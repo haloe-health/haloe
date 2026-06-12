@@ -12,7 +12,9 @@
     --black: #0D0D0D;
     --cream: #F5F0E8;
     --text-muted: #6B6357;
-    --border: rgba(200,169,110,0.25);
+    --border: rgba(200,169,110,0.18);
+    --surface: #15120D;
+    --radius: 16px;
   }
   body {
     background: var(--black);
@@ -40,6 +42,8 @@
     font-size: 2rem;
     font-weight: 300;
     margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
   }
   .sub {
     font-size: 0.75rem;
@@ -50,12 +54,13 @@
   }
   .card {
     border: 1px solid var(--border);
+    border-radius: var(--radius);
     max-width: 420px;
     width: 100%;
     padding: 1.8rem;
     text-align: left;
     margin-bottom: 2rem;
-    background: rgba(200,169,110,0.03);
+    background: var(--surface);
   }
   .card p {
     font-size: 0.88rem;
@@ -88,9 +93,10 @@
     padding: 13px 32px;
     text-decoration: none;
     border-radius: 50px;
-    transition: background 0.3s;
+    transition: background 0.3s, transform 0.1s;
   }
   .btn:hover { background: #dbb85a; }
+  .btn:active { transform: scale(0.98); }
 </style>
 </head>
 <body>
