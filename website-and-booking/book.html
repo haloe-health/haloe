@@ -359,6 +359,16 @@
   .form-field textarea:focus { border-color: var(--gold); }
   .form-field select option { background: #1A1710; color: var(--cream); }
   .form-field textarea { resize: vertical; min-height: 80px; }
+  .form-field input.invalid { border-color: #C97A6E; }
+  .field-error {
+    display: none;
+    font-size: 0.72rem;
+    color: #E0A59B;
+    letter-spacing: 0.02em;
+    margin-top: 0.45rem;
+    line-height: 1.5;
+  }
+  .field-error.visible { display: block; }
 
   .checkbox-group { display: flex; flex-direction: column; gap: 0.8rem; }
   .checkbox-item {
@@ -679,23 +689,19 @@
     <p class="panel-sub">All information is held in confidence</p>
 
     <div class="form-grid">
-      <div class="form-row">
-        <div class="form-field">
-          <label>First name *</label>
-          <input type="text" id="fname" placeholder="Your first name" oninput="checkStep3()">
-        </div>
-        <div class="form-field">
-          <label>Last name *</label>
-          <input type="text" id="lname" placeholder="Your last name" oninput="checkStep3()">
-        </div>
+      <div class="form-field">
+        <label>Full name *</label>
+        <input type="text" id="fullname" placeholder="Your full name" oninput="checkStep3()">
       </div>
       <div class="form-field">
         <label>Mobile number *</label>
         <input type="tel" id="phone" placeholder="+44 7700 000000" oninput="checkStep3()">
+        <p class="field-error" id="phone-error"></p>
       </div>
       <div class="form-field">
         <label>Email address *</label>
         <input type="email" id="email" placeholder="your@email.com" oninput="checkStep3()">
+        <p class="field-error" id="email-error"></p>
       </div>
       <div class="form-field">
         <label>How did you hear about haloe?</label>
@@ -940,16 +946,45 @@ function selectTime(t) {
   document.getElementById('btn-step2').disabled = false;
 }
 
+function isValidEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+}
+
+function isValidPhone(v) {
+  // Lenient UK format: allow +44, spaces, hyphens, parentheses, and a leading 0.
+  const cleaned = v.replace(/[\s()\-]/g, '');
+  return /^(\+44|0)\d{9,10}$/.test(cleaned);
+}
+
+// Live-validate a single field. Shows the inline message only once the user has
+// typed something invalid; an empty field is treated as "not yet valid" but quiet.
+function validateField(inputId, errorId, validatorFn, message) {
+  const input = document.getElementById(inputId);
+  const errorEl = document.getElementById(errorId);
+  const val = input.value.trim();
+  if (!val) {
+    input.classList.remove('invalid');
+    errorEl.classList.remove('visible');
+    return false;
+  }
+  const ok = validatorFn(val);
+  input.classList.toggle('invalid', !ok);
+  errorEl.textContent = ok ? '' : message;
+  errorEl.classList.toggle('visible', !ok);
+  return ok;
+}
+
 function checkStep3() {
-  const ok =
-    document.getElementById('fname').value.trim() &&
-    document.getElementById('lname').value.trim() &&
-    document.getElementById('phone').value.trim() &&
-    document.getElementById('email').value.trim() &&
+  const nameOk = document.getElementById('fullname').value.trim().length > 0;
+  const emailOk = validateField('email', 'email-error', isValidEmail,
+    'Please enter a valid email address so we can send your intake form.');
+  const phoneOk = validateField('phone', 'phone-error', isValidPhone,
+    'Please enter a valid UK mobile number (e.g. 07700 900900 or +44 7700 900900).');
+  const consentsOk =
     document.getElementById('consent1').checked &&
     document.getElementById('consent2').checked &&
     document.getElementById('consent3').checked;
-  document.getElementById('btn-step3').disabled = !ok;
+  document.getElementById('btn-step3').disabled = !(nameOk && emailOk && phoneOk && consentsOk);
 }
 
 function buildSummary() {
@@ -959,7 +994,7 @@ function buildSummary() {
   const catLabel = { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package' }[state.category];
   const dateStr = state.date ? state.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
   const locationLabel = state.location === 'clinic' ? 'Haloe Treatment Room, Manchester' : 'Mobile — your home';
-  const name = `${document.getElementById('fname').value} ${document.getElementById('lname').value}`;
+  const name = document.getElementById('fullname').value.trim();
   return { service, catLabel, dateStr, locationLabel, name };
 }
 
@@ -986,10 +1021,24 @@ function renderSummary() {
 async function handlePayment(type) {
   if (state.serviceIndex === null) { alert("Please go back and select a treatment."); return; }
   const { service, dateStr, locationLabel } = buildSummary();
-  const name  = `${document.getElementById('fname').value} ${document.getElementById('lname').value}`;
-  const email = document.getElementById('email').value;
-  const phone = document.getElementById('phone').value;
+  const name  = document.getElementById('fullname').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
   const notes = document.getElementById('notes') ? document.getElementById('notes').value : '';
+
+  // Final guard — never reach Stripe with missing or invalid contact details.
+  if (!name) {
+    alert("Please go back and enter your full name before paying.");
+    goToStep(3); return;
+  }
+  if (!isValidEmail(email)) {
+    alert("Please go back and enter a valid email address — we send your intake form there.");
+    goToStep(3); return;
+  }
+  if (!isValidPhone(phone)) {
+    alert("Please go back and enter a valid UK mobile number so Halima can confirm your booking.");
+    goToStep(3); return;
+  }
 
   const depositBtn = document.getElementById('btn-deposit');
   const fullBtn = document.getElementById('btn-full');
