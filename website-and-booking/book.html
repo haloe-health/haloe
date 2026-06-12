@@ -1015,7 +1015,7 @@ async function handlePayment(type) {
   const amount = type === 'deposit' ? 2500 : service.price * 100; // pence
 
   try {
-    const res = await fetch('/.netlify/functions/create-checkout', {
+    const res = await fetch('/functions/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
