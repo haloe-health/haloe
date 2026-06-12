@@ -1,6 +1,6 @@
 export async function onRequestPost(context) {
   try {
-    const { amount, treatmentName, paymentType, customerEmail, customerName } = await context.request.json();
+    const { amount, treatmentName, paymentType, customerEmail, customerName, customerPhone, date, time, location, notes } = await context.request.json();
     const secretKey = context.env.STRIPE_SECRET_KEY;
     const origin = new URL(context.request.url).origin;
 
@@ -22,8 +22,13 @@ export async function onRequestPost(context) {
     params.append('line_items[0][price_data][unit_amount]', String(amount));
     params.append('line_items[0][quantity]', '1');
     params.append('metadata[customerName]', customerName);
+    params.append('metadata[customerPhone]', customerPhone || '');
     params.append('metadata[treatmentName]', treatmentName);
     params.append('metadata[paymentType]', paymentType);
+    params.append('metadata[date]', date || '');
+    params.append('metadata[time]', time || '');
+    params.append('metadata[location]', location || '');
+    params.append('metadata[notes]', notes || '');
     params.append('success_url', `${origin}/booking-confirmed.html?type=${paymentType}`);
     params.append('cancel_url', `${origin}/book.html`);
 
