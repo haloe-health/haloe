@@ -151,29 +151,46 @@
     margin-bottom: 2rem;
   }
 
-  /* ---- Category Tabs ---- */
+  /* ---- Category Segmented Control ---- */
   .category-tabs {
-    display: flex;
-    gap: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
     margin-bottom: 1.5rem;
-    flex-wrap: wrap;
+    padding: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 28px;
   }
   .tab-btn {
-    padding: 0.45rem 1.1rem;
-    border: 1px solid var(--border);
+    min-height: 44px;
+    padding: 0.5rem 0.4rem;
+    border: none;
     background: transparent;
     color: var(--text-muted);
     font-family: 'Poppins', sans-serif;
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
+    white-space: nowrap;
     cursor: pointer;
-    border-radius: var(--radius);
-    transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.1s;
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: background 0.25s, color 0.25s;
   }
-  .tab-btn:hover { border-color: var(--gold); color: var(--gold-light); }
-  .tab-btn:active { transform: scale(0.98); }
-  .tab-btn.active { border-color: var(--gold); background: rgba(200,169,110,0.1); color: var(--gold); }
+  .tab-btn:hover:not(.active) { color: var(--gold-light); }
+  .tab-btn.active {
+    background: var(--gold);
+    color: var(--black);
+    font-weight: 500;
+  }
+  /* On phones, 4 labels won't fit one row — wrap to two rows of two, still pill-contained */
+  @media (max-width: 420px) {
+    .category-tabs { grid-template-columns: repeat(2, 1fr); }
+  }
 
   /* ---- Service Cards ---- */
   .service-grid { display: flex; flex-direction: column; gap: 0.75rem; }
