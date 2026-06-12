@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a Treatment · haloe</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C8A96E;
+    --gold-light: #E8D5A8;
+    --gold-dark: #A08040;
+    --black: #0D0D0D;
+    --cream: #F5F0E8;
+    --cream-mid: #EDE6D6;
+    --white: #FFFFFF;
+    --text-muted: #6B6357;
+    --border: rgba(200, 169, 110, 0.25);
+    --border-strong: rgba(200, 169, 110, 0.5);
+    --step-active: var(--gold);
+    --step-done: var(--gold-dark);
+    --step-idle: #D0C8BC;
+  }
+
+  body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  /* ---- Header ---- */
+  header {
+    text-align: center;
+    padding: 3rem 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .back-link,
+  .back-link:link,
+  .back-link:visited {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cream) !important;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s;
+  }
+  .back-link:hover { color: var(--gold) !important; }
+  .logo {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 300;
+    letter-spacing: 0.35em;
+    color: var(--cream);
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .logo-sub {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* ---- Progress Steps ---- */
+  .steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    padding: 2rem 1.5rem 0;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 1;
+    position: relative;
+  }
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    width: 100%;
+    height: 1px;
+    background: var(--step-idle);
+    z-index: 0;
+  }
+  .step.done:not(:last-child)::after { background: var(--gold); }
+  .step-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--step-idle);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    color: var(--step-idle);
+    background: var(--black);
+    position: relative; z-index: 1;
+    transition: all 0.3s;
+  }
+  .step.active .step-dot { border-color: var(--gold); color: var(--gold); }
+  .step.done .step-dot { border-color: var(--gold); background: var(--gold); color: var(--black); }
+  .step-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .step.active .step-label { color: var(--gold); }
+
+  /* ---- Main Container ---- */
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+
+  /* ---- Panel ---- */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .panel-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+  }
+  .panel-sub {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+
+  /* ---- Category Tabs ---- */
+  .category-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 0.45rem 1.1rem;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { border-color: var(--gold); color: var(--gold-light); }
+  .tab-btn.active { border-color: var(--gold); background: rgba(200,169,110,0.1); color: var(--gold); }
+
+  /* ---- Service Cards ---- */
+  .service-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+  .service-card {
+    border: 1px solid var(--border);
+    padding: 1.1rem 1.3rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    background: rgba(255,255,255,0.02);
+  }
+  .service-card:hover { border-color: var(--border-strong); background: rgba(200,169,110,0.04); }
+  .service-card.selected { border-color: var(--gold); background: rgba(200,169,110,0.08); }
+  .service-card.selected::before {
+    content: '✓';
+    position: absolute;
+    top: 0.9rem; right: 1.1rem;
+    color: var(--gold);
+    font-size: 0.8rem;
+  }
+  .service-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--cream);
+    margin-bottom: 0.25rem;
+  }
+  .service-meta {
+    display: flex;
+    gap: 1.2rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+  .service-price { color: var(--gold); font-weight: 400; }
+  .service-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.4rem;
+    line-height: 1.5;
+  }
+
+  /* ---- Location Toggle ---- */
+  .location-toggle {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .loc-btn {
+    flex: 1;
+    padding: 0.9rem;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .loc-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(200,169,110,0.06); }
+  .loc-notice {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    display: none;
+    line-height: 1.6;
+  }
+  .loc-notice.visible { display: block; }
+
+  /* ---- Date Picker ---- */
+  .date-section { margin-bottom: 2rem; }
+  .section-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.9rem;
+  }
+  .calendar {
+    border: 1px solid var(--border);
+    padding: 1.2rem;
+  }
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+  }
+  .cal-nav {
+    background: none;
+    border: none;
+    color: var(--gold);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0.2rem 0.6rem;
+  }
+  .cal-nav:hover { color: var(--gold-light); }
+  .cal-month {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    color: var(--cream);
+  }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    text-align: center;
+  }
+  .cal-day-name {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0.3rem 0;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    color: var(--cream);
+    transition: all 0.15s;
+  }
+  .cal-day:hover:not(.disabled):not(.empty) { border-color: var(--border-strong); color: var(--gold); }
+  .cal-day.selected { border-color: var(--gold); background: rgba(200,169,110,0.15); color: var(--gold); }
+  .cal-day.today { color: var(--gold-light); font-weight: 500; }
+  .cal-day.disabled { color: #3A3530; cursor: not-allowed; }
+  .cal-day.empty { cursor: default; }
+
+  /* ---- Time Slots ---- */
+  .time-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.5rem;
+  }
+  .time-slot {
+    padding: 0.55rem 0.4rem;
+    border: 1px solid var(--border);
+    text-align: center;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+  .time-slot:hover:not(.taken) { border-color: var(--gold); color: var(--gold); }
+  .time-slot.selected { border-color: var(--gold); background: rgba(200,169,110,0.1); color: var(--gold); }
+  .time-slot.taken { color: #3A3530; cursor: not-allowed; border-color: transparent; }
+
+  /* ---- Form Fields ---- */
+  .form-grid { display: flex; flex-direction: column; gap: 1.2rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-field label {
+    display: block;
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.45rem;
+  }
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    width: 100%;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    color: var(--cream);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 300;
+    padding: 0.7rem 0.9rem;
+    outline: none;
+    border-radius: 0;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus { border-color: var(--gold); }
+  .form-field select option { background: #1A1710; color: var(--cream); }
+  .form-field textarea { resize: vertical; min-height: 80px; }
+
+  .checkbox-group { display: flex; flex-direction: column; gap: 0.8rem; }
+  .checkbox-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    cursor: pointer;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    user-select: none;
+  }
+  .checkbox-item input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+  }
+  .checkbox-custom {
+    width: 20px; height: 20px;
+    min-width: 20px;
+    border: 1.5px solid rgba(200,169,110,0.5);
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+  .checkbox-item:hover .checkbox-custom {
+    border-color: var(--gold);
+  }
+  .checkbox-item input[type="checkbox"]:checked + .checkbox-custom {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .checkbox-item input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '';
+    display: block;
+    width: 5px; height: 9px;
+    border: 2px solid #0D0D0D;
+    border-top: none; border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+  }
+  .required-note {
+    font-size: 0.72rem;
+    color: var(--gold);
+    margin-top: 1.5rem;
+    padding: 0.8rem 1rem;
+    border: 1px solid rgba(200,169,110,0.2);
+    line-height: 1.6;
+  }
+
+  /* ---- Summary ---- */
+  .summary-card {
+    border: 1px solid var(--border);
+    background: rgba(200,169,110,0.03);
+    overflow: hidden;
+  }
+  /* Hero block — treatment name + price */
+  .sc-hero {
+    padding: 1.4rem 1.5rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .sc-hero-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1.2;
+  }
+  .sc-hero-type {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .sc-hero-price {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+  /* Detail rows */
+  .sc-rows { padding: 0.4rem 0; }
+  .sc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.65rem 1.5rem;
+    gap: 1rem;
+  }
+  .sc-row + .sc-row { border-top: 1px solid rgba(200,169,110,0.07); }
+  .sc-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .sc-value {
+    font-size: 0.9rem;
+    color: var(--cream);
+    text-align: right;
+    font-weight: 400;
+  }
+
+  .whatsapp-note {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    padding: 0.9rem 1rem;
+    border-left: 2px solid var(--gold);
+  }
+
+  /* ---- Buttons ---- */
+  .btn-primary {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 2rem;
+  }
+  .btn-primary:hover { background: var(--gold-light); }
+  .btn-primary:disabled { background: #3A3530; color: #6B6357; cursor: not-allowed; }
+
+  .btn-back {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.2rem;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    transition: border-color 0.2s;
+  }
+  .btn-back:hover { border-color: var(--border-strong); color: var(--cream); }
+
+  /* ---- Confirmation ---- */
+  .confirmation {
+    text-align: center;
+    padding: 3rem 1rem;
+    display: none;
+  }
+  .confirmation.visible { display: block; }
+  .confirm-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 1.5px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 1.4rem;
+    color: var(--gold);
+  }
+  .confirm-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 0.5rem;
+  }
+  .confirm-sub {
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+  }
+  .confirm-details {
+    border: 1px solid var(--border);
+    text-align: left;
+    max-width: 420px;
+    margin: 0 auto 2rem;
+    overflow: hidden;
+  }
+  .confirm-details .sc-hero { padding: 1.2rem 1.4rem 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+  .confirm-details .sc-hero-name { font-size: 1.1rem; font-weight: 500; color: var(--cream); }
+  .confirm-details .sc-hero-price { font-size: 1.4rem; font-weight: 500; color: var(--gold); white-space: nowrap; }
+  .confirm-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.6rem 1.4rem;
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(200,169,110,0.07);
+  }
+  .confirm-detail-row .cd-label { color: var(--text-muted); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; flex-shrink: 0; }
+  .confirm-detail-row .cd-value { color: var(--cream); font-family: 'Poppins', sans-serif; font-size: 0.9rem; text-align: right; }
+  .confirm-intake {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    padding: 1rem;
+    border: 1px solid rgba(200,169,110,0.15);
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .confirm-intake a { color: var(--gold); text-decoration: none; }
+  .confirm-intake a:hover { text-decoration: underline; }
+
+  /* Mobile */
+  @media (max-width: 500px) {
+    .form-row { grid-template-columns: 1fr; }
+    .time-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hidden Netlify form — detected at deploy, submitted via fetch on booking confirmation -->
+<form name="haloe-booking" netlify netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name"  value="haloe-booking">
+  <input type="text"   name="bot-field">
+  <input type="text"   name="name">
+  <input type="email"  name="email">
+  <input type="tel"    name="phone">
+  <input type="text"   name="treatment">
+  <input type="text"   name="date">
+  <input type="text"   name="time">
+  <input type="text"   name="location">
+  <input type="text"   name="price">
+  <input type="text"   name="payment">
+  <input type="text"   name="notes">
+</form>
+
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:flex-end;align-items:center;padding:18px 40px;background:rgba(13,13,13,0.92);border-bottom:1px solid rgba(200,169,110,0.12);backdrop-filter:blur(12px);">
+  <a href="index.html" class="back-link">← Back to site</a>
+</nav>
+<div style="height:64px;"></div>
+<header>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
+    <svg style="width:210px;height:210px;display:block;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" zoomAndPan="magnify" viewBox="30 12 315 325" preserveAspectRatio="xMidYMid meet" version="1.0"><defs><g/><clipPath id="79f7e01c52"><path d="M 117 127 L 194 127 L 194 215.476562 L 117 215.476562 Z M 117 127 " clip-rule="nonzero"/></clipPath><clipPath id="a98c3e60f6"><path d="M 86.074219 72 L 163 72 L 163 161 L 86.074219 161 Z M 86.074219 72 " clip-rule="nonzero"/></clipPath><clipPath id="fa7408fc6a"><path d="M 180 127 L 257 127 L 257 215.476562 L 180 215.476562 Z M 180 127 " clip-rule="nonzero"/></clipPath><clipPath id="2785e1d3f5"><path d="M 180 18.226562 L 256 18.226562 L 256 106 L 180 106 Z M 180 18.226562 " clip-rule="nonzero"/></clipPath><clipPath id="01663e6826"><path d="M 117 18.226562 L 193 18.226562 L 193 106 L 117 106 Z M 117 18.226562 " clip-rule="nonzero"/></clipPath></defs><g clip-path="url(#79f7e01c52)"><path fill="#000000" d="M 117.894531 194.054688 L 118.496094 150.179688 L 156.136719 127.722656 L 193.171875 149.144531 L 192.570312 193.019531 L 154.929688 215.476562 Z M 117.894531 194.054688 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#a98c3e60f6)"><path fill="#000000" d="M 86.738281 138.832031 L 87.34375 94.957031 L 124.984375 72.5 L 162.019531 93.917969 L 161.414062 137.792969 L 123.777344 160.25 Z M 86.738281 138.832031 " fill-opacity="1" fill-rule="nonzero"/></g><path fill="#000000" d="M 150.339844 138.832031 L 150.945312 94.957031 L 188.582031 72.5 L 225.621094 93.917969 L 225.015625 137.792969 L 187.375 160.25 Z M 150.339844 138.832031 " fill-opacity="1" fill-rule="nonzero"/><g clip-path="url(#fa7408fc6a)"><path fill="#000000" d="M 180.769531 194.054688 L 181.375 150.179688 L 219.03125 127.722656 L 256.066406 149.144531 L 255.460938 193.019531 L 217.824219 215.476562 Z M 180.769531 194.054688 " fill-opacity="1" fill-rule="nonzero"/></g><path fill="#000000" d="M 212.613281 138.832031 L 213.21875 94.957031 L 250.855469 72.5 L 287.910156 93.917969 L 287.304688 137.792969 L 249.648438 160.25 Z M 212.613281 138.832031 " fill-opacity="1" fill-rule="nonzero"/><g clip-path="url(#2785e1d3f5)"><path fill="#000000" d="M 180.097656 84.554688 L 180.699219 40.679688 L 218.339844 18.226562 L 255.375 39.644531 L 254.773438 83.519531 L 217.132812 105.976562 Z M 180.097656 84.554688 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#01663e6826)"><path fill="#000000" d="M 117.03125 84.554688 L 117.632812 40.679688 L 155.273438 18.226562 L 192.308594 39.644531 L 191.707031 83.519531 L 154.066406 105.976562 Z M 117.03125 84.554688 " fill-opacity="1" fill-rule="nonzero"/></g><path fill="#ffffff" d="M 129.96875 77.714844 L 130.382812 48.058594 L 155.824219 32.875 L 180.875 47.347656 L 180.460938 77.007812 L 155.015625 92.191406 Z M 129.96875 77.714844 " fill-opacity="1" fill-rule="nonzero"/><path fill="#ffffff" d="M 161.898438 132.648438 L 162.3125 102.988281 L 187.757812 87.804688 L 212.804688 102.28125 L 212.390625 131.9375 L 186.945312 147.121094 Z M 161.898438 132.648438 " fill-opacity="1" fill-rule="nonzero"/><path fill="#ffffff" d="M 98.296875 132.648438 L 98.710938 102.988281 L 124.15625 87.804688 L 149.203125 102.28125 L 148.789062 131.9375 L 123.34375 147.121094 Z M 98.296875 132.648438 " fill-opacity="1" fill-rule="nonzero"/><path fill="#e6e7e8" d="M 170.953125 127.914062 L 205.523438 107.183594 L 205.886719 127.480469 L 188.410156 138.070312 Z M 170.953125 127.914062 " fill-opacity="1" fill-rule="nonzero"/><path fill="#e6e7e8" d="M 137.957031 74.105469 L 172.523438 53.378906 L 172.886719 73.675781 L 155.429688 84.261719 Z M 137.957031 74.105469 " fill-opacity="1" fill-rule="nonzero"/><path fill="#e6e7e8" d="M 106.285156 127.914062 L 140.851562 107.183594 L 141.214844 127.480469 L 123.757812 138.070312 Z M 106.285156 127.914062 " fill-opacity="1" fill-rule="nonzero"/><path fill="#ffffff" d="M 129.96875 186.992188 L 130.382812 157.332031 L 155.824219 142.148438 L 180.875 156.621094 L 180.460938 186.28125 L 155.015625 201.464844 Z M 129.96875 186.992188 " fill-opacity="1" fill-rule="nonzero"/><path fill="#ffffff" d="M 192.292969 186.992188 L 192.691406 157.332031 L 218.152344 142.148438 L 243.179688 156.621094 L 242.785156 186.28125 L 217.324219 201.464844 Z M 192.292969 186.992188 " fill-opacity="1" fill-rule="nonzero"/><path fill="#ffffff" d="M 223.617188 132.648438 L 224.03125 102.988281 L 249.476562 87.804688 L 274.507812 102.28125 L 274.109375 131.9375 L 248.648438 147.121094 Z M 223.617188 132.648438 " fill-opacity="1" fill-rule="nonzero"/><path fill="#e6e7e8" d="M 138.972656 181.722656 L 173.558594 160.992188 L 173.921875 181.289062 L 156.445312 191.878906 Z M 138.972656 181.722656 " fill-opacity="1" fill-rule="nonzero"/><path fill="#e6e7e8" d="M 200.261719 183.277344 L 234.847656 162.546875 L 235.210938 182.828125 L 217.738281 193.417969 Z M 200.261719 183.277344 " fill-opacity="1" fill-rule="nonzero"/><path fill="#e6e7e8" d="M 232.796875 127.914062 L 267.363281 107.183594 L 267.726562 127.480469 L 250.253906 138.070312 Z M 232.796875 127.914062 " fill-opacity="1" fill-rule="nonzero"/><path fill="#fbb716" d="M 192.964844 77.714844 L 193.378906 48.058594 L 218.824219 32.875 L 243.871094 47.347656 L 243.457031 77.007812 L 218.011719 92.191406 Z M 192.964844 77.714844 " fill-opacity="1" fill-rule="nonzero"/><path fill="#cf8a2a" d="M 200.953125 74.105469 L 235.519531 53.378906 L 235.882812 73.675781 L 218.425781 84.261719 Z M 200.953125 74.105469 " fill-opacity="1" fill-rule="nonzero"/><g fill="#ffffff" fill-opacity="1"><g transform="translate(41.046905, 322.768851)"><g><path d="M 0.75 -80.015625 C 2.632812 -80.015625 4.78125 -80.226562 7.1875 -80.65625 C 9.601562 -81.082031 12.03125 -81.601562 14.46875 -82.21875 C 16.90625 -82.84375 19.179688 -83.503906 21.296875 -84.203125 C 23.410156 -84.898438 25.132812 -85.492188 26.46875 -85.984375 C 26.875 -86.140625 27.175781 -86.289062 27.375 -86.4375 L 28.109375 -86.4375 L 28.109375 -49.4375 C 29.054688 -51.425781 30.425781 -53.28125 32.21875 -55 C 34.007812 -56.71875 36.109375 -58.097656 38.515625 -59.140625 C 40.929688 -60.179688 43.554688 -60.703125 46.390625 -60.703125 C 50.210938 -60.703125 53.265625 -60.039062 55.546875 -58.71875 C 57.835938 -57.40625 59.554688 -55.726562 60.703125 -53.6875 C 61.847656 -51.65625 62.617188 -49.492188 63.015625 -47.203125 C 63.410156 -44.921875 63.609375 -42.8125 63.609375 -40.875 L 63.609375 -10.4375 C 63.609375 -7.707031 63.984375 -5.519531 64.734375 -3.875 C 65.484375 -2.238281 66.726562 -1.195312 68.46875 -0.75 L 68.46875 0 L 36.390625 0 L 36.390625 -0.75 C 38.128906 -1.195312 39.367188 -2.238281 40.109375 -3.875 C 40.859375 -5.519531 41.234375 -7.707031 41.234375 -10.4375 L 41.234375 -43.703125 C 41.234375 -45.097656 41.097656 -46.515625 40.828125 -47.953125 C 40.554688 -49.390625 40.035156 -50.601562 39.265625 -51.59375 C 38.492188 -52.59375 37.3125 -53.09375 35.71875 -53.09375 C 34.175781 -53.09375 32.832031 -52.632812 31.6875 -51.71875 C 30.550781 -50.800781 29.671875 -49.59375 29.046875 -48.09375 C 28.421875 -46.601562 28.109375 -45.015625 28.109375 -43.328125 L 28.109375 -10.4375 C 28.109375 -7.707031 28.484375 -5.519531 29.234375 -3.875 C 29.984375 -2.238281 31.226562 -1.195312 32.96875 -0.75 L 32.96875 0 L 0.890625 0 L 0.890625 -0.75 C 2.628906 -1.195312 3.875 -2.238281 4.625 -3.875 C 5.375 -5.519531 5.75 -7.707031 5.75 -10.4375 L 5.75 -69.4375 C 5.75 -71.769531 5.460938 -73.65625 4.890625 -75.09375 C 4.316406 -76.539062 3.644531 -77.597656 2.875 -78.265625 C 2.101562 -78.941406 1.394531 -79.28125 0.75 -79.28125 Z M 0.75 -80.015625 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(110.244597, 322.768851)"><g><path d="M 2.984375 -14.09375 C 2.984375 -17.375 3.539062 -20.179688 4.65625 -22.515625 C 5.78125 -24.859375 7.25 -26.820312 9.0625 -28.40625 C 10.875 -30 12.875 -31.316406 15.0625 -32.359375 C 17.25 -33.410156 19.445312 -34.296875 21.65625 -35.015625 C 23.875 -35.734375 25.890625 -36.378906 27.703125 -36.953125 C 29.515625 -37.523438 30.976562 -38.144531 32.09375 -38.8125 C 33.21875 -39.488281 33.78125 -40.296875 33.78125 -41.234375 C 33.78125 -42.234375 33.34375 -42.894531 32.46875 -43.21875 C 31.601562 -43.539062 30.800781 -43.703125 30.0625 -43.703125 C 28.664062 -43.703125 27.441406 -43.363281 26.390625 -42.6875 C 25.347656 -42.019531 24.328125 -41.265625 23.328125 -40.421875 C 22.335938 -39.578125 21.222656 -38.816406 19.984375 -38.140625 C 18.742188 -37.472656 17.253906 -37.140625 15.515625 -37.140625 C 12.828125 -37.140625 10.675781 -37.972656 9.0625 -39.640625 C 7.445312 -41.304688 6.640625 -43.28125 6.640625 -45.5625 C 6.640625 -47.300781 7.085938 -49.050781 7.984375 -50.8125 C 8.878906 -52.582031 10.257812 -54.210938 12.125 -55.703125 C 13.988281 -57.203125 16.382812 -58.410156 19.3125 -59.328125 C 22.25 -60.242188 25.753906 -60.703125 29.828125 -60.703125 C 34.503906 -60.703125 38.484375 -60.101562 41.765625 -58.90625 C 45.046875 -57.71875 47.742188 -56.15625 49.859375 -54.21875 C 51.972656 -52.28125 53.625 -50.164062 54.8125 -47.875 C 56.007812 -45.59375 56.84375 -43.359375 57.3125 -41.171875 C 57.78125 -38.984375 58.015625 -37.066406 58.015625 -35.421875 L 58.015625 -14.46875 C 58.015625 -11.6875 58.425781 -9.320312 59.25 -7.375 C 60.070312 -5.4375 61.550781 -4.46875 63.6875 -4.46875 L 63.6875 -3.734375 C 61.695312 -2.585938 59.410156 -1.441406 56.828125 -0.296875 C 54.242188 0.847656 51.1875 1.421875 47.65625 1.421875 C 44.96875 1.421875 42.726562 0.75 40.9375 -0.59375 C 39.15625 -1.9375 37.789062 -3.640625 36.84375 -5.703125 C 35.894531 -7.765625 35.347656 -9.863281 35.203125 -12 C 33.710938 -7.332031 31.523438 -3.925781 28.640625 -1.78125 C 25.753906 0.351562 22.320312 1.421875 18.34375 1.421875 C 15.65625 1.421875 13.144531 0.785156 10.8125 -0.484375 C 8.476562 -1.753906 6.585938 -3.546875 5.140625 -5.859375 C 3.703125 -8.171875 2.984375 -10.914062 2.984375 -14.09375 Z M 25.28125 -20.28125 C 25.28125 -18.9375 25.488281 -17.601562 25.90625 -16.28125 C 26.332031 -14.96875 26.976562 -13.890625 27.84375 -13.046875 C 28.71875 -12.203125 29.78125 -11.78125 31.03125 -11.78125 C 32.019531 -11.78125 32.945312 -12.101562 33.8125 -12.75 C 34.6875 -13.394531 35.125 -13.914062 35.125 -14.3125 L 35.125 -44.671875 C 35.125 -45.710938 35.125 -47.066406 35.125 -48.734375 C 35.125 -50.398438 34.988281 -52.050781 34.71875 -53.6875 C 34.445312 -55.332031 33.9375 -56.726562 33.1875 -57.875 C 32.4375 -59.019531 31.316406 -59.59375 29.828125 -59.59375 C 28.785156 -59.59375 27.988281 -59.144531 27.4375 -58.25 C 26.894531 -57.351562 26.523438 -56.367188 26.328125 -55.296875 C 26.128906 -54.234375 26.03125 -53.425781 26.03125 -52.875 C 26.03125 -50.6875 26.5625 -49.054688 27.625 -47.984375 C 28.695312 -46.921875 29.832031 -46.113281 31.03125 -45.5625 C 32.070312 -45.070312 33.015625 -44.5625 33.859375 -44.03125 C 34.703125 -43.507812 35.125 -42.65625 35.125 -41.46875 C 35.125 -40.269531 34.785156 -39.332031 34.109375 -38.65625 C 33.441406 -37.988281 32.625 -37.304688 31.65625 -36.609375 C 30.6875 -35.921875 29.71875 -34.976562 28.75 -33.78125 C 27.78125 -32.59375 26.957031 -30.941406 26.28125 -28.828125 C 25.613281 -26.710938 25.28125 -23.863281 25.28125 -20.28125 Z M 25.28125 -20.28125 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(174.670035, 322.768851)"><g><path d="M 0.75 -80.015625 C 2.78125 -80.015625 5.078125 -80.238281 7.640625 -80.6875 C 10.203125 -81.132812 12.773438 -81.691406 15.359375 -82.359375 C 17.941406 -83.035156 20.300781 -83.734375 22.4375 -84.453125 C 24.582031 -85.179688 26.226562 -85.84375 27.375 -86.4375 L 28.109375 -86.4375 L 28.109375 -10.4375 C 28.109375 -7.707031 28.484375 -5.519531 29.234375 -3.875 C 29.984375 -2.238281 31.226562 -1.195312 32.96875 -0.75 L 32.96875 0 L 0.890625 0 L 0.890625 -0.75 C 2.628906 -1.195312 3.875 -2.238281 4.625 -3.875 C 5.375 -5.519531 5.75 -7.707031 5.75 -10.4375 L 5.75 -69.4375 C 5.75 -71.769531 5.460938 -73.65625 4.890625 -75.09375 C 4.316406 -76.539062 3.644531 -77.597656 2.875 -78.265625 C 2.101562 -78.941406 1.394531 -79.28125 0.75 -79.28125 Z M 0.75 -80.015625 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(208.374085, 322.768851)"><g><path d="M 32.890625 1.421875 C 28.765625 1.421875 24.898438 0.722656 21.296875 -0.671875 C 17.691406 -2.066406 14.507812 -4.09375 11.75 -6.75 C 8.988281 -9.40625 6.835938 -12.660156 5.296875 -16.515625 C 3.753906 -20.367188 2.984375 -24.734375 2.984375 -29.609375 C 2.984375 -34.484375 3.765625 -38.84375 5.328125 -42.6875 C 6.898438 -46.539062 9.0625 -49.8125 11.8125 -52.5 C 14.570312 -55.1875 17.753906 -57.222656 21.359375 -58.609375 C 24.972656 -60.003906 28.84375 -60.703125 32.96875 -60.703125 C 37.09375 -60.703125 40.957031 -60.003906 44.5625 -58.609375 C 48.164062 -57.222656 51.347656 -55.1875 54.109375 -52.5 C 56.867188 -49.8125 59.019531 -46.539062 60.5625 -42.6875 C 62.101562 -38.84375 62.875 -34.484375 62.875 -29.609375 C 62.875 -24.734375 62.085938 -20.367188 60.515625 -16.515625 C 58.953125 -12.660156 56.789062 -9.40625 54.03125 -6.75 C 51.269531 -4.09375 48.085938 -2.066406 44.484375 -0.671875 C 40.878906 0.722656 37.015625 1.421875 32.890625 1.421875 Z M 27.21875 -29.6875 C 27.21875 -25.601562 27.226562 -21.769531 27.25 -18.1875 C 27.28125 -14.613281 27.429688 -11.472656 27.703125 -8.765625 C 27.972656 -6.054688 28.519531 -3.941406 29.34375 -2.421875 C 30.164062 -0.910156 31.347656 -0.15625 32.890625 -0.15625 C 34.484375 -0.15625 35.675781 -0.910156 36.46875 -2.421875 C 37.257812 -3.941406 37.789062 -6.054688 38.0625 -8.765625 C 38.34375 -11.472656 38.492188 -14.613281 38.515625 -18.1875 C 38.546875 -21.769531 38.5625 -25.601562 38.5625 -29.6875 C 38.5625 -33.757812 38.546875 -37.570312 38.515625 -41.125 C 38.492188 -44.6875 38.34375 -47.804688 38.0625 -50.484375 C 37.789062 -53.171875 37.257812 -55.269531 36.46875 -56.78125 C 35.675781 -58.300781 34.484375 -59.0625 32.890625 -59.0625 C 31.347656 -59.0625 30.164062 -58.300781 29.34375 -56.78125 C 28.519531 -55.269531 27.972656 -53.171875 27.703125 -50.484375 C 27.429688 -47.804688 27.28125 -44.6875 27.25 -41.125 C 27.226562 -37.570312 27.21875 -33.757812 27.21875 -29.6875 Z M 27.21875 -29.6875 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(274.216278, 322.768851)"><g><path d="M 34.078125 1.421875 C 29.753906 1.421875 25.710938 0.613281 21.953125 -1 C 18.203125 -2.625 14.910156 -4.851562 12.078125 -7.6875 C 9.242188 -10.519531 7.019531 -13.8125 5.40625 -17.5625 C 3.789062 -21.3125 2.984375 -25.328125 2.984375 -29.609375 C 2.984375 -33.878906 3.703125 -37.890625 5.140625 -41.640625 C 6.585938 -45.398438 8.628906 -48.695312 11.265625 -51.53125 C 13.898438 -54.363281 17.019531 -56.585938 20.625 -58.203125 C 24.226562 -59.816406 28.191406 -60.625 32.515625 -60.625 C 38.179688 -60.625 42.976562 -59.753906 46.90625 -58.015625 C 50.832031 -56.273438 53.828125 -53.953125 55.890625 -51.046875 C 57.953125 -48.140625 58.984375 -44.921875 58.984375 -41.390625 C 58.984375 -36.460938 56.96875 -32.734375 52.9375 -30.203125 C 48.914062 -27.671875 42.40625 -26.40625 33.40625 -26.40625 L 26.703125 -26.40625 C 29.035156 -22.71875 32.078125 -19.90625 35.828125 -17.96875 C 39.585938 -16.03125 43.828125 -15.0625 48.546875 -15.0625 C 50.242188 -15.0625 51.859375 -15.222656 53.390625 -15.546875 C 54.929688 -15.867188 56.472656 -16.351562 58.015625 -17 C 58.015625 -14.414062 57.351562 -12.003906 56.03125 -9.765625 C 54.71875 -7.523438 52.929688 -5.5625 50.671875 -3.875 C 48.410156 -2.1875 45.847656 -0.882812 42.984375 0.03125 C 40.128906 0.957031 37.160156 1.421875 34.078125 1.421875 Z M 25.875 -27.8125 L 26.328125 -27.8125 C 28.816406 -27.8125 30.90625 -28.304688 32.59375 -29.296875 C 34.28125 -30.296875 35.644531 -31.628906 36.6875 -33.296875 C 37.738281 -34.960938 38.484375 -36.789062 38.921875 -38.78125 C 39.367188 -40.769531 39.59375 -42.734375 39.59375 -44.671875 C 39.59375 -46.265625 39.429688 -47.894531 39.109375 -49.5625 C 38.785156 -51.226562 38.273438 -52.769531 37.578125 -54.1875 C 36.890625 -55.601562 36.007812 -56.753906 34.9375 -57.640625 C 33.875 -58.535156 32.617188 -58.984375 31.171875 -58.984375 C 29.484375 -58.984375 28.050781 -58.5 26.875 -57.53125 C 25.707031 -56.5625 24.773438 -55.304688 24.078125 -53.765625 C 23.390625 -52.222656 22.894531 -50.617188 22.59375 -48.953125 C 22.300781 -47.296875 22.15625 -45.742188 22.15625 -44.296875 C 22.15625 -41.015625 22.476562 -37.992188 23.125 -35.234375 C 23.769531 -32.472656 24.6875 -30 25.875 -27.8125 Z M 25.875 -27.8125 "/></g></g></g></svg>
+    <span class="logo-sub">Hijama · Wellness · Manchester</span>
+  </div>
+</header>
+
+<div class="steps" id="steps">
+  <div class="step active" data-step="1">
+    <div class="step-dot">1</div>
+    <span class="step-label">Treatment</span>
+  </div>
+  <div class="step" data-step="2">
+    <div class="step-dot">2</div>
+    <span class="step-label">Date & Time</span>
+  </div>
+  <div class="step" data-step="3">
+    <div class="step-dot">3</div>
+    <span class="step-label">Details</span>
+  </div>
+  <div class="step" data-step="4">
+    <div class="step-dot">4</div>
+    <span class="step-label">Confirm</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- STEP 1: Choose Treatment -->
+  <div class="panel active" id="panel-1">
+    <p class="panel-title">Choose your treatment</p>
+    <p class="panel-sub">Women only · Fully accredited · Manchester</p>
+
+    <div class="category-tabs" id="category-tabs">
+      <button class="tab-btn active" data-cat="massage">Massage</button>
+      <button class="tab-btn" data-cat="dry">Dry Cupping</button>
+      <button class="tab-btn" data-cat="wet">Wet Cupping</button>
+      <button class="tab-btn" data-cat="packages">Packages</button>
+    </div>
+
+    <div class="service-grid" id="service-grid"></div>
+
+    <div style="margin-top: 1.5rem;">
+      <p class="section-label">Where would you like your treatment?</p>
+      <div class="location-toggle">
+        <button class="loc-btn active" data-loc="clinic">Haloe Treatment Room</button>
+        <button class="loc-btn" data-loc="mobile">Mobile — My Home</button>
+      </div>
+      <div class="loc-notice" id="loc-notice">
+        A flat travel fee applies based on your distance from Manchester city centre. Halima will confirm this when she contacts you to confirm the booking.
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-step1" onclick="goToStep(2)" disabled>Continue — Choose Date & Time</button>
+  </div>
+
+  <!-- STEP 2: Date & Time -->
+  <div class="panel" id="panel-2">
+    <button class="btn-back" onclick="goToStep(1)">← Back</button>
+    <p class="panel-title">Choose a date & time</p>
+    <p class="panel-sub">Available appointments</p>
+
+    <div class="date-section">
+      <p class="section-label">Select a date</p>
+      <div class="calendar">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="changeMonth(-1)">←</button>
+          <span class="cal-month" id="cal-month-label"></span>
+          <button class="cal-nav" onclick="changeMonth(1)">→</button>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+    </div>
+
+    <div class="date-section" id="time-section" style="display:none;">
+      <p class="section-label">Select a time</p>
+      <div class="time-grid" id="time-grid"></div>
+    </div>
+
+    <button class="btn-primary" id="btn-step2" onclick="goToStep(3)" disabled>Continue — Your Details</button>
+  </div>
+
+  <!-- STEP 3: Your Details -->
+  <div class="panel" id="panel-3">
+    <button class="btn-back" onclick="goToStep(2)">← Back</button>
+    <p class="panel-title">Your details</p>
+    <p class="panel-sub">All information is held in confidence</p>
+
+    <div class="form-grid">
+      <div class="form-row">
+        <div class="form-field">
+          <label>First name *</label>
+          <input type="text" id="fname" placeholder="Your first name" oninput="checkStep3()">
+        </div>
+        <div class="form-field">
+          <label>Last name *</label>
+          <input type="text" id="lname" placeholder="Your last name" oninput="checkStep3()">
+        </div>
+      </div>
+      <div class="form-field">
+        <label>Mobile number *</label>
+        <input type="tel" id="phone" placeholder="+44 7700 000000" oninput="checkStep3()">
+      </div>
+      <div class="form-field">
+        <label>Email address *</label>
+        <input type="email" id="email" placeholder="your@email.com" oninput="checkStep3()">
+      </div>
+      <div class="form-field">
+        <label>How did you hear about haloe?</label>
+        <select id="referral">
+          <option value="">Please select</option>
+          <option>Instagram</option>
+          <option>TikTok</option>
+          <option>Friend or family</option>
+          <option>Google search</option>
+          <option>Word of mouth</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Anything you'd like Halima to know?</label>
+        <textarea id="notes" placeholder="Any relevant health notes, questions, or preferences…"></textarea>
+      </div>
+
+      <div class="form-field">
+        <p class="section-label" style="margin-bottom:0.75rem;">Consent & acknowledgements</p>
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="consent1" onchange="checkStep3()">
+            <div class="checkbox-custom"></div>
+            I confirm I am female and 18 or over (or booking on behalf of a female family member with their consent).
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="consent2" onchange="checkStep3()">
+            <div class="checkbox-custom"></div>
+            I understand haloe offers complementary wellness therapy and is not a substitute for medical diagnosis or treatment.
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="consent3" onchange="checkStep3()">
+            <div class="checkbox-custom"></div>
+            I will complete the full health intake form sent after this booking, before my appointment.
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="required-note">
+      A full health intake form will be sent to your email after booking. This must be completed before your appointment. If you have a complex health history (diabetes, blood thinners, pregnancy, cardiovascular conditions), Halima may ask for a GP clearance letter before treating you.
+    </div>
+
+    <button class="btn-primary" id="btn-step3" onclick="goToStep(4)" disabled>Review Booking</button>
+  </div>
+
+  <!-- STEP 4: Confirm -->
+  <div class="panel" id="panel-4">
+    <button class="btn-back" onclick="goToStep(3)">← Back</button>
+    <p class="panel-title">Review & confirm</p>
+    <p class="panel-sub">Please check everything looks right</p>
+
+    <div class="summary-card" id="summary-card"></div>
+
+    <div class="whatsapp-note">
+      After payment, Halima will confirm your booking via WhatsApp within a few hours. Please ensure your mobile number is correct.
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:2rem;">
+      <button class="btn-primary" id="btn-deposit" onclick="handlePayment('deposit')" style="margin-top:0; background:var(--gold);">
+        Pay £25 Deposit
+      </button>
+      <button class="btn-primary" id="btn-full" onclick="handlePayment('full')" style="margin-top:0; background:transparent; border:1px solid rgba(200,169,110,0.5); color:var(--gold);">
+        Pay in Full
+      </button>
+    </div>
+    <p style="font-size:0.72rem;color:var(--text-muted);text-align:center;margin-top:0.75rem;line-height:1.6;">
+      Deposit is non-refundable if cancelled within 48 hours or for no-shows.<br>Remainder payable on the day.
+    </p>
+  </div>
+
+  <!-- Confirmation Screen -->
+  <div class="confirmation" id="confirmation">
+    <div class="confirm-icon">✓</div>
+    <p class="confirm-title">Booking Request Sent</p>
+    <p class="confirm-sub">Halima will confirm via WhatsApp</p>
+    <div class="confirm-details" id="confirm-details"></div>
+    <div class="confirm-intake">
+      Your health intake form has been sent to <strong id="confirm-email-display"></strong>.<br>
+      Please complete it before your appointment:<br>
+      <a href="https://forms.gle/UY2jpwdBHXPccfxJ9" target="_blank">Complete your intake form →</a>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+const SERVICES = {
+  massage: [
+    { name: 'Face Massage', time: '30 min', price: 40 },
+    { name: 'Head Massage', time: '30 min', price: 40 },
+    { name: 'Face & Head Massage', time: '45 min', price: 70 },
+    { name: 'Head & Foot Massage', time: '1 hour', price: 60 },
+    { name: 'Back, Neck & Shoulders', time: '1 hour', price: 75 },
+    { name: 'Full Body Massage', time: '1 hr 10 min', price: 90 },
+  ],
+  dry: [
+    { name: 'Face Cupping', time: '30 min', price: 50 },
+    { name: 'Head Cupping', time: '30 min', price: 50 },
+    { name: 'Face & Head Cupping', time: '45 min', price: 85 },
+    { name: 'Targeted Area / Sports Injury', time: '45 min', price: 60 },
+    { name: 'Full Back', time: '45 min', price: 80 },
+    { name: 'Full Body', time: '1 hour', price: 100 },
+    { name: 'Head, Scalp & Full Body', time: '1 hr 15 min', price: 115 },
+  ],
+  wet: [
+    { name: 'Head & Scalp', time: '45 min', price: 70 },
+    { name: 'Targeted Area / Sports Injury', time: '1 hour', price: 80 },
+    { name: 'Full Back', time: '1 hour', price: 90 },
+    { name: 'Full Body', time: '1 hr 30 min', price: 120 },
+    { name: 'Head, Scalp & Full Body', time: '1 hr 30 min', price: 150 },
+  ],
+  packages: [
+    { name: 'Pain & Mobility', time: '4 sessions · 8–12 wks', price: 340, desc: 'Targeted cupping to support ease of movement and tension relief.' },
+    { name: 'Breathe & Immunity', time: '4 sessions · 16 wks', price: 340, desc: 'Supports respiratory wellness and immune resilience.' },
+    { name: 'Cycle Comfort', time: '4 sessions · ~3 cycles', price: 340, desc: 'Focused on menstrual comfort and hormonal balance.' },
+    { name: 'Stress & Sleep', time: '6 sessions · 24 wks', price: 480, desc: 'Designed to ease tension and support restful sleep patterns.' },
+    { name: 'Headache & Tension', time: '6 sessions · 14 wks', price: 480, desc: 'Head, neck and shoulder focus for tension headache relief.' },
+    { name: 'Digestion & Detox', time: '6 sessions · 24 wks', price: 480, desc: 'Supporting digestive comfort and overall wellbeing.' },
+    { name: 'Circulation & Energy', time: '8 sessions · 18 wks', price: 600, desc: 'Full circulation support for vitality and energy levels.' },
+    { name: "Women's Hormonal Balance", time: '8 sessions · 16 wks', price: 600, desc: 'Comprehensive hormonal wellness support across the cycle.' },
+  ]
+};
+
+let state = {
+  category: 'massage',
+  serviceIndex: null,
+  location: 'clinic',
+  date: null,
+  time: null,
+  calYear: null,
+  calMonth: null,
+};
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function init() {
+  const now = new Date();
+  state.calYear = now.getFullYear();
+  state.calMonth = now.getMonth();
+  renderServices();
+  renderCalendar();
+}
+
+function renderServices() {
+  const grid = document.getElementById('service-grid');
+  const services = SERVICES[state.category];
+  grid.innerHTML = services.map((s, i) => `
+    <div class="service-card ${state.serviceIndex === i ? 'selected' : ''}" onclick="selectService(${i})">
+      <p class="service-name">${s.name}</p>
+      <div class="service-meta">
+        <span>${s.time}</span>
+        <span class="service-price">£${s.price}${state.category === 'packages' ? '' : ''}</span>
+      </div>
+      ${s.desc ? `<p class="service-desc">${s.desc}</p>` : ''}
+    </div>
+  `).join('');
+}
+
+function selectService(i) {
+  state.serviceIndex = i;
+  renderServices();
+  document.getElementById('btn-step1').disabled = false;
+}
+
+document.getElementById('category-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab-btn');
+  if (!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.category = btn.dataset.cat;
+  state.serviceIndex = null;
+  document.getElementById('btn-step1').disabled = true;
+  renderServices();
+});
+
+document.querySelector('.location-toggle').addEventListener('click', e => {
+  const btn = e.target.closest('.loc-btn');
+  if (!btn) return;
+  document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.location = btn.dataset.loc;
+  document.getElementById('loc-notice').classList.toggle('visible', state.location === 'mobile');
+});
+
+function renderCalendar() {
+  const label = document.getElementById('cal-month-label');
+  label.textContent = `${MONTHS[state.calMonth]} ${state.calYear}`;
+  const grid = document.getElementById('cal-grid');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const firstDay = new Date(state.calYear, state.calMonth, 1).getDay();
+  const daysInMonth = new Date(state.calYear, state.calMonth + 1, 0).getDate();
+  let html = DAYS.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(state.calYear, state.calMonth, d);
+    const isSun = date.getDay() === 0;
+    const isPast = date < today;
+    const isSelected = state.date && date.toDateString() === state.date.toDateString();
+    const isToday = date.toDateString() === today.toDateString();
+    const cls = [
+      'cal-day',
+      (isPast || isSun) ? 'disabled' : '',
+      isSelected ? 'selected' : '',
+      isToday ? 'today' : '',
+    ].filter(Boolean).join(' ');
+    const onclick = (!isPast && !isSun) ? `onclick="selectDate(${state.calYear},${state.calMonth},${d})"` : '';
+    html += `<div class="${cls}" ${onclick}>${d}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function changeMonth(dir) {
+  state.calMonth += dir;
+  if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
+  if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
+  renderCalendar();
+}
+
+function selectDate(y, m, d) {
+  state.date = new Date(y, m, d);
+  state.time = null;
+  renderCalendar();
+  renderTimes();
+  document.getElementById('time-section').style.display = 'block';
+  document.getElementById('btn-step2').disabled = true;
+}
+
+function renderTimes() {
+  const slots = ['9:00 am','9:30 am','10:00 am','10:30 am','11:00 am','11:30 am','12:00 pm','1:00 pm','2:00 pm','2:30 pm','3:00 pm','3:30 pm','4:00 pm','4:30 pm','5:00 pm'];
+  const grid = document.getElementById('time-grid');
+  grid.innerHTML = slots.map(t => `
+    <div class="time-slot ${state.time === t ? 'selected' : ''}" onclick="selectTime('${t}')">${t}</div>
+  `).join('');
+}
+
+function selectTime(t) {
+  state.time = t;
+  renderTimes();
+  document.getElementById('btn-step2').disabled = false;
+}
+
+function checkStep3() {
+  const ok =
+    document.getElementById('fname').value.trim() &&
+    document.getElementById('lname').value.trim() &&
+    document.getElementById('phone').value.trim() &&
+    document.getElementById('email').value.trim() &&
+    document.getElementById('consent1').checked &&
+    document.getElementById('consent2').checked &&
+    document.getElementById('consent3').checked;
+  document.getElementById('btn-step3').disabled = !ok;
+}
+
+function buildSummary() {
+  const service = SERVICES[state.category][state.serviceIndex];
+  const catLabel = { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package' }[state.category];
+  const dateStr = state.date ? state.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
+  const locationLabel = state.location === 'clinic' ? 'Haloe Treatment Room, Manchester' : 'Mobile — your home';
+  const name = `${document.getElementById('fname').value} ${document.getElementById('lname').value}`;
+  return { service, catLabel, dateStr, locationLabel, name };
+}
+
+function renderSummary() {
+  const { service, catLabel, dateStr, locationLabel, name } = buildSummary();
+  const card = document.getElementById('summary-card');
+  card.innerHTML = `
+    <div class="sc-hero">
+      <div>
+        <div class="sc-hero-name">${service.name}</div>
+        <div class="sc-hero-type">${catLabel}${service.time ? ' · ' + service.time : ''}</div>
+      </div>
+      <div class="sc-hero-price">£${service.price}</div>
+    </div>
+    <div class="sc-rows">
+      <div class="sc-row"><span class="sc-label">Date</span><span class="sc-value">${dateStr}</span></div>
+      <div class="sc-row"><span class="sc-label">Time</span><span class="sc-value">${state.time}</span></div>
+      <div class="sc-row"><span class="sc-label">Location</span><span class="sc-value">${locationLabel}</span></div>
+      <div class="sc-row"><span class="sc-label">Name</span><span class="sc-value">${name}</span></div>
+    </div>
+  `;
+}
+
+async function handlePayment(type) {
+  const { service, dateStr, locationLabel } = buildSummary();
+  const name = `${document.getElementById('fname').value} ${document.getElementById('lname').value}`;
+  const email = document.getElementById('email').value;
+
+  // First submit the booking data (Netlify form + WhatsApp)
+  await submitBooking(type);
+
+  // Then redirect to Stripe
+  const depositBtn = document.getElementById('btn-deposit');
+  const fullBtn = document.getElementById('btn-full');
+  if (depositBtn) depositBtn.disabled = true;
+  if (fullBtn) fullBtn.disabled = true;
+  if (depositBtn) depositBtn.textContent = 'Redirecting to payment…';
+
+  const amount = type === 'deposit' ? 2500 : service.price * 100; // pence
+
+  try {
+    const res = await fetch('/functions/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount,
+        treatmentName: service.name,
+        paymentType: type,
+        customerEmail: email,
+        customerName: name,
+      }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Payment setup failed. Please try again.');
+      if (depositBtn) depositBtn.disabled = false;
+      if (fullBtn) fullBtn.disabled = false;
+      if (depositBtn) depositBtn.textContent = 'Pay £25 Deposit';
+    }
+  } catch (err) {
+    alert('Something went wrong. Please try again.');
+    if (depositBtn) depositBtn.disabled = false;
+    if (fullBtn) fullBtn.disabled = false;
+    if (depositBtn) depositBtn.textContent = 'Pay £25 Deposit';
+  }
+}
+
+
+function submitBooking(paymentType) {
+  const { service, dateStr, locationLabel } = buildSummary();
+  const name = `${document.getElementById('fname').value} ${document.getElementById('lname').value}`;
+  const phone = document.getElementById('phone').value;
+  const email = document.getElementById('email').value;
+  const notes = document.getElementById('notes') ? document.getElementById('notes').value : '';
+  const paymentLabel = paymentType === 'deposit' ? '£25 deposit' : `full payment of £${service.price}`;
+
+  // POST to Netlify Forms
+  const formData = new FormData();
+  formData.append('form-name', 'haloe-booking');
+  formData.append('name',      name);
+  formData.append('email',     email);
+  formData.append('phone',     phone);
+  formData.append('treatment', service.name);
+  formData.append('date',      dateStr);
+  formData.append('time',      state.time);
+  formData.append('location',  locationLabel);
+  formData.append('price',     '£' + service.price);
+  formData.append('payment',   paymentLabel);
+  formData.append('notes',     notes);
+  fetch('/', { method: 'POST', body: formData }).catch(() => {});
+
+  const waMsg = encodeURIComponent(
+    `Hi Halima, I've just submitted a booking request via the haloe website.\n\nName: ${name}\nTreatment: ${service.name}\nDate: ${dateStr}\nTime: ${state.time}\nLocation: ${locationLabel}\nPayment: ${paymentLabel}\n\nPlease confirm when you can. Thank you!`
+  );
+  setTimeout(() => {
+    window.open(`https://wa.me/447474833643?text=${waMsg}`, '_blank');
+  }, 800);
+}
+
+function goToStep(n) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`panel-${n}`).classList.add('active');
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i + 1 < n) s.classList.add('done');
+    else if (i + 1 === n) s.classList.add('active');
+  });
+  if (n === 4) renderSummary();
+  window.scrollTo(0, 0);
+}
+
+init();
+</script>
+</body>
+</html>
