@@ -29,7 +29,16 @@ export async function onRequestPost(context) {
     params.append('metadata[time]', time || '');
     params.append('metadata[location]', location || '');
     params.append('metadata[notes]', notes || '');
-    params.append('success_url', `${origin}/booking-confirmed.html?type=${paymentType}`);
+    const successParams = new URLSearchParams({
+      type: paymentType,
+      name: customerName || '',
+      treatment: treatmentName || '',
+      date: date || '',
+      time: time || '',
+      location: location || '',
+      amount: String(amount),
+    });
+    params.append('success_url', `${origin}/booking-confirmed.html?${successParams.toString()}`);
     params.append('cancel_url', `${origin}/book.html`);
 
     const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
