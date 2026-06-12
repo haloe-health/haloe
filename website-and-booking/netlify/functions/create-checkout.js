@@ -1,12 +1,8 @@
-exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-
+export async function onRequestPost(context) {
   try {
-    const { amount, treatmentName, paymentType, customerEmail, customerName } = JSON.parse(event.body);
-    const secretKey = process.env.STRIPE_SECRET_KEY;
-    const origin = event.headers.origin || 'https://haloe.health';
+    const { amount, treatmentName, paymentType, customerEmail, customerName } = await context.request.json();
+    const secretKey = context.env.STRIPE_SECRET_KEY;
+    const origin = new URL(context.request.url).origin;
 
     const productName = paymentType === 'deposit'
       ? `Deposit — ${treatmentName}`
@@ -16,7 +12,6 @@ exports.handler = async (event) => {
       ? 'Non-refundable deposit to secure your booking. Remainder payable on the day.'
       : `Full payment for ${treatmentName} with haloe.`;
 
-    // Build form-encoded body for Stripe API
     const params = new URLSearchParams();
     params.append('payment_method_types[]', 'card');
     params.append('mode', 'payment');
@@ -45,19 +40,22 @@ exports.handler = async (event) => {
 
     if (!response.ok) {
       console.error('Stripe error:', session);
-      return { statusCode: 500, body: JSON.stringify({ error: session.error?.message || 'Stripe error' }) };
+      return new Response(JSON.stringify({ error: session.error?.message || 'Stripe error' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ url: session.url }),
-    };
+    return new Response(JSON.stringify({ url: session.url }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
 
   } catch (err) {
     console.error('Function error:', err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
-    };
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
-};
+}
