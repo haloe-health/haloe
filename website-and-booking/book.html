@@ -969,6 +969,8 @@ function checkStep3() {
 }
 
 function buildSummary() {
+  if (state.serviceIndex === null || !SERVICES[state.category]) return {};
+  if (!SERVICES[state.category][state.serviceIndex]) return {};
   const service = SERVICES[state.category][state.serviceIndex];
   const catLabel = { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package' }[state.category];
   const dateStr = state.date ? state.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
@@ -998,6 +1000,7 @@ function renderSummary() {
 }
 
 async function handlePayment(type) {
+  if (state.serviceIndex === null) { alert("Please go back and select a treatment."); return; }
   const { service, dateStr, locationLabel } = buildSummary();
   const name = `${document.getElementById('fname').value} ${document.getElementById('lname').value}`;
   const email = document.getElementById('email').value;
@@ -1076,6 +1079,7 @@ function submitBooking(paymentType) {
 }
 
 function goToStep(n) {
+  if (n === 4 && state.serviceIndex === null) { alert("Please select a treatment first."); return; }
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById(`panel-${n}`).classList.add('active');
   document.querySelectorAll('.step').forEach((s, i) => {
