@@ -100,25 +100,47 @@
 <p class="sub" id="payment-sub">Halima will confirm via WhatsApp</p>
 
 <div class="card">
-  <p>Your booking request and payment have been received. Halima will confirm your appointment via WhatsApp within a few hours.</p>
+  <p>Your booking request and payment have been received. Tap below to send Halima your confirmation on WhatsApp — she'll reply to confirm your appointment.</p>
   <p>Please complete your health intake form before your appointment:<br>
     <a href="https://forms.gle/UY2jpwdBHXPccfxJ9" target="_blank">Complete your intake form →</a>
   </p>
 </div>
 
+<a id="wa-btn" href="#" target="_blank" class="btn" style="background:#25D366;color:#fff;margin-bottom:1.2rem;">Send confirmation on WhatsApp →</a>
+
 <p class="deposit-note" id="deposit-note"></p>
 
-<a href="index.html" class="btn">Back to haloe</a>
+<a href="index.html" class="btn" style="background:transparent;color:var(--gold);border:1px solid var(--gold);">Back to haloe</a>
 
 <script>
   const params = new URLSearchParams(window.location.search);
   const type = params.get('type');
   if (type === 'deposit') {
-    document.getElementById('payment-sub').textContent = '£25 deposit paid · Halima will confirm via WhatsApp';
+    document.getElementById('payment-sub').textContent = '£25 deposit paid · Confirm with Halima on WhatsApp';
     document.getElementById('deposit-note').textContent = 'Your £25 deposit secures your slot. The remaining balance is payable on the day of your appointment.';
   } else {
-    document.getElementById('payment-sub').textContent = 'Paid in full · Halima will confirm via WhatsApp';
+    document.getElementById('payment-sub').textContent = 'Paid in full · Confirm with Halima on WhatsApp';
   }
+
+  // Build the WhatsApp confirmation from the booking detail passed by Stripe
+  const name      = params.get('name')      || '';
+  const treatment = params.get('treatment') || '';
+  const date      = params.get('date')      || '';
+  const time      = params.get('time')      || '';
+  const place     = params.get('location')  || '';
+  const amount    = parseInt(params.get('amount') || '0', 10);
+  const paymentLabel = type === 'deposit'
+    ? '£25 deposit paid'
+    : `paid in full (£${(amount / 100).toFixed(0)})`;
+
+  const waMsg = encodeURIComponent(
+    `Hi Halima, I've just paid for my booking on the haloe website.\n\nName: ${name}\nTreatment: ${treatment}\nDate: ${date}\nTime: ${time}\nLocation: ${place}\nPayment: ${paymentLabel}\n\nPlease confirm when you can. Thank you!`
+  );
+  const waUrl = `https://wa.me/447474833643?text=${waMsg}`;
+  document.getElementById('wa-btn').href = waUrl;
+
+  // Try to open WhatsApp automatically; if the browser blocks it, the button is there.
+  setTimeout(() => { window.open(waUrl, '_blank'); }, 600);
 </script>
 
 </body>
