@@ -586,22 +586,6 @@
 </head>
 <body>
 
-<!-- Hidden Netlify form — detected at deploy, submitted via fetch on booking confirmation -->
-<form name="haloe-booking" netlify netlify-honeypot="bot-field" hidden>
-  <input type="hidden" name="form-name"  value="haloe-booking">
-  <input type="text"   name="bot-field">
-  <input type="text"   name="name">
-  <input type="email"  name="email">
-  <input type="tel"    name="phone">
-  <input type="text"   name="treatment">
-  <input type="text"   name="date">
-  <input type="text"   name="time">
-  <input type="text"   name="location">
-  <input type="text"   name="price">
-  <input type="text"   name="payment">
-  <input type="text"   name="notes">
-</form>
-
 <nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:flex-end;align-items:center;padding:18px 40px;background:rgba(13,13,13,0.92);border-bottom:1px solid rgba(200,169,110,0.12);backdrop-filter:blur(12px);">
   <a href="index.html" class="back-link">← Back to site</a>
 </nav>
@@ -1002,13 +986,14 @@ function renderSummary() {
 async function handlePayment(type) {
   if (state.serviceIndex === null) { alert("Please go back and select a treatment."); return; }
   const { service, dateStr, locationLabel } = buildSummary();
-  const name = `${document.getElementById('fname').value} ${document.getElementById('lname').value}`;
+  const name  = `${document.getElementById('fname').value} ${document.getElementById('lname').value}`;
   const email = document.getElementById('email').value;
+  const phone = document.getElementById('phone').value;
+  const notes = document.getElementById('notes') ? document.getElementById('notes').value : '';
 
-  // First submit the booking data (Netlify form + WhatsApp)
-  await submitBooking(type);
+  // Instant WhatsApp ping to Halima (backup notification)
+  notifyWhatsApp(type);
 
-  // Then redirect to Stripe
   const depositBtn = document.getElementById('btn-deposit');
   const fullBtn = document.getElementById('btn-full');
   if (depositBtn) depositBtn.disabled = true;
@@ -1018,7 +1003,7 @@ async function handlePayment(type) {
   const amount = type === 'deposit' ? 2500 : service.price * 100; // pence
 
   try {
-    const res = await fetch('/functions/create-checkout', {
+    const res = await fetch('/create-checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1027,6 +1012,11 @@ async function handlePayment(type) {
         paymentType: type,
         customerEmail: email,
         customerName: name,
+        customerPhone: phone,
+        date: dateStr,
+        time: state.time,
+        location: locationLabel,
+        notes,
       }),
     });
     const data = await res.json();
@@ -1034,41 +1024,25 @@ async function handlePayment(type) {
       window.location.href = data.url;
     } else {
       alert('Payment setup failed. Please try again.');
-      if (depositBtn) depositBtn.disabled = false;
-      if (fullBtn) fullBtn.disabled = false;
-      if (depositBtn) depositBtn.textContent = 'Pay £25 Deposit';
+      resetPayButtons();
     }
   } catch (err) {
     alert('Something went wrong. Please try again.');
-    if (depositBtn) depositBtn.disabled = false;
-    if (fullBtn) fullBtn.disabled = false;
-    if (depositBtn) depositBtn.textContent = 'Pay £25 Deposit';
+    resetPayButtons();
   }
 }
 
+function resetPayButtons() {
+  const depositBtn = document.getElementById('btn-deposit');
+  const fullBtn = document.getElementById('btn-full');
+  if (depositBtn) { depositBtn.disabled = false; depositBtn.textContent = 'Pay £25 Deposit'; }
+  if (fullBtn) fullBtn.disabled = false;
+}
 
-function submitBooking(paymentType) {
+function notifyWhatsApp(paymentType) {
   const { service, dateStr, locationLabel } = buildSummary();
   const name = `${document.getElementById('fname').value} ${document.getElementById('lname').value}`;
-  const phone = document.getElementById('phone').value;
-  const email = document.getElementById('email').value;
-  const notes = document.getElementById('notes') ? document.getElementById('notes').value : '';
   const paymentLabel = paymentType === 'deposit' ? '£25 deposit' : `full payment of £${service.price}`;
-
-  // POST to Netlify Forms
-  const formData = new FormData();
-  formData.append('form-name', 'haloe-booking');
-  formData.append('name',      name);
-  formData.append('email',     email);
-  formData.append('phone',     phone);
-  formData.append('treatment', service.name);
-  formData.append('date',      dateStr);
-  formData.append('time',      state.time);
-  formData.append('location',  locationLabel);
-  formData.append('price',     '£' + service.price);
-  formData.append('payment',   paymentLabel);
-  formData.append('notes',     notes);
-  fetch('/', { method: 'POST', body: formData }).catch(() => {});
 
   const waMsg = encodeURIComponent(
     `Hi Halima, I've just submitted a booking request via the haloe website.\n\nName: ${name}\nTreatment: ${service.name}\nDate: ${dateStr}\nTime: ${state.time}\nLocation: ${locationLabel}\nPayment: ${paymentLabel}\n\nPlease confirm when you can. Thank you!`
