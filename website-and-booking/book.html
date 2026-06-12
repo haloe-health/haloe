@@ -991,9 +991,6 @@ async function handlePayment(type) {
   const phone = document.getElementById('phone').value;
   const notes = document.getElementById('notes') ? document.getElementById('notes').value : '';
 
-  // Instant WhatsApp ping to Halima (backup notification)
-  notifyWhatsApp(type);
-
   const depositBtn = document.getElementById('btn-deposit');
   const fullBtn = document.getElementById('btn-full');
   if (depositBtn) depositBtn.disabled = true;
@@ -1040,16 +1037,7 @@ function resetPayButtons() {
 }
 
 function notifyWhatsApp(paymentType) {
-  const { service, dateStr, locationLabel } = buildSummary();
-  const name = `${document.getElementById('fname').value} ${document.getElementById('lname').value}`;
-  const paymentLabel = paymentType === 'deposit' ? '£25 deposit' : `full payment of £${service.price}`;
-
-  const waMsg = encodeURIComponent(
-    `Hi Halima, I've just submitted a booking request via the haloe website.\n\nName: ${name}\nTreatment: ${service.name}\nDate: ${dateStr}\nTime: ${state.time}\nLocation: ${locationLabel}\nPayment: ${paymentLabel}\n\nPlease confirm when you can. Thank you!`
-  );
-  setTimeout(() => {
-    window.open(`https://wa.me/447474833643?text=${waMsg}`, '_blank');
-  }, 800);
+  // WhatsApp confirmation now fires on booking-confirmed.html AFTER successful payment.
 }
 
 function goToStep(n) {
