@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Session at Haloe — What to Expect · Hijama for Women, Manchester</title>
+<meta name="description" content="Your pre-session guide for haloe — what to expect, what to wear and bring, and how to look after yourself afterwards. A calm, women-only hijama & wellness space in Manchester.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080806;
+    --deep: #0d0d0b;
+    --gold: #c9a040;
+    --gold-light: #dbb85a;
+    --gold-dim: rgba(201,160,64,0.12);
+    --white: #f7f2ea;
+    --dim: #7a7060;
+    --border: rgba(201,160,64,0.12);
+    --radius: 0px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+
+  body {
+    background:var(--black);
+    color:var(--white);
+    font-family:'Poppins',sans-serif;
+    font-weight:300;
+    overflow-x:hidden;
+    font-size:16px;
+    line-height:1.7;
+  }
+
+  /* Grain overlay — matches index.html */
+  body::before {
+    content:'';
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    opacity:0.025;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:200px;
+  }
+
+  /* NAV — copied from index.html */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    padding:22px 80px;
+    display:flex; justify-content:space-between; align-items:center;
+    background:rgba(8,8,6,0.88);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+  }
+  .nav-logo { display:flex; align-items:center; gap:14px; text-decoration:none; }
+  .nav-logo img { height:32px; width:auto; }
+  .nav-logo span {
+    font-family:'Poppins',sans-serif;
+    font-size:1.4rem; color:var(--gold);
+    letter-spacing:0.2em; font-weight:300;
+    text-transform:lowercase;
+  }
+  nav ul { list-style:none; display:flex; gap:48px; align-items:center; }
+  nav ul a {
+    color:var(--dim); text-decoration:none;
+    font-size:0.7rem; letter-spacing:0.2em;
+    text-transform:uppercase; transition:color 0.4s;
+    font-weight:400;
+  }
+  nav ul a:hover { color:var(--gold); text-decoration:none; }
+  .nav-cta {
+    border:1px solid rgba(201,160,64,0.5) !important;
+    color:var(--gold) !important;
+    padding:10px 26px;
+    font-weight:400 !important;
+    background:transparent !important;
+    transition:all 0.4s !important;
+    border-radius:50px !important;
+    text-decoration:none !important;
+    display:inline-block !important;
+  }
+  .nav-cta:hover {
+    background:var(--gold) !important;
+    color:#080806 !important;
+    border-color:var(--gold) !important;
+    text-decoration:none !important;
+  }
+
+  /* Buttons — copied from index.html */
+  .btn {
+    display:inline-block; text-decoration:none;
+    font-family:'Poppins',sans-serif; font-size:0.72rem;
+    letter-spacing:0.2em; text-transform:uppercase;
+    padding:16px 44px; transition:all 0.35s;
+    font-weight:400; border-radius:50px;
+  }
+  .btn-gold { background:var(--gold); color:#080806; font-weight:500; }
+  .btn-gold:hover { background:var(--gold-light); transform:translateY(-3px); box-shadow:0 12px 40px rgba(201,160,64,0.25); }
+  .btn-outline { border:1px solid rgba(201,160,64,0.35); color:var(--gold); }
+  .btn-outline:hover { border-color:var(--gold); background:rgba(201,160,64,0.06); }
+
+  /* Section tag / eyebrow — copied from index.html */
+  .section-tag {
+    font-size:0.65rem; letter-spacing:0.28em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:24px;
+    display:flex; align-items:center; gap:12px; opacity:0.9;
+  }
+  .section-tag.center { justify-content:center; }
+  .section-tag::before { content:''; width:24px; height:1px; background:var(--gold); opacity:0.6; }
+
+  /* Headings — copied from index.html */
+  h1 {
+    font-family:'Poppins',sans-serif;
+    font-size:clamp(2.6rem,6vw,4.2rem);
+    font-weight:300; line-height:1.08;
+    margin-bottom:24px; letter-spacing:-0.01em;
+  }
+  h1 em { font-style:italic; color:var(--gold); display:block; }
+  h2 {
+    font-family:'Poppins',sans-serif;
+    font-size:clamp(1.7rem,3.5vw,2.4rem);
+    font-weight:300; line-height:1.15; margin-bottom:20px;
+    letter-spacing:-0.025em;
+  }
+  h2 em { font-style:italic; color:var(--gold); }
+  .cert-tag {
+    font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase;
+    border:1px solid var(--border); color:var(--gold);
+    padding:9px 18px; opacity:0.85; border-radius:50px;
+    display:inline-block;
+  }
+
+  /* ── Article layout (built from existing tokens) ── */
+  .article-hero {
+    padding:160px 24px 64px;
+    text-align:center;
+    background:radial-gradient(ellipse 80% 70% at 50% 0%, rgba(201,160,64,0.05) 0%, transparent 70%), var(--black);
+    position:relative; z-index:1;
+  }
+  .article-hero .hero-pill {
+    display:inline-block;
+    font-size:0.6rem; letter-spacing:0.28em; text-transform:uppercase;
+    color:var(--gold); border:1px solid rgba(201,160,64,0.4);
+    padding:8px 20px; border-radius:50px; margin-bottom:32px;
+  }
+  .article-hero h1 { margin-bottom:8px; }
+  .article-hero .hero-sub {
+    font-family:'Poppins',sans-serif; font-style:italic;
+    font-size:clamp(1.1rem,2.4vw,1.5rem); color:var(--gold);
+    font-weight:300; margin-bottom:32px;
+  }
+  .article-hero .creds {
+    font-size:0.8rem; color:var(--dim); line-height:1.8;
+    max-width:520px; margin:0 auto; letter-spacing:0.02em;
+  }
+
+  .article { position:relative; z-index:1; max-width:760px; margin:0 auto; padding:0 24px 40px; }
+  .block { padding:48px 0; border-top:1px solid var(--border); }
+  .block:first-child { border-top:none; }
+  .block p { color:var(--dim); line-height:2.0; margin-bottom:20px; font-size:0.97rem; }
+  .block p:last-child { margin-bottom:0; }
+  .block p strong, .block strong { color:var(--white); font-weight:400; }
+  .lead p { color:var(--white); font-size:1.05rem; }
+
+  .eyebrow-label {
+    font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:16px; opacity:0.9;
+  }
+
+  /* Info cards — mirror the booking card style (.hb-card) */
+  .info-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  .info-card {
+    border:1px solid rgba(201,160,64,0.2);
+    background:rgba(255,255,255,0.02);
+    border-radius:6px; padding:28px 24px;
+  }
+  .info-card h3 {
+    font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--gold); font-weight:500; margin-bottom:14px;
+  }
+  .info-card p { font-size:0.88rem; line-height:1.8; color:var(--dim); margin:0; }
+
+  /* Safety alert / callout — gold-accented box (mirrors .form-warn, stronger) */
+  .alert {
+    border:1px solid rgba(201,160,64,0.3);
+    border-left:3px solid var(--gold);
+    background:rgba(201,160,64,0.04);
+    border-radius:6px; padding:32px 30px;
+  }
+  .alert h2 { margin-bottom:18px; }
+  .alert p { color:var(--dim); }
+  .alert ul { list-style:none; margin:8px 0 22px; }
+  .alert ul li {
+    position:relative; padding-left:26px; margin-bottom:12px;
+    color:var(--white); font-size:0.95rem; line-height:1.6;
+  }
+  .alert ul li::before {
+    content:''; position:absolute; left:0; top:11px;
+    width:6px; height:6px; background:var(--gold); border-radius:50%;
+  }
+  .note-highlight {
+    margin-top:24px; padding:18px 22px;
+    background:rgba(201,160,64,0.08);
+    border:1px solid rgba(201,160,64,0.25);
+    border-radius:6px;
+    color:var(--white); font-size:0.92rem; line-height:1.7;
+  }
+  .note-highlight strong { color:var(--gold); }
+
+  /* Numbered steps */
+  .steps { list-style:none; counter-reset:step; margin-bottom:24px; }
+  .steps li {
+    position:relative; counter-increment:step;
+    padding:20px 0 20px 64px; border-top:1px solid var(--border);
+    color:var(--white); font-size:1rem; line-height:1.6;
+  }
+  .steps li:first-child { border-top:none; }
+  .steps li::before {
+    content:counter(step);
+    position:absolute; left:0; top:18px;
+    width:36px; height:36px;
+    border:1px solid rgba(201,160,64,0.4); border-radius:50%;
+    color:var(--gold); font-size:0.85rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .caption { font-size:0.88rem; color:var(--dim); font-style:italic; line-height:1.8; }
+
+  /* Pull-quote */
+  .pull-quote {
+    margin:32px 0 0; padding:28px 0 4px;
+    border-top:1px solid var(--border);
+    text-align:center;
+  }
+  .pull-quote blockquote {
+    font-family:'Poppins',sans-serif; font-style:italic;
+    font-size:1.3rem; line-height:1.6; color:var(--white);
+    font-weight:300; margin-bottom:14px; letter-spacing:-0.01em;
+  }
+  .pull-quote cite {
+    display:block; font-style:normal; font-size:0.75rem;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); opacity:0.85;
+  }
+
+  /* Offer list */
+  .offer-list { list-style:none; margin:8px 0 24px; }
+  .offer-list li {
+    padding:18px 0; border-top:1px solid var(--border);
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .offer-list li:first-child { border-top:none; }
+  .offer-list .offer-name { color:var(--white); font-size:1rem; font-weight:400; }
+  .offer-list .offer-desc { color:var(--dim); font-size:0.88rem; }
+  .offer-note {
+    font-size:0.85rem; color:var(--dim); font-style:italic;
+    padding:16px 0; line-height:1.8;
+  }
+
+  /* Marks timeline */
+  .timeline {
+    display:flex; gap:0; margin-top:28px;
+    border:1px solid var(--border); border-radius:6px; overflow:hidden;
+  }
+  .timeline .t-step {
+    flex:1; padding:18px 10px; text-align:center;
+    border-right:1px solid var(--border);
+  }
+  .timeline .t-step:last-child { border-right:none; }
+  .timeline .t-day {
+    display:block; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:6px;
+  }
+  .timeline .t-label { font-size:0.78rem; color:var(--dim); }
+
+  /* Before / after columns */
+  .checklists { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px; }
+  .checklist {
+    border:1px solid rgba(201,160,64,0.2);
+    background:rgba(255,255,255,0.02);
+    border-radius:6px; padding:28px 26px;
+  }
+  .checklist h3 {
+    font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--gold); font-weight:500; margin-bottom:18px;
+  }
+  .checklist ul { list-style:none; }
+  .checklist ul li {
+    position:relative; padding-left:24px; margin-bottom:14px;
+    font-size:0.9rem; line-height:1.6; color:var(--white);
+  }
+  .checklist ul li:last-child { margin-bottom:0; }
+  .checklist ul li::before {
+    content:'✓'; position:absolute; left:0; top:0;
+    color:var(--gold); font-size:0.85rem;
+  }
+  .reassure { font-size:0.92rem; color:var(--dim); line-height:1.9; font-style:italic; }
+
+  /* FAQ */
+  .faq-item { padding:24px 0; border-top:1px solid var(--border); }
+  .faq-item:first-of-type { border-top:none; }
+  .faq-item h3 { font-size:1.02rem; color:var(--white); font-weight:400; margin-bottom:12px; }
+  .faq-item p { margin:0; color:var(--dim); font-size:0.94rem; line-height:1.9; }
+
+  /* Closing */
+  .closing { text-align:center; }
+  .closing p { color:var(--white); font-size:1.1rem; line-height:1.8; }
+  .closing .closing-meta { color:var(--dim); font-size:0.85rem; margin-top:12px; }
+
+  /* Small-print compliance */
+  .fine-print {
+    margin-top:8px; padding:28px 0 0; border-top:1px solid var(--border);
+  }
+  .fine-print p { font-size:0.75rem; color:rgba(122,112,96,0.75); line-height:1.8; margin:0; }
+
+  /* FOOTER — copied from index.html */
+  footer {
+    position:relative; z-index:1;
+    background:#040403; padding:64px 80px;
+    border-top:1px solid var(--border);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .footer-left { display:flex; align-items:center; gap:14px; }
+  .footer-left img { height:24px; }
+  .footer-left span {
+    font-family:'Poppins',sans-serif;
+    font-size:1.2rem; color:var(--gold);
+    letter-spacing:0.2em; font-weight:300;
+  }
+  .footer-links { display:flex; gap:32px; }
+  .footer-links a {
+    color:var(--dim); text-decoration:none;
+    font-size:0.68rem; letter-spacing:0.14em;
+    text-transform:uppercase; transition:color 0.4s; opacity:0.7;
+  }
+  .footer-links a:hover { color:var(--gold); opacity:1; }
+  .footer-right { font-size:0.65rem; color:rgba(122,112,96,0.5); text-align:right; line-height:1.8; }
+
+  ::selection { background:rgba(201,160,64,0.2); color:var(--white); }
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:var(--black); }
+  ::-webkit-scrollbar-thumb { background:rgba(201,160,64,0.3); border-radius:2px; }
+
+  /* MOBILE — mirrors index.html breakpoint */
+  @media(max-width:860px){
+    nav { padding:18px 24px; }
+    nav ul { display:none; }
+    .article-hero { padding:120px 20px 48px; }
+    .article { padding:0 20px 24px; }
+    .block { padding:40px 0; }
+    .info-cards { grid-template-columns:1fr; }
+    .checklists { grid-template-columns:1fr; }
+    .timeline { flex-wrap:wrap; }
+    .timeline .t-step { flex:1 0 33.33%; border-bottom:1px solid var(--border); }
+    footer { flex-direction:column; gap:28px; text-align:center; padding:48px 24px; }
+    .footer-links { flex-wrap:wrap; justify-content:center; }
+    .footer-right { text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6IG5vbmU7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogI2NmOGEyYTsKICAgICAgfQoKICAgICAgLmNscy00IHsKICAgICAgICBvcGFjaXR5OiAwOwogICAgICB9CgogICAgICAuY2xzLTUgewogICAgICAgIGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7CiAgICAgIH0KCiAgICAgIC5jbHMtNiB7CiAgICAgICAgZmlsbDogI2U2ZTdlODsKICAgICAgfQoKICAgICAgLmNscy03IHsKICAgICAgICBmaWxsOiAjZmJiNzE2OwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+CiAgICAgIDxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
+    <span>haloe</span>
+  </a>
+  <ul>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#conditions">Conditions</a></li>
+    <li><a href="index.html#process">What to Expect</a></li>
+    <li><a href="book.html" class="nav-cta">Book Now</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<header class="article-hero">
+  <span class="hero-pill">3-Minute Read</span>
+  <h1>Your session at haloe</h1>
+  <div class="hero-sub">What to expect</div>
+  <p class="creds">Halima Yasmin — CMA &amp; IPHM Accredited · Level 5 Diploma (Distinction) · women only</p>
+</header>
+
+<article class="article">
+
+  <!-- A note from Halima -->
+  <section class="block lead">
+    <div class="eyebrow-label">A note from Halima</div>
+    <p>Thank you for booking with me. Whether this is your very first hijama session or you've had cupping before, I want you to feel completely at ease from the moment you arrive. This guide tells you exactly what will happen, what to bring, and how to look after yourself afterwards.</p>
+    <p>If you're nervous — that's completely normal, and you wouldn't be the first. Every session is just you and me, in a private room. You set the pace, and I work around you.</p>
+  </section>
+
+  <!-- Three info cards -->
+  <section class="block">
+    <div class="info-cards">
+      <div class="info-card">
+        <h3>Location</h3>
+        <p>Private clinic space, Manchester. Your exact address will be in your booking confirmation — please save it before you travel.</p>
+      </div>
+      <div class="info-card">
+        <h3>How long to allow</h3>
+        <p>Add 20–30 minutes on top of your treatment time for the health form at the start and rest time at the end. A 1-hour session means roughly 1h 30m in total.</p>
+      </div>
+      <div class="info-card">
+        <h3>Payment</h3>
+        <p>A £25 deposit is paid online when you book; the balance is settled on the day, by cash or bank transfer. Your confirmation shows the full amount.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Safety alert -->
+  <section class="block">
+    <div class="alert">
+      <h2>Before we begin — <em>your safety</em></h2>
+      <p>Wet cupping cannot be performed if you:</p>
+      <ul>
+        <li>Are pregnant</li>
+        <li>Take blood-thinning or anticoagulant medication</li>
+        <li>Are insulin-dependent (Type 1 / insulin-pump) diabetic</li>
+        <li>Are undergoing chemotherapy or radiotherapy</li>
+      </ul>
+      <p>Please also let me know if you have anaemia, a bleeding disorder, have recently had surgery, or are managing any significant medical condition. If you're unsure, bring your medication list and we'll go through it together — no need to have it memorised. When in doubt, we wait for your GP's go-ahead.</p>
+      <div class="note-highlight"><strong>If you practise ruqya:</strong> please leave at least 24 hours between your ruqya and your hijama session.</div>
+    </div>
+  </section>
+
+  <!-- What happens in your session -->
+  <section class="block">
+    <h2>What happens in <em>your session</em></h2>
+    <ol class="steps">
+      <li>We talk first — health form &amp; a chat about what you need</li>
+      <li>Warm &amp; relax — massage to settle the muscles</li>
+      <li>Cups applied — suction lifts the skin gently</li>
+      <li>Gentle draw — tiny pricks (wet cupping only)</li>
+      <li>Soothe &amp; rest — black seed oil, then quiet rest time</li>
+    </ol>
+    <p class="caption">The suction feels like a firm tug. The wet cupping pricks are tiny and quick — most women describe them as a light scratch. Most people find the whole session deeply relaxing.</p>
+  </section>
+
+  <!-- What is hijama -->
+  <section class="block">
+    <h2>What is <em>hijama?</em></h2>
+    <p>Hijama, or wet cupping, is one of the world's oldest natural therapies — a practice rooted in prophetic (sunnah) tradition. In dry cupping the skin stays completely intact: gentle suction only, ideal for facial work, tension and cosmetic use. In wet cupping (hijama), a few tiny, shallow pricks allow a small amount of stagnant blood to be drawn, supporting circulation, detoxification and deeper therapeutic work.</p>
+    <div class="pull-quote">
+      <blockquote>"The best of the remedies you have is hijama."</blockquote>
+      <cite>The Prophet Muhammad (peace be upon him) · Sahih al-Bukhari</cite>
+    </div>
+  </section>
+
+  <!-- What we offer -->
+  <section class="block">
+    <h2>What we <em>offer</em></h2>
+    <ul class="offer-list">
+      <li>
+        <span class="offer-name">Massage</span>
+        <span class="offer-desc">Relaxation, no cups</span>
+      </li>
+      <li>
+        <span class="offer-name">Dry cupping</span>
+        <span class="offer-desc">Suction only, no incisions</span>
+      </li>
+      <li>
+        <span class="offer-name">Wet cupping / hijama</span>
+        <span class="offer-desc">Full accredited treatment</span>
+      </li>
+    </ul>
+    <p class="offer-note">All sessions include as many cups as your treatment needs — never charged per cup.</p>
+    <a href="book.html" class="btn btn-outline">See the full treatment menu and prices →</a>
+  </section>
+
+  <!-- What to wear & bring -->
+  <section class="block">
+    <h2>What to <em>wear &amp; bring</em></h2>
+    <p>Wear loose, comfortable clothing that can be moved aside easily — you won't need to fully undress. Only the area being treated will be uncovered, and you'll be draped throughout. Your modesty is fully respected at every point. Bring a list of any medications you take. Everything else — oils, aftercare — is provided.</p>
+  </section>
+
+  <!-- To take home -->
+  <section class="block">
+    <h2>To take <em>home</em></h2>
+    <p>After every wet cupping session, you'll leave with a bottle of black seed oil to apply to the treated area. It soothes the skin, supports healing, and is a sunnah remedy in its own right.</p>
+  </section>
+
+  <!-- The marks -->
+  <section class="block">
+    <h2>The <em>marks</em> <span style="color:var(--dim);font-size:0.7em;font-style:italic;">(wet cupping only)</span></h2>
+    <p>Wet cupping leaves small circular marks that look like light bruising. They are not scars — your body clears them naturally, usually within one to two weeks.</p>
+    <div class="timeline">
+      <div class="t-step"><span class="t-day">Day 0</span><span class="t-label">just after</span></div>
+      <div class="t-step"><span class="t-day">Days 1–3</span><span class="t-label">settling</span></div>
+      <div class="t-step"><span class="t-day">Days 4–7</span><span class="t-label">fading</span></div>
+      <div class="t-step"><span class="t-day">Days 7–14</span><span class="t-label">nearly gone</span></div>
+      <div class="t-step"><span class="t-day">Day 14+</span><span class="t-label">gone</span></div>
+    </div>
+  </section>
+
+  <!-- Before & after checklists -->
+  <section class="block">
+    <h2>Before &amp; <em>after</em></h2>
+    <div class="checklists">
+      <div class="checklist">
+        <h3>Before your session</h3>
+        <ul>
+          <li>Eat 2–3 hours beforehand, not right before</li>
+          <li>Drink plenty of water the day before and morning of</li>
+          <li>Shower beforehand if you can</li>
+          <li>Avoid caffeine, alcohol and heavy exercise</li>
+        </ul>
+      </div>
+      <div class="checklist">
+        <h3>After your session</h3>
+        <ul>
+          <li>Rest 10–15 min before heading home</li>
+          <li>Keep the area clean and dry for 24–48 hours</li>
+          <li>Apply the black seed oil blend as guided</li>
+          <li>Avoid strenuous activity, swimming &amp; saunas for 24h</li>
+        </ul>
+      </div>
+    </div>
+    <p class="reassure">A little tenderness or light marking afterwards is completely normal and usually settles within a few days. If anything's on your mind, message me anytime — and for anything medical, your GP is always the right first port of call.</p>
+  </section>
+
+  <!-- FAQ -->
+  <section class="block">
+    <h2>A few quick <em>answers</em></h2>
+    <div class="faq-item">
+      <h3>Does it hurt?</h3>
+      <p>The suction feels like a firm tug. The wet cupping pricks feel like a quick light scratch. Most women find the whole session relaxing — some fall asleep.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Will I need to undress?</h3>
+      <p>Only the area being treated will be uncovered. You stay draped throughout and your modesty is fully respected at every point — this is a women-only space.</p>
+    </div>
+    <div class="faq-item">
+      <h3>What if I need to cancel or reschedule?</h3>
+      <p>Plans change, and that's completely fine — just give me at least 48 hours' notice and we'll happily reschedule. Your £25 deposit secures your slot and is non-refundable within 48 hours of your appointment. Message me anytime at @haloe_hijama.</p>
+    </div>
+    <div class="faq-item">
+      <h3>Can I have hijama while fasting in Ramadan?</h3>
+      <p>The majority view is that it does not break the fast, though scholars differ. I'm happy to schedule around Ramadan and your energy levels — just ask.</p>
+    </div>
+  </section>
+
+  <!-- Closing -->
+  <section class="block closing">
+    <p>I look forward to seeing you. — Halima</p>
+    <p class="closing-meta">@haloe_hijama · Manchester · any questions, message me any time</p>
+  </section>
+
+  <!-- Compliance disclaimer -->
+  <div class="fine-print">
+    <p>Hijama at haloe is a complementary wellness therapy. It supports how you feel and does not diagnose, treat or replace medical care. Please continue any medication or treatment prescribed by your doctor, and speak to your GP about any health concern.</p>
+  </div>
+
+</article>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6IG5vbmU7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogI2NmOGEyYTsKICAgICAgfQoKICAgICAgLmNscy00IHsKICAgICAgICBvcGFjaXR5OiAwOwogICAgICB9CgogICAgICAuY2xzLTUgewogICAgICAgIGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7CiAgICAgIH0KCiAgICAgIC5jbHMtNiB7CiAgICAgICAgZmlsbDogI2U2ZTdlODsKICAgICAgfQoKICAgICAgLmNscy03IHsKICAgICAgICBmaWxsOiAjZmJiNzE2OwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+CiAgICAgIDxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
+    <span>haloe</span>
+  </div>
+  <div class="footer-links">
+    <a href="index.html#about">About</a>
+    <a href="index.html#conditions">Conditions</a>
+    <a href="index.html#process">What to Expect</a>
+    <a href="book.html">Book</a>
+    <a href="https://instagram.com/haloe_hijama" target="_blank">Instagram</a>
+  </div>
+  <div class="footer-right">
+    © 2026 Haloe · Halima Yasmin<br>
+    CMA &amp; IPHM Accredited · Fully Insured · Manchester
+  </div>
+</footer>
+
+</body>
+</html>

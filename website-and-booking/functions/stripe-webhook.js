@@ -12,6 +12,7 @@
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
 const INTAKE_FORM = 'https://forms.gle/UY2jpwdBHXPccfxJ9';
+const GUIDE_URL = 'https://haloe.health/before-your-session';
 
 // Brand tokens (kept in sync with the website)
 const BLACK = '#0D0D0D';
@@ -293,8 +294,13 @@ function clientEmailHtml(d) {
                 </td>
               </tr>
               <tr>
-                <td align="center" style="padding:0 4px 26px;">
+                <td align="center" style="padding:0 4px 14px;">
                   <a href="${INTAKE_FORM}" style="display:inline-block;background:${GOLD};color:${BLACK};text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;padding:15px 32px;border-radius:26px;font-family:Arial,Helvetica,sans-serif;">Complete your intake form</a>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding:0 4px 26px;">
+                  <a href="${GUIDE_URL}" style="display:inline-block;background:${GOLD};color:${BLACK};text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;padding:15px 32px;border-radius:26px;font-family:Arial,Helvetica,sans-serif;">Read your pre-session guide</a>
                 </td>
               </tr>
               <!-- Personal note + compliance -->
