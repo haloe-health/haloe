@@ -713,7 +713,7 @@
     <div style="margin-top: 1.5rem;">
       <p class="section-label">Where would you like your treatment?</p>
       <div class="location-toggle segmented">
-        <button class="loc-btn seg-option active" data-loc="clinic">Haloe Treatment Room</button>
+        <button class="loc-btn seg-option active" data-loc="clinic">haloe Treatment Room</button>
         <button class="loc-btn seg-option" data-loc="mobile">Mobile — My Home</button>
       </div>
       <div class="loc-notice" id="loc-notice">
@@ -893,12 +893,6 @@ const SERVICES = {
     { name: 'Circulation & Energy', time: '8 sessions · 18 wks', price: 600, desc: 'Full circulation support for vitality and energy levels.' },
     { name: "Women's Hormonal Balance", time: '8 sessions · 16 wks', price: 600, desc: 'Comprehensive hormonal wellness support across the cycle.' },
   ],
-  // ===== TEST-ONLY: hidden £1 test booking — REMOVE BEFORE FINAL LAUNCH =====
-  // Reachable only via ?test=1 (see enableTestBooking). Not shown in the normal flow.
-  test: [
-    { name: 'Test Booking', time: '5 min', price: 1 },
-  ],
-  // ===== END TEST-ONLY =====
 };
 
 let state = {
@@ -920,33 +914,7 @@ function init() {
   state.calMonth = now.getMonth();
   renderServices();
   renderCalendar();
-
-  // ===== TEST-ONLY: reveal the hidden £1 test booking when loaded with ?test=1 — REMOVE BEFORE FINAL LAUNCH =====
-  if (new URLSearchParams(location.search).get('test') === '1') {
-    enableTestBooking();
-  }
-  // ===== END TEST-ONLY =====
 }
-
-// ===== TEST-ONLY: adds a "Test £1" segment to the category control and auto-selects it. REMOVE BEFORE FINAL LAUNCH =====
-function enableTestBooking() {
-  const tabs = document.getElementById('category-tabs');
-  if (!tabs || tabs.querySelector('[data-cat="test"]')) return;
-  // Inject an extra segment matching the existing segmented-control styling.
-  const btn = document.createElement('button');
-  btn.className = 'tab-btn seg-option';
-  btn.dataset.cat = 'test';
-  btn.textContent = 'Test £1';
-  tabs.appendChild(btn);
-  // Auto-select it so the £1 booking is shown immediately. Reuses the normal click logic/state.
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  state.category = 'test';
-  state.serviceIndex = null;
-  document.getElementById('btn-step1').disabled = true;
-  renderServices();
-}
-// ===== END TEST-ONLY =====
 
 function renderServices() {
   const grid = document.getElementById('service-grid');
@@ -1091,9 +1059,9 @@ function buildSummary() {
   if (state.serviceIndex === null || !SERVICES[state.category]) return {};
   if (!SERVICES[state.category][state.serviceIndex]) return {};
   const service = SERVICES[state.category][state.serviceIndex];
-  const catLabel = { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package', test: 'Test' /* TEST-ONLY: remove before launch */ }[state.category];
+  const catLabel = { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package' }[state.category];
   const dateStr = state.date ? state.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
-  const locationLabel = state.location === 'clinic' ? 'Haloe Treatment Room, Manchester' : 'Mobile — your home';
+  const locationLabel = state.location === 'clinic' ? 'haloe Treatment Room, Manchester' : 'Mobile — your home';
   const name = document.getElementById('fullname').value.trim();
   return { service, catLabel, dateStr, locationLabel, name };
 }
@@ -1147,9 +1115,6 @@ async function handlePayment(type) {
   if (depositBtn) depositBtn.textContent = 'Redirecting to payment…';
 
   let amount = type === 'deposit' ? 2500 : service.price * 100; // pence
-  // ===== TEST-ONLY: the £1 test booking always charges 100 pence, bypassing the £25 deposit. REMOVE BEFORE FINAL LAUNCH =====
-  if (service.price === 1) amount = 100;
-  // ===== END TEST-ONLY =====
 
   try {
     const res = await fetch('/create-checkout', {
