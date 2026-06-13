@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your health &amp; consent form · haloe</title>
+<meta name="description" content="Your private health and consent form for haloe — a short, confidential intake before your hijama session. Women-only practice, Manchester.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080806;
+    --deep: #0d0d0b;
+    --gold: #c9a040;
+    --gold-light: #dbb85a;
+    --white: #f7f2ea;
+    --dim: #7a7060;
+    --border: rgba(201,160,64,0.12);
+    --surface: rgba(255,255,255,0.02);
+    --error: #e0a59b;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    background:var(--black); color:var(--white);
+    font-family:'Poppins',sans-serif; font-weight:300;
+    overflow-x:hidden; font-size:16px; line-height:1.7;
+  }
+  body::before {
+    content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.025;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:200px;
+  }
+
+  /* NAV — matches index.html / before-your-session.html */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    padding:22px 80px; display:flex; justify-content:space-between; align-items:center;
+    background:rgba(8,8,6,0.88); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+  }
+  .nav-logo { display:flex; align-items:center; gap:14px; text-decoration:none; }
+  .nav-logo img { height:32px; width:auto; }
+  .nav-logo span { font-size:1.4rem; color:var(--gold); letter-spacing:0.2em; font-weight:300; text-transform:lowercase; }
+  nav ul { list-style:none; display:flex; gap:48px; align-items:center; }
+  nav ul a { color:var(--dim); text-decoration:none; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; transition:color 0.4s; font-weight:400; }
+  nav ul a:hover { color:var(--gold); }
+  .nav-cta {
+    border:1px solid rgba(201,160,64,0.5) !important; color:var(--gold) !important;
+    padding:10px 26px; font-weight:400 !important; background:transparent !important;
+    transition:all 0.4s !important; border-radius:50px !important; text-decoration:none !important; display:inline-block !important;
+  }
+  .nav-cta:hover { background:var(--gold) !important; color:#080806 !important; border-color:var(--gold) !important; }
+
+  /* Buttons */
+  .btn {
+    display:inline-block; text-decoration:none; cursor:pointer;
+    font-family:'Poppins',sans-serif; font-size:0.72rem; letter-spacing:0.2em;
+    text-transform:uppercase; padding:16px 40px; transition:all 0.35s; font-weight:400;
+    border-radius:50px; border:none;
+  }
+  .btn-gold { background:var(--gold); color:#080806; font-weight:500; }
+  .btn-gold:hover { background:var(--gold-light); transform:translateY(-2px); box-shadow:0 12px 40px rgba(201,160,64,0.25); }
+  .btn-outline { border:1px solid rgba(201,160,64,0.35); color:var(--gold); background:transparent; }
+  .btn-outline:hover { border-color:var(--gold); background:rgba(201,160,64,0.06); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  /* Layout */
+  .wrap { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:150px 24px 80px; }
+  .intro-head { margin-bottom:40px; }
+  .intro-head .eyebrow { font-size:0.6rem; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold); margin-bottom:18px; display:flex; align-items:center; gap:12px; }
+  .intro-head .eyebrow::before { content:''; width:24px; height:1px; background:var(--gold); opacity:0.6; }
+  h1 { font-size:clamp(2rem,5vw,3rem); font-weight:300; line-height:1.1; letter-spacing:-0.02em; margin-bottom:18px; }
+  h1 em { font-style:italic; color:var(--gold); }
+  .intro-line { color:var(--dim); font-size:0.95rem; line-height:1.9; max-width:600px; }
+
+  /* Progress bar */
+  .progress { position:sticky; top:76px; z-index:50; background:var(--black); padding:14px 0 18px; margin-bottom:8px; }
+  .progress-meta { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
+  .progress-step { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); }
+  .progress-name { font-size:0.72rem; color:var(--dim); letter-spacing:0.04em; }
+  .progress-track { height:3px; background:rgba(201,160,64,0.12); border-radius:2px; overflow:hidden; }
+  .progress-fill { height:100%; background:var(--gold); border-radius:2px; width:20%; transition:width 0.45s cubic-bezier(0.25,0.46,0.45,0.94); }
+
+  /* Steps */
+  .step { display:none; }
+  .step.active { display:block; animation:fadeUp 0.5s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  .step h2 { font-size:1.5rem; font-weight:300; letter-spacing:-0.02em; margin-bottom:8px; }
+  .step h2 em { font-style:italic; color:var(--gold); }
+  .section-intro { color:var(--dim); font-size:0.9rem; line-height:1.8; margin-bottom:28px; padding:16px 18px; border-left:2px solid rgba(201,160,64,0.3); background:rgba(201,160,64,0.03); border-radius:0 6px 6px 0; }
+
+  /* Fields */
+  .field { margin:26px 0; }
+  .field > label.q { display:block; font-size:0.9rem; color:var(--white); font-weight:300; margin-bottom:12px; line-height:1.6; }
+  .field .opt-hint { color:var(--dim); font-size:0.78rem; font-style:italic; }
+  .field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date], .field select, .field textarea {
+    width:100%; background:var(--surface); border:1px solid var(--border); color:var(--white);
+    font-family:'Poppins',sans-serif; font-size:0.92rem; font-weight:300;
+    padding:0.85rem 1rem; outline:none; border-radius:6px; transition:border-color 0.2s, box-shadow 0.2s; -webkit-appearance:none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,160,64,0.12); }
+  .field select option { background:#1a1710; color:var(--white); }
+  .field textarea { resize:vertical; min-height:90px; }
+  .field input.invalid, .field select.invalid, .field textarea.invalid { border-color:#c97a6e; }
+
+  /* Segmented choice (Yes/No + multiple choice) */
+  .choices { display:flex; flex-wrap:wrap; gap:10px; }
+  .choices.invalid { outline:1px solid #c97a6e; outline-offset:6px; border-radius:8px; }
+  .opt { position:relative; cursor:pointer; }
+  .opt input { position:absolute; opacity:0; width:0; height:0; }
+  .opt span {
+    display:inline-block; padding:0.6rem 1.3rem; border:1px solid rgba(201,160,64,0.3);
+    border-radius:50px; font-size:0.82rem; color:var(--dim); transition:all 0.2s; user-select:none;
+  }
+  .opt:hover span { border-color:var(--gold); color:var(--white); }
+  .opt input:checked + span { background:var(--gold); border-color:var(--gold); color:#080806; font-weight:400; }
+  .opt input:focus-visible + span { box-shadow:0 0 0 3px rgba(201,160,64,0.25); }
+
+  /* Checkbox list */
+  .check-list { display:flex; flex-direction:column; gap:14px; }
+  .check-list.invalid { outline:1px solid #c97a6e; outline-offset:8px; border-radius:8px; }
+  .check-item { display:flex; align-items:flex-start; gap:0.85rem; cursor:pointer; font-size:0.86rem; color:var(--dim); line-height:1.6; user-select:none; }
+  .check-item input[type=checkbox] { position:absolute; opacity:0; width:0; height:0; }
+  .check-box { width:22px; height:22px; min-width:22px; border:1.5px solid rgba(201,160,64,0.5); background:transparent; display:flex; align-items:center; justify-content:center; margin-top:1px; border-radius:5px; transition:all 0.2s; }
+  .check-item:hover .check-box { border-color:var(--gold); }
+  .check-item input:checked + .check-box { background:var(--gold); border-color:var(--gold); }
+  .check-item input:checked + .check-box::after { content:''; width:5px; height:9px; border:2px solid #080806; border-top:none; border-left:none; transform:rotate(45deg) translateY(-1px); }
+  .check-item input:focus-visible + .check-box { box-shadow:0 0 0 3px rgba(201,160,64,0.25); }
+
+  /* Consent statement block */
+  .consent-statement { font-size:0.86rem; color:var(--dim); line-height:1.9; padding:22px 24px; border:1px solid var(--border); background:var(--surface); border-radius:8px; margin-bottom:26px; }
+
+  /* Field-level error message */
+  .field-error { display:none; font-size:0.74rem; color:var(--error); margin-top:8px; line-height:1.5; }
+  .field-error.visible { display:block; }
+
+  /* Honeypot — hidden from humans */
+  .hp { position:absolute; left:-9999px; top:-9999px; width:1px; height:1px; overflow:hidden; opacity:0; }
+
+  /* Nav buttons */
+  .step-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:40px; padding-top:28px; border-top:1px solid var(--border); }
+  .step-nav .spacer { flex:1; }
+
+  /* Confirmation / error screens */
+  .screen { display:none; text-align:center; padding:60px 0; }
+  .screen.active { display:block; animation:fadeUp 0.5s ease both; }
+  .screen .mark { width:64px; height:64px; border-radius:50%; border:1px solid rgba(201,160,64,0.4); display:flex; align-items:center; justify-content:center; margin:0 auto 28px; color:var(--gold); font-size:1.6rem; }
+  .screen h2 { font-size:1.6rem; font-weight:300; margin-bottom:18px; }
+  .screen h2 em { font-style:italic; color:var(--gold); }
+  .screen p { color:var(--dim); font-size:0.95rem; line-height:1.95; max-width:520px; margin:0 auto 22px; }
+
+  /* Footer */
+  footer { position:relative; z-index:1; background:#040403; padding:64px 80px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .footer-left { display:flex; align-items:center; gap:14px; }
+  .footer-left img { height:24px; }
+  .footer-left span { font-size:1.2rem; color:var(--gold); letter-spacing:0.2em; font-weight:300; }
+  .footer-links { display:flex; gap:32px; }
+  .footer-links a { color:var(--dim); text-decoration:none; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; transition:color 0.4s; opacity:0.7; }
+  .footer-links a:hover { color:var(--gold); opacity:1; }
+  .footer-right { font-size:0.65rem; color:rgba(122,112,96,0.5); text-align:right; line-height:1.8; }
+
+  ::selection { background:rgba(201,160,64,0.2); color:var(--white); }
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-thumb { background:rgba(201,160,64,0.3); border-radius:2px; }
+
+  @media(max-width:860px){
+    nav { padding:18px 24px; }
+    nav ul { display:none; }
+    .wrap { padding:120px 20px 56px; }
+    .progress { top:64px; }
+    footer { flex-direction:column; gap:28px; text-align:center; padding:48px 24px; }
+    .footer-links { flex-wrap:wrap; justify-content:center; }
+    .footer-right { text-align:center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6IG5vbmU7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogI2NmOGEyYTsKICAgICAgfQoKICAgICAgLmNscy00IHsKICAgICAgICBvcGFjaXR5OiAwOwogICAgICB9CgogICAgICAuY2xzLTUgewogICAgICAgIGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7CiAgICAgIH0KCiAgICAgIC5jbHMtNiB7CiAgICAgICAgZmlsbDogI2U2ZTdlODsKICAgICAgfQoKICAgICAgLmNscy03IHsKICAgICAgICBmaWxsOiAjZmJiNzE2OwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+CiAgICAgIDxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
+    <span>haloe</span>
+  </a>
+  <ul>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="before-your-session.html">Your Session</a></li>
+    <li><a href="book.html" class="nav-cta">Book Now</a></li>
+  </ul>
+</nav>
+
+<div class="wrap">
+
+  <div class="intro-head">
+    <div class="eyebrow">Health &amp; Consent</div>
+    <h1>Your health &amp; <em>consent form</em></h1>
+    <p class="intro-line">Welcome, and thank you for booking with haloe. This short form takes about two minutes and helps me care for you safely. Everything you share is kept private and confidential, in a women-only practice.</p>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress" id="progress">
+    <div class="progress-meta">
+      <span class="progress-step" id="progressStep">Step 1 of 5</span>
+      <span class="progress-name" id="progressName">About you</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <form id="intakeForm" autocomplete="on" novalidate>
+
+    <!-- Honeypot (hidden from humans) -->
+    <div class="hp" aria-hidden="true">
+      <label>Leave this field empty<input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></label>
+    </div>
+
+    <!-- ===== STEP 1 · About you ===== -->
+    <section class="step active" data-step="1">
+      <h2>About <em>you</em></h2>
+
+      <div class="field">
+        <label class="q" for="full_name">Full name</label>
+        <input type="text" id="full_name" autocomplete="name">
+        <div class="field-error" data-for="full_name">Please enter your full name.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="date_of_birth">Date of birth</label>
+        <input type="date" id="date_of_birth" autocomplete="bday">
+        <div class="field-error" data-for="date_of_birth">Please enter your date of birth.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">I confirm I am 18 or over</label>
+        <div class="choices" data-group="age_confirmed">
+          <label class="opt"><input type="radio" name="age_confirmed" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="age_confirmed" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="age_confirmed">Please confirm.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="phone">Phone number</label>
+        <input type="tel" id="phone" autocomplete="tel" placeholder="+44 7700 000000">
+        <div class="field-error" data-for="phone">Please enter a phone number.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="email">Email address</label>
+        <input type="email" id="email" autocomplete="email" placeholder="your@email.com">
+        <div class="field-error" data-for="email">Please enter a valid email address.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="area_postcode">Area / postcode <span class="opt-hint">(helps with mobile bookings — optional)</span></label>
+        <input type="text" id="area_postcode" autocomplete="postal-code">
+      </div>
+
+      <div class="field">
+        <label class="q" for="package">Which package or treatment are you booking?</label>
+        <select id="package">
+          <option value="">Please select…</option>
+          <option>Cycle Comfort — Period Relief</option>
+          <option>Pain &amp; Mobility</option>
+          <option>Stress &amp; Sleep</option>
+          <option>Headache &amp; Tension</option>
+          <option>Digestion &amp; Detox</option>
+          <option>Breathe &amp; Immunity</option>
+          <option>Circulation &amp; Energy</option>
+          <option>Women's Hormonal Balance</option>
+          <option>Single treatment</option>
+          <option>Not sure yet</option>
+        </select>
+        <div class="field-error" data-for="package">Please choose an option.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="emergency_contact_name">Emergency contact — name</label>
+        <input type="text" id="emergency_contact_name">
+        <div class="field-error" data-for="emergency_contact_name">Please enter an emergency contact name.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="emergency_contact_phone">Emergency contact — phone</label>
+        <input type="tel" id="emergency_contact_phone">
+        <div class="field-error" data-for="emergency_contact_phone">Please enter an emergency contact phone.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="gp_name">Your GP name &amp; surgery <span class="opt-hint">(optional)</span></label>
+        <input type="text" id="gp_name">
+      </div>
+
+      <div class="step-nav">
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-gold" data-next>Continue</button>
+      </div>
+    </section>
+
+    <!-- ===== STEP 2 · Your health ===== -->
+    <section class="step" data-step="2">
+      <h2>Your <em>health</em></h2>
+
+      <div class="field">
+        <label class="q">Do you have any ongoing medical conditions?</label>
+        <div class="choices" data-group="has_conditions">
+          <label class="opt"><input type="radio" name="has_conditions" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="has_conditions" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="has_conditions">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="medical_conditions">If yes, please tell me about them <span class="opt-hint">(optional)</span></label>
+        <textarea id="medical_conditions"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q">Are you currently taking any medication or supplements?</label>
+        <div class="choices" data-group="takes_medication">
+          <label class="opt"><input type="radio" name="takes_medication" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="takes_medication" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="takes_medication">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="current_medications">If yes, please list them <span class="opt-hint">(optional)</span></label>
+        <textarea id="current_medications"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q">Do you have any allergies — including to oils, latex, plasters or dressings?</label>
+        <div class="choices" data-group="has_allergies">
+          <label class="opt"><input type="radio" name="has_allergies" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="has_allergies" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="has_allergies">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="allergies">If yes, please list them <span class="opt-hint">(optional)</span></label>
+        <textarea id="allergies"></textarea>
+      </div>
+
+      <div class="field">
+        <label class="q">Have you had hijama or cupping before?</label>
+        <div class="choices" data-group="had_hijama_before">
+          <label class="opt"><input type="radio" name="had_hijama_before" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="had_hijama_before" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="had_hijama_before">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="main_concern">What would you most like help with? <span class="opt-hint">(your main reason for coming — optional)</span></label>
+        <textarea id="main_concern"></textarea>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn btn-outline" data-back>Back</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-gold" data-next>Continue</button>
+      </div>
+    </section>
+
+    <!-- ===== STEP 3 · Safety screening ===== -->
+    <section class="step" data-step="3">
+      <h2>Safety <em>screening</em></h2>
+      <p class="section-intro">Please answer honestly — there are no wrong answers. Some answers simply mean we'll need to wait, adjust your treatment, or check with your GP before any wet cupping. Your safety always comes first.</p>
+
+      <div class="field">
+        <label class="q">Are you pregnant, or is there any chance you could be?</label>
+        <div class="choices" data-group="is_pregnant">
+          <label class="opt"><input type="radio" name="is_pregnant" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="is_pregnant" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="is_pregnant">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Are you currently breastfeeding?</label>
+        <div class="choices" data-group="breastfeeding">
+          <label class="opt"><input type="radio" name="breastfeeding" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="breastfeeding" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="breastfeeding">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Do you take blood-thinning or anticoagulant medication? <span class="opt-hint">(e.g. warfarin, rivaroxaban, apixaban, clopidogrel, or high-dose aspirin)</span></label>
+        <div class="choices" data-group="takes_blood_thinners">
+          <label class="opt"><input type="radio" name="takes_blood_thinners" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="takes_blood_thinners" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="takes_blood_thinners">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Do you have a bleeding or clotting disorder? <span class="opt-hint">(e.g. haemophilia)</span></label>
+        <div class="choices" data-group="bleeding_disorder">
+          <label class="opt"><input type="radio" name="bleeding_disorder" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="bleeding_disorder" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="bleeding_disorder">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Do you have diabetes?</label>
+        <div class="choices" data-group="diabetes_status">
+          <label class="opt"><input type="radio" name="diabetes_status" value="No"><span>No</span></label>
+          <label class="opt"><input type="radio" name="diabetes_status" value="Yes — managed by diet/tablets"><span>Yes — managed by diet/tablets</span></label>
+          <label class="opt"><input type="radio" name="diabetes_status" value="Yes — insulin-dependent (Type 1 or insulin pump)"><span>Yes — insulin-dependent (Type 1 or insulin pump)</span></label>
+        </div>
+        <div class="field-error" data-for="diabetes_status">Please choose an option.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Are you currently undergoing chemotherapy or radiotherapy, or being treated for cancer?</label>
+        <div class="choices" data-group="chemo_or_radiotherapy">
+          <label class="opt"><input type="radio" name="chemo_or_radiotherapy" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="chemo_or_radiotherapy" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="chemo_or_radiotherapy">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Do you have anaemia or low iron, or do you feel faint or dizzy easily?</label>
+        <div class="choices" data-group="has_anaemia">
+          <label class="opt"><input type="radio" name="has_anaemia" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="has_anaemia" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="has_anaemia">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Do you have a blood-borne infection? <span class="opt-hint">(e.g. hepatitis B or C, HIV)</span></label>
+        <div class="choices" data-group="infectious_condition">
+          <label class="opt"><input type="radio" name="infectious_condition" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="infectious_condition" value="No"><span>No</span></label>
+          <label class="opt"><input type="radio" name="infectious_condition" value="Prefer to discuss privately"><span>Prefer to discuss privately</span></label>
+        </div>
+        <div class="field-error" data-for="infectious_condition">Please choose an option.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Have you had any surgery in the last 6 months?</label>
+        <div class="choices" data-group="recent_surgery">
+          <label class="opt"><input type="radio" name="recent_surgery" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="recent_surgery" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="recent_surgery">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Do you have very high or very low blood pressure?</label>
+        <div class="choices" data-group="blood_pressure">
+          <label class="opt"><input type="radio" name="blood_pressure" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="blood_pressure" value="No"><span>No</span></label>
+          <label class="opt"><input type="radio" name="blood_pressure" value="Not sure"><span>Not sure</span></label>
+        </div>
+        <div class="field-error" data-for="blood_pressure">Please choose an option.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Do you have any skin conditions, infections, or broken skin in the area to be treated?</label>
+        <div class="choices" data-group="skin_condition">
+          <label class="opt"><input type="radio" name="skin_condition" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="skin_condition" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="skin_condition">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Do you have a pacemaker, epilepsy, or any other condition you think I should know about?</label>
+        <div class="choices" data-group="pacemaker_epilepsy">
+          <label class="opt"><input type="radio" name="pacemaker_epilepsy" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="pacemaker_epilepsy" value="No"><span>No</span></label>
+        </div>
+        <div class="field-error" data-for="pacemaker_epilepsy">Please choose Yes or No.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="safety_notes">If you answered yes to anything above, or there's anything else I should know, please tell me here <span class="opt-hint">(optional)</span></label>
+        <textarea id="safety_notes"></textarea>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn btn-outline" data-back>Back</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-gold" data-next>Continue</button>
+      </div>
+    </section>
+
+    <!-- ===== STEP 4 · Before & after ===== -->
+    <section class="step" data-step="4">
+      <h2>Before &amp; after your <em>session</em></h2>
+      <p class="section-intro">A few simple things help your session go smoothly and your body recover well.</p>
+
+      <div class="field">
+        <label class="q">Please tick to confirm you understand:</label>
+        <div class="check-list" data-group="before_after_ack">
+          <label class="check-item">
+            <input type="checkbox" name="before_after_ack" value="1">
+            <span class="check-box"></span>
+            <span>I'll come on a fairly empty stomach (eat 2–3 hours before, not right before), well hydrated, and showered.</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="before_after_ack" value="1">
+            <span class="check-box"></span>
+            <span>Afterwards I'll rest, keep the area clean for 24–48 hours, and avoid strenuous activity, swimming and saunas for 24 hours.</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" name="before_after_ack" value="1">
+            <span class="check-box"></span>
+            <span>If I practise ruqya, I'll leave at least 24 hours between ruqya and my session.</span>
+          </label>
+        </div>
+        <div class="field-error" data-for="before_after_ack">Please tick all three to continue.</div>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn btn-outline" data-back>Back</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-gold" data-next>Continue</button>
+      </div>
+    </section>
+
+    <!-- ===== STEP 5 · Consent & declaration ===== -->
+    <section class="step" data-step="5">
+      <h2>Consent &amp; <em>declaration</em></h2>
+
+      <div class="consent-statement">
+        Please read before signing. Hijama (cupping) at haloe is a complementary wellness therapy. It is intended to support how you feel and to sit alongside your normal healthcare — it is not a substitute for medical advice, diagnosis or treatment, and it does not claim to cure any medical condition. Results vary from person to person. Wet cupping involves a few small, superficial skin incisions so that a little blood can be drawn into the cups. This can leave temporary circular marks that usually fade within one to two weeks. All equipment is single-use and sterile, and disposed of safely. By signing below you confirm you understand and accept the above, and that you have given accurate information about your health.
+      </div>
+
+      <div class="field">
+        <div class="check-list" data-group="consent_accurate_info">
+          <label class="check-item">
+            <input type="checkbox" id="consent_accurate_info">
+            <span class="check-box"></span>
+            <span>I confirm the information I have given is true and complete to the best of my knowledge. <strong style="color:var(--gold);font-weight:400;">(I agree)</strong></span>
+          </label>
+        </div>
+        <div class="field-error" data-for="consent_accurate_info">Please tick to agree.</div>
+      </div>
+
+      <div class="field">
+        <div class="check-list" data-group="consent_complementary">
+          <label class="check-item">
+            <input type="checkbox" id="consent_complementary">
+            <span class="check-box"></span>
+            <span>I understand hijama at haloe is a complementary wellness therapy and not a substitute for medical care, and that results vary. <strong style="color:var(--gold);font-weight:400;">(I understand)</strong></span>
+          </label>
+        </div>
+        <div class="field-error" data-for="consent_complementary">Please tick to confirm.</div>
+      </div>
+
+      <div class="field">
+        <div class="check-list" data-group="consent_treatment">
+          <label class="check-item">
+            <input type="checkbox" id="consent_treatment">
+            <span class="check-box"></span>
+            <span>I understand wet cupping involves small, superficial incisions that may leave temporary marks, and I consent to treatment. <strong style="color:var(--gold);font-weight:400;">(I consent)</strong></span>
+          </label>
+        </div>
+        <div class="field-error" data-for="consent_treatment">Please tick to consent.</div>
+      </div>
+
+      <div class="field">
+        <div class="check-list" data-group="consent_notify_changes">
+          <label class="check-item">
+            <input type="checkbox" id="consent_notify_changes">
+            <span class="check-box"></span>
+            <span>I will let Halima know of any change to my health before each session. <strong style="color:var(--gold);font-weight:400;">(I agree)</strong></span>
+          </label>
+        </div>
+        <div class="field-error" data-for="consent_notify_changes">Please tick to agree.</div>
+      </div>
+
+      <div class="field">
+        <div class="check-list" data-group="consent_data_storage">
+          <label class="check-item">
+            <input type="checkbox" id="consent_data_storage">
+            <span class="check-box"></span>
+            <span>I consent to haloe securely storing this information for the purpose of my care, in line with UK GDPR. <strong style="color:var(--gold);font-weight:400;">(I consent)</strong></span>
+          </label>
+        </div>
+        <div class="field-error" data-for="consent_data_storage">Please tick to consent.</div>
+      </div>
+
+      <div class="field">
+        <label class="q">Photography <span class="opt-hint">(optional — your choice, not required)</span>: Are you happy for anonymised photos — e.g. cups in place, never your face — to be used for haloe's education and social media?</label>
+        <div class="choices" data-group="photo_consent">
+          <label class="opt"><input type="radio" name="photo_consent" value="Yes"><span>Yes</span></label>
+          <label class="opt"><input type="radio" name="photo_consent" value="No"><span>No</span></label>
+          <label class="opt"><input type="radio" name="photo_consent" value="Please ask me each time"><span>Please ask me each time</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="signature_name">Digital signature — type your full name to sign</label>
+        <input type="text" id="signature_name" autocomplete="name">
+        <div class="field-error" data-for="signature_name">Please type your full name to sign.</div>
+      </div>
+
+      <div class="field">
+        <label class="q" for="signature_date">Today's date</label>
+        <input type="date" id="signature_date">
+        <div class="field-error" data-for="signature_date">Please enter today's date.</div>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn btn-outline" data-back>Back</button>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-gold" id="submitBtn">Submit form</button>
+      </div>
+    </section>
+
+  </form>
+
+  <!-- Confirmation screen -->
+  <div class="screen" id="successScreen">
+    <div class="mark">✓</div>
+    <h2>Thank you — that's <em>everything I need</em></h2>
+    <p>I'll review your form before your first session and be in touch if there's anything we should chat about beforehand. See you soon — Halima · haloe</p>
+  </div>
+
+  <!-- Error screen -->
+  <div class="screen" id="errorScreen">
+    <div class="mark">!</div>
+    <h2>Something went <em>wrong</em></h2>
+    <p>Sorry — your form didn't go through. Please try again, or message me on Instagram <a href="https://instagram.com/haloe_hijama" target="_blank" style="color:var(--gold);">@haloe_hijama</a> and I'll sort it out.</p>
+    <button type="button" class="btn btn-outline" id="retryBtn">Try again</button>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6IG5vbmU7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogI2NmOGEyYTsKICAgICAgfQoKICAgICAgLmNscy00IHsKICAgICAgICBvcGFjaXR5OiAwOwogICAgICB9CgogICAgICAuY2xzLTUgewogICAgICAgIGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7CiAgICAgIH0KCiAgICAgIC5jbHMtNiB7CiAgICAgICAgZmlsbDogI2U2ZTdlODsKICAgICAgfQoKICAgICAgLmNscy03IHsKICAgICAgICBmaWxsOiAjZmJiNzE2OwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+CiAgICAgIDxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
+    <span>haloe</span>
+  </div>
+  <div class="footer-links">
+    <a href="index.html#about">About</a>
+    <a href="before-your-session.html">Your Session</a>
+    <a href="book.html">Book</a>
+    <a href="https://instagram.com/haloe_hijama" target="_blank">Instagram</a>
+  </div>
+  <div class="footer-right">
+    © 2026 Haloe · Halima Yasmin<br>
+    CMA &amp; IPHM Accredited · Fully Insured · Manchester
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var TOTAL = 5;
+  var SECTION_NAMES = { 1:'About you', 2:'Your health', 3:'Safety screening', 4:'Before & after', 5:'Consent & declaration' };
+  var current = 1;
+
+  // Required validators per step. Each entry: { key, type, msg }
+  // type: 'text' (input/select/textarea by id), 'radio' (group by name),
+  //       'email' (valid format), 'consent' (single checkbox by id), 'allchecks' (group all ticked)
+  var REQUIRED = {
+    1: [
+      { key:'full_name', type:'text' },
+      { key:'date_of_birth', type:'text' },
+      { key:'age_confirmed', type:'radio' },
+      { key:'phone', type:'text' },
+      { key:'email', type:'email' },
+      { key:'package', type:'text' },
+      { key:'emergency_contact_name', type:'text' },
+      { key:'emergency_contact_phone', type:'text' }
+    ],
+    2: [
+      { key:'has_conditions', type:'radio' },
+      { key:'takes_medication', type:'radio' },
+      { key:'has_allergies', type:'radio' },
+      { key:'had_hijama_before', type:'radio' }
+    ],
+    3: [
+      { key:'is_pregnant', type:'radio' },
+      { key:'breastfeeding', type:'radio' },
+      { key:'takes_blood_thinners', type:'radio' },
+      { key:'bleeding_disorder', type:'radio' },
+      { key:'diabetes_status', type:'radio' },
+      { key:'chemo_or_radiotherapy', type:'radio' },
+      { key:'has_anaemia', type:'radio' },
+      { key:'infectious_condition', type:'radio' },
+      { key:'recent_surgery', type:'radio' },
+      { key:'blood_pressure', type:'radio' },
+      { key:'skin_condition', type:'radio' },
+      { key:'pacemaker_epilepsy', type:'radio' }
+    ],
+    4: [
+      { key:'before_after_ack', type:'allchecks' }
+    ],
+    5: [
+      { key:'consent_accurate_info', type:'consent' },
+      { key:'consent_complementary', type:'consent' },
+      { key:'consent_treatment', type:'consent' },
+      { key:'consent_notify_changes', type:'consent' },
+      { key:'consent_data_storage', type:'consent' },
+      { key:'signature_name', type:'text' },
+      { key:'signature_date', type:'text' }
+    ]
+  };
+
+  function $(sel, ctx) { return (ctx || document).querySelector(sel); }
+  function showError(key, show) {
+    var el = $('.field-error[data-for="' + key + '"]');
+    if (el) el.classList.toggle('visible', !!show);
+  }
+  function markInvalid(key, type, show) {
+    if (type === 'radio') {
+      var grp = $('.choices[data-group="' + key + '"]');
+      if (grp) grp.classList.toggle('invalid', !!show);
+    } else if (type === 'allchecks' || type === 'consent') {
+      var cl = $('.check-list[data-group="' + key + '"]');
+      if (cl) cl.classList.toggle('invalid', !!show);
+    } else {
+      var inp = document.getElementById(key);
+      if (inp) inp.classList.toggle('invalid', !!show);
+    }
+  }
+
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function fieldValid(field) {
+    if (field.type === 'radio') {
+      return !!$('input[name="' + field.key + '"]:checked');
+    }
+    if (field.type === 'consent') {
+      var c = document.getElementById(field.key);
+      return !!(c && c.checked);
+    }
+    if (field.type === 'allchecks') {
+      var boxes = document.querySelectorAll('input[name="' + field.key + '"]');
+      if (!boxes.length) return false;
+      for (var i = 0; i < boxes.length; i++) { if (!boxes[i].checked) return false; }
+      return true;
+    }
+    var inp = document.getElementById(field.key);
+    var val = inp ? inp.value.trim() : '';
+    if (field.type === 'email') return EMAIL_RE.test(val);
+    return val.length > 0;
+  }
+
+  function validateStep(step) {
+    var fields = REQUIRED[step] || [];
+    var firstBad = null;
+    for (var i = 0; i < fields.length; i++) {
+      var ok = fieldValid(fields[i]);
+      showError(fields[i].key, !ok);
+      markInvalid(fields[i].key, fields[i].type, !ok);
+      if (!ok && !firstBad) firstBad = fields[i];
+    }
+    if (firstBad) {
+      var node = document.getElementById(firstBad.key) ||
+                 $('.choices[data-group="' + firstBad.key + '"]') ||
+                 $('.check-list[data-group="' + firstBad.key + '"]');
+      if (node && node.scrollIntoView) node.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+    return !firstBad;
+  }
+
+  function render() {
+    var steps = document.querySelectorAll('.step');
+    for (var i = 0; i < steps.length; i++) {
+      steps[i].classList.toggle('active', Number(steps[i].getAttribute('data-step')) === current);
+    }
+    $('#progressStep').textContent = 'Step ' + current + ' of ' + TOTAL;
+    $('#progressName').textContent = SECTION_NAMES[current];
+    $('#progressFill').style.width = (current / TOTAL * 100) + '%';
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  function goNext() {
+    if (!validateStep(current)) return;
+    if (current < TOTAL) { current++; render(); }
+  }
+  function goBack() {
+    if (current > 1) { current--; render(); }
+  }
+
+  // Clear a field's error as soon as the user starts fixing it.
+  document.addEventListener('input', function (e) {
+    var f = e.target.closest('.field');
+    if (!f) return;
+    var err = f.querySelector('.field-error');
+    if (err) err.classList.remove('visible');
+    if (e.target.classList) e.target.classList.remove('invalid');
+  });
+  document.addEventListener('change', function (e) {
+    var grp = e.target.closest('.choices, .check-list');
+    if (grp) grp.classList.remove('invalid');
+    var f = e.target.closest('.field');
+    if (f) { var err = f.querySelector('.field-error'); if (err) err.classList.remove('visible'); }
+  });
+
+  // Wire nav buttons
+  var nexts = document.querySelectorAll('[data-next]');
+  for (var n = 0; n < nexts.length; n++) nexts[n].addEventListener('click', goNext);
+  var backs = document.querySelectorAll('[data-back]');
+  for (var b = 0; b < backs.length; b++) backs[b].addEventListener('click', goBack);
+
+  // ---- Collect + submit ----
+  function textVal(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  function radioVal(name) { var el = $('input[name="' + name + '"]:checked'); return el ? el.value : ''; }
+  function checkVal(id) { var el = document.getElementById(id); return el && el.checked ? 1 : 0; }
+  function allChecked(name) {
+    var boxes = document.querySelectorAll('input[name="' + name + '"]');
+    if (!boxes.length) return 0;
+    for (var i = 0; i < boxes.length; i++) { if (!boxes[i].checked) return 0; }
+    return 1;
+  }
+
+  function collect() {
+    return {
+      website: textVal('website'), // honeypot
+      full_name: textVal('full_name'),
+      date_of_birth: textVal('date_of_birth'),
+      age_confirmed: radioVal('age_confirmed'),
+      phone: textVal('phone'),
+      email: textVal('email'),
+      area_postcode: textVal('area_postcode'),
+      package: textVal('package'),
+      emergency_contact_name: textVal('emergency_contact_name'),
+      emergency_contact_phone: textVal('emergency_contact_phone'),
+      gp_name: textVal('gp_name'),
+      has_conditions: radioVal('has_conditions'),
+      medical_conditions: textVal('medical_conditions'),
+      takes_medication: radioVal('takes_medication'),
+      current_medications: textVal('current_medications'),
+      has_allergies: radioVal('has_allergies'),
+      allergies: textVal('allergies'),
+      had_hijama_before: radioVal('had_hijama_before'),
+      main_concern: textVal('main_concern'),
+      is_pregnant: radioVal('is_pregnant'),
+      breastfeeding: radioVal('breastfeeding'),
+      takes_blood_thinners: radioVal('takes_blood_thinners'),
+      bleeding_disorder: radioVal('bleeding_disorder'),
+      diabetes_status: radioVal('diabetes_status'),
+      chemo_or_radiotherapy: radioVal('chemo_or_radiotherapy'),
+      has_anaemia: radioVal('has_anaemia'),
+      infectious_condition: radioVal('infectious_condition'),
+      recent_surgery: radioVal('recent_surgery'),
+      blood_pressure: radioVal('blood_pressure'),
+      skin_condition: radioVal('skin_condition'),
+      pacemaker_epilepsy: radioVal('pacemaker_epilepsy'),
+      safety_notes: textVal('safety_notes'),
+      before_after_ack: allChecked('before_after_ack'),
+      consent_accurate_info: checkVal('consent_accurate_info'),
+      consent_complementary: checkVal('consent_complementary'),
+      consent_treatment: checkVal('consent_treatment'),
+      consent_notify_changes: checkVal('consent_notify_changes'),
+      consent_data_storage: checkVal('consent_data_storage'),
+      photo_consent: radioVal('photo_consent'),
+      signature_name: textVal('signature_name'),
+      signature_date: textVal('signature_date')
+    };
+  }
+
+  var submitBtn = document.getElementById('submitBtn');
+  submitBtn.addEventListener('click', function () {
+    if (!validateStep(5)) return;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    var payload = collect();
+    fetch('/intake-submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (res) {
+      if (!res.ok) throw new Error('Bad status ' + res.status);
+      return res.json().catch(function () { return {}; });
+    }).then(function () {
+      $('#intakeForm').style.display = 'none';
+      $('#progress').style.display = 'none';
+      $('.intro-head').style.display = 'none';
+      document.getElementById('successScreen').classList.add('active');
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }).catch(function () {
+      $('#intakeForm').style.display = 'none';
+      $('#progress').style.display = 'none';
+      document.getElementById('errorScreen').classList.add('active');
+      window.scrollTo({ top:0, behavior:'smooth' });
+    });
+  });
+
+  document.getElementById('retryBtn').addEventListener('click', function () {
+    document.getElementById('errorScreen').classList.remove('active');
+    $('#intakeForm').style.display = '';
+    $('#progress').style.display = '';
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit form';
+    render();
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>

@@ -9,17 +9,16 @@
 //   STRIPE_WEBHOOK_SECRET  — the signing secret for this webhook endpoint (whsec_…)
 //   RESEND_API_KEY         — Resend API key for sending email
 
+import {
+  BLACK, GOLD, CREAM, MUTED, HAIRLINE,
+  sendEmail, esc, emailButton, emailHeader, emailFooter, emailShell,
+} from './_email.js';
+
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
-const INTAKE_FORM = 'https://forms.gle/UY2jpwdBHXPccfxJ9';
-const GUIDE_URL = 'https://haloe.health/before-your-session';
-
-// Brand tokens (kept in sync with the website)
-const BLACK = '#0D0D0D';
-const GOLD = '#C8A96E';
-const CREAM = '#F5F0E8';
-const MUTED = '#A39A86';
-const HAIRLINE = 'rgba(200,169,110,0.22)';
+// Our own intake form now lives on-site (replaces the old Google Form). The
+// pre-session guide is no longer linked here — it is emailed after intake submit.
+const INTAKE_URL = 'https://haloe.health/intake';
 
 export async function onRequestPost(context) {
   // --- Read the RAW body first (required for signature verification) ---
@@ -193,35 +192,9 @@ function constantTimeEqual(a, b) {
 /* Email sending + formatting                                          */
 /* ------------------------------------------------------------------ */
 
-async function sendEmail(apiKey, payload) {
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Resend responded ${res.status}: ${body}`);
-  }
-  return res.json();
-}
-
 function formatGBP(pence) {
   const pounds = (Number(pence) || 0) / 100;
   return '£' + (Number.isInteger(pounds) ? String(pounds) : pounds.toFixed(2));
-}
-
-// Escape user-supplied values before interpolating into HTML.
-function esc(value) {
-  return String(value == null ? '' : value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }
 
 // A single label/value row for the details table.
@@ -245,21 +218,7 @@ function clientEmailHtml(d) {
     ? `<p style="color:${MUTED};font-size:13px;line-height:1.7;margin:0 0 8px;font-family:Arial,Helvetica,sans-serif;">Your deposit secures your appointment. The remaining balance is payable on the day.</p>`
     : '';
 
-  return `<!doctype html>
-<html>
-  <body style="margin:0;padding:0;background:${BLACK};">
-    <div style="background:${BLACK};padding:32px 16px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
-        <tr>
-          <td align="center">
-            <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:480px;max-width:100%;border-collapse:collapse;">
-              <!-- Header -->
-              <tr>
-                <td align="center" style="padding:8px 0 26px;border-bottom:1px solid ${HAIRLINE};">
-                  <div style="font-family:Georgia,'Times New Roman',serif;font-size:30px;letter-spacing:9px;color:${CREAM};font-weight:normal;">haloe</div>
-                  <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:3px;color:${GOLD};text-transform:uppercase;margin-top:8px;">Hijama &middot; Wellness &middot; Manchester</div>
-                </td>
-              </tr>
+  const inner = `${emailHeader()}
               <!-- Intro -->
               <tr>
                 <td style="padding:30px 4px 4px;">
@@ -294,13 +253,8 @@ function clientEmailHtml(d) {
                 </td>
               </tr>
               <tr>
-                <td align="center" style="padding:0 4px 14px;">
-                  <a href="${INTAKE_FORM}" style="display:inline-block;background:${GOLD};color:${BLACK};text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;padding:15px 32px;border-radius:26px;font-family:Arial,Helvetica,sans-serif;">Complete your intake form</a>
-                </td>
-              </tr>
-              <tr>
                 <td align="center" style="padding:0 4px 26px;">
-                  <a href="${GUIDE_URL}" style="display:inline-block;background:${GOLD};color:${BLACK};text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;padding:15px 32px;border-radius:26px;font-family:Arial,Helvetica,sans-serif;">Read your pre-session guide</a>
+                  ${emailButton(INTAKE_URL, 'Complete your intake form')}
                 </td>
               </tr>
               <!-- Personal note + compliance -->
@@ -310,20 +264,9 @@ function clientEmailHtml(d) {
                   <p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;">haloe offers complementary wellness therapy to support your general wellbeing, relaxation and everyday tension. It is not a substitute for medical advice, diagnosis or treatment.</p>
                 </td>
               </tr>
-              <!-- Footer -->
-              <tr>
-                <td align="center" style="padding:26px 4px 8px;border-top:1px solid ${HAIRLINE};margin-top:20px;">
-                  <div style="color:${MUTED};font-size:12px;letter-spacing:1px;font-family:Arial,Helvetica,sans-serif;">With warmth,<br><span style="color:${GOLD};">Halima &middot; haloe</span></div>
-                  <div style="color:#6B6357;font-size:11px;margin-top:12px;font-family:Arial,Helvetica,sans-serif;">Women only &middot; Manchester</div>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </div>
-  </body>
-</html>`;
+              ${emailFooter()}`;
+
+  return emailShell(inner);
 }
 
 // Plain, information-dense notification for Halima with everything she needs to follow up.
