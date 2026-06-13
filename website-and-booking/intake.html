@@ -4,11 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your health &amp; consent form · haloe</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Your private health and consent form for haloe — a short, confidential intake before your hijama session. Women-only practice, Manchester.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
+  /* ── Branded loading screen (presentation only) ── */
+  #haloeLoader {
+    position:fixed; inset:0; z-index:9999;
+    background:var(--black);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:26px;
+    opacity:1; transition:opacity 0.6s ease;
+    /* JS-fail fallback: hide even if window.load / JS never fires */
+    animation:haloeLoaderFailsafe 0s linear 6s forwards;
+  }
+  @keyframes haloeLoaderFailsafe { to { opacity:0; visibility:hidden; pointer-events:none; } }
+  #haloeLoader.is-hidden { opacity:0; pointer-events:none; }
+  #haloeLoader img { width:84px; height:84px; display:block; animation:haloeLoaderPulse 1.9s ease-in-out infinite; }
+  @keyframes haloeLoaderPulse { 0%,100% { opacity:0.6; transform:scale(0.97); } 50% { opacity:1; transform:scale(1); } }
+  .haloe-loader-bar { width:120px; height:2px; background:rgba(201,160,64,0.16); border-radius:2px; overflow:hidden; }
+  .haloe-loader-bar::after { content:''; display:block; width:38%; height:100%; background:#c9a040; border-radius:2px; animation:haloeLoaderShimmer 1.35s ease-in-out infinite; }
+  @keyframes haloeLoaderShimmer { 0% { transform:translateX(-130%); } 100% { transform:translateX(330%); } }
+  @media (prefers-reduced-motion: reduce) {
+    #haloeLoader img, .haloe-loader-bar::after { animation:none; }
+    #haloeLoader img { opacity:1; }
+  }
   :root {
     --black: #080806;
     --deep: #0d0d0b;
@@ -176,6 +197,26 @@
 </style>
 </head>
 <body>
+<!-- Branded loading screen — fades on window load; CSS failsafe hides it if JS fails -->
+<div id="haloeLoader" role="status" aria-label="Loading haloe">
+  <img src="/favicon.svg" alt="haloe" width="84" height="84">
+  <div class="haloe-loader-bar"></div>
+</div>
+<script>
+(function () {
+  var el = document.getElementById('haloeLoader');
+  if (!el) return;
+  var done = false;
+  function hide() {
+    if (done) return; done = true;
+    el.classList.add('is-hidden');
+    setTimeout(function () { if (el && el.parentNode) el.parentNode.removeChild(el); }, 700);
+  }
+  if (document.readyState === 'complete') hide();
+  else window.addEventListener('load', hide);
+  setTimeout(hide, 5000); // safety net: never trap the user on the loader
+})();
+</script>
 
 <!-- NAV -->
 <nav>
