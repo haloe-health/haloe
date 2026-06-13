@@ -9,19 +9,19 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --gold: #C8A96E;
-    --gold-light: #E8D5A8;
-    --gold-dark: #A08040;
+    --gold: #c9a040;
+    --gold-light: #dbb85a;
+    --gold-dark: #a8842f;
     --black: #0D0D0D;
     --cream: #F5F0E8;
     --cream-mid: #EDE6D6;
     --white: #FFFFFF;
     --text-muted: #6B6357;
-    --border: rgba(200, 169, 110, 0.18);
-    --border-strong: rgba(200, 169, 110, 0.4);
+    --border: rgba(201, 160, 64, 0.18);
+    --border-strong: rgba(201, 160, 64, 0.4);
     --surface: #15120D;
     --radius: 16px;
-    --focus-glow: 0 0 0 3px rgba(200, 169, 110, 0.15);
+    --focus-glow: 0 0 0 3px rgba(201, 160, 64, 0.15);
     --step-active: var(--gold);
     --step-done: var(--gold-dark);
     --step-idle: #D0C8BC;
@@ -205,8 +205,8 @@
     position: relative;
     background: var(--surface);
   }
-  .service-card:hover { border-color: var(--border-strong); background: rgba(200,169,110,0.04); }
-  .service-card.selected { border-color: var(--gold); background: rgba(200,169,110,0.08); }
+  .service-card:hover { border-color: var(--border-strong); background: rgba(201,160,64,0.04); }
+  .service-card.selected { border-color: var(--gold); background: rgba(201,160,64,0.08); }
   .service-card.selected::before {
     content: '✓';
     position: absolute;
@@ -311,7 +311,7 @@
     transition: all 0.15s;
   }
   .cal-day:hover:not(.disabled):not(.empty) { border-color: var(--border-strong); color: var(--gold); }
-  .cal-day.selected { border-color: var(--gold); background: rgba(200,169,110,0.15); color: var(--gold); }
+  .cal-day.selected { border-color: var(--gold); background: rgba(201,160,64,0.15); color: var(--gold); }
   .cal-day.today { color: var(--gold-light); font-weight: 500; }
   .cal-day.disabled { color: #3A3530; cursor: not-allowed; }
   .cal-day.empty { cursor: default; }
@@ -325,7 +325,7 @@
   .time-slot {
     padding: 0.55rem 0.4rem;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 50px;
     text-align: center;
     font-size: 0.78rem;
     letter-spacing: 0.06em;
@@ -334,7 +334,7 @@
     transition: all 0.15s;
   }
   .time-slot:hover:not(.taken) { border-color: var(--gold); color: var(--gold); }
-  .time-slot.selected { border-color: var(--gold); background: rgba(200,169,110,0.1); color: var(--gold); }
+  .time-slot.selected { border-color: var(--gold); background: rgba(201,160,64,0.1); color: var(--gold); }
   .time-slot.taken { color: #3A3530; cursor: not-allowed; border-color: transparent; }
 
   /* ---- Form Fields ---- */
@@ -405,7 +405,7 @@
   .checkbox-custom {
     width: 20px; height: 20px;
     min-width: 20px;
-    border: 1.5px solid rgba(200,169,110,0.5);
+    border: 1.5px solid rgba(201,160,64,0.5);
     background: transparent;
     display: flex; align-items: center; justify-content: center;
     margin-top: 1px;
@@ -441,7 +441,7 @@
   .summary-card {
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    background: rgba(200,169,110,0.03);
+    background: rgba(201,160,64,0.03);
     overflow: hidden;
   }
   /* Hero block — treatment name + price */
@@ -484,7 +484,7 @@
     padding: 0.65rem 1.5rem;
     gap: 1rem;
   }
-  .sc-row + .sc-row { border-top: 1px solid rgba(200,169,110,0.07); }
+  .sc-row + .sc-row { border-top: 1px solid rgba(201,160,64,0.07); }
   .sc-label {
     font-size: 0.68rem;
     letter-spacing: 0.12em;
@@ -516,24 +516,24 @@
     background: var(--gold);
     color: var(--black);
     border: none;
-    border-radius: var(--radius);
+    border-radius: 50px;
     font-family: 'Poppins', sans-serif;
     font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s, opacity 0.2s;
+    transition: background 0.25s, transform 0.25s, box-shadow 0.25s, opacity 0.2s;
     margin-top: 2rem;
   }
-  .btn-primary:hover { background: var(--gold-light); }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(201,160,64,0.25); }
   .btn-primary:active { transform: scale(0.98); }
   .btn-primary:disabled { background: #3A3530; color: #6B6357; cursor: not-allowed; opacity: 0.6; transform: none; }
 
   .btn-back {
     background: none;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: 50px;
     color: var(--text-muted);
     font-family: 'Poppins', sans-serif;
     font-size: 0.7rem;
@@ -597,7 +597,7 @@
     gap: 1rem;
     padding: 0.6rem 1.4rem;
     font-size: 0.85rem;
-    border-top: 1px solid rgba(200,169,110,0.07);
+    border-top: 1px solid rgba(201,160,64,0.07);
   }
   .confirm-detail-row .cd-label { color: var(--text-muted); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; flex-shrink: 0; }
   .confirm-detail-row .cd-value { color: var(--cream); font-family: 'Poppins', sans-serif; font-size: 0.9rem; text-align: right; }
@@ -623,7 +623,7 @@
 </head>
 <body>
 
-<nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:flex-end;align-items:center;padding:18px 40px;background:rgba(13,13,13,0.92);border-bottom:1px solid rgba(200,169,110,0.12);backdrop-filter:blur(12px);">
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:flex-end;align-items:center;padding:18px 40px;background:rgba(13,13,13,0.92);border-bottom:1px solid rgba(201,160,64,0.12);backdrop-filter:blur(12px);">
   <a href="index.html" class="back-link">← Back to site</a>
 </nav>
 <div style="height:64px;"></div>
@@ -792,7 +792,7 @@
       <button class="btn-primary" id="btn-deposit" onclick="handlePayment('deposit')" style="margin-top:0; background:var(--gold);">
         Pay £25 Deposit
       </button>
-      <button class="btn-primary" id="btn-full" onclick="handlePayment('full')" style="margin-top:0; background:transparent; border:1px solid rgba(200,169,110,0.5); color:var(--gold);">
+      <button class="btn-primary" id="btn-full" onclick="handlePayment('full')" style="margin-top:0; background:transparent; border:1px solid rgba(201,160,64,0.5); color:var(--gold);">
         Pay in Full
       </button>
     </div>
