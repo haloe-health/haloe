@@ -145,9 +145,6 @@
   );
   const waUrl = `https://wa.me/447474833643?text=${waMsg}`;
   document.getElementById('wa-btn').href = waUrl;
-
-  // Try to open WhatsApp automatically; if the browser blocks it, the button is there.
-  setTimeout(() => { window.open(waUrl, '_blank'); }, 600);
 </script>
 
 </body>
