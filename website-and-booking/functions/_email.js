@@ -10,10 +10,10 @@
 
 // Brand tokens (kept in sync with the website's email styling).
 export const BLACK = '#0D0D0D';
-export const GOLD = '#C8A96E';
+export const GOLD = '#c9a040';
 export const CREAM = '#F5F0E8';
 export const MUTED = '#A39A86';
-export const HAIRLINE = 'rgba(200,169,110,0.22)';
+export const HAIRLINE = 'rgba(201,160,64,0.22)';
 
 // POST an email through the Resend REST API. Throws on a non-2xx response.
 export async function sendEmail(apiKey, payload) {
