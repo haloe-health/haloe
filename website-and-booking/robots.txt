@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Health-intake form and its submit endpoint hold personal health data — never index
+Disallow: /intake
+Disallow: /intake.html
+Disallow: /intake-submit
+
+Sitemap: https://haloe.health/sitemap.xml
