@@ -41,6 +41,15 @@ export async function onRequestPost(context) {
       return new Response('Invalid signature', { status: 400 });
     }
 
+    // Reject stale payloads. Without this a captured, still-validly-signed
+    // webhook could be replayed forever, duplicating bookings and alerts.
+    // Stripe's own libraries use the same 5-minute default tolerance.
+    const ageSeconds = Math.abs(Math.floor(Date.now() / 1000) - Number(t));
+    if (!Number.isFinite(ageSeconds) || ageSeconds > 300) {
+      console.error('Webhook rejected: timestamp outside tolerance', t);
+      return new Response('Invalid signature', { status: 400 });
+    }
+
     const signedPayload = `${t}.${rawBody}`;
     const expected = await hmacSha256Hex(secret, signedPayload);
     const verified = signatures.some((sig) => constantTimeEqual(sig, expected));
@@ -83,6 +92,7 @@ export async function onRequestPost(context) {
     const date = md.date || '';
     const time = md.time || '';
     const location = md.location || '';
+    const address = md.customerAddress || '';
     const notes = md.notes || '';
 
     const amountPence =
@@ -93,13 +103,23 @@ export async function onRequestPost(context) {
     const isDeposit = paymentType === 'deposit';
     const paymentLabel = isDeposit ? `${amount} deposit paid` : `${amount} — paid in full`;
 
+    const detail = { name, phone, email, treatment, date, time, location, address, amount, isDeposit, paymentLabel, notes };
+
+    // WhatsApp notification to Halima. Sent before the email block and wrapped in
+    // its own try/catch so it still fires if Resend is unconfigured or failing —
+    // the two alert paths must not be able to take each other down.
+    // No-ops until Twilio is configured.
+    try {
+      await sendWhatsAppNotification(context.env, detail);
+    } catch (err) {
+      console.error('Failed to send WhatsApp notification:', err);
+    }
+
     const apiKey = context.env.RESEND_API_KEY;
     if (!apiKey) {
       console.error('RESEND_API_KEY is not configured; cannot send confirmation emails');
       return new Response('OK', { status: 200 });
     }
-
-    const detail = { name, phone, email, treatment, date, time, location, amount, isDeposit, paymentLabel, notes };
 
     // Send the customer confirmation (skip gracefully if we have no address)
     if (email) {
@@ -186,6 +206,63 @@ function constantTimeEqual(a, b) {
     result |= a.charCodeAt(i) ^ b.charCodeAt(i);
   }
   return result === 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* WhatsApp notification to Halima                                     */
+/* ------------------------------------------------------------------ */
+
+// Sends Halima a WhatsApp message the moment payment succeeds, via Twilio.
+//
+// Note this arrives from the Twilio business number, NOT the client's number —
+// sending as the client is not possible and would be impersonation. The client's
+// own number is included in the body so Halima can reply to them directly.
+//
+// Env vars (Cloudflare Pages dashboard, never in code):
+//   TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, HALOE_WHATSAPP_TO
+// If any are missing this logs and returns, so the webhook stays healthy.
+async function sendWhatsAppNotification(env, d) {
+  const sid = env.TWILIO_ACCOUNT_SID;
+  const token = env.TWILIO_AUTH_TOKEN;
+  const from = env.TWILIO_WHATSAPP_FROM;
+  const to = env.HALOE_WHATSAPP_TO;
+
+  if (!sid || !token || !from || !to) {
+    console.log('Twilio not configured; skipping WhatsApp notification');
+    return;
+  }
+
+  const body = [
+    'New haloe booking — payment received',
+    '',
+    `Name: ${d.name}`,
+    d.phone ? `Phone: ${d.phone}` : null,
+    d.email ? `Email: ${d.email}` : null,
+    `Treatment: ${d.treatment}`,
+    d.date ? `Date: ${d.date}` : null,
+    d.time ? `Time: ${d.time}` : null,
+    d.location ? `Location: ${d.location}` : null,
+    d.address ? `Address: ${d.address}` : null,
+    `Payment: ${d.paymentLabel}`,
+    d.notes ? `Notes: ${d.notes}` : null,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const form = new URLSearchParams({ From: from, To: to, Body: body });
+
+  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${btoa(`${sid}:${token}`)}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: form.toString(),
+  });
+
+  if (!res.ok) {
+    console.error('Twilio error:', res.status, await res.text());
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -294,6 +371,7 @@ function halimaEmailHtml(d) {
                     ${detailRow('Date', d.date)}
                     ${detailRow('Time', d.time)}
                     ${detailRow('Location', d.location)}
+                    ${detailRow('Address', d.address)}
                     ${detailRow('Name', d.name)}
                     ${detailRow('Phone', d.phone)}
                     ${detailRow('Email', d.email)}
