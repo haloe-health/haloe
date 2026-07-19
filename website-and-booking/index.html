@@ -1112,7 +1112,6 @@
       <button class="hb-tab active" data-cat="massage">Massage</button>
       <button class="hb-tab" data-cat="dry">Dry Cupping</button>
       <button class="hb-tab" data-cat="wet">Wet Cupping</button>
-      <button class="hb-tab" data-cat="facial">Facials</button>
       <button class="hb-tab" data-cat="packages">Packages</button>
     </div>
     <div class="hb-cards" id="hb-cards"></div>
@@ -1200,31 +1199,38 @@
 <script>
 const HB_SERVICES = {
   massage:[
+    {name:'Face Massage',time:'45 min',price:40},
+    {name:'Head Massage',time:'45 min',price:40},
+    {name:'Face & Head Massage',time:'1 hour',price:70},
     {name:'Head & Foot Massage',time:'1 hour',price:60},
-    {name:'Swedish — Face, Scalp, Neck & Back',time:'1 hour',price:70},
-    {name:'Swedish — Face & Full Body',time:'1 hr 10 min',price:90},
+    {name:'Back, Neck & Shoulders',time:'1 hour',price:75},
+    {name:'Full Body Massage',time:'1 hr 15 min',price:90},
   ],
   dry:[
-    {name:'Face, Neck & Shoulders',time:'45 min',price:50},
-    {name:'Functional — Sports Injury',time:'45 min',price:50},
-    {name:'Back Massage',time:'45 min',price:60},
-    {name:'Face & Full Body',time:'1 hr 10 min',price:80},
+    {name:'Face Cupping',time:'45 min',price:50},
+    {name:'Head Cupping',time:'45 min',price:50},
+    {name:'Face & Head Cupping',time:'1 hour',price:85},
+    {name:'Targeted Area / Sports Injury',time:'1 hour',price:60},
+    {name:'Full Back',time:'1 hour',price:80},
+    {name:'Full Body',time:'1 hour',price:100},
+    {name:'Head, Scalp & Full Body',time:'1 hr 15 min',price:115},
   ],
   wet:[
-    {name:'Functional — Sports Injury',time:'1 hour',price:60},
-    {name:'Back Massage',time:'1 hour',price:70},
+    {name:'Head & Scalp',time:'1 hour',price:70},
+    {name:'Targeted Area / Sports Injury',time:'1 hour',price:80},
+    {name:'Full Back',time:'1 hour',price:90},
     {name:'Full Body',time:'1 hr 30 min',price:120},
-  ],
-  facial:[
-    {name:'Deep Cleansing Facial',time:'45 min',price:50},
-    {name:'Chemical Peel',time:'45 min',price:60},
-    {name:'Dermaplaning',time:'45 min',price:50},
+    {name:'Head, Scalp & Full Body',time:'1 hr 45 min',price:150},
   ],
   packages:[
-    {name:'Facial x4',time:'4 sessions',price:180,desc:'Save £20 on a course of 4 facials.'},
-    {name:'Massage x4',time:'4 sessions',price:190,desc:'Save on a course of 4 massage sessions.'},
-    {name:'Dry Cupping — Face & Full Body x4',time:'4 sessions',price:300,desc:'Course of 4 dry cupping full body sessions.'},
-    {name:'Wet Cupping — Face & Full Body x4',time:'4 sessions',price:450,desc:'Course of 4 wet cupping full body sessions.'},
+    {name:'Pain & Mobility',time:'4 sessions · 8–12 wks',price:340,desc:'Targeted cupping to support ease of movement and tension relief.'},
+    {name:'Breathe & Immunity',time:'4 sessions · 16 wks',price:340,desc:'Supports respiratory wellness and immune resilience.'},
+    {name:'Cycle Comfort',time:'4 sessions · ~3 cycles',price:340,desc:'Focused on menstrual comfort and hormonal balance.'},
+    {name:'Stress & Sleep',time:'6 sessions · 24 wks',price:480,desc:'Designed to ease tension and support restful sleep patterns.'},
+    {name:'Headache & Tension',time:'6 sessions · 14 wks',price:480,desc:'Head, neck and shoulder focus for tension headache relief.'},
+    {name:'Digestion & Detox',time:'6 sessions · 24 wks',price:480,desc:'Supporting digestive comfort and overall wellbeing.'},
+    {name:'Circulation & Energy',time:'8 sessions · 18 wks',price:600,desc:'Full circulation support for vitality and energy levels.'},
+    {name:"Women's Hormonal Balance",time:'8 sessions · 16 wks',price:600,desc:'Comprehensive hormonal wellness support across the cycle.'},
   ]
 };
 const HB_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1330,7 +1336,7 @@ function hbGoTo(n){
 
 function hbRenderSummary(){
   const svc=HB_SERVICES[hbState.cat][hbState.idx];
-  const catLabel={massage:'Massage',dry:'Dry Cupping',wet:'Wet / Hijama',facial:'Facial',packages:'Package'}[hbState.cat];
+  const catLabel={massage:'Massage',dry:'Dry Cupping',wet:'Wet / Hijama',packages:'Package'}[hbState.cat];
   const dateStr=hbState.date?hbState.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
   const loc=hbState.loc==='clinic'?'haloe Treatment Room, Manchester':'Mobile — your home';
   const name=document.getElementById('hb-fname').value+' '+document.getElementById('hb-lname').value;
@@ -1371,7 +1377,7 @@ Time: ${hbState.time}
 Location: ${loc}
 
 Please confirm when you can. Thank you!`);
-  setTimeout(()=>window.open('https://wa.me/447700000000?text='+msg,'_blank'),800);
+  setTimeout(()=>window.open('https://wa.me/447474833643?text='+msg,'_blank'),800);
 }
 
 hbInit();
