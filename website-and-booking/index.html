@@ -131,16 +131,6 @@
     position:absolute; inset:0;
     background:radial-gradient(ellipse 60% 80% at 0% 50%, rgba(201,160,64,0.05) 0%, transparent 70%), #080806;
   }
-  /* Ambient 3D honeycomb. Sits above .hero-bg, below .hero-content.
-     Injected only if WebGL + no reduce-motion; the gradient above is the fallback. */
-  .hero-canvas {
-    position:absolute; inset:0; z-index:0; pointer-events:none;
-    opacity:0; transition:opacity 1.2s ease;
-    -webkit-mask-image:linear-gradient(to right, #000 0%, #000 45%, transparent 72%);
-    mask-image:linear-gradient(to right, #000 0%, #000 45%, transparent 72%);
-  }
-  .hero-canvas.ready { opacity:1; }
-  @media (prefers-reduced-motion: reduce) { .hero-canvas { display:none; } }
   .hero-content { position:relative; max-width:560px; }
   .hero-eyebrow {
     display:inline-flex; align-items:center; gap:16px;
@@ -672,7 +662,6 @@
 <!-- HERO -->
 <section id="hero">
   <div class="hero-bg"></div>
-  <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
   <div class="hero-left">
   <div class="hero-content">
     <div class="hero-eyebrow">Women Only · Manchester · Mobile Only</div>
@@ -1414,87 +1403,6 @@ hbInit();
     el.style.transitionDelay = (i % 4) * 0.07 + 's';
     obs.observe(el);
   });
-</script>
-<!-- Ambient hero honeycomb (three.js, lazy). Purely decorative: if any of this
-     fails or is skipped, the hero keeps its existing gradient background. -->
-<script>
-(function(){
-  var cv = document.getElementById('hero-canvas');
-  if (!cv) return;
-
-  // Bail out early on anything that shouldn't run an animation loop.
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if ((navigator.hardwareConcurrency || 2) < 4) return;          // low-end phones
-  if (navigator.connection && navigator.connection.saveData) return;
-  try {
-    var probe = document.createElement('canvas');
-    if (!(probe.getContext('webgl') || probe.getContext('experimental-webgl'))) return;
-  } catch (e) { return; }
-
-  var started = false;
-  function start(){
-    if (started) return; started = true;
-    import('https://unpkg.com/three@0.160.0/build/three.module.js').then(function(THREE){
-      var host = document.getElementById('hero');
-      var renderer = new THREE.WebGLRenderer({canvas: cv, alpha: true, antialias: true});
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-      var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-      camera.position.z = 18;
-
-      // Hex grid of thin gold rings, staggered in depth.
-      var group = new THREE.Group();
-      var geo = new THREE.TorusGeometry(1.5, 0.018, 3, 6);
-      var mat = new THREE.MeshBasicMaterial({color: 0xC8A96E, transparent: true, opacity: 0.30});
-      var dx = 2.9, dy = 2.5;
-      for (var r = -3; r <= 3; r++) {
-        for (var c = -3; c <= 3; c++) {
-          var m = new THREE.Mesh(geo, mat);
-          m.position.set(c * dx + (r % 2 ? dx / 2 : 0), r * dy, (r * 7 + c * 3) % 3 * -0.5);
-          m.rotation.z = Math.PI / 6;
-          group.add(m);
-        }
-      }
-      scene.add(group);
-
-      function resize(){
-        var w = host.clientWidth, h = host.clientHeight;
-        renderer.setSize(w, h, false);
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-      }
-      resize();
-      window.addEventListener('resize', resize);
-
-      // Only animate while the hero is actually on screen and the tab is visible.
-      var onScreen = true, raf = null, t = 0;
-      new IntersectionObserver(function(es){
-        onScreen = es[0].isIntersecting; loop();
-      }).observe(host);
-      document.addEventListener('visibilitychange', loop);
-
-      function frame(){
-        raf = null; t += 0.0015;
-        group.rotation.z = t;
-        group.position.y = Math.sin(t * 1.4) * 0.5;
-        renderer.render(scene, camera);
-        loop();
-      }
-      function loop(){
-        var run = onScreen && !document.hidden;
-        if (run && raf === null) raf = requestAnimationFrame(frame);
-        else if (!run && raf !== null) { cancelAnimationFrame(raf); raf = null; }
-      }
-      cv.classList.add('ready');
-      loop();
-    }).catch(function(){ /* CDN blocked or offline — gradient fallback stands */ });
-  }
-
-  // Wait until the browser is idle so this never competes with page load.
-  if ('requestIdleCallback' in window) requestIdleCallback(start, {timeout: 3000});
-  else window.addEventListener('load', function(){ setTimeout(start, 600); });
-})();
 </script>
 </body>
 </html>
