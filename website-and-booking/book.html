@@ -223,7 +223,6 @@
   }
   /* Segment counts per control */
   .category-tabs { grid-template-columns: repeat(4, 1fr); }
-  .location-toggle { grid-template-columns: repeat(2, 1fr); }
   /* On phones, 4 category labels won't fit one row — wrap to two rows of two, still pill-contained */
   @media (max-width: 420px) {
     .category-tabs { grid-template-columns: repeat(2, 1fr); }
@@ -726,13 +725,9 @@
     <div class="service-grid" id="service-grid"></div>
 
     <div style="margin-top: 1.5rem;">
-      <p class="section-label">Where would you like your treatment?</p>
-      <div class="location-toggle segmented">
-        <button class="loc-btn seg-option active" data-loc="clinic">haloe Treatment Room</button>
-        <button class="loc-btn seg-option" data-loc="mobile">Mobile — My Home</button>
-      </div>
-      <div class="loc-notice" id="loc-notice">
-        A flat travel fee applies based on your distance from Manchester city centre. Halima will confirm this when she contacts you to confirm the booking.
+      <p class="section-label">Where your treatment takes place</p>
+      <div class="loc-notice" id="loc-notice" style="display:block;">
+        All sessions are mobile — Halima comes to your home. A flat travel fee applies based on your distance from Manchester city centre, and she will confirm this when she contacts you to confirm the booking.
       </div>
     </div>
 
@@ -913,7 +908,7 @@ const SERVICES = {
 let state = {
   category: 'massage',
   serviceIndex: null,
-  location: 'clinic',
+  location: 'mobile',
   date: null,
   time: null,
   calYear: null,
@@ -961,15 +956,6 @@ document.getElementById('category-tabs').addEventListener('click', e => {
   state.serviceIndex = null;
   document.getElementById('btn-step1').disabled = true;
   renderServices();
-});
-
-document.querySelector('.location-toggle').addEventListener('click', e => {
-  const btn = e.target.closest('.loc-btn');
-  if (!btn) return;
-  document.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  state.location = btn.dataset.loc;
-  document.getElementById('loc-notice').classList.toggle('visible', state.location === 'mobile');
 });
 
 function renderCalendar() {
@@ -1076,7 +1062,7 @@ function buildSummary() {
   const service = SERVICES[state.category][state.serviceIndex];
   const catLabel = { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package' }[state.category];
   const dateStr = state.date ? state.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
-  const locationLabel = state.location === 'clinic' ? 'haloe Treatment Room, Manchester' : 'Mobile — your home';
+  const locationLabel = 'Mobile — your home';
   const name = document.getElementById('fullname').value.trim();
   return { service, catLabel, dateStr, locationLabel, name };
 }

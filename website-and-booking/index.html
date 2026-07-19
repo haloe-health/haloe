@@ -25,7 +25,7 @@
   "@context": "https://schema.org",
   "@type": "HealthAndBeautyBusiness",
   "name": "haloe",
-  "description": "Women-only hijama and cupping wellness studio in Manchester, supporting relaxation, circulation and general wellbeing. CMA and IPHM accredited.",
+  "description": "Women-only hijama and mobile cupping wellness service in Manchester, supporting relaxation, circulation and general wellbeing. CMA and IPHM accredited.",
   "url": "https://haloe.health/",
   "logo": "https://haloe.health/favicon.svg",
   "image": "https://haloe.health/og-image.jpg",
@@ -664,7 +664,7 @@
   <div class="hero-bg"></div>
   <div class="hero-left">
   <div class="hero-content">
-    <div class="hero-eyebrow">Women Only · Manchester · Clinic & Mobile</div>
+    <div class="hero-eyebrow">Women Only · Manchester · Mobile Only</div>
     <h1>Ancient healing.<br><em>Modern standards.</em></h1>
     <p class="hero-sub">Certified hijama cupping therapy for women — addressing pain, hormonal health, fatigue, and spiritual wellbeing through the prophetic medicine of Al-Hijama.</p>
     <div class="hero-btns">
@@ -704,7 +704,7 @@
     <h2>Healing rooted in <em>the Sunnah</em></h2>
     <p>Hijama — wet cupping — is one of the oldest and most powerful forms of natural medicine. Endorsed by the Prophet Muhammad ﷺ and practiced for thousands of years, it draws out stagnant blood, toxins, and impurities to restore the body's natural balance.</p>
     <p>haloe is a women-only hijama practice based in Manchester, run by Halima Yasmin — a CMA and IPHM accredited therapist who graduated with an 88% distinction from The Suuk Academy's L5 Diploma in Health and Cupping Therapy.</p>
-    <p>Every session is private, dignified, and designed entirely around your comfort — whether you visit the clinic space or I come to you.</p>
+    <p>Every session is private, dignified, and designed entirely around your comfort — I come to you, so you can rest in your own space afterwards.</p>
     <br>
     <a href="book.html" class="btn btn-gold">Book a Consultation</a>
     <div class="cert-strip">
@@ -1022,9 +1022,6 @@
 
 /* Location */
 .hb-sec-label { font-size:0.65rem; letter-spacing:0.18em; text-transform:uppercase; color:rgba(201,160,64,0.4); margin-bottom:1.4rem; margin-top:2rem; }
-.hb-loc { display:flex; gap:1.2rem; margin-bottom:2rem; }
-.hb-loc-btn { flex:1; padding:1.3rem; border:1px solid rgba(201,160,64,0.2); background:transparent; color:rgba(201,160,64,0.5); font-family:'Poppins',sans-serif; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:all 0.2s; border-radius:6px; }
-.hb-loc-btn.active { border-color:var(--gold,#c9a040); color:var(--gold,#c9a040); background:rgba(201,160,64,0.05); }
 
 /* Calendar */
 .hb-cal { border:1px solid rgba(201,160,64,0.2); padding:1.8rem; margin-bottom:2.5rem; }
@@ -1116,12 +1113,8 @@
     </div>
     <div class="hb-cards" id="hb-cards"></div>
     <div style="margin-top:1.5rem;">
-      <p class="hb-sec-label">Where would you like your treatment?</p>
-      <div class="hb-loc">
-        <button class="hb-loc-btn active" data-loc="clinic">haloe Treatment Room</button>
-        <button class="hb-loc-btn" data-loc="mobile">Mobile — My Home</button>
-      </div>
-      <div class="hb-loc-notice" id="hb-loc-notice">A flat travel fee applies based on your distance from Manchester city centre. Halima will confirm this when she contacts you.</div>
+      <p class="hb-sec-label">Where your treatment takes place</p>
+      <div class="hb-loc-notice visible" id="hb-loc-notice">All sessions are mobile — Halima comes to your home. A flat travel fee applies based on your distance from Manchester city centre, and she will confirm this when she contacts you.</div>
     </div>
     <button class="hb-btn" id="hb-btn1" onclick="hbGoTo(2)" disabled>Continue — Choose Date & Time</button>
   </div>
@@ -1235,7 +1228,7 @@ const HB_SERVICES = {
 };
 const HB_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const HB_DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-let hbState = {cat:'massage',idx:null,loc:'clinic',date:null,time:null,yr:null,mo:null};
+let hbState = {cat:'massage',idx:null,loc:'mobile',date:null,time:null,yr:null,mo:null};
 
 function hbInit(){
   const n=new Date(); hbState.yr=n.getFullYear(); hbState.mo=n.getMonth();
@@ -1264,12 +1257,6 @@ document.getElementById('hb-tabs').addEventListener('click',e=>{
   document.getElementById('hb-btn1').disabled=true; hbRenderCards();
 });
 
-document.querySelector('.hb-loc').addEventListener('click',e=>{
-  const b=e.target.closest('.hb-loc-btn'); if(!b) return;
-  document.querySelectorAll('.hb-loc-btn').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active'); hbState.loc=b.dataset.loc;
-  document.getElementById('hb-loc-notice').classList.toggle('visible',hbState.loc==='mobile');
-});
 
 function hbRenderCal(){
   document.getElementById('hb-cal-month').textContent=HB_MONTHS[hbState.mo]+' '+hbState.yr;
@@ -1338,7 +1325,7 @@ function hbRenderSummary(){
   const svc=HB_SERVICES[hbState.cat][hbState.idx];
   const catLabel={massage:'Massage',dry:'Dry Cupping',wet:'Wet / Hijama',packages:'Package'}[hbState.cat];
   const dateStr=hbState.date?hbState.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
-  const loc=hbState.loc==='clinic'?'haloe Treatment Room, Manchester':'Mobile — your home';
+  const loc='Mobile — your home';
   const name=document.getElementById('hb-fname').value+' '+document.getElementById('hb-lname').value;
   document.getElementById('hb-summary').innerHTML=`
     <div class="hb-sum-row"><span class="sl">Treatment</span><span class="sv">${svc.name}</span></div>
@@ -1354,7 +1341,7 @@ function hbRenderSummary(){
 function hbSubmit(){
   const svc=HB_SERVICES[hbState.cat][hbState.idx];
   const dateStr=hbState.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const loc=hbState.loc==='clinic'?'haloe Treatment Room, Manchester':'Mobile — your home';
+  const loc='Mobile — your home';
   const name=document.getElementById('hb-fname').value+' '+document.getElementById('hb-lname').value;
   const email=document.getElementById('hb-email').value;
   document.getElementById('hb-panel-4').classList.remove('active');
