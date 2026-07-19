@@ -905,6 +905,13 @@ const SERVICES = {
   ],
 };
 
+// £1 test treatment for verifying the live Stripe flow end to end.
+// Hidden from customers — only appears when the URL has ?test=1
+// (e.g. /book.html?test=1). Remove this block once testing is done.
+if (new URLSearchParams(location.search).get('test') === '1') {
+  SERVICES.massage.unshift({ name: 'TEST — £1 (do not book)', time: '15 min', price: 1 });
+}
+
 let state = {
   category: 'massage',
   serviceIndex: null,
@@ -1115,7 +1122,7 @@ async function handlePayment(type) {
   if (fullBtn) fullBtn.disabled = true;
   if (depositBtn) depositBtn.textContent = 'Redirecting to payment…';
 
-  let amount = type === 'deposit' ? 2500 : service.price * 100; // pence
+  let amount = type === 'deposit' ? Math.min(2500, service.price * 100) : service.price * 100; // pence
 
   try {
     const res = await fetch('/create-checkout', {
