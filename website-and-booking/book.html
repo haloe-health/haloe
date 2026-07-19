@@ -782,6 +782,11 @@
         <p class="field-error" id="email-error"></p>
       </div>
       <div class="form-field">
+        <label>Address for your session *</label>
+        <textarea id="address" placeholder="House number and street, area, postcode" oninput="checkStep3()"></textarea>
+        <p class="field-error" id="address-error"></p>
+      </div>
+      <div class="form-field">
         <label>How did you hear about haloe?</label>
         <select id="referral">
           <option value="">Please select</option>
@@ -1034,6 +1039,11 @@ function isValidPhone(v) {
 
 // Live-validate a single field. Shows the inline message only once the user has
 // typed something invalid; an empty field is treated as "not yet valid" but quiet.
+function isValidAddress(v) {
+  // Must look like a real UK address: some street detail plus a postcode,
+  // since Halima is travelling to it.
+  return v.trim().length >= 8 && /\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i.test(v);
+}
 function validateField(inputId, errorId, validatorFn, message) {
   const input = document.getElementById(inputId);
   const errorEl = document.getElementById(errorId);
@@ -1056,11 +1066,13 @@ function checkStep3() {
     'Please enter a valid email address so we can send your intake form.');
   const phoneOk = validateField('phone', 'phone-error', isValidPhone,
     'Please enter a valid UK mobile number (e.g. 07700 900900 or +44 7700 900900).');
+  const addressOk = validateField('address', 'address-error', isValidAddress,
+    'Please include your full address and postcode so Halima knows where to travel to.');
   const consentsOk =
     document.getElementById('consent1').checked &&
     document.getElementById('consent2').checked &&
     document.getElementById('consent3').checked;
-  document.getElementById('btn-step3').disabled = !(nameOk && emailOk && phoneOk && consentsOk);
+  document.getElementById('btn-step3').disabled = !(nameOk && emailOk && phoneOk && addressOk && consentsOk);
 }
 
 function buildSummary() {
@@ -1101,6 +1113,7 @@ async function handlePayment(type) {
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const notes = document.getElementById('notes') ? document.getElementById('notes').value : '';
+  const address = document.getElementById('address').value.trim();
 
   // Final guard — never reach Stripe with missing or invalid contact details.
   if (!name) {
@@ -1113,6 +1126,10 @@ async function handlePayment(type) {
   }
   if (!isValidPhone(phone)) {
     alert("Please go back and enter a valid UK mobile number so Halima can confirm your booking.");
+    goToStep(3); return;
+  }
+  if (!isValidAddress(address)) {
+    alert("Please go back and enter the full address, including postcode, where your session will take place.");
     goToStep(3); return;
   }
 
@@ -1139,10 +1156,14 @@ async function handlePayment(type) {
         time: state.time,
         location: locationLabel,
         notes,
+        customerAddress: address,
       }),
     });
     const data = await res.json();
     if (data.url) {
+      // Kept in sessionStorage rather than the success_url so a home address
+      // never ends up in a URL, in browser history, or in server logs.
+      try { sessionStorage.setItem('haloe_address', address); } catch (e) {}
       window.location.href = data.url;
     } else {
       alert('Payment setup failed. Please try again.');

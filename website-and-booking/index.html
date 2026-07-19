@@ -1152,6 +1152,7 @@
       </div>
       <div class="hb-field"><label>Mobile number *</label><input type="tel" id="hb-phone" placeholder="+44 7700 000000" oninput="hbCheck3()"></div>
       <div class="hb-field"><label>Email address *</label><input type="email" id="hb-email" placeholder="your@email.com" oninput="hbCheck3()"></div>
+      <div class="hb-field"><label>Address for your session *</label><textarea id="hb-address" placeholder="House number and street, area, postcode" oninput="hbCheck3()"></textarea></div>
       <div class="hb-field"><label>How did you hear about haloe?</label>
         <select id="hb-ref"><option value="">Please select</option><option>Instagram</option><option>TikTok</option><option>Friend or family</option><option>Google search</option><option>Word of mouth</option><option>Other</option></select>
       </div>
@@ -1299,11 +1300,18 @@ function hbPickTime(t){
   document.getElementById('hb-btn2').disabled=false;
 }
 
+// Same rule as the booking wizard: street detail plus a postcode, since
+// Halima is travelling to the address.
+function hbValidAddress(v){
+  return v.trim().length>=8 && /\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i.test(v);
+}
+
 function hbCheck3(){
   const ok=document.getElementById('hb-fname').value.trim()&&
     document.getElementById('hb-lname').value.trim()&&
     document.getElementById('hb-phone').value.trim()&&
     document.getElementById('hb-email').value.trim()&&
+    hbValidAddress(document.getElementById('hb-address').value)&&
     document.getElementById('hb-c1').checked&&
     document.getElementById('hb-c2').checked&&
     document.getElementById('hb-c3').checked;
@@ -1362,6 +1370,7 @@ Treatment: ${svc.name}
 Date: ${dateStr}
 Time: ${hbState.time}
 Location: ${loc}
+Address: ${document.getElementById('hb-address').value.trim()}
 
 Please confirm when you can. Thank you!`);
   setTimeout(()=>window.open('https://wa.me/447474833643?text='+msg,'_blank'),800);

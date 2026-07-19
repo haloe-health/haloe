@@ -1,6 +1,6 @@
 export async function onRequestPost(context) {
   try {
-    const { amount, treatmentName, paymentType, customerEmail, customerName, customerPhone, date, time, location, notes } = await context.request.json();
+    const { amount, treatmentName, paymentType, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes } = await context.request.json();
     const secretKey = context.env.STRIPE_SECRET_KEY;
     const origin = new URL(context.request.url).origin;
 
@@ -28,6 +28,7 @@ export async function onRequestPost(context) {
     params.append('metadata[date]', date || '');
     params.append('metadata[time]', time || '');
     params.append('metadata[location]', location || '');
+    params.append('metadata[customerAddress]', customerAddress || '');
     params.append('metadata[notes]', notes || '');
     const successParams = new URLSearchParams({
       type: paymentType,

@@ -137,12 +137,19 @@
   const time      = params.get('time')      || '';
   const place     = params.get('location')  || '';
   const amount    = parseInt(params.get('amount') || '0', 10);
+
+  // Read from sessionStorage, not the URL — the address is deliberately kept out
+  // of the query string. Empty if the customer came back in a different tab.
+  let address = '';
+  try { address = sessionStorage.getItem('haloe_address') || ''; } catch (e) {}
+
+  const paidAmount = (amount / 100).toFixed(2).replace(/\.00$/, '');
   const paymentLabel = type === 'deposit'
-    ? '£25 deposit paid'
-    : `paid in full (£${(amount / 100).toFixed(0)})`;
+    ? `£${paidAmount} deposit paid`
+    : `paid in full (£${paidAmount})`;
 
   const waMsg = encodeURIComponent(
-    `Hi Halima, I've just paid for my booking on the haloe website.\n\nName: ${name}\nTreatment: ${treatment}\nDate: ${date}\nTime: ${time}\nLocation: ${place}\nPayment: ${paymentLabel}\n\nPlease confirm when you can. Thank you!`
+    `Hi Halima, I've just paid for my booking on the haloe website.\n\nName: ${name}\nTreatment: ${treatment}\nDate: ${date}\nTime: ${time}\nLocation: ${place}${address ? `\nAddress: ${address}` : ''}\nPayment: ${paymentLabel}\n\nPlease confirm when you can. Thank you!`
   );
   const waUrl = `https://wa.me/447474833643?text=${waMsg}`;
   document.getElementById('wa-btn').href = waUrl;
