@@ -208,6 +208,12 @@
     .rail-col { position: static; order: -1; }
   }
 
+  /* Step 2: calendar and times side by side inside the main column */
+  .dt-cols { display: grid; grid-template-columns: minmax(0, 300px) 1fr; gap: 1.75rem; align-items: start; }
+  .dt-cols .date-section { margin: 0; }
+  .time-hint { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
+  @media (max-width: 720px) { .dt-cols { grid-template-columns: 1fr; } }
+
   /* ---- Panel ---- */
   .panel { display: none; }
   .panel.active { display: block; }
@@ -783,21 +789,24 @@
     <p class="panel-title">Choose a date & time</p>
     <p class="panel-sub">Available appointments</p>
 
-    <div class="date-section">
-      <p class="section-label">Select a date</p>
-      <div class="calendar">
-        <div class="cal-header">
-          <button class="cal-nav" onclick="changeMonth(-1)">←</button>
-          <span class="cal-month" id="cal-month-label"></span>
-          <button class="cal-nav" onclick="changeMonth(1)">→</button>
+    <div class="dt-cols">
+      <div class="date-section">
+        <p class="section-label">Select a date</p>
+        <div class="calendar">
+          <div class="cal-header">
+            <button class="cal-nav" onclick="changeMonth(-1)">←</button>
+            <span class="cal-month" id="cal-month-label"></span>
+            <button class="cal-nav" onclick="changeMonth(1)">→</button>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
         </div>
-        <div class="cal-grid" id="cal-grid"></div>
       </div>
-    </div>
 
-    <div class="date-section" id="time-section" style="display:none;">
-      <p class="section-label">Select a time</p>
-      <div class="time-grid" id="time-grid"></div>
+      <div class="date-section" id="time-section">
+        <p class="section-label">Select a time</p>
+        <div class="time-grid" id="time-grid"></div>
+        <p class="time-hint" id="time-hint">Choose a date to see available times.</p>
+      </div>
     </div>
 
     <button class="btn-primary" id="btn-step2" onclick="goToStep(3)" disabled>Continue — Your Details</button>
@@ -1142,7 +1151,8 @@ async function selectDate(y, m, d) {
   busyIntervals = [];
   renderCalendar();
   renderTimes();
-  document.getElementById('time-section').style.display = 'block';
+  const hint = document.getElementById('time-hint');
+  if (hint) hint.style.display = 'none';
   document.getElementById('btn-step2').disabled = true;
   updateRail();
 
