@@ -67,20 +67,24 @@ Flat fee, unlimited cups — no per-cup charges anywhere on the site. Every trea
 - **Pages:** `index.html` (marketing site, all CTAs link to `book.html`), `book.html` (4-step booking wizard; state lives in one in-memory `state` object), `booking-confirmed.html` (Stripe success landing page).
 - **Function:** `functions/create-checkout.js` — a Cloudflare Pages Function mapped to `/create-checkout`. Creates a Stripe Checkout Session via the Stripe REST API directly (no SDK).
 - **Payments:** Stripe (live). Currency is GBP; `unit_amount` is always in pence. Secret key is `context.env.STRIPE_SECRET_KEY`, set in the Cloudflare Pages dashboard — never in code.
-- **No database, no webhook.** This corrects an earlier assumption in this doc (a D1 database was previously listed — that's not what's actually live in this repo). Confirmation after payment is manual: `booking-confirmed.html` auto-opens a pre-filled WhatsApp message to Halima, and that's the entire confirmation step.
-- **WhatsApp number:** the real number is `447474833643`. `booking-confirmed.html` already uses it correctly. **`index.html` (~line 1339) still has a placeholder `447700000000`** — fix on next touch.
-- **Health-intake form:** currently a Google Form (`https://forms.gle/UY2jpwdBHXPccfxJ9`), referenced in three files (`book.html`, `index.html`, `booking-confirmed.html`) — update all three together if it changes. (Note: this is a different, simpler intake mechanism than the custom haloe.health/intake form referenced elsewhere in business planning — worth clarifying with Halima which is actually current.)
+- **There IS a database and a webhook.** An earlier revision of this doc "corrected" the D1 mention as wrong — that correction was itself wrong, and it misled a later session. A D1 database (`haloe-clients`) stores intake submissions, and `functions/stripe-webhook.js` fires on payment to email both parties (Resend) and WhatsApp Halima (Twilio). The WhatsApp button on the confirmation page is a convenience, **not** the notification mechanism.
+- **WhatsApp number:** `447474833643`, used consistently across the site. The old `447700000000` placeholder is gone.
+- **Health-intake form:** the on-site form at `haloe.health/intake`, which writes to D1. The old Google Form is **retired** and all links now point at `/intake`. This resolves the ambiguity previously flagged here.
+- **Service model: mobile only.** No clinic or treatment room; the location toggle has been removed from both booking flows.
 - **Pricing source of truth on the live site:** the `SERVICES` constant near the top of `book.html` — not this doc, not the business plan doc directly. If a price changes, update `SERVICES`; the function and confirmation page just echo whatever the wizard sends.
 - **DNS:** Cloudflare DNS. **2FA on the Cloudflare account was still outstanding as of last check** — worth confirming before doing sensitive infra work.
 
 ## Open items to check against the live site
 
+- [x] **Pricing/session times** — `SERVICES` now matches the tables above, including the lengthened durations
+- [x] **Service model** — confirmed mobile-only by Halima; location toggle removed site-wide
+- [x] **WhatsApp placeholder number** — replaced with `447474833643`
+- [x] **Intake form mechanism** — resolved: the on-site `/intake` form is current, the Google Form is retired
+- [x] **Client address** — now collected at booking (required, validated for a UK postcode), since every session is at the client's home
 - [ ] **Instagram handle** — confirm every reference site-wide uses `@haloe.health`, not `@haloe_hijama`
-- [ ] **Pricing/session times** — confirm `SERVICES` in `book.html` matches the tables above (times were recently lengthened; site may still show old shorter durations)
-- [ ] **Women-only messaging** — confirm site reflects this consistently (booking flow, intake form copy, About/FAQ pages), not leftover "all clients" language
-- [ ] **Service model / home visits** — a recent building-specific poster used "Home Visits Only" positioning (Halima travels to the client) rather than "Private Room" (client comes to her). **Unconfirmed whether this is now the universal service model or specific to that one campaign** — check with Halima before changing site-wide service-model copy off the back of this doc alone.
-- [ ] **WhatsApp placeholder number** in `index.html` (~line 1339) — swap `447700000000` for the real `447474833643`
-- [ ] **Intake form mechanism** — confirm whether the Google Form or a custom `haloe.health/intake` form is actually current; the two references in prior planning docs don't agree
+- [ ] **Women-only messaging** — confirm site reflects this consistently (booking flow, intake copy, About/FAQ), not leftover "all clients" language
+- [ ] **Notification env vars** — confirm `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY` and the four `TWILIO_*` vars are set in Cloudflare, and that a Stripe webhook endpoint for `checkout.session.completed` points at `https://haloe.health/stripe-webhook`. Absent notifications are almost always config, not code.
+- [ ] **Slot durations** — time slots (10:00–20:00, 30-min steps) ignore how long each treatment takes, so overlaps and past-closing bookings are possible
 
 ## Brand assets
 

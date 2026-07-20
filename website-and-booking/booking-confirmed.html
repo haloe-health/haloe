@@ -110,7 +110,7 @@
 <div class="card">
   <p>Your booking request and payment have been received. Tap below to send Halima your confirmation on WhatsApp — she'll reply to confirm your appointment.</p>
   <p>Please complete your health intake form before your appointment:<br>
-    <a href="https://forms.gle/UY2jpwdBHXPccfxJ9" target="_blank">Complete your intake form →</a>
+    <a href="/intake" target="_blank">Complete your intake form →</a>
   </p>
 </div>
 
@@ -123,12 +123,6 @@
 <script>
   const params = new URLSearchParams(window.location.search);
   const type = params.get('type');
-  if (type === 'deposit') {
-    document.getElementById('payment-sub').textContent = '£25 deposit paid · Confirm with Halima on WhatsApp';
-    document.getElementById('deposit-note').textContent = 'Your £25 deposit secures your slot. The remaining balance is payable on the day of your appointment.';
-  } else {
-    document.getElementById('payment-sub').textContent = 'Paid in full · Confirm with Halima on WhatsApp';
-  }
 
   // Build the WhatsApp confirmation from the booking detail passed by Stripe
   const name      = params.get('name')      || '';
@@ -138,15 +132,25 @@
   const place     = params.get('location')  || '';
   const amount    = parseInt(params.get('amount') || '0', 10);
 
+  // Derived from the amount actually charged — never hard-code the deposit,
+  // or a £1 test booking reports itself as £25.
+  const paid = '£' + (amount / 100).toFixed(2).replace(/\.00$/, '');
+
+  if (type === 'deposit') {
+    document.getElementById('payment-sub').textContent = `${paid} deposit paid · Confirm with Halima on WhatsApp`;
+    document.getElementById('deposit-note').textContent = `Your ${paid} deposit secures your slot. The remaining balance is payable on the day of your appointment.`;
+  } else {
+    document.getElementById('payment-sub').textContent = 'Paid in full · Confirm with Halima on WhatsApp';
+  }
+
   // Read from sessionStorage, not the URL — the address is deliberately kept out
   // of the query string. Empty if the customer came back in a different tab.
   let address = '';
   try { address = sessionStorage.getItem('haloe_address') || ''; } catch (e) {}
 
-  const paidAmount = (amount / 100).toFixed(2).replace(/\.00$/, '');
   const paymentLabel = type === 'deposit'
-    ? `£${paidAmount} deposit paid`
-    : `paid in full (£${paidAmount})`;
+    ? `${paid} deposit paid`
+    : `paid in full (${paid})`;
 
   const waMsg = encodeURIComponent(
     `Hi Halima, I've just paid for my booking on the haloe website.\n\nName: ${name}\nTreatment: ${treatment}\nDate: ${date}\nTime: ${time}\nLocation: ${place}${address ? `\nAddress: ${address}` : ''}\nPayment: ${paymentLabel}\n\nPlease confirm when you can. Thank you!`
