@@ -84,7 +84,7 @@ Flat fee, unlimited cups — no per-cup charges anywhere on the site. Every trea
 - [ ] **Instagram handle** — confirm every reference site-wide uses `@haloe.health`, not `@haloe_hijama`
 - [ ] **Women-only messaging** — confirm site reflects this consistently (booking flow, intake copy, About/FAQ), not leftover "all clients" language
 - [ ] **Notification env vars** — confirm `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY` and the four `TWILIO_*` vars are set in Cloudflare, and that a Stripe webhook endpoint for `checkout.session.completed` points at `https://haloe.health/stripe-webhook`. Absent notifications are almost always config, not code.
-- [ ] **Slot durations** — time slots (10:00–20:00, 30-min steps) ignore how long each treatment takes, so overlaps and past-closing bookings are possible
+- [x] **Slot durations / double-booking** — `book.html` now reserves the slot in D1 at checkout and greys out overlapping times; two people can no longer pay for the same slot. (Homepage WhatsApp widget still doesn't reserve — manual check needed there.)
 
 ## Brand assets
 

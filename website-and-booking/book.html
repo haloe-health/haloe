@@ -1004,24 +1004,79 @@ function changeMonth(dir) {
   renderCalendar();
 }
 
-function selectDate(y, m, d) {
+// Busy intervals [{s,e}] for the selected date, from /availability. Slots that
+// would overlap one of these (given the chosen treatment's length) are disabled.
+let busyIntervals = [];
+
+const TIME_SLOTS = ['10:00 am','10:30 am','11:00 am','11:30 am','12:00 pm','12:30 pm','1:00 pm','1:30 pm','2:00 pm','2:30 pm','3:00 pm','3:30 pm','4:00 pm','4:30 pm','5:00 pm','5:30 pm','6:00 pm','6:30 pm','7:00 pm','7:30 pm','8:00 pm'];
+
+function slotToMinutes(t) {
+  const m = /^(\d{1,2}):(\d{2})\s*(am|pm)$/i.exec(t);
+  if (!m) return null;
+  let h = parseInt(m[1], 10); const min = parseInt(m[2], 10);
+  if (h === 12) h = 0;
+  if (m[3].toLowerCase() === 'pm') h += 12;
+  return h * 60 + min;
+}
+
+function selectedDurationMin() {
+  const svc = SERVICES[state.category] && SERVICES[state.category][state.serviceIndex];
+  if (!svc) return 60;
+  const s = svc.time || '';
+  const hr = /(\d+)\s*(?:hours?|hrs?|hr)\b/i.exec(s);
+  const mn = /(\d+)\s*min/i.exec(s);
+  const total = (hr ? parseInt(hr[1], 10) * 60 : 0) + (mn ? parseInt(mn[1], 10) : 0);
+  return total > 0 ? total : 60;
+}
+
+function toISODate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function slotIsTaken(t) {
+  const start = slotToMinutes(t);
+  if (start === null) return false;
+  const end = start + selectedDurationMin();
+  return busyIntervals.some((b) => start < b.e && end > b.s);
+}
+
+async function selectDate(y, m, d) {
   state.date = new Date(y, m, d);
   state.time = null;
+  busyIntervals = [];
   renderCalendar();
   renderTimes();
   document.getElementById('time-section').style.display = 'block';
   document.getElementById('btn-step2').disabled = true;
+
+  // Pull real availability, then re-render so taken slots grey out. Fail open —
+  // a fetch error just leaves every slot enabled rather than blocking booking.
+  try {
+    const res = await fetch(`/availability?date=${toISODate(state.date)}`);
+    if (res.ok) {
+      const data = await res.json();
+      // Ignore a stale response if the user has since picked another date.
+      if (state.date && toISODate(state.date) === toISODate(new Date(y, m, d))) {
+        busyIntervals = Array.isArray(data.busy) ? data.busy : [];
+        renderTimes();
+      }
+    }
+  } catch (e) { /* fail open */ }
 }
 
 function renderTimes() {
-  const slots = ['10:00 am','10:30 am','11:00 am','11:30 am','12:00 pm','12:30 pm','1:00 pm','1:30 pm','2:00 pm','2:30 pm','3:00 pm','3:30 pm','4:00 pm','4:30 pm','5:00 pm','5:30 pm','6:00 pm','6:30 pm','7:00 pm','7:30 pm','8:00 pm'];
   const grid = document.getElementById('time-grid');
-  grid.innerHTML = slots.map(t => `
-    <div class="time-slot ${state.time === t ? 'selected' : ''}" onclick="selectTime('${t}')">${t}</div>
-  `).join('');
+  grid.innerHTML = TIME_SLOTS.map(t => {
+    const taken = slotIsTaken(t);
+    const cls = taken ? 'taken' : (state.time === t ? 'selected' : '');
+    const click = taken ? '' : `onclick="selectTime('${t}')"`;
+    const label = taken ? `${t} · booked` : t;
+    return `<div class="time-slot ${cls}" ${click}>${label}</div>`;
+  }).join('');
 }
 
 function selectTime(t) {
+  if (slotIsTaken(t)) return;
   state.time = t;
   renderTimes();
   document.getElementById('btn-step2').disabled = false;
@@ -1157,8 +1212,24 @@ async function handlePayment(type) {
         location: locationLabel,
         notes,
         customerAddress: address,
+        // Machine-readable fields for slot reservation (the strings above are
+        // for display and the WhatsApp/email copy).
+        bookingDate: state.date ? toISODate(state.date) : '',
+        durationMin: selectedDurationMin(),
       }),
     });
+
+    // 409 = the slot was booked by someone else during checkout. Send them back
+    // to pick another time, and refresh availability so it shows as taken.
+    if (res.status === 409) {
+      alert('Sorry — that time was just booked by someone else. Please choose another slot.');
+      state.time = null;
+      resetPayButtons();
+      goToStep(2);
+      if (state.date) selectDate(state.date.getFullYear(), state.date.getMonth(), state.date.getDate());
+      return;
+    }
+
     const data = await res.json();
     if (data.url) {
       // Kept in sessionStorage rather than the success_url so a home address
@@ -1195,6 +1266,16 @@ function goToStep(n) {
     if (i + 1 < n) s.classList.add('done');
     else if (i + 1 === n) s.classList.add('active');
   });
+  // Re-validate the time when arriving at step 2: the treatment (and so its
+  // duration) may have changed since a slot was picked, turning a once-free slot
+  // into an overlapping one. Drop a now-invalid selection and re-render.
+  if (n === 2 && state.date) {
+    if (state.time && slotIsTaken(state.time)) {
+      state.time = null;
+      document.getElementById('btn-step2').disabled = true;
+    }
+    renderTimes();
+  }
   if (n === 4) renderSummary();
   window.scrollTo(0, 0);
 }

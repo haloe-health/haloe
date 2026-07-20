@@ -21,7 +21,15 @@ Marketing site + booking flow for **haloe**, a women-only hijama/cupping & massa
 - `create-checkout.js` → `/create-checkout`. Creates a Stripe Checkout Session via the REST API (no SDK), embedding booking fields in `metadata[...]`.
 - `stripe-webhook.js` → `/stripe-webhook`. Verifies the Stripe signature manually with Web Crypto (HMAC-SHA256, 5-minute timestamp tolerance), then on `checkout.session.completed` sends: a customer confirmation email, Halima's notification email (both via Resend), and a WhatsApp alert to Halima (via Twilio).
 - `intake-submit.js` → `/intake-submit`. Upserts the client and writes an `intake_forms` row to the **D1 database (`haloe-clients`, bound as `DB`)**, then emails the pre-session guide. POST only — intake data is never publicly readable.
-- `_email.js` — shared brand tokens and email helpers. The `_` prefix keeps it from becoming a route.
+- `availability.js` → `/availability?date=YYYY-MM-DD`. Read-only; returns `{ busy: [{s,e}] }` (start/end minutes) for active bookings on that date. Fails open (returns empty) on any error so a lookup fault never blocks booking.
+- `_email.js` — shared brand tokens and email helpers. `_bookings.js` — slot-reservation helpers (table DDL, time/duration parsing, atomic reserve, confirm/release). The `_` prefix keeps both from becoming routes.
+
+### Slot reservation / double-booking prevention (D1 `bookings` table)
+- The `bookings` table is created lazily via `CREATE TABLE IF NOT EXISTS` (no migration step). Columns: `booking_date` (`YYYY-MM-DD`), `start_min`/`end_min` (minutes from midnight), status `'pending'|'confirmed'`, `hold_expires_at`, `stripe_session_id`.
+- `create-checkout.js` reserves the slot **before** creating the Stripe session, via an atomic `INSERT…SELECT…WHERE NOT EXISTS(overlap)` — two racing requests can't both win. A win writes a `'pending'` row held for `HOLD_SECONDS` (35 min) and passes `metadata[bookingId]` + `expires_at` to Stripe. A loss returns **409 `slot_taken`**, and `book.html` sends the customer back to pick another time. Stripe failure releases the hold.
+- `stripe-webhook.js` flips the row to `'confirmed'` on `checkout.session.completed`. Abandoned checkouts never confirm; their holds lapse and the overlap check ignores expired pending rows, so the slot frees itself.
+- **Fail-open everywhere:** if `DB` is unbound or the time can't be parsed, checkout proceeds unreserved rather than blocking a paying customer.
+- **Known limitations:** the homepage widget (`index.html`) takes no payment, so it neither reserves nor reflects availability — those WhatsApp bookings aren't in D1 and need Halima's manual eye. 8pm stays bookable for any treatment (no "runs past closing" rule).
 
 ### Booking → payment → notification flow (the critical path)
 1. `book.html` collects selection + details into `state`, then `handlePayment(type)` POSTs to `/create-checkout`. `type` is `'deposit'` (£25, capped at the treatment price so the £1 test item charges £1) or `'full'`.
@@ -67,6 +75,6 @@ The address collected at step 3 is deliberately **kept out of the URL**. It trav
 - The health intake is the on-site form at `/intake`, linked from `book.html`, `index.html` and `booking-confirmed.html`. Update all three together.
 - If you change a price or treatment name, update `SERVICES` in `book.html` **and `HB_SERVICES` in `index.html`** — the two lists are separate and have silently diverged before (the homepage once advertised facials and peels that were never offered). The function and confirmation page just echo whatever the wizard sends.
 - Calendar disables past dates and Sundays. Time slots are a fixed hard-coded list, 10:00–20:00 in 30-minute steps, duplicated in both `book.html` and `index.html`.
-- **Known gap: slots ignore treatment duration.** There is no availability check, so a 1h45 treatment can be booked at 20:00, and overlapping bookings are possible. Fixing this means deriving the slot list from the selected treatment's `time`.
+- **`book.html` slots now reflect real availability** — on date select it fetches `/availability`, then greys out any slot that would overlap an existing booking given the selected treatment's duration (parsed from its `time`). Changing treatment re-validates the chosen slot on return to step 2. The homepage widget does **not** do this (see reservation section above).
 - `/book.html?test=1` injects a hidden **£1 test treatment** for live Stripe checks (`SERVICES.massage.unshift`, near the catalogue). It is invisible without the query flag. Remove the block when testing is done.
 - The site serves extensionless URLs — `/book.html` redirects to `/book`. Query strings survive the redirect, but `curl` needs `-L` or you'll read an empty 308 and wrongly conclude a deploy failed.

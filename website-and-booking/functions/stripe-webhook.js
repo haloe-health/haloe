@@ -13,6 +13,7 @@ import {
   BLACK, GOLD, CREAM, MUTED, HAIRLINE,
   sendEmail, esc, emailButton, emailHeader, emailFooter, emailShell,
 } from './_email.js';
+import { confirmBooking } from './_bookings.js';
 
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
@@ -102,6 +103,18 @@ export async function onRequestPost(context) {
     const amount = formatGBP(amountPence);
     const isDeposit = paymentType === 'deposit';
     const paymentLabel = isDeposit ? `${amount} deposit paid` : `${amount} — paid in full`;
+
+    // Confirm the held slot so it converts from a temporary hold into a firm
+    // booking that keeps blocking the time. Best-effort: if the row lapsed or the
+    // DB is unbound, the notifications below must still go out.
+    const bookingId = md.bookingId;
+    if (bookingId && context.env.DB) {
+      try {
+        await confirmBooking(context.env.DB, Number(bookingId));
+      } catch (err) {
+        console.error('Failed to confirm booking slot:', err);
+      }
+    }
 
     const detail = { name, phone, email, treatment, date, time, location, address, amount, isDeposit, paymentLabel, notes };
 
