@@ -238,16 +238,16 @@
   /* ---- Segmented Control (shared component: treatment categories + location) ---- */
   .segmented {
     display: grid;
-    gap: 4px;
-    margin-bottom: 1.5rem;
-    padding: 4px;
+    gap: 3px;
+    margin-bottom: 1.1rem;
+    padding: 3px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 28px;
+    border-radius: 22px;
   }
   .seg-option {
-    min-height: 44px;
-    padding: 0.5rem 0.4rem;
+    min-height: 34px;
+    padding: 0.3rem 0.4rem;
     border: none;
     background: transparent;
     color: var(--text-muted);
@@ -257,13 +257,15 @@
     text-transform: uppercase;
     white-space: nowrap;
     cursor: pointer;
-    border-radius: 22px;
+    border-radius: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     transition: background 0.25s, color 0.25s;
   }
+  /* Keep a comfortable tap target on touch devices even though the pill is tighter on desktop */
+  @media (pointer: coarse) { .seg-option { min-height: 44px; } }
   .seg-option:hover:not(.active) { color: var(--gold-light); }
   .seg-option.active {
     background: var(--gold);
@@ -278,11 +280,11 @@
   }
 
   /* ---- Service Cards ---- */
-  .service-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+  .service-grid { display: flex; flex-direction: column; gap: 0.5rem; }
   .service-card {
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.1rem 1.3rem;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
@@ -302,7 +304,8 @@
     font-size: 1.1rem;
     font-weight: 400;
     color: var(--cream);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.12rem;
+    line-height: 1.25;
   }
   .service-meta {
     display: flex;
