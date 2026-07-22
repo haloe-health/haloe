@@ -210,7 +210,7 @@ function guideEmailHtml(fullName) {
               <!-- Sign-off + compliance -->
               <tr>
                 <td style="padding:4px 4px 0;">
-                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">I look forward to seeing you. — Halima &middot; @haloe_hijama</p>
+                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">I look forward to seeing you. — Halima &middot; @haloe.health</p>
                   <p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;">Hijama at haloe is a complementary wellness therapy. It supports how you feel and does not diagnose, treat or replace medical care. Please continue any medication prescribed by your doctor and speak to your GP about any health concern.</p>
                 </td>
               </tr>
