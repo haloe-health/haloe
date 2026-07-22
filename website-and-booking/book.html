@@ -492,6 +492,33 @@
   .form-field input.invalid,
   .form-field input.invalid:focus { border-color: #C97A6E; }
   .form-field input.invalid:focus { box-shadow: 0 0 0 3px rgba(201,122,110,0.15); }
+  /* ---- Autofill ----
+     Safari and Chrome paint an autofilled field pale yellow and ignore both
+     background-color and color. An inset box-shadow is the only reliable way
+     to cover the fill, and -webkit-text-fill-color the only way to set the
+     text. The absurd transition delay stops the yellow flashing back when the
+     field re-renders.
+
+     Step 3's fields are .ios-row (transparent inputs on a .ios-group card), so
+     the inset must match the CARD colour, not the input's own background. */
+  .ios-row input:-webkit-autofill,
+  .ios-row input:-webkit-autofill:hover,
+  .ios-row input:-webkit-autofill:focus,
+  .ios-row select:-webkit-autofill,
+  .ios-row textarea:-webkit-autofill {
+    -webkit-text-fill-color: var(--cream);
+    -webkit-box-shadow: 0 0 0 1000px #1C1C1E inset;
+            box-shadow: 0 0 0 1000px #1C1C1E inset;
+    caret-color: var(--cream);
+    transition: background-color 100000s ease 0s;
+  }
+  /* An invalid row signals with red TEXT, and -webkit-text-fill-color would
+     otherwise repaint it cream — losing the only error cue on that field. */
+  .ios-row input.invalid:-webkit-autofill,
+  .ios-row input.invalid:-webkit-autofill:focus,
+  .ios-row textarea.invalid:-webkit-autofill {
+    -webkit-text-fill-color: #E5736A;
+  }
   .field-error {
     display: none;
     font-size: 0.72rem;

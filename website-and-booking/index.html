@@ -1073,6 +1073,20 @@
 .hb-field label { display:block; font-size:0.62rem; letter-spacing:0.16em; text-transform:uppercase; color:rgba(201,160,64,0.5); margin-bottom:0.5rem; }
 .hb-field input, .hb-field select, .hb-field textarea { width:100%; background:rgba(255,255,255,0.03); border:1px solid rgba(201,160,64,0.2); color:#F5F0E8; font-family:'Poppins',sans-serif; font-size:0.85rem; font-weight:300; padding:0.8rem 1rem; outline:none; border-radius:0; transition:border-color 0.2s; -webkit-appearance:none; }
 .hb-field input:focus, .hb-field select:focus, .hb-field textarea:focus { border-color:var(--gold,#c9a040); }
+/* Autofill: Safari/Chrome paint the field pale yellow and ignore background-color.
+   The inset shadow is the only reliable cover. #0F0F0D is rgba(255,255,255,0.03)
+   over the page black — keep it in step if either changes. */
+.hb-field input:-webkit-autofill,
+.hb-field input:-webkit-autofill:hover,
+.hb-field input:-webkit-autofill:focus,
+.hb-field select:-webkit-autofill,
+.hb-field textarea:-webkit-autofill {
+  -webkit-text-fill-color:#F5F0E8;
+  -webkit-box-shadow:0 0 0 1000px #0F0F0D inset;
+          box-shadow:0 0 0 1000px #0F0F0D inset;
+  caret-color:#F5F0E8;
+  transition:background-color 100000s ease 0s;
+}
 .hb-field select option { background:#1A1710; color:#F5F0E8; }
 .hb-field textarea { resize:vertical; min-height:90px; }
 .hb-checks { display:flex; flex-direction:column; gap:0.8rem; }

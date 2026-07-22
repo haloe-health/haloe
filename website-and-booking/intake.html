@@ -508,6 +508,24 @@
   }
   .field:has(> textarea) > textarea::placeholder { color: var(--a-t3); }
 
+  /* ---- Autofill ----
+     Safari and Chrome paint autofilled fields pale yellow and ignore
+     background-color and color. The inset shadow covers the fill and
+     -webkit-text-fill-color sets the text; the long transition stops the
+     yellow returning on re-render. The inset matches the row (--a-s1),
+     since these inputs are transparent and the row supplies the surface. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  textarea:-webkit-autofill {
+    -webkit-text-fill-color: var(--a-t1);
+    -webkit-box-shadow: 0 0 0 1000px var(--a-s1) inset;
+            box-shadow: 0 0 0 1000px var(--a-s1) inset;
+    caret-color: var(--a-t1);
+    transition: background-color 100000s ease 0s;
+  }
+
   /* ---- Grouped inset list ----
      The wrapper owns the card: one background, one radius, hairlines between
      rows. Rows inside go flat, so a hidden .reveal between two questions can't
