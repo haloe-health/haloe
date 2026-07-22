@@ -526,6 +526,14 @@
   }
   .group > .field:last-child { border-bottom: none; }
 
+  /* A three-option control (diabetes, blood-borne infection, blood pressure)
+     is too wide to sit beside its question on a phone. The label is flex:1
+     with min-width:0, so it used to collapse to a few pixels and render one
+     word per line. A floor on the label forces the control to wrap onto its
+     own row instead, which is what the flex-wrap above was always for. */
+  .field:has(> .choices) > label.q { min-width: 11rem; }
+  .field:has(> .choices) > .choices { margin-left: auto; }
+
   /* ---- Segmented control ----
      Match book.html's .segmented / .seg-option exactly. The legacy .opt span
      rule above still puts a gold hairline round every option; the Apple
