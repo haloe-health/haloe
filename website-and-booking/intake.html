@@ -194,6 +194,249 @@
     .footer-links { flex-wrap:wrap; justify-content:center; }
     .footer-right { text-align:center; }
   }
+
+  /* ==================================================================
+     Apple pass — matches the booking flow (book.html / booking-confirmed).
+     Deliberately CSS-only: no markup is touched, so every field id and
+     radio name the D1 submission depends on is untouched by construction.
+     ================================================================== */
+  html { font-size: 78%; }
+  :root {
+    --a-bg: #000;
+    --a-s1: #1C1C1E;
+    --a-s3: #3A3A3C;
+    --a-t1: #F5F0E8;
+    --a-t2: #A1A1A6;
+    --a-t3: #6E6E73;
+    --a-sep: rgba(255,255,255,0.10);
+    --a-sep2: rgba(255,255,255,0.16);
+  }
+  body { background: var(--a-bg); }
+
+  /* Headings: plain, tight, no decorative gold italics */
+  h1 { font-size: 1.95rem !important; font-weight: 500; letter-spacing: -0.03em; line-height: 1.12; }
+  h2 { font-size: 1.35rem !important; font-weight: 500; letter-spacing: -0.02em; }
+  h1 em, h2 em, .step h2 em, .screen h2 em { font-style: normal; color: inherit; }
+
+  /* Progress: a hairline rule rather than a gold bar */
+  .progress { background: var(--a-bg); }
+  .progress-track { height: 2px; background: var(--a-sep); }
+  .progress-fill { background: var(--gold); }
+  .progress-step { letter-spacing: 0.14em; color: var(--a-t3); }
+  .progress-name { color: var(--a-t2); }
+
+  /* Fields */
+  .field { margin-bottom: 0.9rem; }
+  .field label.q {
+    font-size: 0.82rem;
+    font-weight: 300;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--a-t1);
+    margin-bottom: 0.4rem;
+  }
+  .field input[type="text"],
+  .field input[type="tel"],
+  .field input[type="email"],
+  .field input[type="date"],
+  .field select,
+  .field textarea,
+  input[type="text"], input[type="tel"], input[type="email"], input[type="date"],
+  select, textarea {
+    background: var(--a-s1) !important;
+    border: 1px solid var(--a-sep) !important;
+    border-radius: 10px !important;
+    color: var(--a-t1) !important;
+    font-size: 0.85rem !important;
+    font-weight: 300;
+    padding: 0.6rem 0.8rem !important;
+    box-shadow: none !important;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold) !important;
+    outline: none;
+  }
+  ::placeholder { color: #5A5A5F; }
+
+  /* Yes/No answers become an Apple segmented control */
+  .choices {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    background: var(--a-s1);
+    border-radius: 9px;
+    padding: 2px;
+  }
+  .choices .opt {
+    margin: 0;
+    border: none !important;
+    background: none !important;
+    border-radius: 7px;
+    padding: 0;
+    overflow: hidden;
+  }
+  .choices .opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .choices .opt span {
+    display: block;
+    padding: 0.34rem 0.95rem;
+    font-size: 0.78rem;
+    color: var(--a-t2);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s;
+    white-space: nowrap;
+  }
+  .choices .opt:hover span { color: var(--a-t1); }
+  .choices .opt input:checked + span {
+    background: var(--gold);
+    color: #000;
+    font-weight: 500;
+  }
+
+  /* Checkboxes become iOS toggles */
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 0.62rem 0.85rem;
+    border-bottom: 1px solid var(--a-sep);
+    cursor: pointer;
+  }
+  .check-list {
+    background: var(--a-s1);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .check-list .check-item:last-child { border-bottom: none; }
+  .check-item input { position: absolute; opacity: 0; pointer-events: none; }
+  .check-item .check-box {
+    order: 2;
+    margin-left: auto;
+    position: relative;
+    flex: none;
+    width: 38px; height: 22px;
+    border-radius: 999px;
+    background: var(--a-s3);
+    border: none !important;
+    margin-top: 0.1rem;
+    transition: background 0.2s;
+  }
+  .check-item .check-box::after {
+    content: '';
+    position: absolute; top: 2px; left: 2px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+  }
+  .check-item input:checked ~ .check-box { background: var(--gold); }
+  .check-item input:checked ~ .check-box::after { transform: translateX(16px); }
+  .check-item > span:not(.check-box) {
+    order: 1;
+    flex: 1;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--a-t1);
+  }
+
+  /* Buttons: Apple pills */
+  .btn, button.btn, .step-nav button {
+    border-radius: 999px !important;
+    font-size: 0.82rem !important;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    padding: 0.65rem 1.5rem !important;
+  }
+
+  /* ---- Option A: questions as rows inside grouped cards ----
+     Built entirely from :has() on the existing markup, so no ids or radio
+     names move. Consecutive rows fuse into one card: every row is rounded at
+     the top, and any row that follows another has that rounding removed. */
+  .field:has(> .choices),
+  .field:has(> input[type="text"]),
+  .field:has(> input[type="tel"]),
+  .field:has(> input[type="email"]),
+  .field:has(> input[type="date"]),
+  .field:has(> select) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    background: var(--a-s1);
+    padding: 0.55rem 0.85rem;
+    margin: 0;
+    border-bottom: 1px solid var(--a-sep);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+  }
+  /* a row that follows another row is mid-card, so square off its top */
+  .field:has(> .choices) + .field:has(> .choices),
+  .field:has(> .choices) + .field:has(> input),
+  .field:has(> .choices) + .field:has(> select),
+  .field:has(> input) + .field:has(> .choices),
+  .field:has(> input) + .field:has(> input),
+  .field:has(> input) + .field:has(> select),
+  .field:has(> select) + .field:has(> .choices),
+  .field:has(> select) + .field:has(> input),
+  .field:has(> select) + .field:has(> select) {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+  /* the last row of a run closes the card */
+  .field:has(> .choices):not(:has(+ .field:has(> .choices))):not(:has(+ .field:has(> input))):not(:has(+ .field:has(> select))),
+  .field:has(> input):not(:has(+ .field:has(> .choices))):not(:has(+ .field:has(> input))):not(:has(+ .field:has(> select))),
+  .field:has(> select):not(:has(+ .field:has(> .choices))):not(:has(+ .field:has(> input))):not(:has(+ .field:has(> select))) {
+    border-bottom: none;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    margin-bottom: 0.8rem;
+  }
+  /* label left, answer right */
+  .field:has(> .choices) > label.q,
+  .field:has(> input) > label.q,
+  .field:has(> select) > label.q {
+    flex: 1;
+    min-width: 0;
+    margin-bottom: 0;
+    font-size: 0.79rem;
+    line-height: 1.45;
+  }
+  .field:has(> .choices) > .choices { flex: none; background: #000; }
+  .field:has(> input) > input[type],
+  .field:has(> select) > select {
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: 62%;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    text-align: right;
+    border-radius: 0 !important;
+  }
+  .field:has(> .choices) > .field-error,
+  .field:has(> input) > .field-error,
+  .field:has(> select) > .field-error { flex-basis: 100%; margin-top: 0.2rem; }
+
+  /* Textareas stay full width — they need the room */
+  .field:has(> textarea) { margin-bottom: 0.8rem; }
+  .field:has(> textarea) > label.q { display: block; margin-bottom: 0.4rem; }
+
+  /* ---- Vertical rhythm: the page sat too far down ----
+     The nav is 81px tall but .wrap reserved 150px, leaving ~69px of dead
+     space. Trim the nav a little, close the gap, and re-anchor the sticky
+     progress bar to the real nav height (it was 76px, so it slid underneath). */
+  nav { padding: 14px 40px !important; }
+  .wrap { padding-top: 88px !important; padding-bottom: 56px !important; }
+  .intro-head { margin-bottom: 26px !important; }
+  .progress { top: 66px !important; }
+  @media (max-width: 720px) {
+    nav { padding: 12px 20px !important; }
+    .wrap { padding-top: 76px !important; }
+    .progress { top: 58px !important; }
+  }
+
+  /* Validation reads as a quiet footnote */
+  .field-error { font-size: 0.72rem; color: #E0A59B; letter-spacing: 0; }
 </style>
 </head>
 <body>
