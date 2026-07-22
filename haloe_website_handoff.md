@@ -86,11 +86,18 @@ notification webhook all work and have been tested with real £1 bookings.
 **Verified working end to end:** treatment selection → Stripe payment → confirmation
 page → automatic notification email to halima@haloe.health (with the client's address).
 
-**Never yet exercised:** the intake form's POST to `/intake-submit`. Cloudflare
-Functions don't run under a static local server, so the only way to test it is to
-submit the live form and confirm a row lands in D1 and the guide email sends. **Do
-this first in the next session.** A silent failure looks identical to success — the
-form says "thank you" either way.
+**Now exercised too:** the intake form's POST to `/intake-submit` was tested live on
+22 July 2026 by filling all five steps in a browser and submitting. The POST returned
+**200 `{"ok":true}`**, and the success panel rendered. Because the function returns 500
+when `DB` is unbound or the insert fails, and 400 on any validation miss, a 200 means
+the D1 write genuinely succeeded. The honeypot field was left empty, so this was the
+real path and not the silent bot-ack.
+
+The test row is identifiable by the name **`ZZ TEST SUBMISSION (Claude Code)`** —
+delete it from `clients` and `intake_forms` once you've eyeballed it.
+
+Still worth confirming by hand (neither is visible from the browser): the row's column
+mapping in D1, and that the guide email actually landed via Resend.
 
 ## Open items to check against the live site
 
@@ -123,7 +130,8 @@ form says "thank you" either way.
 - No gold-plating before launch — ship the working version, polish later
 - Always end tasks with `git add -A && git commit && git push`
 
-- [ ] **Test a live intake submission** — the one untested link in the chain (see above)
+- [x] **Test a live intake submission** — done 22 July 2026, returned 200; delete the `ZZ TEST SUBMISSION` row
+- [x] **Instagram handle** — all six `@haloe_hijama` references replaced with `@haloe.health`
 - [ ] **Remove the £1 test treatment** once testing is finished — it's the `?test=1` block near the `SERVICES` catalogue in `book.html`, invisible without the query flag
 - [ ] **Instagram handle** — confirm every reference site-wide uses `@haloe.health`, not `@haloe_hijama`
 - [ ] **Women-only messaging** — confirm no leftover "all clients" language
