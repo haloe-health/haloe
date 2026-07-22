@@ -508,6 +508,31 @@
   }
   .field:has(> textarea) > textarea::placeholder { color: var(--a-t3); }
 
+  /* ---- Grouped inset list ----
+     The wrapper owns the card: one background, one radius, hairlines between
+     rows. Rows inside go flat, so a hidden .reveal between two questions can't
+     break the run the way the :has() adjacency chain did. This is the same
+     structure book.html uses, and what COMPONENTS.md documents. */
+  .group {
+    background: var(--a-s1);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0.8rem;
+  }
+  .group > .field {
+    border-radius: 0 !important;
+    margin: 0 !important;
+    border-bottom: 1px solid var(--a-sep);
+  }
+  .group > .field:last-child { border-bottom: none; }
+
+  /* ---- Segmented control ----
+     Match book.html's .segmented / .seg-option exactly. The legacy .opt span
+     rule above still puts a gold hairline round every option; the Apple
+     override never reset it, which is why the pills looked outlined. */
+  .choices .opt span { border: none !important; }
+  .field:has(> .choices) > .choices { background: #1C1A16; }
+
   /* ---- Progressive disclosure ----
      A follow-up marked .reveal stays hidden until its question is answered
      Yes, then opens as a sub-row welded to the card above. Only the three
@@ -709,6 +734,10 @@
     <section class="step" data-step="2">
       <h2>Your <em>health</em></h2>
 
+      <!-- One grouped inset list. The wrapper owns the card so the rows stay
+           welded even when a hidden .reveal sits between two questions. -->
+      <div class="group">
+
       <div class="field">
         <label class="q">Do you have any ongoing medical conditions?</label>
         <div class="choices" data-group="has_conditions">
@@ -759,6 +788,8 @@
         </div>
         <div class="field-error" data-for="had_hijama_before">Please choose Yes or No.</div>
       </div>
+
+      </div><!-- /.group -->
 
       <div class="field">
         <label class="q" for="main_concern">What would you most like help with? <span class="opt-hint">(your main reason for coming — optional)</span></label>

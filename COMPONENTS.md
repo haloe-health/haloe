@@ -163,6 +163,58 @@ handler so the switch can be turned back off.
 
 ---
 
+## Segmented control
+
+Either/or answers. `book.html` is canonical — `.segmented` / `.seg-option`.
+
+| Part | Value |
+|---|---|
+| Track | `#1C1A16`, `border-radius: 9px`, `padding: 2px`, `gap: 2px`, no border |
+| Option | no border, transparent, `var(--a-t2)`, `border-radius: 7px`, `padding: .34rem .95rem` |
+| Selected | `book.html` uses `#3A362E` + cream; `intake.html` uses gold fill + black |
+| Touch | `@media (pointer: coarse) { min-height: 44px }` |
+
+**Options must have no border.** `intake.html` carries a legacy
+`.opt span { border: 1px solid rgba(201,160,64,0.3) }` from the pre-Apple
+design. The `.choices .opt span` override that restyles everything else never
+reset `border`, so every Yes/No pill silently kept a gold hairline and the
+control read as two outlined buttons rather than one segmented track. It is now
+explicitly reset — don't remove that line.
+
+The two pages still disagree on the **selected** fill (gold vs `#3A362E`).
+That's unresolved, not an accident: gold gives stronger feedback across a
+12-question safety screen. Pick one deliberately before adding a third page.
+
+---
+
+## Grouped inset list
+
+A card of rows: one background, one radius, hairlines between. Used for every
+question run on `intake.html` and throughout `book.html`.
+
+```html
+<div class="group">
+  <div class="field">…</div>
+  <div class="field">…</div>
+</div>
+```
+
+```css
+.group { background: var(--a-s1); border-radius: 12px; overflow: hidden; margin-bottom: .8rem; }
+.group > .field { border-radius: 0 !important; margin: 0 !important;
+                  border-bottom: 1px solid var(--a-sep); }
+.group > .field:last-child { border-bottom: none; }
+```
+
+**Prefer the wrapper to `:has()` adjacency.** `intake.html` originally welded
+rows with a chain of `.field:has(> .choices) + .field:has(> input)` rules that
+rounded the first and last of each run. That chain breaks the moment anything
+sits between two rows — when the hidden [[conditional follow-up]] fields were
+added, every question became its own island with a gap. The wrapper owns the
+card, so nothing between rows can break it.
+
+---
+
 ## Conditional follow-up (progressive disclosure)
 
 A free-text box that stays hidden until its question is answered Yes, then
