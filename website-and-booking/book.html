@@ -416,8 +416,13 @@
     color: var(--cream);
     transition: background 0.15s, color 0.15s;
   }
-  .cal-day:not(.disabled):hover { background: rgba(255,255,255,0.08); }
-  .cal-day:hover:not(.disabled):not(.empty) { border-color: var(--border-strong); color: var(--gold); }
+  /* Hover only where a real pointer exists. On a touchscreen :hover sticks to
+     the last thing tapped, and these rules out-specify .selected — so the
+     chosen day rendered gold text on a gold fill and vanished. */
+  @media (hover: hover) {
+    .cal-day:not(.disabled):not(.selected):hover { background: rgba(255,255,255,0.08); }
+    .cal-day:hover:not(.disabled):not(.empty):not(.selected) { border-color: var(--border-strong); color: var(--gold); }
+  }
   .cal-day.selected { background: var(--gold); color: #000; font-weight: 500; }
   .cal-day.today { color: var(--gold); font-weight: 500; }
   .cal-day.disabled { color: #48484A; cursor: default; }
@@ -440,7 +445,11 @@
     color: var(--cream);
     transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
-  .time-slot:hover:not(.taken) { border-color: var(--gold); color: var(--gold); }
+  /* Same sticky-hover trap as .cal-day above — the selected slot went gold
+     on gold and its time disappeared on a phone. */
+  @media (hover: hover) {
+    .time-slot:hover:not(.taken):not(.selected) { border-color: var(--gold); color: var(--gold); }
+  }
   .time-slot.selected { border-color: var(--gold); background: var(--gold); color: #000; font-weight: 500; }
   .time-slot.taken { color: #48484A; cursor: not-allowed; border-color: rgba(255,255,255,0.06); }
 
