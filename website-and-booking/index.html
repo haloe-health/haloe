@@ -1017,7 +1017,9 @@
 .hb-card.selected::after { content:'✓'; position:absolute; top:1.2rem; right:1.4rem; color:var(--gold,#c9a040); font-size:0.8rem; }
 .hb-card-name { font-size:1.15rem; font-weight:500; color:#F5F0E8; margin-bottom:0.7rem; letter-spacing:-0.01em; }
 .hb-card-meta { display:flex; gap:1.6rem; font-size:0.78rem; color:rgba(201,160,64,0.5); margin-top:0.3rem; }
-.hb-card-price { color:var(--gold,#c9a040); }
+.hb-card-price { color:var(--gold,#c9a040); white-space:nowrap; }
+/* Pre-discount price, kept quiet so the payable amount stays dominant. */
+.was { color:var(--dim,#7a7060); font-size:0.82em; margin-right:0.34em; text-decoration-thickness:1px; }
 .hb-card-desc { font-size:0.82rem; color:rgba(201,160,64,0.4); margin-top:0.8rem; line-height:1.75; }
 
 /* Location */
@@ -1227,6 +1229,17 @@ const HB_SERVICES = {
     {name:"Women's Hormonal Balance",time:'8 sessions · 16 wks',price:600,desc:'Comprehensive hormonal wellness support across the cycle.'},
   ]
 };
+/* Promotional discount — must stay in step with PROMO_DISCOUNT in book.html.
+   HB_SERVICES keeps full prices so they can be shown struck through; hbNet()
+   is what the client actually pays. Set to 0 to end the promotion. */
+const HB_PROMO_DISCOUNT = 0.20;
+function hbNet(svc){ return Math.round(svc.price * (1 - HB_PROMO_DISCOUNT)); }
+function hbPriceHtml(svc){
+  return hbNet(svc) < svc.price
+    ? `<s class="was">£${svc.price}</s> £${hbNet(svc)}`
+    : `£${svc.price}`;
+}
+
 const HB_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const HB_DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 let hbState = {cat:'massage',idx:null,loc:'mobile',date:null,time:null,yr:null,mo:null};
@@ -1241,7 +1254,7 @@ function hbRenderCards(){
   g.innerHTML=HB_SERVICES[hbState.cat].map((s,i)=>`
     <div class="hb-card ${hbState.idx===i?'selected':''}" onclick="hbSelectSvc(${i})">
       <p class="hb-card-name">${s.name}</p>
-      <div class="hb-card-meta"><span>${s.time}</span><span class="hb-card-price">£${s.price}</span></div>
+      <div class="hb-card-meta"><span>${s.time}</span><span class="hb-card-price">${hbPriceHtml(s)}</span></div>
       ${s.desc?`<p class="hb-card-desc">${s.desc}</p>`:''}
     </div>`).join('');
 }
@@ -1343,7 +1356,7 @@ function hbRenderSummary(){
     <div class="hb-sum-row"><span class="sl">Time</span><span class="sv">${hbState.time}</span></div>
     <div class="hb-sum-row"><span class="sl">Location</span><span class="sv">${loc}</span></div>
     <div class="hb-sum-row"><span class="sl">Name</span><span class="sv">${name}</span></div>
-    <div class="hb-sum-row hb-total"><span class="sl">Total</span><span class="sv">£${svc.price}</span></div>`;
+    <div class="hb-sum-row hb-total"><span class="sl">Total</span><span class="sv">${hbPriceHtml(svc)}</span></div>`;
 }
 
 function hbSubmit(){
@@ -1360,7 +1373,7 @@ function hbSubmit(){
     <div class="hb-cd-row"><span class="hb-cd-l">Date</span><span class="hb-cd-v">${dateStr}</span></div>
     <div class="hb-cd-row"><span class="hb-cd-l">Time</span><span class="hb-cd-v">${hbState.time}</span></div>
     <div class="hb-cd-row"><span class="hb-cd-l">Location</span><span class="hb-cd-v">${loc}</span></div>
-    <div class="hb-cd-row"><span class="hb-cd-l">Total</span><span class="hb-cd-v">£${svc.price}</span></div>`;
+    <div class="hb-cd-row"><span class="hb-cd-l">Total</span><span class="hb-cd-v">${hbPriceHtml(svc)}</span></div>`;
   document.getElementById('hb-confirm-email').textContent=email;
   conf.classList.add('visible');
   const msg=encodeURIComponent(`Hi Halima, I've just submitted a booking via haloe.health.

@@ -290,7 +290,15 @@
   .svc-name { display: block; font-size: 1rem; color: var(--cream); letter-spacing: -0.01em; }
   .svc-desc { display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.1rem; line-height: 1.45; }
   .svc-time { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
-  .svc-price { font-size: 1rem; font-weight: 500; color: var(--cream); min-width: 52px; text-align: right; }
+  .svc-price { font-size: 1rem; font-weight: 500; color: var(--cream); min-width: 52px; text-align: right; white-space: nowrap; }
+  /* Pre-discount price, kept quiet so the payable amount stays dominant. */
+  .was {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.78em;
+    margin-right: 0.34em;
+    text-decoration-thickness: 1px;
+  }
   .service-card:hover { border-color: var(--border-strong); background: rgba(201,160,64,0.04); }
   .service-card.selected { background: rgba(201,160,64,0.05); }
   .service-card.selected::before {
@@ -1132,6 +1140,29 @@ if (new URLSearchParams(location.search).get('test') === '1') {
   SERVICES.massage.unshift({ name: 'TEST — £1 (do not book)', time: '15 min', price: 1 });
 }
 
+/* ---- Promotional discount ----
+   Every entry in SERVICES keeps its FULL price, so it can be shown struck
+   through. netPrice() is the amount actually displayed and charged — nothing
+   should read svc.price directly for money.
+
+   To end the promotion, set PROMO_DISCOUNT to 0. The strikethroughs disappear
+   and full prices are charged again; no other line needs touching.
+
+   Every price is a multiple of 5, so a 20% cut lands on a whole pound in each
+   case (£75 -> £60, £115 -> £92, £340 -> £272). Math.round is belt-and-braces
+   for any future price that isn't. */
+const PROMO_DISCOUNT = 0.20;
+
+function netPrice(svc) {
+  return Math.round(svc.price * (1 - PROMO_DISCOUNT));
+}
+function priceHtml(svc) {
+  // The £1 test item rounds back to £1, so it gets no misleading strikethrough.
+  return netPrice(svc) < svc.price
+    ? `<s class="was">£${svc.price}</s> £${netPrice(svc)}`
+    : `£${svc.price}`;
+}
+
 let state = {
   category: 'massage',
   serviceIndex: null,
@@ -1179,7 +1210,7 @@ function updateRail() {
     ).join('');
   }
   const totalEl = document.getElementById('rail-total');
-  if (totalEl) totalEl.textContent = svc ? `£${svc.price}` : '—';
+  if (totalEl) totalEl.textContent = svc ? `£${netPrice(svc)}` : '—';
   const ring = document.getElementById('rail-ring');
   if (ring) ring.style.setProperty('--p', `${Math.round((currentStep / 4) * 100)}%`);
   const lbl = document.getElementById('rail-ring-label');
@@ -1198,7 +1229,7 @@ function updateRail() {
     }
   }
   const ft = document.getElementById('foot-total');
-  if (ft) ft.textContent = svc ? `£${svc.price}` : '—';
+  if (ft) ft.innerHTML = svc ? priceHtml(svc) : '—';
   syncFooter();
 }
 
@@ -1247,7 +1278,7 @@ function renderServices() {
         ${s.desc ? `<span class="svc-desc">${s.desc}</span>` : ''}
       </span>
       <span class="svc-time">${s.time}</span>
-      <span class="svc-price">£${s.price}</span>
+      <span class="svc-price">${priceHtml(s)}</span>
     </div>
   `).join('');
 }
@@ -1462,7 +1493,7 @@ function renderSummary() {
           <div class="pass-name">${service.name}</div>
           <div class="pass-meta">${catLabel}${service.time ? ' · ' + service.time : ''}${name ? ' · ' + name : ''}</div>
         </div>
-        <div class="pass-price">£${service.price}</div>
+        <div class="pass-price">${priceHtml(service)}</div>
       </div>
     </div>
   `;
@@ -1501,7 +1532,8 @@ async function handlePayment(type) {
   if (fullBtn) fullBtn.disabled = true;
   if (depositBtn) depositBtn.textContent = 'Redirecting to payment…';
 
-  let amount = type === 'deposit' ? Math.min(2500, service.price * 100) : service.price * 100; // pence
+  const net = netPrice(service); // discounted price — never charge service.price
+  let amount = type === 'deposit' ? Math.min(2500, net * 100) : net * 100; // pence
 
   try {
     const res = await fetch('/create-checkout', {
@@ -1557,14 +1589,14 @@ async function handlePayment(type) {
 function depositLabel() {
   const svc = (state.serviceIndex !== null && SERVICES[state.category])
     ? SERVICES[state.category][state.serviceIndex] : null;
-  const amount = svc ? Math.min(25, svc.price) : 25;
+  const amount = svc ? Math.min(25, netPrice(svc)) : 25;
   return `Pay £${amount} deposit`;
 }
 
 function fullLabel() {
   const svc = (state.serviceIndex !== null && SERVICES[state.category])
     ? SERVICES[state.category][state.serviceIndex] : null;
-  return svc ? `Pay in full — £${svc.price}` : 'Pay in full';
+  return svc ? `Pay in full — £${netPrice(svc)}` : 'Pay in full';
 }
 
 function resetPayButtons() {
