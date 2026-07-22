@@ -74,6 +74,22 @@ Flat fee, unlimited cups — no per-cup charges anywhere on the site. Every trea
 - **Pricing source of truth on the live site:** the `SERVICES` constant near the top of `book.html` — not this doc, not the business plan doc directly. If a price changes, update `SERVICES`; the function and confirmation page just echo whatever the wizard sends.
 - **DNS:** Cloudflare DNS. **2FA on the Cloudflare account was still outstanding as of last check** — worth confirming before doing sensitive infra work.
 
+## State of play (last updated 22 July 2026)
+
+The booking flow, confirmation page and intake form have all been redesigned in one
+Apple-derived language — see the "Design language" section of `CLAUDE.md` and the
+reusable snippets in `COMPONENTS.md`. Payments, the D1 slot reservation and the
+notification webhook all work and have been tested with real £1 bookings.
+
+**Verified working end to end:** treatment selection → Stripe payment → confirmation
+page → automatic notification email to halima@haloe.health (with the client's address).
+
+**Never yet exercised:** the intake form's POST to `/intake-submit`. Cloudflare
+Functions don't run under a static local server, so the only way to test it is to
+submit the live form and confirm a row lands in D1 and the guide email sends. **Do
+this first in the next session.** A silent failure looks identical to success — the
+form says "thank you" either way.
+
 ## Open items to check against the live site
 
 - [x] **Pricing/session times** — `SERVICES` now matches the tables above, including the lengthened durations
@@ -104,3 +120,10 @@ Flat fee, unlimited cups — no per-cup charges anywhere on the site. Every trea
 - Read before writing — check existing code/content before editing
 - No gold-plating before launch — ship the working version, polish later
 - Always end tasks with `git add -A && git commit && git push`
+
+- [ ] **Test a live intake submission** — the one untested link in the chain (see above)
+- [ ] **Remove the £1 test treatment** once testing is finished — it's the `?test=1` block near the `SERVICES` catalogue in `book.html`, invisible without the query flag
+- [ ] **Instagram handle** — confirm every reference site-wide uses `@haloe.health`, not `@haloe_hijama`
+- [ ] **Women-only messaging** — confirm no leftover "all clients" language
+- [ ] **Intake step 3** fits a 900px-tall window but will still scroll slightly on a shorter laptop; splitting the 12 safety questions across two steps would fix it properly
+- [ ] **Nothing warns about GP clearance** for complex health histories any more — that copy was removed from the booking page at Halima's request and hasn't been re-homed in the intake email

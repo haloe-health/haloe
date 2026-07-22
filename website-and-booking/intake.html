@@ -446,6 +446,57 @@
   .progress-dots i.on { background: var(--gold); width: 18px; }
   .progress-meta { margin-bottom: 8px; }
 
+  /* "I confirm I am 18 or over" reads as a consent, so it renders as a
+     switch rather than Yes/No. Both radios stay in the DOM untouched — the
+     stored value is still 'Yes' — but only the Yes option is shown, and the
+     step can't be passed while it's off. */
+  .choices.as-toggle { background: none; padding: 0; gap: 0; }
+  .choices.as-toggle .opt:has(input[value="No"]) { display: none; }
+  .choices.as-toggle .opt:has(input[value="Yes"]) span {
+    display: block;
+    position: relative;
+    width: 38px; height: 22px;
+    padding: 0;
+    border-radius: 999px;
+    background: #3A3A3C;
+    font-size: 0;
+    transition: background 0.2s;
+  }
+  .choices.as-toggle .opt:has(input[value="Yes"]) span::after {
+    content: '';
+    position: absolute; top: 2px; left: 2px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+  }
+  .choices.as-toggle .opt input[value="Yes"]:checked + span { background: var(--gold); }
+  .choices.as-toggle .opt input[value="Yes"]:checked + span::after { transform: translateX(16px); }
+  .choices.as-toggle.invalid .opt:has(input[value="Yes"]) span { box-shadow: 0 0 0 2px rgba(224,165,155,0.6); }
+
+  /* ---- Fit a step on one screen ----
+     This is a form, not a marketing page, so the space goes to the questions.
+     Reclaimed: the site footer (158px of links below the fold), the repeated
+     intro paragraph, and the section <h2> that just repeated the progress
+     label ("About you" was on screen twice). */
+  footer { display: none; }
+  .wrap { padding-top: 76px !important; padding-bottom: 28px !important; }
+  h1 { font-size: 1.5rem !important; }
+  .intro-head { margin-bottom: 16px !important; }
+  .intro-line { font-size: 0.85rem; line-height: 1.65; max-width: 62ch; }
+  .step > h2 { display: none; }
+  /* The welcome message is only needed on the first step — on steps 2-5 it was
+     costing ~130px of every screen for no new information. */
+  .intro-head { display: none; }
+  .wrap:has(.step[data-step="1"].active) .intro-head { display: block; }
+  /* free-text boxes don't need to be tall */
+  .step textarea { min-height: 3.4rem !important; height: 3.4rem; }
+  .section-intro { font-size: 0.78rem; line-height: 1.5; margin-bottom: 0.5rem; padding: 0.55rem 0.75rem; }
+  .progress { padding: 10px 0 12px !important; margin-bottom: 0 !important; }
+  .field:has(> .choices),
+  .field:has(> input[type]),
+  .field:has(> select) { padding-top: 0.45rem !important; padding-bottom: 0.45rem !important; }
+  .step-nav { margin-top: 0.8rem !important; padding-top: 0.9rem !important; }
+
   /* Validation reads as a quiet footnote */
   .field-error { font-size: 0.72rem; color: #E0A59B; letter-spacing: 0; }
 </style>
@@ -526,7 +577,7 @@
 
       <div class="field">
         <label class="q">I confirm I am 18 or over</label>
-        <div class="choices" data-group="age_confirmed">
+        <div class="choices as-toggle" data-group="age_confirmed">
           <label class="opt"><input type="radio" name="age_confirmed" value="Yes"><span>Yes</span></label>
           <label class="opt"><input type="radio" name="age_confirmed" value="No"><span>No</span></label>
         </div>
@@ -1098,6 +1149,22 @@
     var f = e.target.closest('.field');
     if (f) { var err = f.querySelector('.field-error'); if (err) err.classList.remove('visible'); }
   });
+
+  // A radio can't be unticked by clicking it again, so the 18-or-over switch
+  // needs its own handler: on -> Yes, off -> neither, which keeps the step
+  // blocked until it's confirmed.
+  var ageGroup = $('.choices.as-toggle[data-group="age_confirmed"]');
+  if (ageGroup) {
+    ageGroup.addEventListener('click', function (e) {
+      e.preventDefault();
+      var yes = ageGroup.querySelector('input[value="Yes"]');
+      var no = ageGroup.querySelector('input[value="No"]');
+      var turningOn = !yes.checked;
+      yes.checked = turningOn;
+      no.checked = false;
+      yes.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  }
 
   // Wire nav buttons
   var nexts = document.querySelectorAll('[data-next]');
