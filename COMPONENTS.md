@@ -160,3 +160,67 @@ Where a switch hides one half of a radio pair (`intake.html`'s 18-or-over shows
 only the `Yes` option, with `[value="No"]` set to `display:none`), remember a
 radio can't be unticked by clicking it again — that page wires up an explicit
 handler so the switch can be turned back off.
+
+---
+
+## Conditional follow-up (progressive disclosure)
+
+A free-text box that stays hidden until its question is answered Yes, then
+opens welded to the card above it. Used on `intake.html` step 2 for the three
+"please list them" boxes.
+
+Before this existed, those boxes sat outside the card with their own label and
+margin — the step ran ~1,180px and scrolled on every laptop. With disclosure it
+is ~380px for a client with nothing to declare.
+
+### Markup
+
+Mark **only** the genuinely conditional wrapper. It must be the immediate next
+sibling of its question.
+
+```html
+<div class="field">
+  <label class="q">Are you currently taking any medication?</label>
+  <div class="choices" data-group="takes_medication">…Yes / No radios…</div>
+</div>
+
+<div class="field reveal">
+  <label class="q" for="current_medications">Please list them</label>
+  <textarea id="current_medications"></textarea>
+</div>
+```
+
+Drop the "If yes," prefix from the label — the box only exists when the answer
+was Yes, so the words are redundant.
+
+### CSS
+
+```css
+.field.reveal { display: none; }
+
+.field:has(> .choices input[value="Yes"]:checked) + .field.reveal {
+  display: block;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+/* the question above squares off its foot so the pair reads as one card */
+.field:has(> .choices input[value="Yes"]:checked):has(+ .field.reveal) {
+  border-bottom: 1px solid var(--a-sep);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-bottom: 0;
+}
+```
+
+### Do not use a blanket sibling rule
+
+The obvious selector — every `.field:has(> textarea)` after a question — is
+wrong. `main_concern` (step 2) and `safety_notes` (step 3) also follow a
+question row and must **always** be visible. Requiring the explicit `.reveal`
+class is what keeps them safe; adding a new conditional box is opt-in.
+
+### Known caveat
+
+Hiding is CSS-only, so a hidden `<textarea>` keeps any text already typed and
+still submits it. Answer Yes, type, then switch to No, and the note is stored
+alongside the "No". Clear the field on change if that matters for the record.

@@ -473,6 +473,69 @@
   .choices.as-toggle .opt input[value="Yes"]:checked + span::after { transform: translateX(16px); }
   .choices.as-toggle.invalid .opt:has(input[value="Yes"]) span { box-shadow: 0 0 0 2px rgba(224,165,155,0.6); }
 
+  /* ---- Free-text rows ----
+     The row-grouping rules above cover .choices, input and select but not
+     textarea, which is why the "if yes" boxes used to float outside the card
+     with their own label and margin. These give a textarea the same inset-card
+     treatment, with its label as a caption above rather than a heading. */
+  .field:has(> textarea) {
+    background: var(--a-s1);
+    border-radius: 12px;
+    padding: 0.5rem 0.85rem 0.6rem;
+    margin: 0 0 0.8rem;
+  }
+  .field:has(> textarea) > label.q {
+    display: block;
+    margin-bottom: 0.15rem;
+    font-size: 0.66rem;
+    line-height: 1.4;
+    color: var(--a-t3);
+  }
+  .field:has(> textarea) > textarea {
+    width: 100%;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    color: var(--a-t1);
+    font-family: inherit;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    display: block;
+    height: 2.9em;      /* ~2 lines; the box shouldn't dwarf its answer */
+    min-height: 2.9em;
+  }
+  .field:has(> textarea) > textarea::placeholder { color: var(--a-t3); }
+
+  /* ---- Progressive disclosure ----
+     A follow-up marked .reveal stays hidden until its question is answered
+     Yes, then opens as a sub-row welded to the card above. Only the three
+     genuinely conditional boxes carry .reveal — main_concern and safety_notes
+     follow a question row too, but are always shown. */
+  .field.reveal { display: none; }
+
+  .field:has(> .choices input[value="Yes"]:checked) + .field.reveal {
+    display: block;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+  /* the question above squares off its foot so the pair reads as one card */
+  .field:has(> .choices input[value="Yes"]:checked):has(+ .field.reveal) {
+    border-bottom: 1px solid var(--a-sep);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .field.reveal { animation: reveal-in 0.22s ease-out; }
+    @keyframes reveal-in {
+      from { opacity: 0; transform: translateY(-3px); }
+      to   { opacity: 1; transform: none; }
+    }
+  }
+
   /* ---- Fit a step on one screen ----
      This is a form, not a marketing page, so the space goes to the questions.
      Reclaimed: the site footer (158px of links below the fold), the repeated
@@ -655,8 +718,8 @@
         <div class="field-error" data-for="has_conditions">Please choose Yes or No.</div>
       </div>
 
-      <div class="field">
-        <label class="q" for="medical_conditions">If yes, please tell me about them <span class="opt-hint">(optional)</span></label>
+      <div class="field reveal">
+        <label class="q" for="medical_conditions">Please tell me about them</label>
         <textarea id="medical_conditions"></textarea>
       </div>
 
@@ -669,8 +732,8 @@
         <div class="field-error" data-for="takes_medication">Please choose Yes or No.</div>
       </div>
 
-      <div class="field">
-        <label class="q" for="current_medications">If yes, please list them <span class="opt-hint">(optional)</span></label>
+      <div class="field reveal">
+        <label class="q" for="current_medications">Please list them</label>
         <textarea id="current_medications"></textarea>
       </div>
 
@@ -683,8 +746,8 @@
         <div class="field-error" data-for="has_allergies">Please choose Yes or No.</div>
       </div>
 
-      <div class="field">
-        <label class="q" for="allergies">If yes, please list them <span class="opt-hint">(optional)</span></label>
+      <div class="field reveal">
+        <label class="q" for="allergies">Please list them</label>
         <textarea id="allergies"></textarea>
       </div>
 
