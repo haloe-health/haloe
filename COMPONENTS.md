@@ -99,3 +99,64 @@ carries risk for no user-visible gain). **New pages should use the canonical
 | `book.html` | `.steps` > `.step` > `.step-dot` | `.active` / `.done` |
 | `intake.html` | `.progress-dots` > `i` | `.on` / `.done` |
 | **Canonical (new work)** | `.page-control` > `i` | `.is-current` / `.is-done` |
+
+---
+
+## Toggle switch
+
+An iOS-style switch, used for consents and either/or confirmations where the
+answer is really "yes or not yet" rather than a genuine choice. For a true
+either/or, use a segmented control instead.
+
+**Used by:** `intake.html` (the 18-or-over confirmation, and the five consents
+on step 5), `book.html`.
+
+### Geometry — do not change these five numbers
+
+```css
+.switch {
+  position: relative;
+  width: 38px; height: 22px;
+  border-radius: 999px;
+  background: #3A3A3C;           /* off */
+  transition: background 0.2s;
+}
+.switch::after {                  /* the knob */
+  content: '';
+  position: absolute; top: 2px; left: 2px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--cream);       /* #F5F0E8 — NOT #fff, see below */
+  transition: transform 0.2s;
+}
+input:checked + .switch          { background: var(--gold); }
+input:checked + .switch::after   { transform: translateX(16px); }
+```
+
+They interlock: `2 + 18 + 2 = 22` sets the height, and the knob's travel is
+`38 − 18 − 2 − 2 = 16`, which is the `translateX`. Change the track width and
+you must change the translate to match, or the knob stops short of the edge.
+
+### The knob is cream, never `#fff`
+
+This is the one detail that's easy to get wrong, and it was wrong in all three
+implementations until July 2026. **The palette contains no pure white** — the
+lightest tokens are `--cream` / `--a-t1` (`#F5F0E8`) and `--white` (`#f7f2ea`),
+both warm. A cool `#fff` knob on a warm `--gold` track is the only pure white on
+the page, so it reads as a foreign object punched into the control rather than
+part of it.
+
+Use `var(--cream)` (or `var(--a-t1)` on pages using the Apple token set — same
+value). Note `book.html` also defines `--white: #FFFFFF`; that token is for
+other purposes, so don't reach for it here.
+
+### Accessibility
+
+The real `<input>` stays in the DOM and keeps its `id`/`name` — the switch is
+purely a restyle of the label. On `intake.html` this is load-bearing: `collect()`
+reads text fields by **`id`** and radio groups by **`name`**, so a switch that
+replaced its input would silently drop that answer while still reporting success.
+
+Where a switch hides one half of a radio pair (`intake.html`'s 18-or-over shows
+only the `Yes` option, with `[value="No"]` set to `display:none`), remember a
+radio can't be unticked by clicking it again — that page wires up an explicit
+handler so the switch can be turned back off.
