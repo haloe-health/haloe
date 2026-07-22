@@ -11,15 +11,18 @@
 
 import {
   BLACK, GOLD, CREAM, MUTED, HAIRLINE,
-  sendEmail, esc, emailButton, emailHeader, emailFooter, emailShell,
+  sendEmail, esc, emailHeader, emailFooter, emailShell,
 } from './_email.js';
 import { confirmBooking } from './_bookings.js';
 
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
-// Our own intake form now lives on-site (replaces the old Google Form). The
-// pre-session guide is no longer linked here — it is emailed after intake submit.
-const INTAKE_URL = 'https://haloe.health/intake';
+// The intake form is deliberately NOT linked from this email. Halima speaks to
+// each client on WhatsApp first and sends https://haloe.health/intake herself.
+// The form is still live and still writes to D1 — only the automatic prompts
+// were removed (this email, booking-confirmed.html, book.html, index.html).
+// To restore, put back the paragraph + emailButton(INTAKE_URL, …) block and
+// re-add emailButton to the ./_email.js import above.
 
 export async function onRequestPost(context) {
   // --- Read the RAW body first (required for signature verification) ---
@@ -336,21 +339,10 @@ function clientEmailHtml(d) {
               </tr>
               <!-- Deposit note -->
               ${depositNote ? `<tr><td style="padding:0 4px 18px;">${depositNote}</td></tr>` : ''}
-              <!-- Intake form -->
-              <tr>
-                <td style="padding:4px 4px 8px;">
-                  <p style="color:${MUTED};font-size:15px;line-height:1.75;margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;">Before your appointment, please take a moment to complete your health intake form so Halima can prepare and tailor your session to you:</p>
-                </td>
-              </tr>
-              <tr>
-                <td align="center" style="padding:0 4px 26px;">
-                  ${emailButton(INTAKE_URL, 'Complete your intake form')}
-                </td>
-              </tr>
               <!-- Personal note + compliance -->
               <tr>
-                <td style="padding:4px 4px 0;">
-                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Halima will be in touch personally to confirm the final details and answer any questions you may have.</p>
+                <td style="padding:16px 4px 0;">
+                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Halima will be in touch personally on WhatsApp to confirm the final details, send your health form, and answer any questions you may have.</p>
                   <p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;">haloe offers complementary wellness therapy to support your general wellbeing, relaxation and everyday tension. It is not a substitute for medical advice, diagnosis or treatment.</p>
                 </td>
               </tr>
