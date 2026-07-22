@@ -849,7 +849,7 @@
     <h3 id="condHeading"></h3>
     <p id="condBody"></p>
     <div class="cond-modal-tags" id="condTags"></div>
-    <a href="book.html" class="cond-modal-cta">Book This Treatment</a>
+    <a href="book.html" class="cond-modal-cta" id="condCta">Book This Treatment</a>
   </div>
 </div>
 
@@ -861,49 +861,58 @@
       title: 'Hormonal & Menstrual Health',
       heading: 'Cycle comfort & hormonal balance',
       body: "Hijama has long been used to support women's hormonal wellness — helping ease the discomfort of irregular cycles, period pain, and hormonal fluctuations. The Women's Hormonal Balance package (8 sessions over 16 weeks) and Cycle Comfort — Period Relief package (4 sessions over ~3 cycles) are designed specifically for this.",
-      tags: ["Women's Hormonal Balance", 'Cycle Comfort Package', '8–16 weeks', 'Wet & dry cupping']
+      tags: ["Women's Hormonal Balance", 'Cycle Comfort Package', '8–16 weeks', 'Wet & dry cupping'],
+      cta: { cat: 'packages', svc: "Women's Hormonal Balance" }
     },
     spiritual: {
       emoji: '🌙',
       title: 'Spiritual Wellbeing',
       heading: 'Prophetic medicine. Modern care.',
       body: "Al-Hijama is a Sunnah — a practice of the Prophet ﷺ. For many Muslim women, receiving hijama in a women-only, private space with a modest practitioner who understands their faith is itself part of the healing. haloe exists precisely for this. Every session is delivered with care, dignity, and full respect for your values.",
-      tags: ['Women only', 'Private space', 'Sunnah practice', 'Modest environment']
+      tags: ['Women only', 'Private space', 'Sunnah practice', 'Modest environment'],
+      // Not tied to one package — open the hijama list and let her choose.
+      cta: { cat: 'wet' }
     },
     stress: {
       emoji: '🧘',
       title: 'Stress & Anxiety',
       heading: 'Rest, release, restore',
       body: "Cupping works deeply on the nervous system — many clients describe a profound calm that settles in during and after treatment. The Stress & Sleep package (6 sessions over 24 weeks) offers a sustained, structured course of care, pairing wet and dry cupping with follow-up consultations and a herbal oil kit to support your wellbeing between sessions.",
-      tags: ['Stress & Sleep Package', '6 sessions', '24 weeks', 'Herbal oil kit included']
+      tags: ['Stress & Sleep Package', '6 sessions', '24 weeks', 'Herbal oil kit included'],
+      cta: { cat: 'packages', svc: 'Stress & Sleep' }
     },
     detox: {
       emoji: '🍃',
       title: 'Detox & Cleansing',
       heading: 'Support your body\'s natural rhythm',
       body: "Wet cupping draws blood to the surface, supporting your body's natural cleansing processes. The Digestion & Detox package (6 sessions over 24 weeks) is built around this — combining wet and dry cupping with a symptom-tracking guide so you can see real progress over time.",
-      tags: ['Digestion & Detox Package', '6 sessions', '24 weeks', 'Symptom tracking guide']
+      tags: ['Digestion & Detox Package', '6 sessions', '24 weeks', 'Symptom tracking guide'],
+      cta: { cat: 'packages', svc: 'Digestion & Detox' }
     },
     pain: {
       emoji: '⚡',
       title: 'Chronic Pain & Tension',
       heading: 'Targeted relief for persistent pain',
       body: "The Pain & Mobility package was built for women carrying chronic tension — back pain, shoulder tightness, sports injuries, recurring aches. Four sessions over 8–12 weeks, combining wet and dry cupping with unlimited cups and a follow-up consultation to track what's shifting. Targeted area and full-back options also available as single treatments.",
-      tags: ['Pain & Mobility Package', '4 sessions', 'Headache & Tension Package', 'Unlimited cups']
+      tags: ['Pain & Mobility Package', '4 sessions', 'Headache & Tension Package', 'Unlimited cups'],
+      cta: { cat: 'packages', svc: 'Pain & Mobility' }
     },
     skin: {
       emoji: '🌿',
       title: 'Skin & Beauty',
       heading: 'Glow from the inside out',
       body: "Face and head cupping uses gentle suction to lift the skin, stimulate circulation, and encourage your complexion to feel refreshed and vital. Every client also leaves with a take-home black seed oil bottle — used for centuries for its skin-nourishing properties and included as part of your aftercare at every session.",
-      tags: ['Face cupping', 'Head cupping', 'Black seed oil aftercare', 'Dry cupping only']
+      tags: ['Face cupping', 'Head cupping', 'Black seed oil aftercare', 'Dry cupping only'],
+      // The only condition with no package — it is a single dry-cupping treatment.
+      cta: { cat: 'dry', svc: 'Face Cupping' }
     },
     fatigue: {
       emoji: '✨',
       title: 'Fatigue & Low Energy',
       heading: 'Reclaim your vitality',
       body: "The Circulation & Energy package (8 sessions over 18 weeks) is haloe's most comprehensive energy-focused course. By supporting circulation and encouraging the body to function more freely, clients often notice a meaningful shift in their energy levels and general vitality. Includes unlimited cups, herbal oil kit, and priority booking.",
-      tags: ['Circulation & Energy Package', '8 sessions', '18 weeks', 'Priority booking']
+      tags: ['Circulation & Energy Package', '8 sessions', '18 weeks', 'Priority booking'],
+      cta: { cat: 'packages', svc: 'Circulation & Energy' }
     }
   };
 
@@ -925,6 +934,19 @@
       span.textContent = t;
       tags.appendChild(span);
     });
+    // Point "Book This Treatment" at the treatment she actually tapped.
+    // Without this every condition opened the wizard on Massage.
+    var cta = document.getElementById('condCta');
+    if (cta) {
+      var q = 'book.html';
+      if (d.cta && d.cta.cat) {
+        q += '?cat=' + encodeURIComponent(d.cta.cat);
+        if (d.cta.svc) q += '&svc=' + encodeURIComponent(d.cta.svc);
+      }
+      cta.href = q;
+      cta.textContent = d.cta && d.cta.svc ? 'Book ' + d.cta.svc : 'Book This Treatment';
+    }
+
     overlay.classList.add('open');
     document.body.style.overflow = 'hidden';
   }

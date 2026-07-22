@@ -1176,10 +1176,36 @@ let state = {
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+/* Deep link from the homepage condition modals: ?cat=packages&svc=Stress%20%26%20Sleep
+   Without this the wizard always opened on Massage, so someone who tapped
+   "Stress & Anxiety" landed on face massages instead of their package.
+   The category alone is enough; svc is optional and matched by exact name. */
+function applyDeepLink() {
+  const params = new URLSearchParams(location.search);
+  const cat = params.get('cat');
+  if (!cat || !SERVICES[cat]) return;
+
+  state.category = cat;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === cat);
+  });
+
+  const wanted = params.get('svc');
+  if (wanted) {
+    const i = SERVICES[cat].findIndex(s => s.name === wanted);
+    if (i !== -1) {
+      state.serviceIndex = i;
+      const btn = document.getElementById('btn-step1');
+      if (btn) btn.disabled = false;
+    }
+  }
+}
+
 function init() {
   const now = new Date();
   state.calYear = now.getFullYear();
   state.calMonth = now.getMonth();
+  applyDeepLink();
   renderServices();
   renderCalendar();
   updateRail();
