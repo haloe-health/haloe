@@ -56,7 +56,9 @@ Session times run longer than typical for the industry by design — deliberatel
 | Stress & Sleep / Headache & Tension / Digestion & Detox | 6 | £480 (£80/session) |
 | Circulation & Energy / Women's Hormonal Balance | 8 | £600 (£75/session) |
 
-Flat fee, unlimited cups — no per-cup charges anywhere on the site. Every treatment includes take-home black seed oil aftercare; packages add a 30-min follow-up consultation and full herbal oil kit. Mobile sessions available with a flat travel fee by radius.
+Flat fee, unlimited cups — no per-cup charges anywhere on the site. Every treatment includes take-home black seed oil aftercare; packages add a 30-min follow-up consultation and full herbal oil kit.
+
+**Travel:** free within Manchester city centre; outside it, charged at the actual cost of a taxi from the centre — **not** a flat fee and not banded. Confirmed by Halima after booking.
 
 ## Technical infrastructure
 
@@ -64,11 +66,11 @@ Flat fee, unlimited cups — no per-cup charges anywhere on the site. Every trea
 
 - **Hosting:** haloe.health on Cloudflare Pages
 - **Repo:** site code lives in `website-and-booking/`. Hand-written static HTML, no framework, no build step, no package manager, no test suite. CSS/JS are inline per-file — there are no shared/external asset files, and that's the deliberate pattern, not a gap.
-- **Pages:** `index.html` (marketing site, all CTAs link to `book.html`), `book.html` (4-step booking wizard; state lives in one in-memory `state` object), `booking-confirmed.html` (Stripe success landing page).
-- **Function:** `functions/create-checkout.js` — a Cloudflare Pages Function mapped to `/create-checkout`. Creates a Stripe Checkout Session via the Stripe REST API directly (no SDK).
+- **Pages:** `index.html` (marketing site + a non-paying WhatsApp booking widget), `book.html` (4-step booking wizard — the only path that charges), `booking-confirmed.html` (Stripe success page), `intake.html` (5-step health form → D1), `before-your-session.html` (pre-session guide, linked from the intake email).
+- **Functions:** `create-checkout.js`, `stripe-webhook.js`, `intake-submit.js`, `availability.js`, plus shared `_email.js` / `_bookings.js`. See `CLAUDE.md` for what each does.
 - **Payments:** Stripe (live). Currency is GBP; `unit_amount` is always in pence. Secret key is `context.env.STRIPE_SECRET_KEY`, set in the Cloudflare Pages dashboard — never in code.
-- **There IS a database and a webhook.** An earlier revision of this doc "corrected" the D1 mention as wrong — that correction was itself wrong, and it misled a later session. A D1 database (`haloe-clients`) stores intake submissions, and `functions/stripe-webhook.js` fires on payment to email both parties (Resend) and WhatsApp Halima (Twilio). The WhatsApp button on the confirmation page is a convenience, **not** the notification mechanism.
-- **WhatsApp number:** `447474833643`, used consistently across the site. The old `447700000000` placeholder is gone.
+- **There IS a database and a webhook.** An earlier revision of this doc "corrected" the D1 mention as wrong — that correction was itself wrong, and it misled a later session. A D1 database (`haloe-clients`) stores intake submissions **and** booking slot reservations, and `functions/stripe-webhook.js` fires on payment to email both parties (Resend). Twilio/WhatsApp alerts are coded but deliberately **not configured** — Halima chose email-only. The WhatsApp button that used to sit on the confirmation page has been removed entirely.
+- **WhatsApp number:** `447474833643` — still used by the homepage widget's hand-off. The old `447700000000` placeholder is gone.
 - **Health-intake form:** the on-site form at `haloe.health/intake`, which writes to D1. The old Google Form is **retired** and all links now point at `/intake`. This resolves the ambiguity previously flagged here.
 - **Service model: mobile only.** No clinic or treatment room; the location toggle has been removed from both booking flows.
 - **Pricing source of truth on the live site:** the `SERVICES` constant near the top of `book.html` — not this doc, not the business plan doc directly. If a price changes, update `SERVICES`; the function and confirmation page just echo whatever the wizard sends.
