@@ -8,6 +8,8 @@ Marketing site + booking flow for **haloe**, a women-only hijama/cupping & massa
 
 **Service model: mobile only.** Halima travels to the client; there is no clinic or treatment room. Do not reintroduce a location choice or any "visit us" copy.
 
+**Travel cost:** free within Manchester city centre; outside it, charged at the actual cost of a taxi from the centre (not a flat fee, not banded). Confirmed by Halima after booking. This wording appears in `book.html` (step 1), `booking-confirmed.html` (step 2) and `before-your-session.html` — keep all three identical.
+
 ## Architecture
 
 ### Pages
