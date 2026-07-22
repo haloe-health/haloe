@@ -43,6 +43,8 @@ Marketing site + booking flow for **haloe**, a women-only hijama/cupping & massa
 4. The WhatsApp alert comes from the Twilio business number, **not** the client's number — sending as the client is impossible and would be impersonation. The client's number is in the message body so Halima can reply.
 
 ### Design language (all customer-facing pages)
+Reusable patterns are documented in **`COMPONENTS.md`** (repo root) — copy-paste snippets, since the site keeps CSS/JS inline per page. Update that file first when you improve one.
+
 `book.html`, `booking-confirmed.html` and `intake.html` share one Apple-derived language — **true black, neutral greys (`#1C1C1E` surfaces, `rgba(255,255,255,0.10)` hairlines), gold used only for the active selection**, sentence-case headings with full stops, and `html { font-size: 78% }` as the single scale dial. Patterns to reuse rather than reinvent:
 - **Grouped inset lists** (iOS Settings): label left, answer right, hairline between rows, 12px radius.
 - **Segmented controls** for either/or answers; **toggle switches** for consents.

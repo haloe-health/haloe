@@ -435,6 +435,17 @@
     .progress { top: 58px !important; }
   }
 
+  /* Progress as Apple dots, matching the booking flow */
+  .progress-dots { display: flex; justify-content: center; gap: 7px; padding-top: 2px; }
+  .progress-dots i {
+    display: block; width: 6px; height: 6px; border-radius: 999px;
+    background: #3A3A3C; font-style: normal;
+    transition: background 0.25s, width 0.25s;
+  }
+  .progress-dots i.done { background: rgba(201,160,64,0.55); }
+  .progress-dots i.on { background: var(--gold); width: 18px; }
+  .progress-meta { margin-bottom: 8px; }
+
   /* Validation reads as a quiet footnote */
   .field-error { font-size: 0.72rem; color: #E0A59B; letter-spacing: 0; }
 </style>
@@ -477,7 +488,6 @@
 <div class="wrap">
 
   <div class="intro-head">
-    <div class="eyebrow">Health &amp; Consent</div>
     <h1>Your health &amp; <em>consent form</em></h1>
     <p class="intro-line">Welcome, and thank you for booking with haloe. This short form takes about two minutes and helps me care for you safely. Everything you share is kept private and confidential, in a women-only practice.</p>
   </div>
@@ -488,7 +498,7 @@
       <span class="progress-step" id="progressStep">Step 1 of 5</span>
       <span class="progress-name" id="progressName">About you</span>
     </div>
-    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-dots" id="progressDots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   </div>
 
   <form id="intakeForm" autocomplete="on" novalidate>
@@ -1059,7 +1069,10 @@
     }
     $('#progressStep').textContent = 'Step ' + current + ' of ' + TOTAL;
     $('#progressName').textContent = SECTION_NAMES[current];
-    $('#progressFill').style.width = (current / TOTAL * 100) + '%';
+    var dots = document.querySelectorAll('#progressDots i');
+    for (var d = 0; d < dots.length; d++) {
+      dots[d].className = (d + 1 === current) ? 'on' : (d + 1 < current ? 'done' : '');
+    }
     window.scrollTo({ top:0, behavior:'smooth' });
   }
 
