@@ -62,6 +62,10 @@
     --step-idle: #D0C8BC;
   }
 
+  /* Scales the whole booking page down in one place — every size below is in
+     rem, so this shrinks type, padding and gaps together and keeps proportions.
+     16px browser default -> 12.5px. */
+  html { font-size: 78%; }
   body {
     background: var(--black);
     color: var(--cream);
@@ -81,16 +85,23 @@
   .back-link:visited {
     font-family: 'Poppins', sans-serif;
     font-size: 0.68rem;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--cream) !important;
     text-decoration: none;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    transition: color 0.3s;
+    gap: 7px;
+    padding: 0.42rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    transition: border-color 0.25s, color 0.25s, background 0.25s;
   }
-  .back-link:hover { color: var(--gold) !important; }
+  .back-link:hover {
+    color: var(--gold) !important;
+    border-color: var(--border-strong);
+    background: rgba(201,160,64,0.06);
+  }
   .logo {
     font-family: 'Poppins', sans-serif;
     font-size: 2.2rem;
@@ -137,7 +148,7 @@
   }
   .step.done:not(:last-child)::after { background: var(--gold); }
   .step-dot {
-    width: 28px; height: 28px;
+    width: 22px; height: 22px;
     border-radius: 50%;
     border: 1.5px solid var(--step-idle);
     display: flex; align-items: center; justify-content: center;
@@ -160,56 +171,28 @@
 
   /* ---- Two-column shell (Option B: living summary) ---- */
   .book-shell {
-    max-width: 1080px;
+    max-width: 560px;
     margin: 0 auto;
-    padding: 1.5rem clamp(1rem, 3vw, 2.5rem) 4rem;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 336px;
-    gap: clamp(1.5rem, 3vw, 3rem);
-    align-items: start;
+    padding: 1.6rem clamp(1rem, 4vw, 1.5rem) 2rem;
   }
   .book-main { min-width: 0; }
   /* steps become a left-aligned breadcrumb inside the main column */
-  .book-main .steps { max-width: none; margin: 0; justify-content: flex-start; padding: 0 0 1.75rem; }
+  /* Step indicator reduced to a row of dots, centred in the top bar */
+  .steps { max-width: none; margin: 0; padding: 0; gap: 7px; justify-content: center; }
+  .step { flex: none; }
+  .step:not(:last-child)::after { display: none; }
+  .step-label { display: none; }
+  .step-dot {
+    width: 6px; height: 6px; border-radius: 999px;
+    border: none; background: #3A3A3C; color: transparent;
+    font-size: 0; transition: background 0.25s, width 0.25s;
+  }
+  .step.done .step-dot { background: rgba(201,160,64,0.55); }
+  .step.active .step-dot { background: var(--gold); width: 18px; }
   .book-main .container { max-width: none; margin: 0; padding: 0.5rem 0 0; }
 
-  /* ---- Summary rail ---- */
-  .rail-col { position: sticky; top: 88px; }
-  .rail {
-    position: relative; overflow: hidden;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    background: linear-gradient(200deg, #1A160E, #100F0B 75%);
-    padding: 1.6rem 1.5rem;
-  }
-  .rail-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.4rem; }
-  .rail-logo { display: flex; align-items: center; gap: 0.6rem; }
-  .rail-logo svg { width: 26px; height: 26px; }
-  .rail-logo b { font-weight: 400; font-size: 1.05rem; letter-spacing: 0.14em; color: var(--cream); }
-  .rail-ring { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    background: conic-gradient(var(--gold) var(--p, 25%), rgba(201,160,64,0.16) 0); transition: background 0.4s ease; }
-  .rail-ring span { width: 33px; height: 33px; border-radius: 50%; background: #16130D; display: flex; align-items: center; justify-content: center;
-    font-size: 0.6rem; letter-spacing: 0.04em; color: var(--cream); }
-  .rail-title { font-size: 1.05rem; font-weight: 400; color: var(--cream); margin-bottom: 1rem; letter-spacing: -0.01em; }
-  .rail-rows { display: flex; flex-direction: column; }
-  .rail-row { display: flex; justify-content: space-between; gap: 0.9rem; padding: 0.68rem 0; border-top: 1px solid var(--border); font-size: 0.82rem; }
-  .rail-row .rk { color: var(--text-muted); letter-spacing: 0.03em; }
-  .rail-row .rv { color: var(--cream); text-align: right; }
-  .rail-row .rv.empty { color: #4A443A; }
-  .rail-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px solid var(--border-strong); }
-  .rail-total .rk { font-size: 0.66rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
-  .rail-total .rv { font-size: 1.5rem; color: var(--gold); }
-  .rail-note { margin-top: 1rem; font-size: 0.72rem; line-height: 1.6; color: var(--text-muted); }
-  .rail-honey { position: absolute; inset: 0; opacity: 0.5; pointer-events: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='56' height='96' viewBox='0 0 56 96'><g fill='none' stroke='%23c9a040' stroke-opacity='0.06' stroke-width='1'><path d='M28 0l24 14v28L28 56 4 42V14z'/><path d='M28 48l24 14v28L28 104 4 90V62z'/></g></svg>"); background-size: 56px 96px; }
-  .rail > *:not(.rail-honey) { position: relative; }
-
-  @media (max-width: 860px) {
-    .book-shell { grid-template-columns: 1fr; }
-    .rail-col { position: static; order: -1; }
-  }
-
   /* Step 2: calendar and times side by side inside the main column */
-  .dt-cols { display: grid; grid-template-columns: minmax(0, 300px) 1fr; gap: 1.75rem; align-items: start; }
+  .dt-cols { display: grid; grid-template-columns: minmax(0, 240px) 1fr; gap: 1.75rem; align-items: start; }
   .dt-cols .date-section { margin: 0; }
   .time-hint { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
   @media (max-width: 720px) { .dt-cols { grid-template-columns: 1fr; } }
@@ -220,7 +203,8 @@
 
   .panel-title {
     font-family: 'Poppins', sans-serif;
-    font-size: 1.3rem;
+    font-size: 1.85rem;
+    font-weight: 500;
     font-weight: 400;
     color: var(--cream);
     margin-bottom: 0.5rem;
@@ -228,36 +212,37 @@
     line-height: 1.15;
   }
   .panel-sub {
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
-    margin-bottom: 2rem;
+    margin-bottom: 1.3rem;
   }
 
   /* ---- Segmented Control (shared component: treatment categories + location) ---- */
   .segmented {
-    display: grid;
-    gap: 3px;
-    margin-bottom: 1.1rem;
-    padding: 3px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 22px;
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-bottom: 1.2rem;
+    padding: 2px;
+    background: #1C1A16;
+    border: none;
+    border-radius: 9px;
   }
   .seg-option {
-    min-height: 34px;
-    padding: 0.3rem 0.4rem;
+    min-height: 26px;
+    padding: 0.34rem 0.95rem;
     border: none;
     background: transparent;
     color: var(--text-muted);
     font-family: 'Poppins', sans-serif;
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+    text-transform: none;
     white-space: nowrap;
     cursor: pointer;
-    border-radius: 18px;
+    border-radius: 7px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -268,30 +253,46 @@
   @media (pointer: coarse) { .seg-option { min-height: 44px; } }
   .seg-option:hover:not(.active) { color: var(--gold-light); }
   .seg-option.active {
-    background: var(--gold);
-    color: var(--black);
+    background: #3A362E;
+    color: var(--cream);
     font-weight: 500;
   }
   /* Segment counts per control */
-  .category-tabs { grid-template-columns: repeat(4, 1fr); }
+  .category-tabs { }
   /* On phones, 4 category labels won't fit one row — wrap to two rows of two, still pill-contained */
   @media (max-width: 420px) {
     .category-tabs { grid-template-columns: repeat(2, 1fr); }
   }
 
   /* ---- Service Cards ---- */
-  .service-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+  .service-grid { display: block; border-top: 1px solid rgba(245,240,232,0.10); }
   .service-card {
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 0.7rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.78rem 0.25rem;
+    border: none;
+    border-bottom: 1px solid rgba(245,240,232,0.10);
+    border-radius: 0;
+    background: none;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.18s;
     position: relative;
-    background: var(--surface);
   }
+  .service-card:hover { background: rgba(201,160,64,0.045); }
+  .svc-ring {
+    width: 19px; height: 19px; border-radius: 50%;
+    border: 1.5px solid #4A453C; flex: none;
+    transition: border-color 0.18s, border-width 0.18s;
+  }
+  .service-card.selected .svc-ring { border-color: var(--gold); border-width: 6px; }
+  .svc-main { flex: 1; min-width: 0; }
+  .svc-name { display: block; font-size: 1rem; color: var(--cream); letter-spacing: -0.01em; }
+  .svc-desc { display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.1rem; line-height: 1.45; }
+  .svc-time { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
+  .svc-price { font-size: 1rem; font-weight: 500; color: var(--cream); min-width: 52px; text-align: right; }
   .service-card:hover { border-color: var(--border-strong); background: rgba(201,160,64,0.04); }
-  .service-card.selected { border-color: var(--gold); background: rgba(201,160,64,0.08); }
+  .service-card.selected { background: rgba(201,160,64,0.05); }
   .service-card.selected::before {
     content: '✓';
     position: absolute;
@@ -323,6 +324,13 @@
   }
 
   /* ---- Location Toggle ---- (styling reuses the shared .segmented / .seg-option component) */
+  /* Apple step 1: the travel-fee note is a quiet line, not a bordered box */
+  .loc-line {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin: 0.9rem 0 0;
+  }
   .loc-notice {
     font-size: 0.75rem;
     color: var(--text-muted);
@@ -338,17 +346,17 @@
   /* ---- Date Picker ---- */
   .date-section { margin-bottom: 2rem; }
   .section-label {
-    font-size: 0.68rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 0.9rem;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #A1A1A6;
+    margin-bottom: 0.7rem;
   }
   .calendar {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.2rem;
-    background: var(--surface);
+    border: none;
+    border-radius: 12px;
+    padding: 0.9rem;
+    background: #1C1C1E;
   }
   .cal-header {
     display: flex;
@@ -359,16 +367,20 @@
   .cal-nav {
     background: none;
     border: none;
-    color: var(--gold);
+    color: #A1A1A6;
     cursor: pointer;
-    font-size: 1.1rem;
-    padding: 0.2rem 0.6rem;
+    font-size: 1rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
   }
+  .cal-nav:hover { background: rgba(255,255,255,0.07); color: var(--cream); }
   .cal-nav:hover { color: var(--gold-light); }
   .cal-month {
     font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    letter-spacing: 0.1em;
+    font-size: 0.88rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
     color: var(--cream);
   }
   .cal-grid {
@@ -391,15 +403,16 @@
     justify-content: center;
     font-size: 0.8rem;
     cursor: pointer;
-    border-radius: 2px;
-    border: 1px solid transparent;
+    border-radius: 999px;
+    border: none;
     color: var(--cream);
-    transition: all 0.15s;
+    transition: background 0.15s, color 0.15s;
   }
+  .cal-day:not(.disabled):hover { background: rgba(255,255,255,0.08); }
   .cal-day:hover:not(.disabled):not(.empty) { border-color: var(--border-strong); color: var(--gold); }
-  .cal-day.selected { border-color: var(--gold); background: rgba(201,160,64,0.15); color: var(--gold); }
-  .cal-day.today { color: var(--gold-light); font-weight: 500; }
-  .cal-day.disabled { color: #3A3530; cursor: not-allowed; }
+  .cal-day.selected { background: var(--gold); color: #000; font-weight: 500; }
+  .cal-day.today { color: var(--gold); font-weight: 500; }
+  .cal-day.disabled { color: #48484A; cursor: default; }
   .cal-day.empty { cursor: default; }
 
   /* ---- Time Slots ---- */
@@ -409,44 +422,44 @@
     gap: 0.5rem;
   }
   .time-slot {
-    padding: 0.55rem 0.4rem;
-    border: 1px solid var(--border);
-    border-radius: 50px;
+    padding: 0.5rem 0.4rem;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 9px;
     text-align: center;
-    font-size: 0.78rem;
-    letter-spacing: 0.06em;
+    font-size: 0.8rem;
+    letter-spacing: 0;
     cursor: pointer;
-    color: var(--text-muted);
-    transition: all 0.15s;
+    color: var(--cream);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
   .time-slot:hover:not(.taken) { border-color: var(--gold); color: var(--gold); }
-  .time-slot.selected { border-color: var(--gold); background: rgba(201,160,64,0.1); color: var(--gold); }
-  .time-slot.taken { color: #3A3530; cursor: not-allowed; border-color: transparent; }
+  .time-slot.selected { border-color: var(--gold); background: var(--gold); color: #000; font-weight: 500; }
+  .time-slot.taken { color: #48484A; cursor: not-allowed; border-color: rgba(255,255,255,0.06); }
 
   /* ---- Form Fields ---- */
   .form-grid { display: flex; flex-direction: column; gap: 1.5rem; }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   .form-field label {
     display: block;
-    font-size: 0.65rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #A1A1A6;
+    margin-bottom: 0.4rem;
   }
   .form-field input,
   .form-field select,
   .form-field textarea {
     width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: #1C1C1E;
+    border: 1px solid rgba(255,255,255,0.12);
     color: var(--cream);
     font-family: 'Poppins', sans-serif;
     font-size: 0.88rem;
     font-weight: 300;
-    padding: 0.85rem 1rem;
+    padding: 0.7rem 0.85rem;
     outline: none;
-    border-radius: var(--radius);
+    border-radius: 10px;
     transition: border-color 0.2s, box-shadow 0.2s;
     -webkit-appearance: none;
   }
@@ -457,7 +470,7 @@
     box-shadow: var(--focus-glow);
   }
   .form-field select option { background: #1A1710; color: var(--cream); }
-  .form-field textarea { resize: vertical; min-height: 88px; }
+  .form-field textarea { resize: vertical; min-height: 70px; }
   /* Error state wins over focus — declared last so the red border isn't overridden */
   .form-field input.invalid,
   .form-field input.invalid:focus { border-color: #C97A6E; }
@@ -471,6 +484,19 @@
     line-height: 1.5;
   }
   .field-error.visible { display: block; }
+
+  /* Step 3 validation sits directly under the field it refers to, reading as a
+     continuation of that cell: the hairline above it is suppressed so the field
+     and its message form one block, with the separator moving below. */
+  .ios-group .field-error {
+    margin: 0;
+    padding: 0 0.85rem 0.5rem;
+    font-size: 0.7rem;
+    line-height: 1.45;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+  }
+  .ios-group .ios-row:has(+ .field-error.visible) { border-bottom: none; }
+  .ios-group > *:last-child { border-bottom: none; }
 
   .checkbox-group { display: flex; flex-direction: column; gap: 0.8rem; }
   .checkbox-item {
@@ -513,27 +539,151 @@
     border-top: none; border-left: none;
     transform: rotate(45deg) translateY(-1px);
   }
-  .required-note {
-    font-size: 0.72rem;
+  /* ---- Step 3: grouped inset list (iOS Settings) ---- */
+  .ios-group {
+    background: #1C1C1E;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 0.8rem;
+  }
+  .ios-group-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6E6E73;
+    padding: 0.3rem 0.2rem 0.45rem;
+  }
+  .ios-row {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.6rem 0.85rem;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+  }
+  .ios-group .ios-row:last-child { border-bottom: none; }
+  .ios-row label {
+    font-size: 0.82rem;
+    color: var(--cream);
+    width: 96px;
+    flex: none;
+    margin: 0;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  .ios-row input,
+  .ios-row select,
+  .ios-row textarea {
+    flex: 1; min-width: 0;
+    background: none; border: none; outline: none;
+    color: var(--cream);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.82rem; font-weight: 300;
+    text-align: right;
+    padding: 0; border-radius: 0;
+    -webkit-appearance: none;
+  }
+  .ios-row textarea { resize: none; height: 2.5rem; line-height: 1.45; }
+  .ios-row input::placeholder,
+  .ios-row textarea::placeholder { color: #5A5A5F; }
+  .ios-row select { direction: rtl; }
+  .ios-row select option { direction: ltr; background: #1C1C1E; }
+  .ios-row input.invalid, .ios-row textarea.invalid { color: #E5736A; }
+
+  /* Consent toggles */
+  .ios-toggle {
+    display: flex; align-items: flex-start; gap: 0.85rem;
+    padding: 0.62rem 0.85rem;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
+    cursor: pointer;
+  }
+  .ios-group .ios-toggle:last-child { border-bottom: none; }
+  .ios-toggle > span:first-child {
+    flex: 1;
+    font-size: 0.78rem; line-height: 1.5;
+    color: var(--cream);
+  }
+  .ios-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+  .ios-toggle .switch {
+    position: relative; flex: none;
+    width: 38px; height: 22px; border-radius: 999px;
+    background: #3A3A3C; margin-top: 0.1rem;
+    transition: background 0.2s;
+  }
+  .ios-toggle .switch::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; transition: transform 0.2s;
+  }
+  .ios-toggle input:checked + .switch { background: var(--gold); }
+  .ios-toggle input:checked + .switch::after { transform: translateX(16px); }
+  .ios-toggle input:focus-visible + .switch { box-shadow: 0 0 0 3px rgba(201,160,64,0.35); }
+
+  /* ---- Step 4: appointment pass ---- */
+  .summary-card { background: none; border-radius: 0; overflow: visible; }
+  .pass { background: #1C1C1E; border-radius: 14px; overflow: hidden; }
+  .pass-when { padding: 1.15rem 1rem 0.95rem; text-align: center; }
+  .pass-date {
+    font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
     color: var(--gold);
-    margin-top: 1.5rem;
-    padding: 0.8rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    line-height: 1.6;
+  }
+  .pass-time {
+    font-size: 2.1rem; font-weight: 500; letter-spacing: -0.03em;
+    line-height: 1.05; margin: 0.25rem 0 0.15rem; color: var(--cream);
+  }
+  .pass-at { font-size: 0.85rem; color: #A1A1A6; }
+  /* Perforated edge: two notches punched out of the card, dashes between */
+  .pass-perf { position: relative; height: 14px; }
+  .pass-perf::before, .pass-perf::after {
+    content: ''; position: absolute; top: 0; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--black);
+  }
+  .pass-perf::before { left: -7px; }
+  .pass-perf::after { right: -7px; }
+  .pass-perf span {
+    position: absolute; left: 12px; right: 12px; top: 7px;
+    border-top: 1px dashed rgba(255,255,255,0.18);
+  }
+  .pass-what {
+    padding: 0.25rem 1rem 1.05rem;
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem;
+  }
+  .pass-name { font-size: 1rem; color: var(--cream); letter-spacing: -0.01em; }
+  .pass-meta { font-size: 0.72rem; color: #6E6E73; margin-top: 0.15rem; }
+  .pass-price { font-size: 1.35rem; font-weight: 500; color: var(--gold); white-space: nowrap; }
+
+  /* ---- Step 4 payment actions ---- */
+  .pay-actions { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 1.2rem; }
+  .pay-btn {
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+  }
+  .pay-primary { background: var(--gold); color: #000; border: none; }
+  .pay-primary:hover:not(:disabled) { background: var(--gold-light); }
+  .pay-secondary { background: none; color: var(--cream); border: 1px solid rgba(255,255,255,0.16); }
+  .pay-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.06); }
+  .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .pay-note {
+    font-size: 0.72rem; color: #6E6E73; text-align: center;
+    margin-top: 0.7rem; line-height: 1.6;
   }
 
   /* ---- Summary ---- */
   .summary-card {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: rgba(201,160,64,0.03);
+    border: none;
+    border-radius: 12px;
+    background: #1C1C1E;
     overflow: hidden;
   }
   /* Hero block — treatment name + price */
   .sc-hero {
-    padding: 1.4rem 1.5rem 1.2rem;
-    border-bottom: 1px solid var(--border);
+    padding: 0.95rem 0.85rem 0.85rem;
+    border-bottom: 1px solid rgba(255,255,255,0.10);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -567,15 +717,15 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    padding: 0.65rem 1.5rem;
+    padding: 0.6rem 0.85rem;
     gap: 1rem;
   }
-  .sc-row + .sc-row { border-top: 1px solid rgba(201,160,64,0.07); }
+  .sc-row + .sc-row { border-top: 1px solid rgba(255,255,255,0.10); }
   .sc-label {
-    font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-muted);
+    font-size: 0.82rem;
+    letter-spacing: 0;
+    text-transform: none;
+    color: #A1A1A6;
     flex-shrink: 0;
   }
   .sc-value {
@@ -586,12 +736,12 @@
   }
 
   .whatsapp-note {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-    padding: 0.9rem 1rem;
-    border-left: 2px solid var(--gold);
+    font-size: 0.75rem;
+    color: #6E6E73;
+    line-height: 1.6;
+    margin: 0.7rem 0 0;
+    padding: 0 0.85rem;
+    border-left: none;
   }
 
   /* ---- Buttons ---- */
@@ -615,21 +765,52 @@
   .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(201,160,64,0.25); }
   .btn-primary:active { transform: scale(0.98); }
   .btn-primary:disabled { background: #3A3530; color: #6B6357; cursor: not-allowed; opacity: 0.6; transform: none; }
+  /* Steps 1–3 are driven from the frosted footer; these stay in the DOM so all
+     the existing enable/disable logic keeps working, but aren't shown. */
+  #btn-step1, #btn-step2, #btn-step3 { display: none; }
 
-  .btn-back {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 50px;
-    color: var(--text-muted);
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 0.6rem 1.2rem;
-    cursor: pointer;
-    margin-bottom: 2rem;
-    transition: border-color 0.2s, color 0.2s, transform 0.1s;
+  /* ---- Frosted footer bar (Apple buy-flow) ---- */
+  .footbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    background: rgba(20,20,22,0.86);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255,255,255,0.10);
   }
+  .footbar-inner {
+    max-width: 560px; margin: 0 auto;
+    padding: 0.7rem clamp(1rem, 4vw, 1.5rem);
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  }
+  .foot-label { font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: #6E6E73; }
+  .foot-total { font-size: 1rem; font-weight: 500; color: var(--cream); }
+  .foot-cta {
+    background: var(--gold); color: #000; border: none;
+    font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 0.8rem;
+    padding: 0.6rem 1.5rem; border-radius: 999px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .foot-cta:hover:not(:disabled) { background: var(--gold-light); }
+  .foot-cta:disabled { background: #2C2C2E; color: #6E6E73; cursor: not-allowed; }
+  .foot-cta.hidden { display: none; }
+  .footbar.hidden { display: none; }
+  body { padding-bottom: 76px; }
+
+  .btn-back { display: none; }
+  .btn-back-unused {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 999px;
+    color: #A1A1A6;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0;
+    text-transform: none;
+    padding: 0.36rem 0.9rem;
+    cursor: pointer;
+    margin-bottom: 1.2rem;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .btn-back:hover { background: rgba(255,255,255,0.05); color: var(--cream); }
   .btn-back:hover { border-color: var(--border-strong); color: var(--cream); }
   .btn-back:active { transform: scale(0.98); }
 
@@ -729,10 +910,29 @@
 })();
 </script>
 
-<nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:flex-end;align-items:center;padding:18px 40px;background:rgba(13,13,13,0.92);border-bottom:1px solid rgba(201,160,64,0.12);backdrop-filter:blur(12px);">
-  <a href="index.html" class="back-link">← Back to site</a>
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:12px clamp(1rem,3vw,2.5rem);background:rgba(13,13,13,0.92);backdrop-filter:blur(12px);">
+  <a href="index.html" class="back-link" id="back-control" onclick="backControl(event)">← Back to site</a>
+  <div class="steps" id="steps">
+    <div class="step active" data-step="1">
+      <div class="step-dot">1</div>
+      <span class="step-label">Treatment</span>
+    </div>
+    <div class="step" data-step="2">
+      <div class="step-dot">2</div>
+      <span class="step-label">Date & Time</span>
+    </div>
+    <div class="step" data-step="3">
+      <div class="step-dot">3</div>
+      <span class="step-label">Details</span>
+    </div>
+    <div class="step" data-step="4">
+      <div class="step-dot">4</div>
+      <span class="step-label">Confirm</span>
+    </div>
+  </div>
+  <span class="foot-label" id="step-counter">Step 1 of 4</span>
 </nav>
-<div style="height:64px;"></div>
+<div style="height:52px;"></div>
 <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Book a women's hijama or cupping session at haloe — Manchester</h1>
 <div class="book-shell">
 <div class="book-main">
@@ -741,31 +941,13 @@
     <span class="logo-sub">Hijama · Wellness · Manchester</span>
   </div>
 
-<div class="steps" id="steps">
-  <div class="step active" data-step="1">
-    <div class="step-dot">1</div>
-    <span class="step-label">Treatment</span>
-  </div>
-  <div class="step" data-step="2">
-    <div class="step-dot">2</div>
-    <span class="step-label">Date & Time</span>
-  </div>
-  <div class="step" data-step="3">
-    <div class="step-dot">3</div>
-    <span class="step-label">Details</span>
-  </div>
-  <div class="step" data-step="4">
-    <div class="step-dot">4</div>
-    <span class="step-label">Confirm</span>
-  </div>
-</div>
 
 <div class="container">
 
   <!-- STEP 1: Choose Treatment -->
   <div class="panel active" id="panel-1">
-    <p class="panel-title">Choose your treatment</p>
-    <p class="panel-sub">Women only · Fully accredited · Manchester</p>
+    <p class="panel-title">Choose your treatment.</p>
+    <p class="panel-sub">Women only. Fully accredited. Mobile across Manchester.</p>
 
     <div class="category-tabs segmented" id="category-tabs">
       <button class="tab-btn seg-option active" data-cat="massage">Massage</button>
@@ -776,12 +958,7 @@
 
     <div class="service-grid" id="service-grid"></div>
 
-    <div style="margin-top: 1.5rem;">
-      <p class="section-label">Where your treatment takes place</p>
-      <div class="loc-notice" id="loc-notice" style="display:block;">
-        All sessions are mobile — Halima comes to your home. A flat travel fee applies based on your distance from Manchester city centre, and she will confirm this when she contacts you to confirm the booking.
-      </div>
-    </div>
+    <p class="loc-line" id="loc-notice">All sessions are mobile — Halima comes to you. A flat travel fee applies by distance from Manchester city centre, confirmed when she contacts you.</p>
 
     <button class="btn-primary" id="btn-step1" onclick="goToStep(2)" disabled>Continue — Choose Date & Time</button>
   </div>
@@ -789,8 +966,8 @@
   <!-- STEP 2: Date & Time -->
   <div class="panel" id="panel-2">
     <button class="btn-back" onclick="goToStep(1)">← Back</button>
-    <p class="panel-title">Choose a date & time</p>
-    <p class="panel-sub">Available appointments</p>
+    <p class="panel-title">Choose a date & time.</p>
+    <p class="panel-sub">Pick a day, then a time that suits you.</p>
 
     <div class="dt-cols">
       <div class="date-section">
@@ -818,31 +995,34 @@
   <!-- STEP 3: Your Details -->
   <div class="panel" id="panel-3">
     <button class="btn-back" onclick="goToStep(2)">← Back</button>
-    <p class="panel-title">Your details</p>
-    <p class="panel-sub">All information is held in confidence</p>
+    <p class="panel-title">Your details.</p>
+    <p class="panel-sub">All information is held in confidence.</p>
 
-    <div class="form-grid">
-      <div class="form-field">
-        <label>Full name *</label>
+    <div class="ios-group">
+      <div class="ios-row">
+        <label for="fullname">Name</label>
         <input type="text" id="fullname" placeholder="Your full name" oninput="checkStep3()">
       </div>
-      <div class="form-field">
-        <label>Mobile number *</label>
-        <input type="tel" id="phone" placeholder="+44 7700 000000" oninput="checkStep3()">
-        <p class="field-error" id="phone-error"></p>
+      <div class="ios-row">
+        <label for="phone">Mobile</label>
+        <input type="tel" id="phone" placeholder="07700 000000" oninput="checkStep3()">
       </div>
-      <div class="form-field">
-        <label>Email address *</label>
+      <p class="field-error" id="phone-error"></p>
+      <div class="ios-row">
+        <label for="email">Email</label>
         <input type="email" id="email" placeholder="your@email.com" oninput="checkStep3()">
-        <p class="field-error" id="email-error"></p>
       </div>
-      <div class="form-field">
-        <label>Address for your session *</label>
-        <textarea id="address" placeholder="House number and street, area, postcode" oninput="checkStep3()"></textarea>
-        <p class="field-error" id="address-error"></p>
+      <p class="field-error" id="email-error"></p>
+      <div class="ios-row">
+        <label for="address">Address</label>
+        <textarea id="address" placeholder="House number, street, postcode" oninput="checkStep3()"></textarea>
       </div>
-      <div class="form-field">
-        <label>How did you hear about haloe?</label>
+      <p class="field-error" id="address-error"></p>
+    </div>
+
+    <div class="ios-group">
+      <div class="ios-row">
+        <label for="referral">Heard via</label>
         <select id="referral">
           <option value="">Please select</option>
           <option>Instagram</option>
@@ -853,35 +1033,24 @@
           <option>Other</option>
         </select>
       </div>
-      <div class="form-field">
-        <label>Anything you'd like Halima to know?</label>
-        <textarea id="notes" placeholder="Any relevant health notes, questions, or preferences…"></textarea>
-      </div>
-
-      <div class="form-field">
-        <p class="section-label" style="margin-bottom:0.75rem;">Consent & acknowledgements</p>
-        <div class="checkbox-group">
-          <label class="checkbox-item">
-            <input type="checkbox" id="consent1" onchange="checkStep3()">
-            <div class="checkbox-custom"></div>
-            I confirm I am female and 18 or over (or booking on behalf of a female family member with their consent).
-          </label>
-          <label class="checkbox-item">
-            <input type="checkbox" id="consent2" onchange="checkStep3()">
-            <div class="checkbox-custom"></div>
-            I understand haloe offers complementary wellness therapy and is not a substitute for medical diagnosis or treatment.
-          </label>
-          <label class="checkbox-item">
-            <input type="checkbox" id="consent3" onchange="checkStep3()">
-            <div class="checkbox-custom"></div>
-            I will complete the full health intake form sent after this booking, before my appointment.
-          </label>
-        </div>
+      <div class="ios-row">
+        <label for="notes">Notes</label>
+        <textarea id="notes" placeholder="Anything Halima should know"></textarea>
       </div>
     </div>
 
-    <div class="required-note">
-      A full health intake form will be sent to your email after booking. This must be completed before your appointment. If you have a complex health history (diabetes, blood thinners, pregnancy, cardiovascular conditions), Halima may ask for a GP clearance letter before treating you.
+    <p class="ios-group-label">Consent</p>
+    <div class="ios-group">
+      <label class="ios-toggle">
+        <span>I am female and 18 or over, or booking for a female family member with their consent.</span>
+        <input type="checkbox" id="consent1" onchange="checkStep3()">
+        <span class="switch"></span>
+      </label>
+      <label class="ios-toggle">
+        <span>I understand haloe offers complementary wellness therapy, not a substitute for medical diagnosis or treatment.</span>
+        <input type="checkbox" id="consent2" onchange="checkStep3()">
+        <span class="switch"></span>
+      </label>
     </div>
 
     <button class="btn-primary" id="btn-step3" onclick="goToStep(4)" disabled>Review Booking</button>
@@ -890,26 +1059,16 @@
   <!-- STEP 4: Confirm -->
   <div class="panel" id="panel-4">
     <button class="btn-back" onclick="goToStep(3)">← Back</button>
-    <p class="panel-title">Review & confirm</p>
-    <p class="panel-sub">Please check everything looks right</p>
+    <p class="panel-title">Review & confirm.</p>
+    <p class="panel-sub">Please check everything looks right.</p>
 
     <div class="summary-card" id="summary-card"></div>
 
-    <div class="whatsapp-note">
-      After payment, Halima will confirm your booking via WhatsApp within a few hours. Please ensure your mobile number is correct.
+    <div class="pay-actions">
+      <button class="pay-btn pay-primary" id="btn-deposit" onclick="handlePayment('deposit')">Pay £25 deposit</button>
+      <button class="pay-btn pay-secondary" id="btn-full" onclick="handlePayment('full')">Pay in full</button>
     </div>
-
-    <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:2rem;">
-      <button class="btn-primary" id="btn-deposit" onclick="handlePayment('deposit')" style="margin-top:0; background:var(--gold);">
-        Pay £25 Deposit
-      </button>
-      <button class="btn-primary" id="btn-full" onclick="handlePayment('full')" style="margin-top:0; background:transparent; border:1px solid rgba(201,160,64,0.5); color:var(--gold);">
-        Pay in Full
-      </button>
-    </div>
-    <p style="font-size:0.72rem;color:var(--text-muted);text-align:center;margin-top:0.75rem;line-height:1.6;">
-      Deposit is non-refundable if cancelled within 48 hours or for no-shows.<br>Remainder payable on the day.
-    </p>
+    <p class="pay-note">Deposit is non-refundable within 48 hours or for no-shows. Balance payable on the day.<br>Halima confirms by WhatsApp after payment — please check your number is right.</p>
   </div>
 
   <!-- Confirmation Screen -->
@@ -927,22 +1086,6 @@
 
 </div><!-- /container -->
 </div><!-- /book-main -->
-<aside class="rail-col">
-  <div class="rail" id="rail">
-    <div class="rail-honey"></div>
-    <div class="rail-head">
-      <div class="rail-logo">
-        <svg viewBox="0 0 40 44" aria-hidden="true"><g fill="none" stroke="#c9a040" stroke-width="1.5"><path d="M20 2l8 4.6v9.2L20 20l-8-4.2V6.6z"/><path d="M11 18l8 4.6v9.2L11 36l-8-4.2v-9.2z"/><path d="M29 18l8 4.6v9.2L29 36l-8-4.2v-9.2z"/></g></svg>
-        <b>haloe</b>
-      </div>
-      <div class="rail-ring" id="rail-ring"><span id="rail-ring-label">1/4</span></div>
-    </div>
-    <p class="rail-title">Your booking</p>
-    <div class="rail-rows" id="rail-rows"></div>
-    <div class="rail-total"><span class="rk">Total</span><span class="rv" id="rail-total">—</span></div>
-    <p class="rail-note">A £25 deposit secures your slot — the balance is payable on the day.</p>
-  </div>
-</aside>
 </div><!-- /book-shell -->
 
 <script>
@@ -1042,6 +1185,56 @@ function updateRail() {
   if (ring) ring.style.setProperty('--p', `${Math.round((currentStep / 4) * 100)}%`);
   const lbl = document.getElementById('rail-ring-label');
   if (lbl) lbl.textContent = `${currentStep}/4`;
+
+  // Frosted footer (Apple layout): running selection + total.
+  const fs = document.getElementById('foot-sum');
+  if (fs) {
+    if (!svc) {
+      fs.textContent = 'No treatment selected';
+    } else {
+      const bits = [svc.name, svc.time];
+      if (dateStr) bits.push(dateStr);
+      if (state.time) bits.push(state.time);
+      fs.textContent = bits.join(' · ');
+    }
+  }
+  const ft = document.getElementById('foot-total');
+  if (ft) ft.textContent = svc ? `£${svc.price}` : '—';
+  syncFooter();
+}
+
+// The footer button is a proxy for the current step's (hidden) primary button,
+// so every existing enable/disable rule keeps driving it untouched.
+function syncFooter() {
+  const counter = document.getElementById('step-counter');
+  if (counter) counter.textContent = `Step ${currentStep} of 4`;
+  // A single back control: leaves the site on step 1, steps back after that.
+  const back = document.getElementById('back-control');
+  if (back) back.textContent = currentStep > 1 ? '← Back' : '← Back to site';
+  const cta = document.getElementById('foot-cta');
+  if (!cta) return;
+  // Step 4 carries its own total and pay buttons, so the bar would only repeat
+  // itself — hide it entirely there.
+  const bar = document.querySelector('.footbar');
+  if (bar) bar.classList.toggle('hidden', currentStep === 4);
+  if (currentStep === 4) { cta.classList.add('hidden'); return; }
+  cta.classList.remove('hidden');
+  const src = document.getElementById('btn-step' + currentStep);
+  cta.textContent = currentStep === 3 ? 'Review booking' : 'Continue';
+  cta.disabled = src ? src.disabled : true;
+}
+
+// Step 1 lets the link through to the homepage; later steps step backwards.
+function backControl(e) {
+  if (currentStep > 1) {
+    e.preventDefault();
+    goToStep(currentStep - 1);
+  }
+}
+
+function footerContinue() {
+  const src = document.getElementById('btn-step' + currentStep);
+  if (src && !src.disabled) src.click();
 }
 
 function renderServices() {
@@ -1049,12 +1242,13 @@ function renderServices() {
   const services = SERVICES[state.category];
   grid.innerHTML = services.map((s, i) => `
     <div class="service-card ${state.serviceIndex === i ? 'selected' : ''}" onclick="selectService(${i})">
-      <p class="service-name">${s.name}</p>
-      <div class="service-meta">
-        <span>${s.time}</span>
-        <span class="service-price">£${s.price}${state.category === 'packages' ? '' : ''}</span>
-      </div>
-      ${s.desc ? `<p class="service-desc">${s.desc}</p>` : ''}
+      <span class="svc-ring"></span>
+      <span class="svc-main">
+        <span class="svc-name">${s.name}</span>
+        ${s.desc ? `<span class="svc-desc">${s.desc}</span>` : ''}
+      </span>
+      <span class="svc-time">${s.time}</span>
+      <span class="svc-price">£${s.price}</span>
     </div>
   `).join('');
 }
@@ -1236,9 +1430,9 @@ function checkStep3() {
     'Please include your full address and postcode so Halima knows where to travel to.');
   const consentsOk =
     document.getElementById('consent1').checked &&
-    document.getElementById('consent2').checked &&
-    document.getElementById('consent3').checked;
+    document.getElementById('consent2').checked;
   document.getElementById('btn-step3').disabled = !(nameOk && emailOk && phoneOk && addressOk && consentsOk);
+  syncFooter();
 }
 
 function buildSummary() {
@@ -1255,19 +1449,22 @@ function buildSummary() {
 function renderSummary() {
   const { service, catLabel, dateStr, locationLabel, name } = buildSummary();
   const card = document.getElementById('summary-card');
+  // Presented as an appointment pass: when it is, then what it is.
   card.innerHTML = `
-    <div class="sc-hero">
-      <div>
-        <div class="sc-hero-name">${service.name}</div>
-        <div class="sc-hero-type">${catLabel}${service.time ? ' · ' + service.time : ''}</div>
+    <div class="pass">
+      <div class="pass-when">
+        <div class="pass-date">${dateStr}</div>
+        <div class="pass-time">${state.time}</div>
+        <div class="pass-at">${locationLabel} · Manchester</div>
       </div>
-      <div class="sc-hero-price">£${service.price}</div>
-    </div>
-    <div class="sc-rows">
-      <div class="sc-row"><span class="sc-label">Date</span><span class="sc-value">${dateStr}</span></div>
-      <div class="sc-row"><span class="sc-label">Time</span><span class="sc-value">${state.time}</span></div>
-      <div class="sc-row"><span class="sc-label">Location</span><span class="sc-value">${locationLabel}</span></div>
-      <div class="sc-row"><span class="sc-label">Name</span><span class="sc-value">${name}</span></div>
+      <div class="pass-perf"><span></span></div>
+      <div class="pass-what">
+        <div>
+          <div class="pass-name">${service.name}</div>
+          <div class="pass-meta">${catLabel}${service.time ? ' · ' + service.time : ''}${name ? ' · ' + name : ''}</div>
+        </div>
+        <div class="pass-price">£${service.price}</div>
+      </div>
     </div>
   `;
 }
@@ -1357,11 +1554,25 @@ async function handlePayment(type) {
   }
 }
 
+// £25 deposit, but never more than the treatment itself (the £1 test item).
+function depositLabel() {
+  const svc = (state.serviceIndex !== null && SERVICES[state.category])
+    ? SERVICES[state.category][state.serviceIndex] : null;
+  const amount = svc ? Math.min(25, svc.price) : 25;
+  return `Pay £${amount} deposit`;
+}
+
+function fullLabel() {
+  const svc = (state.serviceIndex !== null && SERVICES[state.category])
+    ? SERVICES[state.category][state.serviceIndex] : null;
+  return svc ? `Pay in full — £${svc.price}` : 'Pay in full';
+}
+
 function resetPayButtons() {
   const depositBtn = document.getElementById('btn-deposit');
   const fullBtn = document.getElementById('btn-full');
-  if (depositBtn) { depositBtn.disabled = false; depositBtn.textContent = 'Pay £25 Deposit'; }
-  if (fullBtn) fullBtn.disabled = false;
+  if (depositBtn) { depositBtn.disabled = false; depositBtn.textContent = depositLabel(); }
+  if (fullBtn) { fullBtn.disabled = false; fullBtn.textContent = fullLabel(); }
 }
 
 function notifyWhatsApp(paymentType) {
@@ -1388,12 +1599,27 @@ function goToStep(n) {
     }
     renderTimes();
   }
-  if (n === 4) renderSummary();
+  if (n === 4) {
+    renderSummary();
+    const dep = document.getElementById('btn-deposit');
+    if (dep) dep.textContent = depositLabel();
+    const full = document.getElementById('btn-full');
+    if (full) full.textContent = fullLabel();
+  }
   updateRail();
   window.scrollTo(0, 0);
 }
 
 init();
 </script>
+<div class="footbar">
+  <div class="footbar-inner">
+    <div>
+      <div class="foot-label" id="foot-sum">No treatment selected</div>
+      <div class="foot-total" id="foot-total">—</div>
+    </div>
+    <button class="foot-cta" id="foot-cta" onclick="footerContinue()" disabled>Continue</button>
+  </div>
+</div>
 </body>
 </html>
