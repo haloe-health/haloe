@@ -257,20 +257,31 @@
     color: var(--cream);
     font-weight: 500;
   }
-  /* Segment counts per control */
-  .category-tabs { }
-  /* On phones, 4 category labels won't fit one row — wrap to two rows of two, still pill-contained */
-  @media (max-width: 420px) {
-    .category-tabs { grid-template-columns: repeat(2, 1fr); }
+  /* Category tabs fill the width — four equal segments, one row. Rounder than
+     the base .segmented so the pill reads softer. Overrides .segmented's
+     inline-flex because it's declared later at equal specificity. */
+  .category-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 16px;
+  }
+  .category-tabs .seg-option { border-radius: 13px; }
+  /* Very narrow phones: shrink the label a touch so "Dry Cupping" etc. still
+     fit one line rather than overflowing the segment. */
+  @media (max-width: 390px) {
+    .category-tabs .seg-option { font-size: 0.68rem; padding-left: 0.3rem; padding-right: 0.3rem; }
   }
 
   /* ---- Service Cards ---- */
   .service-grid { display: block; border-top: 1px solid rgba(245,240,232,0.10); }
   .service-card {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 1rem;
-    padding: 0.78rem 0.25rem;
+    padding: 0.85rem 0.25rem;
     border: none;
     border-bottom: 1px solid rgba(245,240,232,0.10);
     border-radius: 0;
@@ -285,12 +296,24 @@
     border: 1.5px solid #4A453C; flex: none;
     transition: border-color 0.18s, border-width 0.18s;
   }
+  .service-card .svc-ring { margin-top: 2px; }
   .service-card.selected .svc-ring { border-color: var(--gold); border-width: 6px; }
   .svc-main { flex: 1; min-width: 0; }
   .svc-name { display: block; font-size: 1rem; color: var(--cream); letter-spacing: -0.01em; }
-  .svc-desc { display: block; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.1rem; line-height: 1.45; }
-  .svc-time { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; }
-  .svc-price { font-size: 1rem; font-weight: 500; color: var(--cream); min-width: 52px; text-align: right; white-space: nowrap; }
+  /* Duration as a small gold chip on its own line (D4), freeing the right edge
+     for price alone. */
+  .svc-chip {
+    display: inline-block;
+    font-size: 0.62rem; letter-spacing: 0.02em;
+    color: var(--gold);
+    border: 1px solid rgba(201,160,64,0.32);
+    border-radius: 99px;
+    padding: 1.5px 8px;
+    margin: 0.32rem 0 0.28rem;
+    white-space: nowrap;
+  }
+  .svc-desc { display: block; font-size: 0.72rem; color: var(--text-muted); line-height: 1.45; }
+  .svc-price { font-size: 1rem; font-weight: 500; color: var(--cream); min-width: 52px; text-align: right; white-space: nowrap; margin-top: 1px; }
   /* Pre-discount price, kept quiet so the payable amount stays dominant. */
   .was {
     color: var(--text-muted);
@@ -1134,28 +1157,28 @@
 <script>
 const SERVICES = {
   massage: [
-    { name: 'Face Massage', time: '45 min', price: 40 },
-    { name: 'Head Massage', time: '45 min', price: 40 },
-    { name: 'Face & Head Massage', time: '1 hour', price: 70 },
-    { name: 'Head & Foot Massage', time: '1 hour', price: 60 },
-    { name: 'Back, Neck & Shoulders', time: '1 hour', price: 75 },
-    { name: 'Full Body Massage', time: '1 hr 15 min', price: 90 },
+    { name: 'Face Massage', time: '45 min', price: 40, desc: 'Gentle facial massage to relax and refresh.' },
+    { name: 'Head Massage', time: '45 min', price: 40, desc: 'Soothing scalp and head massage to help you unwind.' },
+    { name: 'Face & Head Massage', time: '1 hour', price: 70, desc: 'Face and scalp together, for deeper calm.' },
+    { name: 'Head & Foot Massage', time: '1 hour', price: 60, desc: 'Head and feet, for head-to-toe ease.' },
+    { name: 'Back, Neck & Shoulders', time: '1 hour', price: 75, desc: 'Eases everyday tension where you hold it most.' },
+    { name: 'Full Body Massage', time: '1 hr 15 min', price: 90, desc: 'A slow, head-to-toe reset for tired muscles.' },
   ],
   dry: [
-    { name: 'Face Cupping', time: '45 min', price: 50 },
-    { name: 'Head Cupping', time: '45 min', price: 50 },
-    { name: 'Face & Head Cupping', time: '1 hour', price: 85 },
-    { name: 'Targeted Area / Sports Injury', time: '1 hour', price: 60 },
-    { name: 'Full Back', time: '1 hour', price: 80 },
-    { name: 'Full Body', time: '1 hour', price: 100 },
-    { name: 'Head, Scalp & Full Body', time: '1 hr 15 min', price: 115 },
+    { name: 'Face Cupping', time: '45 min', price: 50, desc: 'Gentle suction to lift and refresh the skin.' },
+    { name: 'Head Cupping', time: '45 min', price: 50, desc: 'Light cupping across the scalp to help you unwind.' },
+    { name: 'Face & Head Cupping', time: '1 hour', price: 85, desc: 'Face and scalp together, for a fuller reset.' },
+    { name: 'Targeted Area / Sports Injury', time: '1 hour', price: 60, desc: 'Focused suction on tight, overworked muscles.' },
+    { name: 'Full Back', time: '1 hour', price: 80, desc: 'Full-back cupping to release built-up tension.' },
+    { name: 'Full Body', time: '1 hour', price: 100, desc: 'Whole-body cupping for all-over release.' },
+    { name: 'Head, Scalp & Full Body', time: '1 hr 15 min', price: 115, desc: 'Scalp to sole — the complete dry-cupping session.' },
   ],
   wet: [
-    { name: 'Head & Scalp', time: '1 hour', price: 70 },
-    { name: 'Targeted Area / Sports Injury', time: '1 hour', price: 80 },
-    { name: 'Full Back', time: '1 hour', price: 90 },
-    { name: 'Full Body', time: '1 hr 30 min', price: 120 },
-    { name: 'Head, Scalp & Full Body', time: '1 hr 45 min', price: 150 },
+    { name: 'Head & Scalp', time: '1 hour', price: 70, desc: 'Traditional hijama focused on the head and scalp.' },
+    { name: 'Targeted Area / Sports Injury', time: '1 hour', price: 80, desc: 'Hijama on a specific area of tension.' },
+    { name: 'Full Back', time: '1 hour', price: 90, desc: 'Full-back hijama, the most-requested session.' },
+    { name: 'Full Body', time: '1 hr 30 min', price: 120, desc: 'Whole-body hijama for an all-over reset.' },
+    { name: 'Head, Scalp & Full Body', time: '1 hr 45 min', price: 150, desc: 'The complete hijama session, head to toe.' },
   ],
   packages: [
     { name: 'Pain & Mobility', time: '4 sessions · 8–12 wks', price: 340, desc: 'Targeted cupping to support ease of movement and tension relief.' },
@@ -1337,9 +1360,9 @@ function renderServices() {
       <span class="svc-ring"></span>
       <span class="svc-main">
         <span class="svc-name">${s.name}</span>
+        ${s.time ? `<span class="svc-chip">${s.time}</span>` : ''}
         ${s.desc ? `<span class="svc-desc">${s.desc}</span>` : ''}
       </span>
-      <span class="svc-time">${s.time}</span>
       <span class="svc-price">${priceHtml(s)}</span>
     </div>
   `).join('');
