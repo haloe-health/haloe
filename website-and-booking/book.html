@@ -323,14 +323,8 @@
     text-decoration-thickness: 1px;
   }
   .service-card:hover { border-color: var(--border-strong); background: rgba(201,160,64,0.04); }
-  .service-card.selected { background: rgba(201,160,64,0.05); }
-  .service-card.selected::before {
-    content: '✓';
-    position: absolute;
-    top: 0.9rem; right: 1.1rem;
-    color: var(--gold);
-    font-size: 0.8rem;
-  }
+  /* Selection is shown by the ring filling gold — no background box or check,
+     which read as a bordered cell against the neighbouring hairlines. */
   .service-name {
     font-family: 'Poppins', sans-serif;
     font-size: 1.1rem;
