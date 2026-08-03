@@ -1,2 +1,6 @@
 # Cloudflare Wrangler local state & cache
 .wrangler/
+
+# Local secrets for `wrangler pages dev` — never commit
+.dev.vars
+**/.dev.vars

@@ -85,3 +85,15 @@ create index if not exists intake_forms_client_id_idx on public.intake_forms(cli
 -- ------------------------------------------------------------------ --
 alter table public.clients      enable row level security;
 alter table public.intake_forms enable row level security;
+
+-- ------------------------------------------------------------------ --
+-- Grant table privileges to service_role ONLY (the role the Cloudflare
+-- Function's secret key maps to). This is required because the project
+-- was created with "automatically expose new tables" OFF, so new tables
+-- get no API-role grants by default. We deliberately do NOT grant anon /
+-- authenticated — the public must never read client health data. The
+-- service_role bypasses RLS, so these grants are what let the Function
+-- write. Without them, inserts fail with "permission denied" (SQLSTATE 42501).
+-- ------------------------------------------------------------------ --
+grant select, insert, update, delete on public.clients      to service_role;
+grant select, insert, update, delete on public.intake_forms to service_role;
