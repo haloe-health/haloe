@@ -32,7 +32,7 @@ Marketing site + booking flow for **haloe**, a women-only hijama/cupping & massa
 ### Functions (`functions/` maps to routes)
 - `create-checkout.js` → `/create-checkout`. Creates a Stripe Checkout Session via the REST API (no SDK), embedding booking fields in `metadata[...]`.
 - `stripe-webhook.js` → `/stripe-webhook`. Verifies the Stripe signature manually with Web Crypto (HMAC-SHA256, 5-minute timestamp tolerance), then on `checkout.session.completed` sends: a customer confirmation email, Halima's notification email (both via Resend), and a WhatsApp alert to Halima (via Twilio). The customer email **no longer links the intake form** — see the intake note under Conventions. Both functions should pass `node --check` after editing; an unbalanced template literal in the email HTML kills confirmations silently.
-- `intake-submit.js` → `/intake-submit`. Upserts the client and writes an `intake_forms` row to the **D1 database (`haloe-clients`, bound as `DB`)**, then emails the pre-session guide. POST only — intake data is never publicly readable.
+- `intake-submit.js` → `/intake-submit`. Upserts the client and writes an `intake_forms` row to **Supabase (Postgres)** via its REST API (PostgREST) using the **service-role key** — which bypasses RLS, so the tables stay locked to the public anon key while this Function keeps full write access. Then emails the pre-session guide. POST only — intake data is never publicly readable. **Migrated from Cloudflare D1 (`haloe-clients`, `DB` binding) in Aug 2026;** the schema lives in `supabase-schema.sql` at the repo root (two tables, `clients` + `intake_forms`, matching the old D1 model). Needs env vars `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`.
 - `availability.js` → `/availability?date=YYYY-MM-DD`. Read-only; returns `{ busy: [{s,e}] }` (start/end minutes) for active bookings on that date. Fails open (returns empty) on any error so a lookup fault never blocks booking.
 - `_email.js` — shared brand tokens and email helpers. `_bookings.js` — slot-reservation helpers (table DDL, time/duration parsing, atomic reserve, confirm/release). The `_` prefix keeps both from becoming routes.
 
@@ -89,7 +89,7 @@ The address collected at step 3 is deliberately **kept out of the URL**. It trav
 | `RESEND_API_KEY` | `stripe-webhook.js`, `intake-submit.js` | Send email |
 | `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` | `stripe-webhook.js` | WhatsApp alerts |
 | `TWILIO_WHATSAPP_FROM` / `HALOE_WHATSAPP_TO` | `stripe-webhook.js` | WhatsApp sender / recipient |
-| `DB` (binding) | `intake-submit.js` | D1 database `haloe-clients` |
+| `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | `intake-submit.js` | Supabase Postgres (intake storage) |
 
 - Missing Twilio or Resend vars are handled gracefully — the webhook logs and still returns 200 rather than failing. So absent notifications usually mean **unset env vars or no registered Stripe webhook endpoint**, not broken code.
 

@@ -1,16 +1,23 @@
 // Cloudflare Pages Function — POST /intake-submit
 //
 // Receives the multi-step intake form (intake.html) as JSON, upserts the client
-// and writes one intake_forms row into the haloe-clients D1 database, then sends
+// and writes one intake_forms row into the Supabase Postgres database, then sends
 // the "before your session" guide email via Resend.
 //
-// There is intentionally NO GET handler — this data is never publicly readable.
-// Only this POST writes it; viewing happens via wrangler or a future protected
-// admin page.
+// Storage was migrated from Cloudflare D1 to Supabase (Postgres) in Aug 2026.
+// Writes go through Supabase's REST API (PostgREST) with the service-role key,
+// which bypasses Row Level Security — so the tables stay locked to the public
+// anon key while this server-side Function retains full write access. No SDK is
+// used, matching the dependency-free style of the other Functions.
 //
-// Bindings / env (set in the Cloudflare Pages dashboard):
-//   DB              — D1 database binding (haloe-clients)
-//   RESEND_API_KEY  — Resend API key for sending email
+// There is intentionally NO GET handler — this data is never publicly readable.
+// Only this POST writes it; viewing happens via the Supabase dashboard or a
+// future protected admin page.
+//
+// Env (set in the Cloudflare Pages dashboard):
+//   SUPABASE_URL               — e.g. https://thxunrygrrxcdjhgshjw.supabase.co
+//   SUPABASE_SERVICE_ROLE_KEY  — service-role key (bypasses RLS; keep secret)
+//   RESEND_API_KEY             — Resend API key for sending email
 
 import {
   BLACK, GOLD, CREAM, MUTED, HAIRLINE,
@@ -61,73 +68,78 @@ export async function onRequestPost(context) {
       }
     }
 
-    const db = context.env.DB;
-    if (!db) {
-      console.error('intake-submit: D1 binding "DB" is not configured');
+    const supabaseUrl = str(context.env.SUPABASE_URL).replace(/\/$/, '');
+    const serviceKey = context.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceKey) {
+      console.error('intake-submit: SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not configured');
       return json({ error: 'Server is not configured. Please message me on Instagram.' }, 500);
     }
 
-    // --- Upsert client by email (parameterised; never string-concatenated) ---
+    // --- Upsert client by email, in one call ---
+    // PostgREST upsert: on_conflict=email + Prefer: resolution=merge-duplicates
+    // inserts a new client or updates the existing one (matched on the unique
+    // email column), and returns the row so we can read its id back.
     const phone = str(data.phone);
     const dob = str(data.date_of_birth);
 
-    let clientId;
-    const existing = await db
-      .prepare('SELECT id FROM clients WHERE email = ?')
-      .bind(email)
-      .first();
-
-    if (existing && existing.id) {
-      clientId = existing.id;
-    } else {
-      const insertClient = await db
-        .prepare('INSERT INTO clients (full_name, email, phone, date_of_birth) VALUES (?, ?, ?, ?)')
-        .bind(fullName, email, phone, dob)
-        .run();
-      clientId = insertClient.meta.last_row_id;
+    const clientRows = await sbRequest(supabaseUrl, serviceKey, {
+      path: '/rest/v1/clients?on_conflict=email',
+      method: 'POST',
+      prefer: 'resolution=merge-duplicates,return=representation',
+      body: [{ full_name: fullName, email, phone: orNull(phone), date_of_birth: orNull(dob) }],
+    });
+    const clientId = Array.isArray(clientRows) && clientRows[0] && clientRows[0].id;
+    if (!clientId) {
+      throw new Error('Supabase upsert returned no client id');
     }
 
     // --- Insert the intake form row (every answer mapped to its column) ---
-    const cols = [
-      'client_id',
-      'area_postcode', 'package', 'emergency_contact_name', 'emergency_contact_phone', 'gp_name',
-      'age_confirmed',
-      'has_conditions', 'medical_conditions', 'takes_medication', 'current_medications',
-      'has_allergies', 'allergies', 'had_hijama_before', 'main_concern',
-      'is_pregnant', 'breastfeeding', 'takes_blood_thinners', 'bleeding_disorder', 'diabetes_status',
-      'chemo_or_radiotherapy', 'has_anaemia', 'infectious_condition', 'recent_surgery',
-      'blood_pressure', 'skin_condition', 'pacemaker_epilepsy', 'safety_notes',
-      'before_after_ack',
-      'consent_accurate_info', 'consent_complementary', 'consent_treatment',
-      'consent_notify_changes', 'consent_data_storage',
-      'photo_consent', 'signature_name', 'signature_date',
-    ];
-    const values = [
-      clientId,
-      orNull(data.area_postcode), orNull(data.package), orNull(data.emergency_contact_name),
-      orNull(data.emergency_contact_phone), orNull(data.gp_name),
-      orNull(data.age_confirmed),
-      orNull(data.has_conditions), orNull(data.medical_conditions), orNull(data.takes_medication),
-      orNull(data.current_medications), orNull(data.has_allergies), orNull(data.allergies),
-      orNull(data.had_hijama_before), orNull(data.main_concern),
-      orNull(data.is_pregnant), orNull(data.breastfeeding), orNull(data.takes_blood_thinners),
-      orNull(data.bleeding_disorder), orNull(data.diabetes_status), orNull(data.chemo_or_radiotherapy),
-      orNull(data.has_anaemia), orNull(data.infectious_condition), orNull(data.recent_surgery),
-      orNull(data.blood_pressure), orNull(data.skin_condition), orNull(data.pacemaker_epilepsy),
-      orNull(data.safety_notes),
-      truthy(data.before_after_ack) ? 1 : 0,
-      truthy(data.consent_accurate_info) ? 1 : 0,
-      truthy(data.consent_complementary) ? 1 : 0,
-      truthy(data.consent_treatment) ? 1 : 0,
-      truthy(data.consent_notify_changes) ? 1 : 0,
-      truthy(data.consent_data_storage) ? 1 : 0,
-      orNull(data.photo_consent), orNull(data.signature_name), orNull(data.signature_date),
-    ];
-    const placeholders = cols.map(() => '?').join(', ');
-    await db
-      .prepare(`INSERT INTO intake_forms (${cols.join(', ')}) VALUES (${placeholders})`)
-      .bind(...values)
-      .run();
+    // Text answers via orNull (blank -> null); the acks/consents as booleans.
+    const intakeRow = {
+      client_id: clientId,
+      area_postcode: orNull(data.area_postcode),
+      package: orNull(data.package),
+      emergency_contact_name: orNull(data.emergency_contact_name),
+      emergency_contact_phone: orNull(data.emergency_contact_phone),
+      gp_name: orNull(data.gp_name),
+      age_confirmed: orNull(data.age_confirmed),
+      has_conditions: orNull(data.has_conditions),
+      medical_conditions: orNull(data.medical_conditions),
+      takes_medication: orNull(data.takes_medication),
+      current_medications: orNull(data.current_medications),
+      has_allergies: orNull(data.has_allergies),
+      allergies: orNull(data.allergies),
+      had_hijama_before: orNull(data.had_hijama_before),
+      main_concern: orNull(data.main_concern),
+      is_pregnant: orNull(data.is_pregnant),
+      breastfeeding: orNull(data.breastfeeding),
+      takes_blood_thinners: orNull(data.takes_blood_thinners),
+      bleeding_disorder: orNull(data.bleeding_disorder),
+      diabetes_status: orNull(data.diabetes_status),
+      chemo_or_radiotherapy: orNull(data.chemo_or_radiotherapy),
+      has_anaemia: orNull(data.has_anaemia),
+      infectious_condition: orNull(data.infectious_condition),
+      recent_surgery: orNull(data.recent_surgery),
+      blood_pressure: orNull(data.blood_pressure),
+      skin_condition: orNull(data.skin_condition),
+      pacemaker_epilepsy: orNull(data.pacemaker_epilepsy),
+      safety_notes: orNull(data.safety_notes),
+      before_after_ack: truthy(data.before_after_ack),
+      consent_accurate_info: truthy(data.consent_accurate_info),
+      consent_complementary: truthy(data.consent_complementary),
+      consent_treatment: truthy(data.consent_treatment),
+      consent_notify_changes: truthy(data.consent_notify_changes),
+      consent_data_storage: truthy(data.consent_data_storage),
+      photo_consent: orNull(data.photo_consent),
+      signature_name: orNull(data.signature_name),
+      signature_date: orNull(data.signature_date),
+    };
+    await sbRequest(supabaseUrl, serviceKey, {
+      path: '/rest/v1/intake_forms',
+      method: 'POST',
+      prefer: 'return=minimal',
+      body: [intakeRow],
+    });
 
     // --- The record is saved; the email is best-effort from here on. ---
     try {
@@ -163,6 +175,29 @@ function json(obj, status) {
     status,
     headers: { 'Content-Type': 'application/json' },
   });
+}
+
+// Call the Supabase REST API (PostgREST) with the service-role key. The key goes
+// in BOTH the apikey header and the Bearer token — PostgREST needs both. Throws
+// on a non-2xx response so the caller's try/catch returns a 500. Parses and
+// returns JSON when the response has a body (e.g. return=representation).
+async function sbRequest(baseUrl, serviceKey, { path, method, prefer, body }) {
+  const res = await fetch(`${baseUrl}${path}`, {
+    method,
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      'Content-Type': 'application/json',
+      ...(prefer ? { Prefer: prefer } : {}),
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Supabase ${method} ${path} responded ${res.status}: ${text}`);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
 // Trim a value to a string ('' for null/undefined/non-string-ish).
