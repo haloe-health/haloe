@@ -10,8 +10,8 @@
 //   RESEND_API_KEY         — Resend API key for sending email
 
 import {
-  BLACK, GOLD, CREAM, MUTED, HAIRLINE,
-  sendEmail, esc, emailHeader, emailFooter, emailShell,
+  BLACK, GOLD, CREAM, MUTED, HAIRLINE, FONT,
+  sendEmail, esc, emailHeader, emailFooter, emailShell, heroRow, infoCard,
 } from './_email.js';
 import { confirmBooking } from './_bookings.js';
 
@@ -308,42 +308,30 @@ function detailRow(label, value) {
 // COMPLIANCE: wellness/symptom language only — no claims to treat/cure/manage conditions.
 function clientEmailHtml(d) {
   const depositNote = d.isDeposit
-    ? `<p style="color:${MUTED};font-size:13px;line-height:1.7;margin:0 0 8px;font-family:Arial,Helvetica,sans-serif;">Your deposit secures your appointment. The remaining balance is payable on the day.</p>`
+    ? `<p style="color:${MUTED};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Your deposit secures your appointment. The remaining balance is payable on the day.</p>`
     : '';
 
   const inner = `${emailHeader()}
               <!-- Intro -->
               <tr>
-                <td style="padding:30px 4px 4px;">
-                  <h1 style="color:${CREAM};font-size:22px;font-weight:normal;margin:0 0 18px;font-family:Georgia,'Times New Roman',serif;">Your booking is confirmed</h1>
-                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Dear ${esc(d.name)},</p>
-                  <p style="color:${MUTED};font-size:15px;line-height:1.75;margin:0 0 22px;font-family:Arial,Helvetica,sans-serif;">Thank you for booking with haloe. Your payment has been received and your appointment is reserved. We look forward to welcoming you for a calm, restorative session in a relaxing, women-only space.</p>
+                <td style="padding:28px 4px 18px;">
+                  <h1 style="color:${CREAM};font-size:22px;font-weight:500;margin:0 0 16px;font-family:${FONT};">Your booking is confirmed</h1>
+                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 14px;font-family:${FONT};">Dear ${esc(d.name)},</p>
+                  <p style="color:${MUTED};font-size:15px;line-height:1.75;margin:0;font-family:${FONT};">Thank you for booking with haloe. Your payment has been received and your appointment is reserved. We look forward to welcoming you for a calm, restorative session in a relaxing, women-only space.</p>
                 </td>
               </tr>
-              <!-- Details card -->
-              <tr>
-                <td style="padding:0 0 24px;">
-                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border:1px solid ${HAIRLINE};border-radius:14px;overflow:hidden;background:#15120D;">
-                    <tr>
-                      <td style="padding:18px 20px 16px;">
-                        <div style="color:${CREAM};font-size:18px;font-family:Georgia,'Times New Roman',serif;">${esc(d.treatment)}</div>
-                        <div style="color:${GOLD};font-size:13px;letter-spacing:1px;margin-top:6px;font-family:Arial,Helvetica,sans-serif;">${esc(d.paymentLabel)}</div>
-                      </td>
-                    </tr>
-                    ${detailRow('Date', d.date)}
-                    ${detailRow('Time', d.time)}
-                    ${detailRow('Location', d.location)}
-                    ${detailRow('Amount paid', d.amount)}
-                  </table>
-                </td>
-              </tr>
+              ${heroRow(d.date, d.time, 'Mobile visit')}
+              ${infoCard([
+                { label: 'Treatment', value: d.treatment },
+                { label: 'Paid', value: d.paymentLabel, gold: true },
+              ])}
               <!-- Deposit note -->
-              ${depositNote ? `<tr><td style="padding:0 4px 18px;">${depositNote}</td></tr>` : ''}
+              ${depositNote ? `<tr><td style="padding:4px 4px 14px;">${depositNote}</td></tr>` : ''}
               <!-- Personal note + compliance -->
               <tr>
-                <td style="padding:16px 4px 0;">
-                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Halima will be in touch personally on WhatsApp to confirm the final details, send your health form, and answer any questions you may have.</p>
-                  <p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;">haloe offers complementary wellness therapy to support your general wellbeing, relaxation and everyday tension. It is not a substitute for medical advice, diagnosis or treatment.</p>
+                <td style="padding:6px 4px 0;">
+                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">Halima will be in touch personally on WhatsApp to confirm the final details, send your health form, and answer any questions you may have.</p>
+                  <p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">haloe offers complementary wellness therapy to support your general wellbeing, relaxation and everyday tension. It is not a substitute for medical advice, diagnosis or treatment.</p>
                 </td>
               </tr>
               ${emailFooter()}`;
@@ -353,47 +341,27 @@ function clientEmailHtml(d) {
 
 // Plain, information-dense notification for Halima with everything she needs to follow up.
 function halimaEmailHtml(d) {
-  return `<!doctype html>
-<html>
-  <body style="margin:0;padding:0;background:${BLACK};">
-    <div style="background:${BLACK};padding:28px 16px;font-family:Arial,Helvetica,sans-serif;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
-        <tr>
-          <td align="center">
-            <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:480px;max-width:100%;border-collapse:collapse;">
-              <tr>
+  const inner = `<tr>
                 <td style="padding:0 0 16px;">
-                  <div style="color:${GOLD};font-size:12px;letter-spacing:2px;text-transform:uppercase;">New booking &middot; payment received</div>
-                  <h1 style="color:${CREAM};font-size:20px;font-weight:normal;margin:8px 0 0;">${esc(d.name)}</h1>
+                  <div style="color:${GOLD};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:${FONT};">New booking &middot; payment received</div>
+                  <h1 style="color:${CREAM};font-size:20px;font-weight:500;margin:8px 0 0;font-family:${FONT};">${esc(d.name)}</h1>
                 </td>
               </tr>
+              ${heroRow(d.date, d.time, 'Mobile visit')}
+              ${infoCard([
+                { label: 'Treatment', value: d.treatment },
+                { label: 'Paid', value: d.paymentLabel, gold: true },
+              ])}
+              ${infoCard([
+                { label: 'Address', value: d.address },
+                { label: 'Phone', value: d.phone },
+                { label: 'Email', value: d.email },
+                { label: 'Notes', value: d.notes },
+              ])}
               <tr>
-                <td>
-                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;border-collapse:separate;border:1px solid ${HAIRLINE};border-radius:12px;overflow:hidden;background:#15120D;">
-                    ${detailRow('Treatment', d.treatment)}
-                    ${detailRow('Payment', d.paymentLabel)}
-                    ${detailRow('Amount', d.amount)}
-                    ${detailRow('Date', d.date)}
-                    ${detailRow('Time', d.time)}
-                    ${detailRow('Location', 'Mobile visit')}
-                    ${detailRow('Address', d.address)}
-                    ${detailRow('Name', d.name)}
-                    ${detailRow('Phone', d.phone)}
-                    ${detailRow('Email', d.email)}
-                    ${detailRow('Notes', d.notes)}
-                  </table>
+                <td style="padding:6px 2px 0;">
+                  <p style="color:${MUTED};font-size:13px;line-height:1.7;margin:0;font-family:${FONT};">Reply to this email to reach ${esc(d.name)} directly${d.phone ? `, or message them on ${esc(d.phone)}` : ''}.</p>
                 </td>
-              </tr>
-              <tr>
-                <td style="padding:18px 2px 0;">
-                  <p style="color:${MUTED};font-size:13px;line-height:1.7;margin:0;">Reply to this email to reach ${esc(d.name)} directly${d.phone ? `, or message them on ${esc(d.phone)}` : ''}.</p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </div>
-  </body>
-</html>`;
+              </tr>`;
+  return emailShell(inner);
 }
