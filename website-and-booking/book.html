@@ -269,16 +269,13 @@
     border-radius: 16px;
   }
   .category-tabs .seg-option { border-radius: 13px; }
-  /* Each category is a tappable pill with a small icon above its label; the
-     inactive tabs carry a faint fill so they read as buttons (not disabled
-     text), and the selected one fills with brand gold. */
+  /* Each category is a tappable pill: the inactive tabs carry a faint fill so
+     they read as buttons (not disabled text), and the selected one fills with
+     brand gold. */
   .category-tabs .seg-option {
-    flex-direction: column;
-    gap: 4px;
     background: rgba(255,255,255,0.06);
     color: #D8D1C4;
   }
-  .tab-ico { width: 18px; height: 18px; flex: none; }
   .category-tabs .seg-option.active {
     background: var(--gold);
     color: #2A2013;
@@ -1051,10 +1048,10 @@
     <p class="panel-sub">Women only. Fully accredited. Mobile across Manchester.</p>
 
     <div class="category-tabs segmented" id="category-tabs">
-      <button class="tab-btn seg-option active" data-cat="massage"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.7 6.3L20 11l-6.3 1.7L12 19l-1.7-6.3L4 11l6.3-1.7z"/></svg>Massage</button>
-      <button class="tab-btn seg-option" data-cat="dry"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17a7 7 0 0 1 14 0z"/><circle cx="12" cy="5" r="1.5"/><path d="M12 6.5V10"/></svg>Dry Cupping</button>
-      <button class="tab-btn seg-option" data-cat="wet"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 10.5a6 6 0 0 1-12 0C6 9.5 12 3 12 3z"/></svg>Wet Cupping</button>
-      <button class="tab-btn seg-option" data-cat="packages"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4v10l-8 4-8-4V7z"/><path d="M4 7l8 4 8-4"/><path d="M12 11v10"/></svg>Packages</button>
+      <button class="tab-btn seg-option active" data-cat="massage">Massage</button>
+      <button class="tab-btn seg-option" data-cat="dry">Dry Cupping</button>
+      <button class="tab-btn seg-option" data-cat="wet">Wet Cupping</button>
+      <button class="tab-btn seg-option" data-cat="packages">Packages</button>
     </div>
 
     <div class="service-grid" id="service-grid"></div>
