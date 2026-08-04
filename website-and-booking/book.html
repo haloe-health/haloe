@@ -479,8 +479,10 @@
     .cal-day:not(.disabled):not(.selected):hover { background: rgba(255,255,255,0.08); }
     .cal-day:hover:not(.disabled):not(.empty):not(.selected) { border-color: var(--border-strong); color: var(--gold); }
   }
-  .cal-day.selected { background: var(--gold); color: #000; font-weight: 500; }
   .cal-day.today { color: var(--gold); font-weight: 500; }
+  /* Selection must win over .today — otherwise selecting today's date turned
+     the number gold-on-gold and it vanished. */
+  .cal-day.selected { background: var(--gold); color: #000; font-weight: 500; }
   .cal-day.disabled { color: #48484A; cursor: default; }
   .cal-day.empty { cursor: default; }
 
