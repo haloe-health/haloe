@@ -375,7 +375,7 @@ function halimaEmailHtml(d) {
                     ${detailRow('Amount', d.amount)}
                     ${detailRow('Date', d.date)}
                     ${detailRow('Time', d.time)}
-                    ${detailRow('Location', d.location)}
+                    ${detailRow('Location', 'Mobile visit')}
                     ${detailRow('Address', d.address)}
                     ${detailRow('Name', d.name)}
                     ${detailRow('Phone', d.phone)}
