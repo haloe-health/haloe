@@ -269,10 +269,18 @@
     border-radius: 16px;
   }
   .category-tabs .seg-option { border-radius: 13px; }
-  /* Very narrow phones: shrink the label a touch so "Dry Cupping" etc. still
-     fit one line rather than overflowing the segment. */
-  @media (max-width: 390px) {
-    .category-tabs .seg-option { font-size: 0.68rem; padding-left: 0.3rem; padding-right: 0.3rem; }
+  /* Phones: four segments across one row forces the labels tiny and hard to
+     read. Switch to a 2×2 grid so each tab has room for a comfortably larger
+     label. */
+  @media (max-width: 560px) {
+    .category-tabs {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+    }
+    .category-tabs .seg-option {
+      font-size: 1.25rem;
+      min-height: 48px;
+    }
   }
 
   /* ---- Service Cards ---- */
