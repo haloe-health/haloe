@@ -295,8 +295,8 @@ function detailRow(label, value) {
   if (!value) return '';
   return `
     <tr>
-      <td style="padding:13px 20px;border-top:1px solid ${HAIRLINE};color:${MUTED};font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif;">${esc(label)}</td>
-      <td align="right" style="padding:13px 20px;border-top:1px solid ${HAIRLINE};color:${CREAM};font-size:14px;text-align:right;font-family:Arial,Helvetica,sans-serif;">${esc(value)}</td>
+      <td style="width:34%;padding:13px 20px;border-top:1px solid ${HAIRLINE};color:${MUTED};font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif;vertical-align:top;">${esc(label)}</td>
+      <td align="right" style="width:66%;padding:13px 20px;border-top:1px solid ${HAIRLINE};color:${CREAM};font-size:14px;text-align:right;font-family:Arial,Helvetica,sans-serif;word-break:break-word;overflow-wrap:anywhere;">${esc(value)}</td>
     </tr>`;
 }
 
@@ -369,7 +369,7 @@ function halimaEmailHtml(d) {
               </tr>
               <tr>
                 <td>
-                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border:1px solid ${HAIRLINE};border-radius:12px;overflow:hidden;background:#15120D;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;border-collapse:separate;border:1px solid ${HAIRLINE};border-radius:12px;overflow:hidden;background:#15120D;">
                     ${detailRow('Treatment', d.treatment)}
                     ${detailRow('Payment', d.paymentLabel)}
                     ${detailRow('Amount', d.amount)}
