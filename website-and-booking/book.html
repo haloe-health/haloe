@@ -269,17 +269,19 @@
     border-radius: 16px;
   }
   .category-tabs .seg-option { border-radius: 13px; }
-  /* Phones: four segments across one row forces the labels tiny and hard to
-     read. Switch to a 2×2 grid so each tab has room for a comfortably larger
-     label. */
+  /* Phones: keep the four categories on one row, but make each grey segment
+     more compact — slimmer height and tighter padding — with a label size
+     that still reads clearly and fits one line. */
   @media (max-width: 560px) {
     .category-tabs {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 4px;
+      gap: 2px;
+      padding: 2px;
     }
     .category-tabs .seg-option {
-      font-size: 1.25rem;
-      min-height: 48px;
+      font-size: 0.82rem;
+      min-height: 34px;
+      padding-left: 0.15rem;
+      padding-right: 0.15rem;
     }
   }
 
