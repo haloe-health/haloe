@@ -493,17 +493,26 @@
     gap: 0.5rem;
   }
   .time-slot {
-    padding: 0.7rem 0.4rem;
+    min-height: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3rem;
     border: 1px solid rgba(255,255,255,0.14);
     border-radius: 9px;
     text-align: center;
     font-size: 1rem;
     font-weight: 500;
+    line-height: 1.15;
     letter-spacing: 0;
     cursor: pointer;
     color: var(--cream);
     transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
+  /* "booked" sits below the time as a small tag so unavailable slots stay the
+     same height as the rest (no wrapping that stretched the whole row). */
+  .slot-tag { font-size: 0.66rem; font-weight: 400; margin-top: 2px; }
   /* Same sticky-hover trap as .cal-day above — the selected slot went gold
      on gold and its time disappeared on a phone. */
   @media (hover: hover) {
@@ -1526,7 +1535,7 @@ function renderTimes() {
     const taken = slotIsTaken(t);
     const cls = taken ? 'taken' : (state.time === t ? 'selected' : '');
     const click = taken ? '' : `onclick="selectTime('${t}')"`;
-    const label = taken ? `${t} · booked` : t;
+    const label = taken ? `${t}<span class="slot-tag">booked</span>` : t;
     return `<div class="time-slot ${cls}" ${click}>${label}</div>`;
   }).join('');
 }
