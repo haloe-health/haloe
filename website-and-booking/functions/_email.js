@@ -126,17 +126,15 @@ export function emailShell(innerRows) {
     </style>
   </head>
   <body style="margin:0;padding:0;background:${BLACK};font-family:${FONT};">
-    <div style="background:${BLACK};padding:32px 16px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
-        <tr>
-          <td align="center">
-            <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:480px;max-width:100%;border-collapse:collapse;">
-              ${innerRows}
-            </table>
-          </td>
-        </tr>
-      </table>
-    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${BLACK}" style="border-collapse:collapse;background:${BLACK};">
+      <tr>
+        <td align="center" bgcolor="${BLACK}" style="padding:32px 16px;background:${BLACK};">
+          <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:480px;max-width:100%;border-collapse:collapse;">
+            ${innerRows}
+          </table>
+        </td>
+      </tr>
+    </table>
   </body>
 </html>`;
 }
