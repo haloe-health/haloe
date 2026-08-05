@@ -96,7 +96,7 @@ export async function onRequestPost(context) {
     const date = md.date || '';
     const time = md.time || '';
     const location = md.location || '';
-    const address = md.customerAddress || '';
+    const address = upperPostcode(md.customerAddress || '');
     const notes = md.notes || '';
 
     const amountPence =
@@ -291,6 +291,17 @@ function formatGBP(pence) {
 }
 
 // A single label/value row for the details table.
+// Uppercase any UK-postcode-looking token inside a free-text address, and
+// normalise the gap to a single space — so "9, ol9 7qe" reads "9, OL9 7QE".
+// Street names and other words are left untouched.
+function upperPostcode(str) {
+  if (!str) return str;
+  return String(str).replace(
+    /\b([A-Za-z]{1,2}[0-9][A-Za-z0-9]?)\s*([0-9][A-Za-z]{2})\b/g,
+    (_, out, inc) => `${out.toUpperCase()} ${inc.toUpperCase()}`,
+  );
+}
+
 function detailRow(label, value) {
   if (!value) return '';
   return `
