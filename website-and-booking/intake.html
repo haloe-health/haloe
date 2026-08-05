@@ -329,7 +329,16 @@
     transition: transform 0.2s;
   }
   .check-item input:checked ~ .check-box { background: var(--gold); }
-  .check-item input:checked ~ .check-box::after { transform: translateX(16px); }
+  /* Keep the round knob when checked — override the legacy checkmark ::after
+     (5x9 tick) that otherwise clipped the toggle into a sliver. */
+  .check-item input:checked ~ .check-box::after {
+    transform: translateX(16px);
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: var(--a-t1);
+  }
   .check-item > span:not(.check-box) {
     order: 1;
     flex: 1;
