@@ -357,16 +357,21 @@
   .field:has(> input[type="email"]),
   .field:has(> input[type="date"]),
   .field:has(> select) {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.9rem;
     background: var(--a-s1);
-    padding: 0.55rem 0.85rem;
+    padding: 0.7rem 0.85rem;
     margin: 0;
     border-bottom: 1px solid var(--a-sep);
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
+  }
+  /* Yes/No answers stay a row (label left, segmented right); free-text and
+     select fields stack the label above a full-width input, so long question
+     labels aren't squeezed into a narrow column. */
+  .field:has(> .choices) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.9rem;
   }
   /* a row that follows another row is mid-card, so square off its top */
   .field:has(> .choices) + .field:has(> .choices),
@@ -390,27 +395,30 @@
     border-bottom-right-radius: 12px;
     margin-bottom: 0.8rem;
   }
-  /* label left, answer right */
-  .field:has(> .choices) > label.q,
-  .field:has(> input) > label.q,
-  .field:has(> select) > label.q {
+  /* Yes/No: label shares the row. Inputs/selects: label sits above. */
+  .field:has(> .choices) > label.q {
     flex: 1;
     min-width: 0;
     margin-bottom: 0;
     font-size: 1.05rem;
     line-height: 1.45;
   }
+  .field:has(> input) > label.q,
+  .field:has(> select) > label.q {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
+    line-height: 1.4;
+  }
   .field:has(> .choices) > .choices { flex: none; background: #000; }
   .field:has(> input) > input[type],
   .field:has(> select) > select {
-    flex: 1 1 auto;
-    width: auto;
-    min-width: 0;
-    max-width: none;
+    display: block;
+    width: 100%;
     background: none !important;
     border: none !important;
     padding: 0 !important;
-    text-align: right;
+    text-align: left;
     border-radius: 0 !important;
   }
   .field:has(> .choices) > .field-error,
