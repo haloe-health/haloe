@@ -93,13 +93,13 @@
   .intro-head .eyebrow::before { content:''; width:24px; height:1px; background:var(--gold); opacity:0.6; }
   h1 { font-size:clamp(2rem,5vw,3rem); font-weight:300; line-height:1.1; letter-spacing:-0.02em; margin-bottom:18px; }
   h1 em { font-style:italic; color:var(--gold); }
-  .intro-line { color:var(--dim); font-size:0.95rem; line-height:1.9; max-width:600px; }
+  .intro-line { color:var(--dim); font-size:1rem; line-height:1.9; max-width:600px; }
 
   /* Progress bar */
   .progress { position:sticky; top:76px; z-index:50; background:var(--black); padding:14px 0 18px; margin-bottom:8px; }
   .progress-meta { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
-  .progress-step { font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); }
-  .progress-name { font-size:0.72rem; color:var(--dim); letter-spacing:0.04em; }
+  .progress-step { font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); }
+  .progress-name { font-size:0.85rem; color:var(--dim); letter-spacing:0.04em; }
   .progress-track { height:3px; background:rgba(201,160,64,0.12); border-radius:2px; overflow:hidden; }
   .progress-fill { height:100%; background:var(--gold); border-radius:2px; width:20%; transition:width 0.45s cubic-bezier(0.25,0.46,0.45,0.94); }
 
@@ -228,7 +228,7 @@
   /* Fields */
   .field { margin-bottom: 0.9rem; }
   .field label.q {
-    font-size: 0.82rem;
+    font-size: 1.05rem;
     font-weight: 300;
     letter-spacing: 0;
     text-transform: none;
@@ -247,7 +247,7 @@
     border: 1px solid var(--a-sep) !important;
     border-radius: 10px !important;
     color: var(--a-t1) !important;
-    font-size: 0.85rem !important;
+    font-size: 1.05rem !important;
     font-weight: 300;
     padding: 0.6rem 0.8rem !important;
     box-shadow: none !important;
@@ -278,8 +278,8 @@
   .choices .opt input { position: absolute; opacity: 0; pointer-events: none; }
   .choices .opt span {
     display: block;
-    padding: 0.34rem 0.95rem;
-    font-size: 0.78rem;
+    padding: 0.42rem 1rem;
+    font-size: 0.95rem;
     color: var(--a-t2);
     border-radius: 7px;
     cursor: pointer;
@@ -333,8 +333,8 @@
   .check-item > span:not(.check-box) {
     order: 1;
     flex: 1;
-    font-size: 0.78rem;
-    line-height: 1.5;
+    font-size: 1rem;
+    line-height: 1.55;
     color: var(--a-t1);
   }
 
@@ -397,7 +397,7 @@
     flex: 1;
     min-width: 0;
     margin-bottom: 0;
-    font-size: 0.79rem;
+    font-size: 1.05rem;
     line-height: 1.45;
   }
   .field:has(> .choices) > .choices { flex: none; background: #000; }
@@ -596,7 +596,7 @@
   .wrap { padding-top: 76px !important; padding-bottom: 28px !important; }
   h1 { font-size: 1.5rem !important; }
   .intro-head { margin-bottom: 16px !important; }
-  .intro-line { font-size: 0.85rem; line-height: 1.65; max-width: 62ch; }
+  .intro-line { font-size: 1rem; line-height: 1.7; max-width: 62ch; }
   .step > h2 { display: none; }
   /* The welcome message is only needed on the first step — on steps 2-5 it was
      costing ~130px of every screen for no new information. */
@@ -604,7 +604,7 @@
   .wrap:has(.step[data-step="1"].active) .intro-head { display: block; }
   /* free-text boxes don't need to be tall */
   .step textarea { min-height: 3.4rem !important; height: 3.4rem; }
-  .section-intro { font-size: 0.78rem; line-height: 1.5; margin-bottom: 0.5rem; padding: 0.55rem 0.75rem; }
+  .section-intro { font-size: 0.92rem; line-height: 1.6; margin-bottom: 0.5rem; padding: 0.6rem 0.8rem; }
   .progress { padding: 10px 0 12px !important; margin-bottom: 0 !important; }
   .field:has(> .choices),
   .field:has(> input[type]),
