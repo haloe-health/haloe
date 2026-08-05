@@ -114,7 +114,7 @@
   /* Fields */
   .field { margin:26px 0; }
   .field > label.q { display:block; font-size:0.9rem; color:var(--white); font-weight:300; margin-bottom:12px; line-height:1.6; }
-  .field .opt-hint { color:var(--dim); font-size:0.78rem; font-style:italic; }
+  .field .opt-hint { color:var(--dim); font-size:0.9rem; font-style:italic; }
   .field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date], .field select, .field textarea {
     width:100%; background:var(--surface); border:1px solid var(--border); color:var(--white);
     font-family:'Poppins',sans-serif; font-size:0.92rem; font-weight:300;
@@ -494,10 +494,10 @@
   }
   .field:has(> textarea) > label.q {
     display: block;
-    margin-bottom: 0.15rem;
-    font-size: 0.66rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.05rem;
     line-height: 1.4;
-    color: var(--a-t3);
+    color: var(--a-t1);
   }
   .field:has(> textarea) > textarea {
     width: 100%;
@@ -506,13 +506,13 @@
     padding: 0 !important;
     color: var(--a-t1);
     font-family: inherit;
-    font-size: 0.78rem;
+    font-size: 1.05rem;
     line-height: 1.5;
     resize: none;
     outline: none;
     display: block;
-    height: 2.9em;      /* ~2 lines; the box shouldn't dwarf its answer */
-    min-height: 2.9em;
+    height: 3em;      /* ~2 lines; the box shouldn't dwarf its answer */
+    min-height: 3em;
   }
   .field:has(> textarea) > textarea::placeholder { color: var(--a-t3); }
 
