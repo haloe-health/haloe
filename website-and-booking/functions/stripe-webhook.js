@@ -98,6 +98,8 @@ export async function onRequestPost(context) {
     const location = md.location || '';
     const address = upperPostcode(md.customerAddress || '');
     const notes = md.notes || '';
+    const gender = md.gender || '';
+    const chaperone = md.chaperone === 'true';
 
     const amountPence =
       typeof session.amount_total === 'number'
@@ -119,7 +121,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    const detail = { name, phone, email, treatment, date, time, location, address, amount, isDeposit, paymentLabel, notes };
+    const detail = { name, phone, email, treatment, date, time, location, address, amount, isDeposit, paymentLabel, notes, gender, chaperone };
 
     // WhatsApp notification to Halima. Sent before the email block and wrapped in
     // its own try/catch so it still fires if Resend is unconfigured or failing —
@@ -328,7 +330,7 @@ function clientEmailHtml(d) {
                 <td style="padding:28px 4px 18px;">
                   <h1 style="color:${CREAM};font-size:22px;font-weight:500;margin:0 0 16px;font-family:${FONT};">Your booking is confirmed</h1>
                   <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 14px;font-family:${FONT};">Dear ${esc(d.name)},</p>
-                  <p style="color:${MUTED};font-size:15px;line-height:1.75;margin:0;font-family:${FONT};">Thank you for booking with haloe. Your payment has been received and your appointment is reserved. We look forward to welcoming you for a calm, restorative session in a relaxing, women-only space.</p>
+                  <p style="color:${MUTED};font-size:15px;line-height:1.75;margin:0;font-family:${FONT};">Thank you for booking with haloe. Your payment has been received and your appointment is reserved. We look forward to welcoming you for a calm, restorative session.</p>
                 </td>
               </tr>
               ${heroRow(d.date, d.time, 'Mobile visit')}
@@ -367,6 +369,8 @@ function halimaEmailHtml(d) {
                 { label: 'Address', value: d.address },
                 { label: 'Phone', value: d.phone },
                 { label: 'Email', value: d.email },
+                { label: 'Gender', value: d.gender ? (d.gender.charAt(0).toUpperCase() + d.gender.slice(1)) : '' },
+                ...(d.gender === 'male' ? [{ label: 'Chaperone', value: d.chaperone ? 'Confirmed — required' : 'NOT confirmed — required', gold: !d.chaperone }] : []),
                 { label: 'Notes', value: d.notes },
               ])}
               <tr>

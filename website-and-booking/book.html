@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Book a Session — haloe Hijama Manchester</title>
-<meta name="description" content="Book your women-only hijama or cupping session in Manchester with haloe. Secure online booking.">
+<meta name="description" content="Book your hijama or cupping session in Manchester with haloe. Secure online booking.">
 <link rel="canonical" href="https://haloe.health/book.html">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="haloe">
 <meta property="og:title" content="Book a Session — haloe Hijama Manchester">
-<meta property="og:description" content="Book your women-only hijama or cupping session in Manchester with haloe. Secure online booking.">
+<meta property="og:description" content="Book your hijama or cupping session in Manchester with haloe. Secure online booking.">
 <meta property="og:url" content="https://haloe.health/book.html">
 <meta property="og:image" content="https://haloe.health/og-image.jpg">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Book a Session — haloe Hijama Manchester">
-<meta name="twitter:description" content="Book your women-only hijama or cupping session in Manchester with haloe. Secure online booking.">
+<meta name="twitter:description" content="Book your hijama or cupping session in Manchester with haloe. Secure online booking.">
 <meta name="twitter:image" content="https://haloe.health/og-image.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -1045,7 +1045,7 @@
   <span class="foot-label" id="step-counter">Step 1 of 4</span>
 </nav>
 <div style="height:52px;"></div>
-<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Book a women's hijama or cupping session at haloe — Manchester</h1>
+<h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Book a hijama or cupping session at haloe — Manchester</h1>
 <div class="book-shell">
 <div class="book-main">
 <div style="display:none;">
@@ -1059,7 +1059,7 @@
   <!-- STEP 1: Choose Treatment -->
   <div class="panel active" id="panel-1">
     <p class="panel-title">Choose your treatment.</p>
-    <p class="panel-sub">Women only. Fully accredited. Mobile across Manchester.</p>
+    <p class="panel-sub">Women &amp; men. Fully accredited. Mobile across Manchester.</p>
 
     <div class="category-tabs segmented" id="category-tabs">
       <button class="tab-btn seg-option active" data-cat="massage">Massage</button>
@@ -1134,6 +1134,14 @@
 
     <div class="ios-group">
       <div class="ios-row">
+        <label for="gender">Gender</label>
+        <select id="gender" onchange="toggleChaperone();checkStep3()">
+          <option value="">Please select</option>
+          <option value="female">Female</option>
+          <option value="male">Male</option>
+        </select>
+      </div>
+      <div class="ios-row">
         <label for="referral">Heard via</label>
         <select id="referral">
           <option value="">Please select</option>
@@ -1154,13 +1162,18 @@
     <p class="ios-group-label">Consent</p>
     <div class="ios-group">
       <label class="ios-toggle">
-        <span>I am female and 18 or over, or booking for a female family member with their consent.</span>
+        <span>I confirm I am 18 or over, or booking for a family member with their consent.</span>
         <input type="checkbox" id="consent1" onchange="checkStep3()">
         <span class="switch"></span>
       </label>
       <label class="ios-toggle">
         <span>I understand haloe offers complementary wellness therapy, not a substitute for medical diagnosis or treatment.</span>
         <input type="checkbox" id="consent2" onchange="checkStep3()">
+        <span class="switch"></span>
+      </label>
+      <label class="ios-toggle" id="consent3-wrap" style="display:none;">
+        <span>I understand my session will be conducted with a chaperone present.</span>
+        <input type="checkbox" id="consent3" onchange="checkStep3()">
         <span class="switch"></span>
       </label>
     </div>
@@ -1593,6 +1606,12 @@ function validateField(inputId, errorId, validatorFn, message) {
   return ok;
 }
 
+function toggleChaperone() {
+  const isMale = document.getElementById('gender').value === 'male';
+  document.getElementById('consent3-wrap').style.display = isMale ? '' : 'none';
+  if (!isMale) document.getElementById('consent3').checked = false;
+}
+
 function checkStep3() {
   const nameOk = document.getElementById('fullname').value.trim().length > 0;
   const emailOk = validateField('email', 'email-error', isValidEmail,
@@ -1601,10 +1620,14 @@ function checkStep3() {
     'Please enter a valid UK mobile number (e.g. 07700 900900 or +44 7700 900900).');
   const addressOk = validateField('address', 'address-error', isValidAddress,
     'Please include your full address and postcode so Halima knows where to travel to.');
+  const gender = document.getElementById('gender').value;
+  const genderOk = gender.length > 0;
+  const chaperoneOk = gender !== 'male' || document.getElementById('consent3').checked;
   const consentsOk =
     document.getElementById('consent1').checked &&
-    document.getElementById('consent2').checked;
-  document.getElementById('btn-step3').disabled = !(nameOk && emailOk && phoneOk && addressOk && consentsOk);
+    document.getElementById('consent2').checked &&
+    chaperoneOk;
+  document.getElementById('btn-step3').disabled = !(nameOk && emailOk && phoneOk && addressOk && genderOk && consentsOk);
   syncFooter();
 }
 
@@ -1650,6 +1673,8 @@ async function handlePayment(type) {
   const phone = document.getElementById('phone').value.trim();
   const notes = document.getElementById('notes') ? document.getElementById('notes').value : '';
   const address = document.getElementById('address').value.trim();
+  const gender = document.getElementById('gender').value;
+  const chaperone = gender === 'male' && document.getElementById('consent3').checked;
 
   // Final guard — never reach Stripe with missing or invalid contact details.
   if (!name) {
@@ -1694,6 +1719,8 @@ async function handlePayment(type) {
         location: locationLabel,
         notes,
         customerAddress: address,
+        gender,
+        chaperone,
         // Machine-readable fields for slot reservation (the strings above are
         // for display and the WhatsApp/email copy).
         bookingDate: state.date ? toISODate(state.date) : '',

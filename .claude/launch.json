@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "haloe",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["wrangler", "pages", "dev", "website-and-booking", "--port", "8788"],
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd website-and-booking && npx wrangler pages dev . --port 8788"],
       "port": 8788
     }
   ]

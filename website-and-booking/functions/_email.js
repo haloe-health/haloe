@@ -68,7 +68,7 @@ export function emailFooter() {
               <tr>
                 <td align="center" style="padding:26px 4px 8px;border-top:1px solid ${HAIRLINE};margin-top:20px;">
                   <div style="color:${MUTED};font-size:12px;letter-spacing:1px;font-family:${FONT};">With warmth,<br><span style="color:${GOLD};">Halima &middot; haloe</span></div>
-                  <div style="color:#6B6357;font-size:11px;margin-top:12px;font-family:${FONT};">Women only &middot; Manchester</div>
+                  <div style="color:#6B6357;font-size:11px;margin-top:12px;font-family:${FONT};">Women &amp; Men &middot; Manchester</div>
                 </td>
               </tr>`;
 }

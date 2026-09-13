@@ -2,7 +2,7 @@ import { ensureBookingsTable, reserveSlot, releaseBooking, slotToMinutes, HOLD_S
 
 export async function onRequestPost(context) {
   try {
-    const { amount, treatmentName, paymentType, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin } = await context.request.json();
+    const { amount, treatmentName, paymentType, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin, gender, chaperone } = await context.request.json();
     const secretKey = context.env.STRIPE_SECRET_KEY;
     const origin = new URL(context.request.url).origin;
 
@@ -69,6 +69,8 @@ export async function onRequestPost(context) {
     params.append('metadata[location]', location || '');
     params.append('metadata[customerAddress]', customerAddress || '');
     params.append('metadata[notes]', notes || '');
+    params.append('metadata[gender]', gender || '');
+    params.append('metadata[chaperone]', chaperone ? 'true' : 'false');
     if (bookingId !== null) params.append('metadata[bookingId]', String(bookingId));
     // Expire the Checkout Session in step with the slot hold, so an abandoned
     // payment and its reservation lapse together.
