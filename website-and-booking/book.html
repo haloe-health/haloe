@@ -1308,13 +1308,22 @@ function applyDeepLink() {
   });
 
   const wanted = params.get('svc');
+  let matched = false;
   if (wanted) {
     const i = SERVICES[cat].findIndex(s => s.name === wanted);
     if (i !== -1) {
       state.serviceIndex = i;
+      matched = true;
       const btn = document.getElementById('btn-step1');
       if (btn) btn.disabled = false;
     }
+  }
+
+  // A package link is a single, deliberate choice (unlike browsing conditions,
+  // which may only narrow to a category) — skip the redundant "confirm your
+  // already-made choice" step and go straight to picking a date & time.
+  if (cat === 'packages' && matched) {
+    goToStep(2);
   }
 }
 
@@ -1811,7 +1820,18 @@ function goToStep(n) {
   window.scrollTo(0, 0);
 }
 
-init();
+// This script tag sits before the .footbar markup in the document, so at the
+// moment it runs mid-parse, #foot-sum/#foot-total/#foot-cta don't exist yet —
+// updateRail()'s writes to them would silently no-op. Deferring to
+// DOMContentLoaded guarantees the whole document (footbar included) is parsed
+// first. Previously invisible on a fresh step-1 load (its default text already
+// matched "nothing selected"), but it became visible once a deep link could
+// land a visitor on step 2 with a real selection to display.
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 </script>
 <div class="footbar">
   <div class="footbar-inner">

@@ -145,6 +145,11 @@
     animation:fadeUp 0.8s ease 0.4s both;
     letter-spacing:-0.01em;
   }
+  /* Hero h1 word-stagger reveal (JS-driven via GSAP). Only applied once JS wraps
+     the words — .hw-ready suppresses the CSS fadeUp so the two don't fight. */
+  h1.hw-ready { animation:none; opacity:1; }
+  .hw-mask { display:inline-block; overflow:hidden; vertical-align:top; }
+  .hw-word { display:inline-block; will-change:transform; }
   h1 em { font-style:italic; color:var(--gold); display:block; }
   .hero-sub {
     font-size:1rem; color:var(--dim); line-height:2.0;
@@ -257,6 +262,16 @@
   .flower-petal:hover svg.petal-bg {
     transform:scale(1.08) translateY(-4px);
     filter:drop-shadow(0 8px 24px rgba(201,160,64,0.35));
+  }
+  /* Hover echo ripple (JS-driven via GSAP) — hexagon-shaped duplicates of the
+     petal that scale out and fade, adapted from the "RepetitionHoverEffect"
+     pattern. Purely decorative: no pointer-events, sits behind the petal svg,
+     and never interferes with the click-to-open-modal behaviour below. */
+  .petal-echo {
+    position:absolute; inset:0; z-index:-1;
+    background:rgba(201,160,64,0.16);
+    clip-path:polygon(50% 4.5%, 91% 27%, 91% 73%, 50% 95.5%, 9% 73%, 9% 27%);
+    opacity:0; pointer-events:none; will-change:transform,opacity;
   }
   .flower-petal-inner {
     position:absolute;
@@ -1472,6 +1487,125 @@ hbInit();
     el.style.transitionDelay = (i % 4) * 0.07 + 's';
     obs.observe(el);
   });
+</script>
+
+<!-- Hero intro reveal: growing-image + word-stagger, adapted from the "Willem" GSAP
+     loader pattern. Pure vanilla + GSAP (no build step). Fails safe: if GSAP doesn't
+     load, or the user prefers reduced motion, the hero just renders in its normal
+     static state (no broken/hidden content). -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script>
+(function () {
+  if (typeof gsap === 'undefined') return; // CDN failed — leave hero as plain CSS fadeUp
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var heroImg = document.querySelector('#hero .hero-right img');
+  var h1 = document.querySelector('#hero h1');
+  if (!heroImg || !h1) return;
+
+  if (reduceMotion) return; // keep the existing instant/fadeUp presentation
+
+  // --- Split the h1 into word-masks, preserving the <br> and <em> structure ---
+  function wrapWords(node) {
+    var frag = document.createDocumentFragment();
+    var words = node.textContent.split(/(\s+)/); // keep whitespace tokens
+    words.forEach(function (chunk) {
+      if (chunk.trim() === '') {
+        frag.appendChild(document.createTextNode(chunk));
+        return;
+      }
+      var mask = document.createElement('span');
+      mask.className = 'hw-mask';
+      var word = document.createElement('span');
+      word.className = 'hw-word';
+      word.textContent = chunk;
+      mask.appendChild(word);
+      frag.appendChild(mask);
+    });
+    node.parentNode.replaceChild(frag, node);
+  }
+
+  // Walk the h1's existing child nodes (text node + <br> + <em>) and split any
+  // text-bearing node into word-masks, without disturbing <br>/<em> themselves.
+  Array.prototype.slice.call(h1.childNodes).forEach(function (child) {
+    if (child.nodeType === 3 && child.textContent.trim()) {
+      wrapWords(child);
+    } else if (child.nodeType === 1 && child.tagName === 'EM') {
+      Array.prototype.slice.call(child.childNodes).forEach(function (grandchild) {
+        if (grandchild.nodeType === 3 && grandchild.textContent.trim()) {
+          wrapWords(grandchild);
+        }
+      });
+    }
+  });
+
+  var words = h1.querySelectorAll('.hw-word');
+  h1.classList.add('hw-ready'); // turn off the CSS fadeUp now that JS owns the reveal
+
+  gsap.set(words, { yPercent: 110, opacity: 0 });
+
+  // --- Growing-image reveal on the hero photo ---
+  // A slow opacity+scale settle rather than a hard clip-path wipe — reads as
+  // calm and deliberate instead of a "garage door" reveal line.
+  gsap.set(heroImg, { opacity: 0, scale: 1.15, transformOrigin: '50% 50%' });
+
+  var tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+  tl.to(heroImg, {
+      opacity: 1,
+      scale: 1,
+      duration: 3.2,
+      ease: 'power2.out'
+    }, 0.1)
+    .to(words, {
+      yPercent: 0,
+      opacity: 1,
+      duration: 0.9,
+      stagger: 0.05
+    }, 0.5);
+})();
+</script>
+
+<!-- Conditions honeycomb: hover echo ripple, adapted from "RepetitionHoverEffect".
+     Purely additive — does not touch the existing bloom-in or click/modal script
+     blocks above. Falls back to the plain CSS hover (scale+shadow on the svg,
+     defined above) if GSAP isn't available. -->
+<script>
+(function () {
+  if (typeof gsap === 'undefined') return;
+
+  var petals = document.querySelectorAll('.flower-petal');
+
+  petals.forEach(function (petal) {
+    // Two stacked echo hexagons, appended before the svg so they paint behind it.
+    var echoes = [];
+    for (var i = 0; i < 2; i++) {
+      var echo = document.createElement('span');
+      echo.className = 'petal-echo';
+      petal.insertBefore(echo, petal.firstChild);
+      echoes.push(echo);
+    }
+
+    var tl = null;
+
+    petal.addEventListener('mouseenter', function () {
+      if (tl) tl.kill();
+      gsap.set(echoes, { scale: 0.85, opacity: 0.6 });
+      tl = gsap.timeline()
+        .to(echoes, {
+          scale: 1.45,
+          opacity: 0,
+          duration: 0.9,
+          ease: 'power2.out',
+          stagger: 0.15
+        });
+    });
+
+    petal.addEventListener('mouseleave', function () {
+      if (tl) tl.kill();
+      gsap.set(echoes, { opacity: 0 });
+    });
+  });
+}());
 </script>
 </body>
 </html>
