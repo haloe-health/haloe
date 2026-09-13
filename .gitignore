@@ -4,3 +4,6 @@
 # Local secrets for `wrangler pages dev` — never commit
 .dev.vars
 **/.dev.vars
+
+# Third-party animation reference pack (6+ GB) — not project source, never commit
+components/
