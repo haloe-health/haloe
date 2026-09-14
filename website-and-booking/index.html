@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>haloe — Hijama &amp; Cupping in Manchester</title>
-<meta name="description" content="Massage, dry cupping and hijama for women and men in Manchester. Mobile &mdash; Halima comes to you. CMA &amp; IPHM accredited. Supporting relaxation and wellbeing. Book your session.">
+<title>haloe — Hijama &amp; Cupping in Manchester | Mobile &amp; Clinic Day</title>
+<meta name="description" content="Massage, dry cupping and hijama for women and men. Mobile &mdash; Halima comes to you across Manchester &mdash; or visit our weekly Tuesday clinic day at Milton Hall, Deansgate. CMA &amp; IPHM accredited. Book your session.">
 <link rel="canonical" href="https://haloe.health/">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="haloe">
-<meta property="og:title" content="haloe — Hijama &amp; Cupping in Manchester">
-<meta property="og:description" content="Massage, dry cupping and hijama for women and men in Manchester. Mobile &mdash; Halima comes to you. CMA &amp; IPHM accredited. Supporting relaxation and wellbeing.">
+<meta property="og:title" content="haloe — Hijama &amp; Cupping in Manchester | Mobile &amp; Clinic Day">
+<meta property="og:description" content="Massage, dry cupping and hijama for women and men. Mobile &mdash; Halima comes to you across Manchester &mdash; or visit our weekly Tuesday clinic day at Milton Hall, Deansgate. CMA &amp; IPHM accredited.">
 <meta property="og:url" content="https://haloe.health/">
 <meta property="og:image" content="https://haloe.health/og-image.jpg">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="haloe — Hijama &amp; Cupping in Manchester">
-<meta name="twitter:description" content="Massage, dry cupping and hijama for women and men in Manchester. Mobile &mdash; Halima comes to you. CMA &amp; IPHM accredited. Supporting relaxation and wellbeing.">
+<meta name="twitter:title" content="haloe — Hijama &amp; Cupping in Manchester | Mobile &amp; Clinic Day">
+<meta name="twitter:description" content="Massage, dry cupping and hijama for women and men. Mobile &mdash; Halima comes to you across Manchester &mdash; or visit our weekly Tuesday clinic day at Milton Hall, Deansgate. CMA &amp; IPHM accredited.">
 <meta name="twitter:image" content="https://haloe.health/og-image.jpg">
 <!-- LocalBusiness structured data (complementary wellness, not medical) -->
 <script type="application/ld+json">
@@ -25,11 +25,22 @@
   "@context": "https://schema.org",
   "@type": "HealthAndBeautyBusiness",
   "name": "haloe",
-  "description": "Hijama and mobile cupping wellness service for women and men in Manchester, supporting relaxation, circulation and general wellbeing. CMA and IPHM accredited.",
+  "description": "Hijama and cupping wellness service for women and men, supporting relaxation, circulation and general wellbeing. Mobile across Greater Manchester, plus a weekly Tuesday clinic day at Milton Hall, Deansgate. CMA and IPHM accredited.",
   "url": "https://haloe.health/",
   "logo": "https://haloe.health/favicon.svg",
   "image": "https://haloe.health/og-image.jpg",
-  "areaServed": "Manchester",
+  "areaServed": "Greater Manchester",
+  "location": {
+    "@type": "Place",
+    "name": "Milton Hall (Remedy Lounge) — Clinic Day, Tuesdays",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Milton Hall, 3rd Floor, 244 Deansgate",
+      "addressLocality": "Manchester",
+      "postalCode": "M3 4BQ",
+      "addressCountry": "GB"
+    }
+  },
   "knowsAbout": ["Hijama", "Cupping", "Wellness", "Relaxation massage"],
   "hasCredential": "CMA (Complementary Medical Association) accredited; IPHM (International Practitioners of Holistic Medicine) accredited",
   "slogan": "Hijama and cupping in Manchester"
@@ -565,6 +576,15 @@
     .footer-links { flex-wrap:wrap; justify-content:center; }
   }
 
+  /* Footer now carries more links (Clinic Day, Hijama in Manchester,
+     Chaperone Policy) than it used to, so it needs to stack sooner than the
+     860px mobile breakpoint above — otherwise it overlaps footer-right on
+     ordinary laptop-width windows. */
+  @media(max-width:1200px){
+    footer { flex-direction:column; gap:24px; text-align:center; }
+    .footer-links { flex-wrap:wrap; justify-content:center; }
+  }
+
   /* 20. Subtle grain overlay for depth */
   body::before {
     content:'';
@@ -737,7 +757,7 @@
   <ul>
     <li><a href="#about">About</a></li>
     <li><a href="#conditions">Conditions</a></li>
-    
+    <li><a href="#clinic-day">Clinic Day</a></li>
     <li><a href="#process">What to Expect</a></li>
     <li><a href="book.html" class="nav-cta">Book Now</a></li>
   </ul>
@@ -763,9 +783,9 @@
          data-saturation="1"></div>
   </div>
   <div class="hero-content">
-    <div class="hero-eyebrow">Women &amp; Men · Manchester · Mobile Only</div>
+    <div class="hero-eyebrow">Women &amp; Men · Mobile across Manchester · Tuesdays at Deansgate</div>
     <h1>Ancient healing.<br><em>Modern standards.</em></h1>
-    <p class="hero-sub">Massage, dry cupping and hijama for women and men across Manchester — unhurried sessions in the comfort of your own home, rooted in the prophetic tradition and held to modern professional standards.</p>
+    <p class="hero-sub">Massage, dry cupping and hijama for women and men across Manchester — unhurried sessions in the comfort of your own home, rooted in the prophetic tradition and held to modern professional standards&hellip;or visit our weekly clinic day at Milton Hall, Deansgate.</p>
     <div class="hero-btns">
       <a href="book.html" class="btn btn-gold">Book Your Session</a>
     </div>
@@ -1674,6 +1694,25 @@ hbInit();
 </div>
 </section>
 
+<!-- CLINIC DAY -->
+<section id="clinic-day">
+  <div class="about-text reveal" style="max-width:640px;">
+    <div class="section-tag">Weekly Clinic Day</div>
+    <h2>Tuesdays at <em>Milton Hall</em></h2>
+    <p>Every Tuesday, Halima holds a full day of appointments at Milton Hall on Deansgate — a private treatment room, not a shared space. A receptionist greets you and the room itself is behind a key-coded door, so your session stays just as private as a home visit.</p>
+    <p>The building has lift access throughout. Sessions are paid in full at the time of booking, and there's no address to arrange or travel fee to work out — just turn up at your appointment time.</p>
+    <div class="cert-strip">
+      <div class="cert-tag">Private treatment room</div>
+      <div class="cert-tag">Receptionist &amp; key-coded door</div>
+      <div class="cert-tag">Lift access</div>
+      <div class="cert-tag">Full payment at booking</div>
+    </div>
+    <p style="margin-top:28px;color:var(--dim);">Milton Hall, 3rd Floor, 244 Deansgate, Manchester M3 4BQ</p>
+    <br>
+    <a href="book.html?location=clinic" class="btn btn-gold">Book a Tuesday Slot</a>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-left">
@@ -1683,8 +1722,10 @@ hbInit();
   <div class="footer-links">
     <a href="#about">About</a>
     <a href="#conditions">Conditions</a>
-    
+    <a href="#clinic-day">Clinic Day</a>
     <a href="#process">What to Expect</a>
+    <a href="hijama-manchester.html">Hijama in Manchester</a>
+    <a href="chaperone-policy.html">Chaperone Policy</a>
     <a href="book.html">Book</a>
     <a href="https://instagram.com/haloe.health" target="_blank">Instagram</a>
   </div>
