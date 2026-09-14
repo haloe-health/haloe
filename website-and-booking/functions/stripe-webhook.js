@@ -327,7 +327,7 @@ function detailRow(label, value) {
 // COMPLIANCE: wellness/symptom language only — no claims to treat/cure/manage conditions.
 function clientEmailHtml(d) {
   const clinicNote = d.location === 'clinic'
-    ? `<p style="color:${MUTED};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Your session is at ${esc(d.venue)}: ${esc(CLINIC_VENUE_ADDRESS)}. Check in at reception on arrival.</p>`
+    ? `<p style="color:${MUTED};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Your session is at ${esc(d.venue)}: ${esc(CLINIC_VENUE_ADDRESS)}. Check in at reception on the ground floor — they'll direct you to the room. Lift access is available.</p>`
     : '';
   const cancellationNote = `<p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>`;
 

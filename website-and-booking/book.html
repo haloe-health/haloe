@@ -1338,9 +1338,12 @@ if (new URLSearchParams(location.search).get('test') === '1') {
    so keep the two in step by hand. */
 const CLINIC_VENUE_NAME = 'Milton Hall, Deansgate';
 const CLINIC_VENUE_ADDRESS = 'Milton Hall, 3rd Floor, 244 Deansgate, Manchester M3 4BQ';
-const CLINIC_WEEKDAY = 4; // 0=Sunday ... 6=Saturday. 4 = Thursday.
+const CLINIC_WEEKDAY = 2; // 0=Sunday ... 6=Saturday. 2 = Tuesday.
 const CLINIC_SLOT_TEMPLATE = ['09:30', '11:15', '13:00', '14:45', '16:30', '18:15'];
-const CLINIC_START_DATE = '2026-10-01';
+// Unset until Halima confirms the first Tuesday after her venue viewing.
+// The calendar must show NO bookable clinic dates while this is null —
+// never default to "next Tuesday".
+const CLINIC_START_DATE = null;
 
 document.getElementById('where-clinic-venue').textContent = CLINIC_VENUE_NAME;
 
@@ -1578,10 +1581,13 @@ document.getElementById('category-tabs').addEventListener('click', e => {
 });
 
 // A date is bookable when: it's not in the past, and — for mobile — it's not
-// a Sunday, or — for clinic — it falls on CLINIC_WEEKDAY on/after CLINIC_START_DATE.
+// a Sunday, or — for clinic — it falls on CLINIC_WEEKDAY on/after
+// CLINIC_START_DATE. While CLINIC_START_DATE is unset, no clinic date is
+// bookable — never default to "next CLINIC_WEEKDAY".
 function dateIsBookable(date, today) {
   if (date < today) return false;
   if (state.location === 'clinic') {
+    if (!CLINIC_START_DATE) return false;
     return date.getDay() === CLINIC_WEEKDAY && toISODate(date) >= CLINIC_START_DATE;
   }
   return date.getDay() !== 0;

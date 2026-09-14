@@ -1441,9 +1441,12 @@ function hbNet(svc){ return Math.round(svc.price * (1 - HB_PROMO_DISCOUNT)); }
    Must stay in step with the same constants in book.html and functions/_clinic.js. */
 const HB_CLINIC_VENUE_NAME = 'Milton Hall, Deansgate';
 const HB_CLINIC_VENUE_ADDRESS = 'Milton Hall, 3rd Floor, 244 Deansgate, Manchester M3 4BQ';
-const HB_CLINIC_WEEKDAY = 4; // 0=Sunday ... 6=Saturday. 4 = Thursday.
+const HB_CLINIC_WEEKDAY = 2; // 0=Sunday ... 6=Saturday. 2 = Tuesday.
 const HB_CLINIC_SLOT_TEMPLATE = ['09:30', '11:15', '13:00', '14:45', '16:30', '18:15'];
-const HB_CLINIC_START_DATE = '2026-10-01';
+// Unset until Halima confirms the first Tuesday after her venue viewing.
+// The calendar must show NO bookable clinic dates while this is null —
+// never default to "next Tuesday".
+const HB_CLINIC_START_DATE = null;
 function hbTo12h(t){
   const [h,m]=t.split(':').map(Number);
   const period=h>=12?'pm':'am';
@@ -1507,10 +1510,15 @@ document.getElementById('hb-tabs').addEventListener('click',e=>{
 });
 
 // A date is bookable when it's not in the past, and — for mobile — it's not a
-// Sunday, or — for clinic — it falls on HB_CLINIC_WEEKDAY on/after HB_CLINIC_START_DATE.
+// Sunday, or — for clinic — it falls on HB_CLINIC_WEEKDAY on/after
+// HB_CLINIC_START_DATE. While HB_CLINIC_START_DATE is unset, no clinic date
+// is bookable — never default to "next HB_CLINIC_WEEKDAY".
 function hbDateIsBookable(date,today){
   if(date<today) return false;
-  if(hbState.loc==='clinic') return date.getDay()===HB_CLINIC_WEEKDAY && hbToISODate(date)>=HB_CLINIC_START_DATE;
+  if(hbState.loc==='clinic'){
+    if(!HB_CLINIC_START_DATE) return false;
+    return date.getDay()===HB_CLINIC_WEEKDAY && hbToISODate(date)>=HB_CLINIC_START_DATE;
+  }
   return date.getDay()!==0;
 }
 
