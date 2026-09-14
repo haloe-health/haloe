@@ -97,20 +97,22 @@
     background:rgba(8,8,6,0.88);
     backdrop-filter:blur(20px);
     -webkit-backdrop-filter:blur(20px);
+    /* Glowing gold hairline along the bottom edge — a crisp 1px line plus a
+       soft low-blur glow bleeding just beneath it. */
+    border-bottom:1px solid var(--hairline-border, rgba(200,169,110,0.2));
+    box-shadow:0 1px 16px rgba(200,169,110,0.08);
   }
   .nav-logo { display:flex; align-items:center; gap:14px; text-decoration:none; }
   .nav-logo img { height:32px; width:auto; }
-  /* 3. Nav wordmark — lighter, more spaced. "Fraunces" is a free Google Font
-     standing in for TAN Ashford (a paid font not available on Google Fonts,
-     and this site has no self-hosted font files to license/bundle one) —
-     Fraunces has the same warm, soft, editorial serif character TAN's
-     fonts are known for (unlike Italiana, tried first, which reads as a
-     thinner, more geometric display-caps face — a different family of
-     "elegant" than Ashford's). Uses Fraunces' optical-size axis at a large
-     value for its most delicate, display-weight letterforms. */
+  /* 3. Nav wordmark — lighter, more spaced. Now Playfair Display (the same
+     heading font used site-wide, e.g. book.html's panel titles) — tried
+     after Italiana and Fraunces. Italic reads more elegant than regular at
+     this letter-spacing and echoes the hero's italic "Modern standards."
+     directly beneath it. Scoped to this element only — the Conditions
+     section's "we treat" keeps its own separate italic treatment. */
   .nav-logo span {
-    font-family:'Fraunces', var(--font-heading);
-    font-optical-sizing:auto;
+    font-family:var(--font-heading);
+    font-style:italic;
     font-size:1.4rem; color:var(--gold);
     letter-spacing:0.2em; font-weight:300;
     text-transform:lowercase;
@@ -123,22 +125,22 @@
     font-weight:400;
   }
   nav ul a:hover { color:var(--gold); text-decoration:none; }
-  /* 4. CTA button — refined, no fill, just border */
+  /* 4. CTA button — solid gold-gradient fill, matching the primary buttons
+     used elsewhere on the site (.btn-gold, .hb-btn). */
   .nav-cta {
-    border:1px solid rgba(201,160,64,0.5) !important;
-    color:var(--gold) !important;
+    border:none !important;
+    background:linear-gradient(135deg, var(--gold-highlight, #dbb85a), var(--gold-primary, var(--gold))) !important;
+    color:var(--obsidian-base, #080806) !important;
     padding:10px 26px;
-    font-weight:400 !important;
-    background:transparent !important;
+    font-weight:500 !important;
     transition:all 0.4s !important;
     border-radius:50px !important;
     text-decoration:none !important;
     display:inline-block !important;
   }
   .nav-cta:hover {
-    background:var(--gold) !important;
-    color:#080806 !important;
-    border-color:var(--gold) !important;
+    filter:brightness(1.08);
+    transform:translateY(-2px);
     text-decoration:none !important;
   }
 
@@ -223,6 +225,13 @@
   }
   .hero-rays .light-rays { position:relative; width:100%; height:100%; overflow:hidden; }
   .hero-rays .light-rays canvas { display:block; width:100%; height:100%; }
+
+  /* About → Conditions divider: soft dithered wave texture (WebGL), adapted
+     from the components "Dither" background pack. Pure vanilla JS, no
+     dependencies, mouse interaction off for a quiet, non-distracting strip. */
+  .about-divider { position:relative; width:100%; height:110px; background:var(--deep); overflow:hidden; }
+  .about-divider canvas { display:block; width:100%; height:100%; }
+  @media(max-width:680px){ .about-divider { height:80px; } }
 
   /* STATS */
   .stats-row {
@@ -310,6 +319,7 @@
     opacity:1;
     transform:scale(1) rotate(0deg);
   }
+  .flower-capstone { text-decoration:none; }
   .flower-petal svg.petal-bg {
     position:absolute;
     inset:0;
@@ -566,14 +576,18 @@
 
   /* ── UI/UX Improvements ── */
 
-  /* Signifiers: nav active state */
-  nav ul a { position:relative; }
-  nav ul a::after {
+  /* Signifiers: nav active state. Scoped off .nav-cta — that's a filled
+     button, not a section link, so it shouldn't grow an underline. */
+  nav ul a:not(.nav-cta) { position:relative; }
+  nav ul a:not(.nav-cta)::after {
     content:''; position:absolute; bottom:-4px; left:0; right:0;
     height:1px; background:var(--gold); transform:scaleX(0);
     transition:transform 0.3s ease; transform-origin:left;
   }
-  nav ul a:hover::after { transform:scaleX(1); }
+  nav ul a:not(.nav-cta):hover::after { transform:scaleX(1); }
+  /* Section currently scrolled into view (JS-driven, see bottom of body) */
+  nav ul a.nav-active::after { transform:scaleX(1); }
+  nav ul a.nav-active { color:var(--gold); }
 
   /* Visual hierarchy: about section divider */
   .about-text h2 { margin-bottom:20px; }
@@ -807,6 +821,9 @@
   </div>
 </section>
 
+<!-- ABOUT → CONDITIONS DIVIDER: soft dithered wave texture -->
+<div class="about-divider" id="aboutDither" aria-hidden="true"></div>
+
 <!-- CONDITIONS -->
 <section id="conditions">
   <div class="reveal">
@@ -815,7 +832,7 @@
   </div>
   <div class="flower-section">
     <p class="conditions-hint">Tap any condition to book your session →</p>
-    <div class="flower-wrap" id="flower-wrap" style="width:660px;height:610px;">
+    <div class="flower-wrap" id="flower-wrap" style="width:660px;height:790px;">
 
       <!-- TOP ROW: 2 — matches logo (top-left, top-right) -->
       <div class="flower-petal" data-index="0" data-cond="hormonal" style="left:126px;top:56px;">
@@ -883,6 +900,26 @@
         </svg>
       </div>
 
+      <!-- CAPSTONE: closing CTA, centred beneath the bottom row — same hex
+           shape/size as the conditions, gold-filled instead of dark, no
+           data-cond so it's never picked up by the condition-modal click
+           handler. Deliberately a plain <a> (not JS-driven) so it works even
+           if the honeycomb's other scripts ever fail to load. -->
+      <a href="book.html" class="flower-petal flower-capstone" data-index="7" style="left:232px;top:581px;">
+        <svg class="petal-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="capstoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#DFC38E"/>
+              <stop offset="100%" stop-color="#C8A96E"/>
+            </linearGradient>
+          </defs>
+          <polygon points="100,9 182,54 182,146 100,191 18,146 18,54" fill="url(#capstoneGrad)" stroke="#DFC38E" stroke-opacity="0.9" stroke-width="1.5"/>
+          <text x="100" y="94" text-anchor="middle" font-family="Poppins,sans-serif" font-size="12" font-weight="700" letter-spacing="1.4" fill="#0D0D0D">VIEW ALL</text>
+          <text x="100" y="110" text-anchor="middle" font-family="Poppins,sans-serif" font-size="12" font-weight="700" letter-spacing="1.4" fill="#0D0D0D">TREATMENTS</text>
+          <text x="100" y="140" text-anchor="middle" font-family="Poppins,sans-serif" font-size="18" fill="#0D0D0D">→</text>
+        </svg>
+      </a>
+
     </div>
   </div>
 </section>
@@ -892,8 +929,9 @@
   var wrap   = document.getElementById('flower-wrap');
   var fired  = false;
 
-  // Spiral clockwise: top-left → top-right → mid-right → bot-right → bot-left → mid-left → mid-centre
-  var order = [0, 1, 4, 6, 5, 2, 3];
+  // Spiral clockwise: top-left → top-right → mid-right → bot-right → bot-left → mid-left → mid-centre,
+  // capstone CTA blooms in last so it reads as the deliberate close of the sequence.
+  var order = [0, 1, 4, 6, 5, 2, 3, 7];
 
   function bloomFlower(){
     if(fired) return;
@@ -915,7 +953,7 @@
       var s = (vw - 32) / 660;
       wrap.style.transform = 'scale(' + s + ')';
       wrap.style.transformOrigin = 'top center';
-      wrap.style.marginBottom = -(610*(1-s)*0.9)+'px';
+      wrap.style.marginBottom = -(790*(1-s)*0.9)+'px';
     } else {
       wrap.style.transform = '';
       wrap.style.marginBottom = '';
@@ -1982,6 +2020,385 @@ void main(){
     };
     requestAnimationFrame(loop);
   });
+}());
+</script>
+
+<!-- Nav active-link indicator: toggles .nav-active on the section link
+     currently scrolled into view. Purely presentational — doesn't touch
+     navigation/click behaviour, just adds/removes a class. -->
+<script>
+(function () {
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('nav ul a:not(.nav-cta)'));
+  var sections = navLinks
+    .map(function (a) {
+      var id = a.getAttribute('href').replace('#', '');
+      var el = document.getElementById(id);
+      return el ? { link: a, section: el } : null;
+    })
+    .filter(Boolean);
+  if (!sections.length) return;
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      var match = sections.find(function (s) { return s.section === entry.target; });
+      if (!match) return;
+      if (entry.isIntersecting) {
+        navLinks.forEach(function (a) { a.classList.remove('nav-active'); });
+        match.link.classList.add('nav-active');
+      }
+    });
+  }, { rootMargin: '-45% 0px -50% 0px' }); // fires when a section crosses the vertical middle of the viewport
+
+  sections.forEach(function (s) { observer.observe(s.section); });
+}());
+</script>
+
+<!-- About → Conditions divider: soft dithered wave texture (WebGL), adapted
+     from the components "Dither" background pack. Pure vanilla JS, no
+     dependencies. Mouse interaction disabled and tuned for a slow, quiet
+     effect — an accent strip, not something meant to draw the eye. -->
+<script>
+(function () {
+  var container = document.getElementById('aboutDither');
+  if (!container) return;
+
+  var opts = {
+    waveColor: [0.784, 0.663, 0.431], // muted gold (#C8A96E)
+    enableMouseInteraction: false,
+    // The Bayer dither quantizes each RGB channel independently — at a low
+    // colorNum (the pack default, tuned for near-grey input) a saturated
+    // colour like gold fringes into visible red/green noise, since each
+    // channel lands on a different quantized step. A much higher colorNum
+    // keeps the intended grain texture while eliminating the colour fringing.
+    colorNum: 32,
+    waveAmplitude: 0.22,
+    waveFrequency: 2,
+    waveSpeed: 0.03,
+    pixelSize: 3,
+  };
+
+  var canvas = document.createElement('canvas');
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  canvas.style.display = 'block';
+  container.appendChild(canvas);
+
+  var gl = canvas.getContext('webgl', { alpha: true, antialias: true, premultipliedAlpha: false })
+    || canvas.getContext('experimental-webgl', { alpha: true, antialias: true, premultipliedAlpha: false });
+  if (!gl) return;
+
+  gl.disable(gl.DEPTH_TEST);
+  gl.disable(gl.CULL_FACE);
+  gl.clearColor(0, 0, 0, 0);
+
+  var vertexSrc = `
+attribute vec2 position;
+varying vec2 vUv;
+void main() {
+  vUv = position * 0.5 + 0.5;
+  gl_Position = vec4(position, 0.0, 1.0);
+}
+`;
+
+  var fragmentSrc = `precision highp float;
+
+uniform vec2 uResolution;
+uniform float uTime;
+
+uniform float uWaveSpeed;
+uniform float uWaveFrequency;
+uniform float uWaveAmplitude;
+uniform vec3 uWaveColor;
+
+uniform float uColorNum;
+uniform float uPixelSize;
+
+varying vec2 vUv;
+
+vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+vec2 fade(vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
+
+float cnoise(vec2 P) {
+  vec4 Pi = floor(P.xyxy) + vec4(0.0,0.0,1.0,1.0);
+  vec4 Pf = fract(P.xyxy) - vec4(0.0,0.0,1.0,1.0);
+  Pi = mod289(Pi);
+  vec4 ix = Pi.xzxz;
+  vec4 iy = Pi.yyww;
+  vec4 fx = Pf.xzxz;
+  vec4 fy = Pf.yyww;
+  vec4 i = permute(permute(ix) + iy);
+  vec4 gx = fract(i * (1.0/41.0)) * 2.0 - 1.0;
+  vec4 gy = abs(gx) - 0.5;
+  vec4 tx = floor(gx + 0.5);
+  gx = gx - tx;
+  vec2 g00 = vec2(gx.x, gy.x);
+  vec2 g10 = vec2(gx.y, gy.y);
+  vec2 g01 = vec2(gx.z, gy.z);
+  vec2 g11 = vec2(gx.w, gy.w);
+  vec4 norm = taylorInvSqrt(vec4(dot(g00,g00), dot(g01,g01), dot(g10,g10), dot(g11,g11)));
+  g00 *= norm.x; g01 *= norm.y; g10 *= norm.z; g11 *= norm.w;
+  float n00 = dot(g00, vec2(fx.x, fy.x));
+  float n10 = dot(g10, vec2(fx.y, fy.y));
+  float n01 = dot(g01, vec2(fx.z, fy.z));
+  float n11 = dot(g11, vec2(fx.w, fy.w));
+  vec2 fade_xy = fade(Pf.xy);
+  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+  return 2.3 * mix(n_x.x, n_x.y, fade_xy.y);
+}
+
+float fbm(vec2 p) {
+  float value = 0.0;
+  float amp = 1.0;
+  float freq = uWaveFrequency;
+  for (int i = 0; i < 4; i++) {
+    value += amp * abs(cnoise(p));
+    p *= freq;
+    amp *= uWaveAmplitude;
+  }
+  return value;
+}
+
+float pattern(vec2 p) {
+  vec2 p2 = p - uTime * uWaveSpeed;
+  return fbm(p + fbm(p2));
+}
+
+float bayer8x8(int x, int y) {
+  int i = y * 8 + x;
+  if (i == 0) return 0.0/64.0;
+  if (i == 1) return 48.0/64.0;
+  if (i == 2) return 12.0/64.0;
+  if (i == 3) return 60.0/64.0;
+  if (i == 4) return 3.0/64.0;
+  if (i == 5) return 51.0/64.0;
+  if (i == 6) return 15.0/64.0;
+  if (i == 7) return 63.0/64.0;
+  if (i == 8) return 32.0/64.0;
+  if (i == 9) return 16.0/64.0;
+  if (i == 10) return 44.0/64.0;
+  if (i == 11) return 28.0/64.0;
+  if (i == 12) return 35.0/64.0;
+  if (i == 13) return 19.0/64.0;
+  if (i == 14) return 47.0/64.0;
+  if (i == 15) return 31.0/64.0;
+  if (i == 16) return 8.0/64.0;
+  if (i == 17) return 56.0/64.0;
+  if (i == 18) return 4.0/64.0;
+  if (i == 19) return 52.0/64.0;
+  if (i == 20) return 11.0/64.0;
+  if (i == 21) return 59.0/64.0;
+  if (i == 22) return 7.0/64.0;
+  if (i == 23) return 55.0/64.0;
+  if (i == 24) return 40.0/64.0;
+  if (i == 25) return 24.0/64.0;
+  if (i == 26) return 36.0/64.0;
+  if (i == 27) return 20.0/64.0;
+  if (i == 28) return 43.0/64.0;
+  if (i == 29) return 27.0/64.0;
+  if (i == 30) return 39.0/64.0;
+  if (i == 31) return 23.0/64.0;
+  if (i == 32) return 2.0/64.0;
+  if (i == 33) return 50.0/64.0;
+  if (i == 34) return 14.0/64.0;
+  if (i == 35) return 62.0/64.0;
+  if (i == 36) return 1.0/64.0;
+  if (i == 37) return 49.0/64.0;
+  if (i == 38) return 13.0/64.0;
+  if (i == 39) return 61.0/64.0;
+  if (i == 40) return 34.0/64.0;
+  if (i == 41) return 18.0/64.0;
+  if (i == 42) return 46.0/64.0;
+  if (i == 43) return 30.0/64.0;
+  if (i == 44) return 33.0/64.0;
+  if (i == 45) return 17.0/64.0;
+  if (i == 46) return 45.0/64.0;
+  if (i == 47) return 29.0/64.0;
+  if (i == 48) return 10.0/64.0;
+  if (i == 49) return 58.0/64.0;
+  if (i == 50) return 6.0/64.0;
+  if (i == 51) return 54.0/64.0;
+  if (i == 52) return 9.0/64.0;
+  if (i == 53) return 57.0/64.0;
+  if (i == 54) return 5.0/64.0;
+  if (i == 55) return 53.0/64.0;
+  if (i == 56) return 42.0/64.0;
+  if (i == 57) return 26.0/64.0;
+  if (i == 58) return 38.0/64.0;
+  if (i == 59) return 22.0/64.0;
+  if (i == 60) return 41.0/64.0;
+  if (i == 61) return 25.0/64.0;
+  if (i == 62) return 37.0/64.0;
+  return 21.0/64.0;
+}
+
+vec3 dither(vec2 fragCoord, vec3 color) {
+  vec2 scaled = floor(fragCoord / max(uPixelSize, 1.0));
+  int x = int(mod(scaled.x, 8.0));
+  int y = int(mod(scaled.y, 8.0));
+  float threshold = bayer8x8(x, y) - 0.25;
+  float stepv = 1.0 / max(uColorNum - 1.0, 1.0);
+  color += threshold * stepv;
+  float bias = 0.2;
+  color = clamp(color - bias, 0.0, 1.0);
+  return floor(color * (uColorNum - 1.0) + 0.5) / max(uColorNum - 1.0, 1.0);
+}
+
+void main() {
+  vec2 frag = gl_FragCoord.xy;
+  vec2 px = vec2(max(uPixelSize, 1.0));
+  vec2 fragP = px * floor(frag / px) + 0.5 * px;
+  vec2 uv = fragP / uResolution;
+  vec2 p = uv - 0.5;
+  p.x *= uResolution.x / uResolution.y;
+
+  float f = pattern(p);
+  vec3 col = mix(vec3(0.0), uWaveColor, f);
+  col = dither(frag, col);
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+  function compile(type, src) {
+    var sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) return null;
+    return sh;
+  }
+  function link(vs2, fs2) {
+    var p = gl.createProgram();
+    gl.attachShader(p, vs2);
+    gl.attachShader(p, fs2);
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) return null;
+    return p;
+  }
+  var vs = compile(gl.VERTEX_SHADER, vertexSrc);
+  var fs = compile(gl.FRAGMENT_SHADER, fragmentSrc);
+  if (!vs || !fs) return;
+  var program = link(vs, fs);
+  if (!program) return;
+  gl.useProgram(program);
+
+  var posLoc = gl.getAttribLocation(program, 'position');
+  var uResolutionLoc = gl.getUniformLocation(program, 'uResolution');
+  var uTimeLoc = gl.getUniformLocation(program, 'uTime');
+  var uWaveSpeedLoc = gl.getUniformLocation(program, 'uWaveSpeed');
+  var uWaveFrequencyLoc = gl.getUniformLocation(program, 'uWaveFrequency');
+  var uWaveAmplitudeLoc = gl.getUniformLocation(program, 'uWaveAmplitude');
+  var uWaveColorLoc = gl.getUniformLocation(program, 'uWaveColor');
+  var uColorNumLoc = gl.getUniformLocation(program, 'uColorNum');
+  var uPixelSizeLoc = gl.getUniformLocation(program, 'uPixelSize');
+
+  var posBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(posLoc);
+  gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+  function setStaticUniforms() {
+    gl.uniform1f(uWaveSpeedLoc, opts.waveSpeed);
+    gl.uniform1f(uWaveFrequencyLoc, opts.waveFrequency);
+    gl.uniform1f(uWaveAmplitudeLoc, opts.waveAmplitude);
+    gl.uniform3fv(uWaveColorLoc, new Float32Array(opts.waveColor));
+    gl.uniform1f(uColorNumLoc, opts.colorNum);
+    gl.uniform1f(uPixelSizeLoc, opts.pixelSize);
+  }
+  function resize() {
+    var rect = container.getBoundingClientRect();
+    var dpr = Math.min(1.25, window.devicePixelRatio || 1);
+    var w = Math.max(1, Math.floor(rect.width * dpr));
+    var h = Math.max(1, Math.floor(rect.height * dpr));
+    canvas.width = w;
+    canvas.height = h;
+    gl.viewport(0, 0, w, h);
+    gl.uniform2fv(uResolutionLoc, new Float32Array([w, h]));
+  }
+  window.addEventListener('resize', resize, false);
+  resize();
+  setStaticUniforms();
+
+  var lastT = 0;
+  function loop(t) {
+    requestAnimationFrame(loop);
+    if (t - lastT < 33) return;
+    lastT = t;
+    gl.uniform1f(uTimeLoc, t * 1e-3);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+  requestAnimationFrame(loop);
+}());
+</script>
+
+<!-- Scroll-triggered reveals for About + What to Expect, adapted from the
+     components "gsap-pinned-image-mask-reveal-on-scroll" technique: real
+     scroll-scrubbed motion (tied to scroll position via ScrollTrigger's
+     `scrub`) instead of the site's default one-shot fade-up. Lenis supplies
+     the smooth-scroll feel the reference demo pairs it with.
+
+     Safety: this ONLY detaches these elements from the existing
+     IntersectionObserver .reveal system (see the very first script in
+     <body>) once GSAP + ScrollTrigger + Lenis have ALL loaded successfully.
+     If any CDN fails, nothing here runs and the original fade-up fallback
+     still drives these same elements untouched — they can never end up
+     stuck invisible. -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+<script>
+(function () {
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined' || typeof Lenis === 'undefined') return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // --- Lenis smooth scroll, wired into GSAP's ticker so ScrollTrigger stays in sync ---
+  var lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+  gsap.ticker.lagSmoothing(0);
+
+  // --- About: was a single one-shot .reveal fade on the whole block; now each
+  // child scrubs in individually as the section scrolls through view. ---
+  var aboutText = document.querySelector('.about-text');
+  if (aboutText) {
+    var aboutChildren = Array.prototype.slice.call(aboutText.children);
+    aboutText.classList.remove('reveal', 'visible'); // hand off from the old observer-driven system
+    gsap.set(aboutChildren, { opacity: 0, y: 40 });
+    gsap.to(aboutChildren, {
+      opacity: 1,
+      y: 0,
+      stagger: 0.12,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: aboutText,
+        start: 'top 85%',
+        end: 'top 30%',
+        scrub: 0.6,
+      },
+    });
+  }
+
+  // --- What to Expect: was 4 separate one-shot .reveal fades; now the whole
+  // row scrubs in together, staggered, tied to scroll through the section. ---
+  var steps = document.querySelectorAll('#process .p-step');
+  if (steps.length) {
+    steps.forEach(function (el) { el.classList.remove('reveal', 'visible'); });
+    gsap.set(steps, { opacity: 0, y: 50 });
+    gsap.to(steps, {
+      opacity: 1,
+      y: 0,
+      stagger: 0.15,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.process-grid',
+        start: 'top 80%',
+        end: 'top 25%',
+        scrub: 0.6,
+      },
+    });
+  }
 }());
 </script>
 </body>
