@@ -36,7 +36,7 @@
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Fraunces:opsz,wght@9..144,300;9..144,400&display=swap" rel="stylesheet">
 <style>
   :root {
     --black: #080806;
@@ -100,13 +100,17 @@
   }
   .nav-logo { display:flex; align-items:center; gap:14px; text-decoration:none; }
   .nav-logo img { height:32px; width:auto; }
-  /* 3. Nav wordmark — lighter, more spaced. Font-family matches the italic
-     heading treatment used for "we treat" in the Conditions section
-     (var(--font-heading) = Playfair Display, not Cormorant — no Cormorant
-     font is actually loaded on this site). */
+  /* 3. Nav wordmark — lighter, more spaced. "Fraunces" is a free Google Font
+     standing in for TAN Ashford (a paid font not available on Google Fonts,
+     and this site has no self-hosted font files to license/bundle one) —
+     Fraunces has the same warm, soft, editorial serif character TAN's
+     fonts are known for (unlike Italiana, tried first, which reads as a
+     thinner, more geometric display-caps face — a different family of
+     "elegant" than Ashford's). Uses Fraunces' optical-size axis at a large
+     value for its most delicate, display-weight letterforms. */
   .nav-logo span {
-    font-family:var(--font-heading);
-    font-style:italic;
+    font-family:'Fraunces', var(--font-heading);
+    font-optical-sizing:auto;
     font-size:1.4rem; color:var(--gold);
     letter-spacing:0.2em; font-weight:300;
     text-transform:lowercase;
