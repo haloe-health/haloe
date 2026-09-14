@@ -1,8 +1,12 @@
 import { ensureBookingsTable, reserveSlot, releaseBooking, slotToMinutes, HOLD_SECONDS } from './_bookings.js';
+import { CLINIC_VENUE_NAME } from './_clinic.js';
 
 export async function onRequestPost(context) {
   try {
-    const { amount, treatmentName, paymentType, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin, gender, chaperone } = await context.request.json();
+    const { amount, treatmentName, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin, gender, chaperone } = await context.request.json();
+    // location is 'clinic' | 'mobile'. Every booking is paid in full — there is
+    // no deposit path.
+    const venue = location === 'clinic' ? CLINIC_VENUE_NAME : '';
     const secretKey = context.env.STRIPE_SECRET_KEY;
     const origin = new URL(context.request.url).origin;
 
@@ -43,13 +47,9 @@ export async function onRequestPost(context) {
       }
     }
 
-    const productName = paymentType === 'deposit'
-      ? `Deposit — ${treatmentName}`
-      : `Full payment — ${treatmentName}`;
+    const productName = `Full payment — ${treatmentName}`;
 
-    const description = paymentType === 'deposit'
-      ? 'Non-refundable deposit to secure your booking. Remainder payable on the day.'
-      : `Full payment for ${treatmentName} with haloe.`;
+    const description = `Full payment for ${treatmentName} with haloe. Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.`;
 
     const params = new URLSearchParams();
     params.append('payment_method_types[]', 'card');
@@ -63,10 +63,10 @@ export async function onRequestPost(context) {
     params.append('metadata[customerName]', customerName);
     params.append('metadata[customerPhone]', customerPhone || '');
     params.append('metadata[treatmentName]', treatmentName);
-    params.append('metadata[paymentType]', paymentType);
     params.append('metadata[date]', date || '');
     params.append('metadata[time]', time || '');
-    params.append('metadata[location]', location || '');
+    params.append('metadata[location]', location || 'mobile');
+    if (venue) params.append('metadata[venue]', venue);
     params.append('metadata[customerAddress]', customerAddress || '');
     params.append('metadata[notes]', notes || '');
     params.append('metadata[gender]', gender || '');
@@ -76,12 +76,12 @@ export async function onRequestPost(context) {
     // payment and its reservation lapse together.
     params.append('expires_at', String(now + HOLD_SECONDS));
     const successParams = new URLSearchParams({
-      type: paymentType,
       name: customerName || '',
       treatment: treatmentName || '',
       date: date || '',
       time: time || '',
-      location: location || '',
+      location: location || 'mobile',
+      venue: venue || '',
       amount: String(amount),
     });
     params.append('success_url', `${origin}/booking-confirmed.html?${successParams.toString()}`);

@@ -1260,6 +1260,12 @@
 .hb-intake a { color:var(--gold,#c9a040); text-decoration:none; }
 .hb-loc-notice { font-size:0.73rem; color:rgba(201,160,64,0.5); padding:0.8rem 1rem; border:1px solid rgba(201,160,64,0.15); margin-bottom:2rem; display:none; line-height:1.7; }
 .hb-loc-notice.visible { display:block; }
+.hb-where-card { display:flex; align-items:flex-start; gap:0.9rem; padding:1rem 1.1rem; border:1px solid rgba(201,160,64,0.15); border-radius:8px; margin-bottom:0.8rem; cursor:pointer; transition:border-color 0.18s, background 0.18s; }
+.hb-where-card:hover { background:rgba(201,160,64,0.04); }
+.hb-where-ring { width:18px; height:18px; border-radius:50%; border:1.5px solid rgba(201,160,64,0.4); flex:none; margin-top:2px; transition:border-color 0.18s, border-width 0.18s; }
+.hb-where-card.selected .hb-where-ring { border-color:var(--gold,#c9a040); border-width:5px; }
+.hb-where-name { display:block; font-size:0.95rem; color:#F5F0E8; margin-bottom:0.25rem; }
+.hb-where-desc { display:block; font-size:0.8rem; color:rgba(245,240,232,0.5); line-height:1.5; }
 @media(max-width:500px){ .hb-form-row { grid-template-columns:1fr; } .hb-times { grid-template-columns:repeat(3,1fr); } }
 </style>
 
@@ -1268,14 +1274,38 @@
   <p style="text-align:center;color:rgba(201,160,64,0.5);font-size:0.72rem;letter-spacing:0.15em;text-transform:uppercase;margin-bottom:2.5rem;">Women &amp; Men · Fully Accredited · Manchester</p>
 
   <div class="hb-steps" id="hb-steps">
-    <div class="hb-step active" data-step="1"><div class="hb-dot">1</div><span class="hb-label">Treatment</span></div>
-    <div class="hb-step" data-step="2"><div class="hb-dot">2</div><span class="hb-label">Date & Time</span></div>
-    <div class="hb-step" data-step="3"><div class="hb-dot">3</div><span class="hb-label">Details</span></div>
-    <div class="hb-step" data-step="4"><div class="hb-dot">4</div><span class="hb-label">Confirm</span></div>
+    <div class="hb-step active" data-step="1"><div class="hb-dot">1</div><span class="hb-label">Where</span></div>
+    <div class="hb-step" data-step="2"><div class="hb-dot">2</div><span class="hb-label">Treatment</span></div>
+    <div class="hb-step" data-step="3"><div class="hb-dot">3</div><span class="hb-label">Date & Time</span></div>
+    <div class="hb-step" data-step="4"><div class="hb-dot">4</div><span class="hb-label">Details</span></div>
+    <div class="hb-step" data-step="5"><div class="hb-dot">5</div><span class="hb-label">Confirm</span></div>
   </div>
 
   <!-- Step 1 -->
   <div class="hb-panel active" id="hb-panel-1">
+    <p class="hb-title">Where would you like your session?</p>
+    <p class="hb-sub">Choose a clinic day appointment or a home visit</p>
+    <div class="hb-where-card" id="hb-where-clinic" onclick="hbSelectLocation('clinic')">
+      <span class="hb-where-ring"></span>
+      <span>
+        <span class="hb-where-name">Clinic Day — <span id="hb-where-clinic-venue"></span></span>
+        <span class="hb-where-desc">A weekly clinic day, one fixed venue. Full payment at booking, no travel fee.</span>
+      </span>
+    </div>
+    <div class="hb-where-card" id="hb-where-mobile" onclick="hbSelectLocation('mobile')">
+      <span class="hb-where-ring"></span>
+      <span>
+        <span class="hb-where-name">Home visit</span>
+        <span class="hb-where-desc">Halima comes to you, across Greater Manchester.</span>
+      </span>
+    </div>
+    <div class="hb-loc-notice" id="hb-loc-notice">Halima comes to your home. Travel is free in Manchester city centre; outside it, travel is charged at the cost of a taxi, which she&rsquo;ll confirm when she contacts you.</div>
+    <button class="hb-btn" id="hb-btn1" onclick="hbGoTo(2)" disabled>Continue</button>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="hb-panel" id="hb-panel-2">
+    <button class="hb-back" onclick="hbGoTo(1)">← Back</button>
     <p class="hb-title">Choose your treatment</p>
     <p class="hb-sub">Select a category below</p>
     <div class="hb-tabs" id="hb-tabs">
@@ -1285,16 +1315,12 @@
       <button class="hb-tab" data-cat="packages">Packages</button>
     </div>
     <div class="hb-cards" id="hb-cards"></div>
-    <div style="margin-top:1.5rem;">
-      <p class="hb-sec-label">Where your treatment takes place</p>
-      <div class="hb-loc-notice visible" id="hb-loc-notice">All sessions are mobile — Halima comes to your home. A flat travel fee applies based on your distance from Manchester city centre, and she will confirm this when she contacts you.</div>
-    </div>
-    <button class="hb-btn" id="hb-btn1" onclick="hbGoTo(2)" disabled>Continue — Choose Date & Time</button>
+    <button class="hb-btn" id="hb-btn2" onclick="hbGoTo(3)" disabled>Continue — Choose Date & Time</button>
   </div>
 
-  <!-- Step 2 -->
-  <div class="hb-panel" id="hb-panel-2">
-    <button class="hb-back" onclick="hbGoTo(1)">← Back</button>
+  <!-- Step 3 -->
+  <div class="hb-panel" id="hb-panel-3">
+    <button class="hb-back" onclick="hbGoTo(2)">← Back</button>
     <p class="hb-title">Choose a date & time</p>
     <p class="hb-sub">Available appointments</p>
     <p class="hb-sec-label">Select a date</p>
@@ -1310,12 +1336,12 @@
       <p class="hb-sec-label">Select a time</p>
       <div class="hb-times" id="hb-times"></div>
     </div>
-    <button class="hb-btn" id="hb-btn2" onclick="hbGoTo(3)" disabled>Continue — Your Details</button>
+    <button class="hb-btn" id="hb-btn3" onclick="hbGoTo(4)" disabled>Continue — Your Details</button>
   </div>
 
-  <!-- Step 3 -->
-  <div class="hb-panel" id="hb-panel-3">
-    <button class="hb-back" onclick="hbGoTo(2)">← Back</button>
+  <!-- Step 4 -->
+  <div class="hb-panel" id="hb-panel-4">
+    <button class="hb-back" onclick="hbGoTo(3)">← Back</button>
     <p class="hb-title">Your details</p>
     <p class="hb-sub">All information held in confidence</p>
     <div class="hb-form-grid">
@@ -1325,7 +1351,8 @@
       </div>
       <div class="hb-field"><label>Mobile number *</label><input type="tel" id="hb-phone" placeholder="+44 7700 000000" oninput="hbCheck3()"></div>
       <div class="hb-field"><label>Email address *</label><input type="email" id="hb-email" placeholder="your@email.com" oninput="hbCheck3()"></div>
-      <div class="hb-field"><label>Address for your session *</label><textarea id="hb-address" placeholder="House number and street, area, postcode" oninput="hbCheck3()"></textarea></div>
+      <div class="hb-field" id="hb-address-field"><label>Address for your session *</label><textarea id="hb-address" placeholder="House number and street, area, postcode" oninput="hbCheck3()"></textarea></div>
+      <div class="hb-field" id="hb-venue-field" style="display:none;"><label>Venue</label><p class="hb-loc-notice visible" id="hb-venue-note" style="margin:0;"></p></div>
       <div class="hb-field"><label>How did you hear about haloe?</label>
         <select id="hb-ref"><option value="">Please select</option><option>Instagram</option><option>TikTok</option><option>Friend or family</option><option>Google search</option><option>Word of mouth</option><option>Other</option></select>
       </div>
@@ -1344,12 +1371,12 @@
       </div>
     </div>
     <div class="hb-note">A full health intake form will be sent to your email after booking. If you have a complex health history (diabetes, blood thinners, pregnancy, cardiovascular conditions), Halima may ask for GP clearance before treating you.</div>
-    <button class="hb-btn" id="hb-btn3" onclick="hbGoTo(4)" disabled>Review Booking</button>
+    <button class="hb-btn" id="hb-btn4" onclick="hbGoTo(5)" disabled>Review Booking</button>
   </div>
 
-  <!-- Step 4 -->
-  <div class="hb-panel" id="hb-panel-4">
-    <button class="hb-back" onclick="hbGoTo(3)">← Back</button>
+  <!-- Step 5 -->
+  <div class="hb-panel" id="hb-panel-5">
+    <button class="hb-back" onclick="hbGoTo(4)">← Back</button>
     <p class="hb-title">Review & confirm</p>
     <p class="hb-sub">Please check everything looks right</p>
     <div class="hb-summary" id="hb-summary"></div>
@@ -1409,6 +1436,22 @@ const HB_SERVICES = {
    is what the client actually pays. Set to 0 to end the promotion. */
 const HB_PROMO_DISCOUNT = 0.20;
 function hbNet(svc){ return Math.round(svc.price * (1 - HB_PROMO_DISCOUNT)); }
+
+/* ---- Weekly Clinic Day config ----
+   Must stay in step with the same constants in book.html and functions/_clinic.js. */
+const HB_CLINIC_VENUE_NAME = 'Milton Hall, Deansgate';
+const HB_CLINIC_VENUE_ADDRESS = 'Milton Hall, 3rd Floor, 244 Deansgate, Manchester M3 4BQ';
+const HB_CLINIC_WEEKDAY = 4; // 0=Sunday ... 6=Saturday. 4 = Thursday.
+const HB_CLINIC_SLOT_TEMPLATE = ['09:30', '11:15', '13:00', '14:45', '16:30', '18:15'];
+const HB_CLINIC_START_DATE = '2026-10-01';
+function hbTo12h(t){
+  const [h,m]=t.split(':').map(Number);
+  const period=h>=12?'pm':'am';
+  let h12=h%12; if(h12===0) h12=12;
+  return `${h12}:${String(m).padStart(2,'0')} ${period}`;
+}
+const HB_CLINIC_TIME_SLOTS = HB_CLINIC_SLOT_TEMPLATE.map(hbTo12h);
+function hbToISODate(d){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function hbPriceHtml(svc){
   return hbNet(svc) < svc.price
     ? `<s class="was">£${svc.price}</s> £${hbNet(svc)}`
@@ -1417,11 +1460,23 @@ function hbPriceHtml(svc){
 
 const HB_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const HB_DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-let hbState = {cat:'massage',idx:null,loc:'mobile',date:null,time:null,yr:null,mo:null};
+let hbState = {cat:'massage',idx:null,loc:null,date:null,time:null,yr:null,mo:null};
 
 function hbInit(){
   const n=new Date(); hbState.yr=n.getFullYear(); hbState.mo=n.getMonth();
+  document.getElementById('hb-where-clinic-venue').textContent = HB_CLINIC_VENUE_NAME;
   hbRenderCards(); hbRenderCal();
+}
+
+function hbSelectLocation(loc){
+  hbState.loc=loc;
+  document.getElementById('hb-where-clinic').classList.toggle('selected', loc==='clinic');
+  document.getElementById('hb-where-mobile').classList.toggle('selected', loc==='mobile');
+  document.getElementById('hb-loc-notice').classList.toggle('visible', loc==='mobile');
+  document.getElementById('hb-btn1').disabled=false;
+  // A date/time picked under the other location's calendar/slots may no
+  // longer be valid — drop it rather than carry over a bad pick.
+  hbState.date=null; hbState.time=null;
 }
 
 function hbRenderCards(){
@@ -1441,16 +1496,23 @@ function hbRenderCards(){
 
 function hbSelectSvc(i){
   hbState.idx=i; hbRenderCards();
-  document.getElementById('hb-btn1').disabled=false;
+  document.getElementById('hb-btn2').disabled=false;
 }
 
 document.getElementById('hb-tabs').addEventListener('click',e=>{
   const b=e.target.closest('.hb-tab'); if(!b) return;
   document.querySelectorAll('.hb-tab').forEach(x=>x.classList.remove('active'));
   b.classList.add('active'); hbState.cat=b.dataset.cat; hbState.idx=null;
-  document.getElementById('hb-btn1').disabled=true; hbRenderCards();
+  document.getElementById('hb-btn2').disabled=true; hbRenderCards();
 });
 
+// A date is bookable when it's not in the past, and — for mobile — it's not a
+// Sunday, or — for clinic — it falls on HB_CLINIC_WEEKDAY on/after HB_CLINIC_START_DATE.
+function hbDateIsBookable(date,today){
+  if(date<today) return false;
+  if(hbState.loc==='clinic') return date.getDay()===HB_CLINIC_WEEKDAY && hbToISODate(date)>=HB_CLINIC_START_DATE;
+  return date.getDay()!==0;
+}
 
 function hbRenderCal(){
   document.getElementById('hb-cal-month').textContent=HB_MONTHS[hbState.mo]+' '+hbState.yr;
@@ -1461,10 +1523,10 @@ function hbRenderCal(){
   for(let i=0;i<first;i++) h+=`<div class="hb-day hb-empty"></div>`;
   for(let d=1;d<=dim;d++){
     const dt=new Date(hbState.yr,hbState.mo,d);
-    const dis=dt<today||dt.getDay()===0;
+    const bookable=hbDateIsBookable(dt,today);
     const sel=hbState.date&&dt.toDateString()===hbState.date.toDateString();
-    const cls=['hb-day',dis?'hb-dis':'',sel?'hb-sel':''].filter(Boolean).join(' ');
-    const oc=!dis?`onclick="hbPickDate(${hbState.yr},${hbState.mo},${d})"`:'' ;
+    const cls=['hb-day',!bookable?'hb-dis':'',sel?'hb-sel':''].filter(Boolean).join(' ');
+    const oc=bookable?`onclick="hbPickDate(${hbState.yr},${hbState.mo},${d})"`:'' ;
     h+=`<div class="${cls}" ${oc}>${d}</div>`;
   }
   document.getElementById('hb-cal-grid').innerHTML=h;
@@ -1480,17 +1542,17 @@ function hbPickDate(y,m,d){
   hbState.date=new Date(y,m,d); hbState.time=null;
   hbRenderCal(); hbRenderTimes();
   document.getElementById('hb-time-wrap').style.display='block';
-  document.getElementById('hb-btn2').disabled=true;
+  document.getElementById('hb-btn3').disabled=true;
 }
 
 function hbRenderTimes(){
-  const slots=['10:00 am','10:30 am','11:00 am','11:30 am','12:00 pm','12:30 pm','1:00 pm','1:30 pm','2:00 pm','2:30 pm','3:00 pm','3:30 pm','4:00 pm','4:30 pm','5:00 pm','5:30 pm','6:00 pm','6:30 pm','7:00 pm','7:30 pm','8:00 pm'];
+  const slots = hbState.loc==='clinic' ? HB_CLINIC_TIME_SLOTS : ['10:00 am','10:30 am','11:00 am','11:30 am','12:00 pm','12:30 pm','1:00 pm','1:30 pm','2:00 pm','2:30 pm','3:00 pm','3:30 pm','4:00 pm','4:30 pm','5:00 pm','5:30 pm','6:00 pm','6:30 pm','7:00 pm','7:30 pm','8:00 pm'];
   document.getElementById('hb-times').innerHTML=slots.map(t=>`<div class="hb-time ${hbState.time===t?'hb-sel':''}" onclick="hbPickTime('${t}')">${t}</div>`).join('');
 }
 
 function hbPickTime(t){
   hbState.time=t; hbRenderTimes();
-  document.getElementById('hb-btn2').disabled=false;
+  document.getElementById('hb-btn3').disabled=false;
 }
 
 // Same rule as the booking wizard: street detail plus a postcode, since
@@ -1505,20 +1567,33 @@ function hbToggleChaperone(){
   if(!isMale) document.getElementById('hb-c4').checked=false;
 }
 
+// Clinic sessions happen at a fixed venue, so there's no client address to
+// collect for them — the field is hidden and skipped from validation.
+function hbIsClinic(){ return hbState.loc==='clinic'; }
+
 function hbCheck3(){
+  document.getElementById('hb-address-field').style.display = hbIsClinic() ? 'none' : '';
+  const venueField = document.getElementById('hb-venue-field');
+  if(hbIsClinic()){
+    venueField.style.display='';
+    document.getElementById('hb-venue-note').textContent = `${HB_CLINIC_VENUE_NAME} — ${HB_CLINIC_VENUE_ADDRESS}. Check in at reception on arrival.`;
+  } else {
+    venueField.style.display='none';
+  }
+
   const gender=document.getElementById('hb-gender').value;
   const chaperoneOk=gender!=='male'||document.getElementById('hb-c4').checked;
   const ok=document.getElementById('hb-fname').value.trim()&&
     document.getElementById('hb-lname').value.trim()&&
     document.getElementById('hb-phone').value.trim()&&
     document.getElementById('hb-email').value.trim()&&
-    hbValidAddress(document.getElementById('hb-address').value)&&
+    (hbIsClinic()||hbValidAddress(document.getElementById('hb-address').value))&&
     gender&&
     document.getElementById('hb-c1').checked&&
     document.getElementById('hb-c2').checked&&
     document.getElementById('hb-c3').checked&&
     chaperoneOk;
-  document.getElementById('hb-btn3').disabled=!ok;
+  document.getElementById('hb-btn4').disabled=!ok;
 }
 
 function hbGoTo(n){
@@ -1528,15 +1603,19 @@ function hbGoTo(n){
     s.classList.remove('active','done');
     if(i+1<n) s.classList.add('done'); else if(i+1===n) s.classList.add('active');
   });
-  if(n===4) hbRenderSummary();
+  if(n===3) hbRenderCal();
+  if(n===5) hbRenderSummary();
   window.scrollTo({top:document.getElementById('book').offsetTop-80,behavior:'smooth'});
+}
+
+function hbLocationLabel(){
+  return hbIsClinic() ? `Clinic Day — ${HB_CLINIC_VENUE_NAME}` : 'Home visit';
 }
 
 function hbRenderSummary(){
   const svc=HB_SERVICES[hbState.cat][hbState.idx];
   const catLabel={massage:'Massage',dry:'Dry Cupping',wet:'Wet / Hijama',packages:'Package'}[hbState.cat];
   const dateStr=hbState.date?hbState.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
-  const loc='Mobile — your home';
   const name=document.getElementById('hb-fname').value+' '+document.getElementById('hb-lname').value;
   document.getElementById('hb-summary').innerHTML=`
     <div class="hb-sum-row"><span class="sl">Treatment</span><span class="sv">${svc.name}</span></div>
@@ -1544,7 +1623,7 @@ function hbRenderSummary(){
     <div class="hb-sum-row"><span class="sl">Duration</span><span class="sv">${svc.time}</span></div>
     <div class="hb-sum-row"><span class="sl">Date</span><span class="sv">${dateStr}</span></div>
     <div class="hb-sum-row"><span class="sl">Time</span><span class="sv">${hbState.time}</span></div>
-    <div class="hb-sum-row"><span class="sl">Location</span><span class="sv">${loc}</span></div>
+    <div class="hb-sum-row"><span class="sl">Location</span><span class="sv">${hbLocationLabel()}</span></div>
     <div class="hb-sum-row"><span class="sl">Name</span><span class="sv">${name}</span></div>
     <div class="hb-sum-row hb-total"><span class="sl">Total</span><span class="sv">${hbPriceHtml(svc)}</span></div>`;
 }
@@ -1552,10 +1631,10 @@ function hbRenderSummary(){
 function hbSubmit(){
   const svc=HB_SERVICES[hbState.cat][hbState.idx];
   const dateStr=hbState.date.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const loc='Mobile — your home';
+  const loc=hbLocationLabel();
   const name=document.getElementById('hb-fname').value+' '+document.getElementById('hb-lname').value;
   const email=document.getElementById('hb-email').value;
-  document.getElementById('hb-panel-4').classList.remove('active');
+  document.getElementById('hb-panel-5').classList.remove('active');
   document.getElementById('hb-steps').style.display='none';
   const conf=document.getElementById('hb-confirm');
   document.getElementById('hb-confirm-card').innerHTML=`
@@ -1566,6 +1645,9 @@ function hbSubmit(){
     <div class="hb-cd-row"><span class="hb-cd-l">Total</span><span class="hb-cd-v">${hbPriceHtml(svc)}</span></div>`;
   document.getElementById('hb-confirm-email').textContent=email;
   conf.classList.add('visible');
+  const addressLine = hbIsClinic()
+    ? `Venue: ${HB_CLINIC_VENUE_NAME} — ${HB_CLINIC_VENUE_ADDRESS}`
+    : `Address: ${document.getElementById('hb-address').value.trim()}`;
   const msg=encodeURIComponent(`Hi Halima, I've just submitted a booking via haloe.health.
 
 Name: ${name}
@@ -1573,7 +1655,7 @@ Treatment: ${svc.name}
 Date: ${dateStr}
 Time: ${hbState.time}
 Location: ${loc}
-Address: ${document.getElementById('hb-address').value.trim()}
+${addressLine}
 
 Please confirm when you can. Thank you!`);
   setTimeout(()=>window.open('https://wa.me/447474833643?text='+msg,'_blank'),800);

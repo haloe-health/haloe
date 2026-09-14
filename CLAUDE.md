@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Marketing site + booking flow for **haloe**, a women-only hijama/cupping & massage wellness business in Manchester. Everything lives under `website-and-booking/`. There is no build step, framework, package manager, or test suite — the site is hand-written static HTML with inline `<style>` and inline `<script>`, plus a handful of Cloudflare Pages Functions and a D1 database.
 
-**Service model: mobile only.** Halima travels to the client; there is no clinic or treatment room. Do not reintroduce a location choice or any "visit us" copy.
+**Service model: mobile across Greater Manchester, plus a weekly Clinic Day** at a fixed venue on a fixed weekday (see `CLINIC_VENUE_NAME`/`CLINIC_WEEKDAY`/etc. constants in `book.html`, `index.html` and the Functions). The booking flow has a **Where step** (clinic / mobile) before date & time. **All bookings — clinic and mobile — are paid in full at checkout. There is no deposit option; do not reintroduce a deposit path.** Clinic bookings have no travel fee and no client address (just the venue address and a check-in-at-reception note); mobile bookings keep the existing calendar, address fields and travel note. Do not remove the Where step, and do not add any further clinic locations without confirming with Halima first.
+
+**Cancellation policy (all bookings):** "Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full." This replaced the old £25-deposit cancellation wording — keep it identical everywhere it appears (`book.html`, `index.html`, `booking-confirmed.html`, `before-your-session.html`, the Stripe checkout description, and the confirmation emails).
 
 **Travel cost:** free within Manchester city centre; outside it, charged at the actual cost of a taxi from the centre (not a flat fee, not banded). Confirmed by Halima after booking. This wording appears in `book.html` (step 1), `booking-confirmed.html` (step 2) and `before-your-session.html` — keep all three identical.
 

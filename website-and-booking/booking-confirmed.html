@@ -111,13 +111,19 @@
     <div class="next now">
       <span class="num">1</span>
       <p>Halima will be in touch
-        <span>On WhatsApp, to confirm the details, send your health form, and let you know your travel cost if you&rsquo;re outside the city centre.</span>
+        <span id="contact-note">On WhatsApp, to confirm the details, send your health form, and let you know your travel cost if you&rsquo;re outside the city centre.</span>
       </p>
     </div>
     <div class="next">
       <span class="num">2</span>
       <p>On the day
         <span id="balance-note">She comes to you.</span>
+      </p>
+    </div>
+    <div class="next">
+      <span class="num">3</span>
+      <p>Changing plans?
+        <span>Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</span>
       </p>
     </div>
   </div>
@@ -127,23 +133,28 @@
 
 <script>
   const params = new URLSearchParams(window.location.search);
-  const type      = params.get('type');
   const treatment = params.get('treatment') || '';
   const date      = params.get('date')      || '';
   const time      = params.get('time')      || '';
+  // NOTE: can't call this `location` — that shadows the global `window.location`
+  // and throws "Identifier 'location' has already been declared", silently
+  // breaking this whole script.
+  const bookingLocation = params.get('location') || 'mobile';
+  const venue     = params.get('venue')     || '';
   const amount    = parseInt(params.get('amount') || '0', 10);
 
-  // Derived from the amount actually charged — never hard-code the deposit,
-  // or a £1 test booking reports itself as £25.
+  // Derived from the amount actually charged — every booking is paid in full.
   const paid = '£' + (amount / 100).toFixed(2).replace(/\.00$/, '');
 
   const bits = [treatment, [date, time].filter(Boolean).join(', ')].filter(Boolean);
-  bits.push(type === 'deposit' ? `${paid} deposit paid` : `Paid in full — ${paid}`);
+  bits.push(`Paid in full — ${paid}`);
   document.getElementById('payment-sub').textContent = bits.join(' · ');
 
-  if (type === 'deposit') {
+  if (bookingLocation === 'clinic') {
+    document.getElementById('contact-note').textContent =
+      'On WhatsApp, to confirm the details and send your health form.';
     document.getElementById('balance-note').textContent =
-      'She comes to you. The remaining balance is payable on the day.';
+      `Check in at reception${venue ? ' at ' + venue : ''} on arrival.`;
   }
 
   // The address was only ever held for the old WhatsApp hand-off, which has gone.

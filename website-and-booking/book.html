@@ -922,9 +922,9 @@
   .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(201,160,64,0.25); }
   .btn-primary:active { transform: scale(0.98); }
   .btn-primary:disabled { background: #3A3530; color: #6B6357; cursor: not-allowed; opacity: 0.6; transform: none; }
-  /* Steps 1–3 are driven from the frosted footer; these stay in the DOM so all
+  /* Steps 1–4 are driven from the frosted footer; these stay in the DOM so all
      the existing enable/disable logic keeps working, but aren't shown. */
-  #btn-step1, #btn-step2, #btn-step3 { display: none; }
+  #btn-step1, #btn-step2, #btn-step3, #btn-step4 { display: none; }
 
   /* ---- Frosted footer bar (Apple buy-flow) ---- */
   .footbar {
@@ -1072,22 +1072,26 @@
   <div class="steps" id="steps">
     <div class="step active" data-step="1">
       <div class="step-dot">1</div>
-      <span class="step-label">Treatment</span>
+      <span class="step-label">Where</span>
     </div>
     <div class="step" data-step="2">
       <div class="step-dot">2</div>
-      <span class="step-label">Date & Time</span>
+      <span class="step-label">Treatment</span>
     </div>
     <div class="step" data-step="3">
       <div class="step-dot">3</div>
-      <span class="step-label">Details</span>
+      <span class="step-label">Date & Time</span>
     </div>
     <div class="step" data-step="4">
       <div class="step-dot">4</div>
+      <span class="step-label">Details</span>
+    </div>
+    <div class="step" data-step="5">
+      <div class="step-dot">5</div>
       <span class="step-label">Confirm</span>
     </div>
   </div>
-  <span class="foot-label" id="step-counter">Step 1 of 4</span>
+  <span class="foot-label" id="step-counter">Step 1 of 5</span>
 </nav>
 <div style="height:52px;"></div>
 <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Book a hijama or cupping session at haloe — Manchester</h1>
@@ -1101,10 +1105,38 @@
 
 <div class="container">
 
-  <!-- STEP 1: Choose Treatment -->
+  <!-- STEP 1: Where -->
   <div class="panel active" id="panel-1">
+    <p class="panel-title">Where would you like your session?</p>
+    <p class="panel-sub">Choose a clinic day appointment or a home visit.</p>
+
+    <div class="service-grid" id="where-grid">
+      <div class="service-card" id="where-clinic" onclick="selectLocation('clinic')">
+        <span class="svc-ring"></span>
+        <span class="svc-main">
+          <span class="svc-name">Clinic Day — <span id="where-clinic-venue"></span></span>
+          <span class="svc-desc">A weekly clinic day, one fixed venue. Full payment at booking, no travel fee.</span>
+        </span>
+      </div>
+      <div class="service-card" id="where-mobile" onclick="selectLocation('mobile')">
+        <span class="svc-ring"></span>
+        <span class="svc-main">
+          <span class="svc-name">Home visit</span>
+          <span class="svc-desc">Halima comes to you, across Greater Manchester.</span>
+        </span>
+      </div>
+    </div>
+
+    <p class="loc-line" id="loc-notice" style="display:none;">Halima comes to you. Travel is free in Manchester city centre. Outside it, travel is charged at the cost of a taxi, which she&rsquo;ll confirm when she contacts you.</p>
+
+    <button class="btn-primary" id="btn-step1" onclick="whereContinue()" disabled>Continue</button>
+  </div>
+
+  <!-- STEP 2: Choose Treatment -->
+  <div class="panel" id="panel-2">
+    <button class="btn-back" onclick="goToStep(1)">← Back</button>
     <p class="panel-title">Choose your treatment.</p>
-    <p class="panel-sub">Women &amp; men. Fully accredited. Mobile across Manchester.</p>
+    <p class="panel-sub">Women &amp; men. Fully accredited.</p>
 
     <div class="category-tabs segmented" id="category-tabs">
       <button class="tab-btn seg-option active" data-cat="massage">Massage</button>
@@ -1115,14 +1147,12 @@
 
     <div class="service-grid" id="service-grid"></div>
 
-    <p class="loc-line" id="loc-notice">All sessions are mobile — Halima comes to you. Travel is free in Manchester city centre. Outside it, travel is charged at the cost of a taxi, which she&rsquo;ll confirm when she contacts you.</p>
-
-    <button class="btn-primary" id="btn-step1" onclick="goToStep(2)" disabled>Continue — Choose Date & Time</button>
+    <button class="btn-primary" id="btn-step2" onclick="goToStep(3)" disabled>Continue — Choose Date & Time</button>
   </div>
 
-  <!-- STEP 2: Date & Time -->
-  <div class="panel" id="panel-2">
-    <button class="btn-back" onclick="goToStep(1)">← Back</button>
+  <!-- STEP 3: Date & Time -->
+  <div class="panel" id="panel-3">
+    <button class="btn-back" onclick="goToStep(2)">← Back</button>
     <p class="panel-title">Choose a date & time.</p>
     <p class="panel-sub">Pick a day, then a time that suits you.</p>
 
@@ -1146,12 +1176,12 @@
       </div>
     </div>
 
-    <button class="btn-primary" id="btn-step2" onclick="goToStep(3)" disabled>Continue — Your Details</button>
+    <button class="btn-primary" id="btn-step3" onclick="goToStep(4)" disabled>Continue — Your Details</button>
   </div>
 
-  <!-- STEP 3: Your Details -->
-  <div class="panel" id="panel-3">
-    <button class="btn-back" onclick="goToStep(2)">← Back</button>
+  <!-- STEP 4: Your Details -->
+  <div class="panel" id="panel-4">
+    <button class="btn-back" onclick="goToStep(3)">← Back</button>
     <p class="panel-title">Your details.</p>
     <p class="panel-sub">All information is held in confidence.</p>
 
@@ -1170,11 +1200,12 @@
         <input type="email" id="email" placeholder="your@email.com" oninput="checkStep3()">
       </div>
       <p class="field-error" id="email-error"></p>
-      <div class="ios-row">
+      <div class="ios-row" id="address-row">
         <label for="address">Address</label>
         <textarea id="address" placeholder="House number, street, postcode" oninput="checkStep3()"></textarea>
       </div>
       <p class="field-error" id="address-error"></p>
+      <p class="loc-line" id="clinic-venue-note" style="display:none;"></p>
     </div>
 
     <div class="ios-group">
@@ -1223,22 +1254,21 @@
       </label>
     </div>
 
-    <button class="btn-primary" id="btn-step3" onclick="goToStep(4)" disabled>Review Booking</button>
+    <button class="btn-primary" id="btn-step4" onclick="goToStep(5)" disabled>Review Booking</button>
   </div>
 
-  <!-- STEP 4: Confirm -->
-  <div class="panel" id="panel-4">
-    <button class="btn-back" onclick="goToStep(3)">← Back</button>
+  <!-- STEP 5: Confirm -->
+  <div class="panel" id="panel-5">
+    <button class="btn-back" onclick="goToStep(4)">← Back</button>
     <p class="panel-title">Review & confirm.</p>
     <p class="panel-sub">Please check everything looks right.</p>
 
     <div class="summary-card" id="summary-card"></div>
 
     <div class="pay-actions">
-      <button class="pay-btn pay-primary" id="btn-deposit" onclick="handlePayment('deposit')">Pay £25 deposit</button>
-      <button class="pay-btn pay-secondary" id="btn-full" onclick="handlePayment('full')">Pay in full</button>
+      <button class="pay-btn pay-primary" id="btn-full" onclick="handlePayment()">Pay in full</button>
     </div>
-    <p class="pay-note">Deposit is non-refundable within 48 hours or for no-shows. Balance payable on the day.<br>Halima confirms by WhatsApp after payment — please check your number is right.</p>
+    <p class="pay-note">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.<br>Halima confirms by WhatsApp after payment — please check your number is right.</p>
   </div>
 
   <!-- Confirmation Screen -->
@@ -1302,6 +1332,29 @@ if (new URLSearchParams(location.search).get('test') === '1') {
   SERVICES.massage.unshift({ name: 'TEST — £1 (do not book)', time: '15 min', price: 1 });
 }
 
+/* ---- Weekly Clinic Day config ----
+   Single source of truth for the browser side. functions/_clinic.js carries
+   the same values for the Functions — browser JS can't import that module,
+   so keep the two in step by hand. */
+const CLINIC_VENUE_NAME = 'Milton Hall, Deansgate';
+const CLINIC_VENUE_ADDRESS = 'Milton Hall, 3rd Floor, 244 Deansgate, Manchester M3 4BQ';
+const CLINIC_WEEKDAY = 4; // 0=Sunday ... 6=Saturday. 4 = Thursday.
+const CLINIC_SLOT_TEMPLATE = ['09:30', '11:15', '13:00', '14:45', '16:30', '18:15'];
+const CLINIC_START_DATE = '2026-10-01';
+
+document.getElementById('where-clinic-venue').textContent = CLINIC_VENUE_NAME;
+
+// The existing slot system (TIME_SLOTS, slotToMinutes, renderTimes) expects
+// '6:00 pm' style strings — convert the 24-hour clinic template once so
+// everything downstream works unmodified for clinic slots too.
+function to12h(t) {
+  const [h, m] = t.split(':').map(Number);
+  const period = h >= 12 ? 'pm' : 'am';
+  let h12 = h % 12; if (h12 === 0) h12 = 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+}
+const CLINIC_TIME_SLOTS = CLINIC_SLOT_TEMPLATE.map(to12h);
+
 /* ---- Promotional discount ----
    Every entry in SERVICES keeps its FULL price, so it can be shown struck
    through. netPrice() is the amount actually displayed and charged — nothing
@@ -1328,12 +1381,33 @@ function priceHtml(svc) {
 let state = {
   category: 'massage',
   serviceIndex: null,
-  location: 'mobile',
+  location: null, // 'clinic' | 'mobile' — chosen on the Where step
   date: null,
   time: null,
   calYear: null,
   calMonth: null,
 };
+
+// A package deep link already picks the treatment, so once location is chosen
+// its own confirm step (Treatment) is redundant — skip straight to Date & Time.
+let skipTreatmentConfirm = false;
+
+function selectLocation(loc) {
+  state.location = loc;
+  document.getElementById('where-clinic').classList.toggle('selected', loc === 'clinic');
+  document.getElementById('where-mobile').classList.toggle('selected', loc === 'mobile');
+  document.getElementById('loc-notice').style.display = loc === 'mobile' ? '' : 'none';
+  document.getElementById('btn-step1').disabled = false;
+  // Changing location can invalidate a date/time picked under the other
+  // location's calendar/slots — drop it rather than carry over a bad pick.
+  state.date = null;
+  state.time = null;
+  updateRail();
+}
+
+function whereContinue() {
+  goToStep(skipTreatmentConfirm ? 3 : 2);
+}
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1359,16 +1433,18 @@ function applyDeepLink() {
     if (i !== -1) {
       state.serviceIndex = i;
       matched = true;
-      const btn = document.getElementById('btn-step1');
+      const btn = document.getElementById('btn-step2');
       if (btn) btn.disabled = false;
     }
   }
 
   // A package link is a single, deliberate choice (unlike browsing conditions,
-  // which may only narrow to a category) — skip the redundant "confirm your
-  // already-made choice" step and go straight to picking a date & time.
+  // which may only narrow to a category) — skip its redundant "confirm your
+  // already-made choice" step once the customer has picked a location on the
+  // Where step. The customer still lands on Where first: a deep link picks
+  // the treatment, not the location.
   if (cat === 'packages' && matched) {
-    goToStep(2);
+    skipTreatmentConfirm = true;
   }
 }
 
@@ -1393,12 +1469,14 @@ function updateRail() {
   const dateStr = state.date
     ? state.date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
     : '';
+  const whereLabel = state.location === 'clinic' ? `Clinic Day — ${CLINIC_VENUE_NAME}`
+    : state.location === 'mobile' ? 'Home visit' : '';
   const rows = [
+    ['Where', whereLabel],
     ['Treatment', svc ? svc.name : ''],
     ['Duration', svc ? svc.time : ''],
     ['Date', dateStr],
     ['Time', state.time || ''],
-    ['Where', svc ? 'Mobile — your home' : ''],
   ];
   const rowsEl = document.getElementById('rail-rows');
   if (rowsEl) {
@@ -1409,9 +1487,9 @@ function updateRail() {
   const totalEl = document.getElementById('rail-total');
   if (totalEl) totalEl.textContent = svc ? `£${netPrice(svc)}` : '—';
   const ring = document.getElementById('rail-ring');
-  if (ring) ring.style.setProperty('--p', `${Math.round((currentStep / 4) * 100)}%`);
+  if (ring) ring.style.setProperty('--p', `${Math.round((currentStep / 5) * 100)}%`);
   const lbl = document.getElementById('rail-ring-label');
-  if (lbl) lbl.textContent = `${currentStep}/4`;
+  if (lbl) lbl.textContent = `${currentStep}/5`;
 
   // Frosted footer (Apple layout): running selection + total.
   const fs = document.getElementById('foot-sum');
@@ -1434,20 +1512,20 @@ function updateRail() {
 // so every existing enable/disable rule keeps driving it untouched.
 function syncFooter() {
   const counter = document.getElementById('step-counter');
-  if (counter) counter.textContent = `Step ${currentStep} of 4`;
+  if (counter) counter.textContent = `Step ${currentStep} of 5`;
   // A single back control: leaves the site on step 1, steps back after that.
   const back = document.getElementById('back-control');
   if (back) back.textContent = currentStep > 1 ? '← Back' : '← Back to site';
   const cta = document.getElementById('foot-cta');
   if (!cta) return;
-  // Step 4 carries its own total and pay buttons, so the bar would only repeat
+  // Step 5 carries its own total and pay button, so the bar would only repeat
   // itself — hide it entirely there.
   const bar = document.querySelector('.footbar');
-  if (bar) bar.classList.toggle('hidden', currentStep === 4);
-  if (currentStep === 4) { cta.classList.add('hidden'); return; }
+  if (bar) bar.classList.toggle('hidden', currentStep === 5);
+  if (currentStep === 5) { cta.classList.add('hidden'); return; }
   cta.classList.remove('hidden');
   const src = document.getElementById('btn-step' + currentStep);
-  cta.textContent = currentStep === 3 ? 'Review booking' : 'Continue';
+  cta.textContent = currentStep === 4 ? 'Review booking' : 'Continue';
   cta.disabled = src ? src.disabled : true;
 }
 
@@ -1483,7 +1561,7 @@ function renderServices() {
 function selectService(i) {
   state.serviceIndex = i;
   renderServices();
-  document.getElementById('btn-step1').disabled = false;
+  document.getElementById('btn-step2').disabled = false;
   updateRail();
 }
 
@@ -1494,10 +1572,20 @@ document.getElementById('category-tabs').addEventListener('click', e => {
   btn.classList.add('active');
   state.category = btn.dataset.cat;
   state.serviceIndex = null;
-  document.getElementById('btn-step1').disabled = true;
+  document.getElementById('btn-step2').disabled = true;
   renderServices();
   updateRail();
 });
+
+// A date is bookable when: it's not in the past, and — for mobile — it's not
+// a Sunday, or — for clinic — it falls on CLINIC_WEEKDAY on/after CLINIC_START_DATE.
+function dateIsBookable(date, today) {
+  if (date < today) return false;
+  if (state.location === 'clinic') {
+    return date.getDay() === CLINIC_WEEKDAY && toISODate(date) >= CLINIC_START_DATE;
+  }
+  return date.getDay() !== 0;
+}
 
 function renderCalendar() {
   const label = document.getElementById('cal-month-label');
@@ -1510,17 +1598,16 @@ function renderCalendar() {
   for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(state.calYear, state.calMonth, d);
-    const isSun = date.getDay() === 0;
-    const isPast = date < today;
+    const bookable = dateIsBookable(date, today);
     const isSelected = state.date && date.toDateString() === state.date.toDateString();
     const isToday = date.toDateString() === today.toDateString();
     const cls = [
       'cal-day',
-      (isPast || isSun) ? 'disabled' : '',
+      !bookable ? 'disabled' : '',
       isSelected ? 'selected' : '',
       isToday ? 'today' : '',
     ].filter(Boolean).join(' ');
-    const onclick = (!isPast && !isSun) ? `onclick="selectDate(${state.calYear},${state.calMonth},${d})"` : '';
+    const onclick = bookable ? `onclick="selectDate(${state.calYear},${state.calMonth},${d})"` : '';
     html += `<div class="${cls}" ${onclick}>${d}</div>`;
   }
   grid.innerHTML = html;
@@ -1588,7 +1675,7 @@ async function selectDate(y, m, d) {
   renderTimes();
   const hint = document.getElementById('time-hint');
   if (hint) hint.style.display = 'none';
-  document.getElementById('btn-step2').disabled = true;
+  document.getElementById('btn-step3').disabled = true;
   updateRail();
 
   // Pull real availability, then re-render so taken slots grey out. Fail open —
@@ -1606,9 +1693,13 @@ async function selectDate(y, m, d) {
   } catch (e) { /* fail open */ }
 }
 
+function activeTimeSlots() {
+  return state.location === 'clinic' ? CLINIC_TIME_SLOTS : TIME_SLOTS;
+}
+
 function renderTimes() {
   const grid = document.getElementById('time-grid');
-  grid.innerHTML = TIME_SLOTS.map(t => {
+  grid.innerHTML = activeTimeSlots().map(t => {
     const past = slotIsPast(t);
     const booked = !past && slotIsTaken(t);
     const disabled = past || booked;
@@ -1623,7 +1714,7 @@ function selectTime(t) {
   if (slotIsPast(t) || slotIsTaken(t)) return;
   state.time = t;
   renderTimes();
-  document.getElementById('btn-step2').disabled = false;
+  document.getElementById('btn-step3').disabled = false;
   updateRail();
 }
 
@@ -1666,13 +1757,32 @@ function toggleChaperone() {
   if (!isMale) document.getElementById('consent3').checked = false;
 }
 
+// Clinic sessions happen at a fixed venue, so there's no client address to
+// collect — the field is hidden and skipped from validation entirely.
+function isClinic() {
+  return state.location === 'clinic';
+}
+
 function checkStep3() {
+  document.getElementById('address-row').style.display = isClinic() ? 'none' : '';
+  const addressError = document.getElementById('address-error');
+  const venueNote = document.getElementById('clinic-venue-note');
+  if (isClinic()) {
+    if (addressError) addressError.classList.remove('visible');
+    if (venueNote) {
+      venueNote.textContent = `${CLINIC_VENUE_NAME} — ${CLINIC_VENUE_ADDRESS}. Check in at reception on arrival.`;
+      venueNote.style.display = '';
+    }
+  } else if (venueNote) {
+    venueNote.style.display = 'none';
+  }
+
   const nameOk = document.getElementById('fullname').value.trim().length > 0;
   const emailOk = validateField('email', 'email-error', isValidEmail,
     'Please enter a valid email address so we can send your intake form.');
   const phoneOk = validateField('phone', 'phone-error', isValidPhone,
     'Please enter a valid UK mobile number (e.g. 07700 900900 or +44 7700 900900).');
-  const addressOk = validateField('address', 'address-error', isValidAddress,
+  const addressOk = isClinic() || validateField('address', 'address-error', isValidAddress,
     'Please include your full address and postcode so Halima knows where to travel to.');
   const gender = document.getElementById('gender').value;
   const genderOk = gender.length > 0;
@@ -1681,7 +1791,7 @@ function checkStep3() {
     document.getElementById('consent1').checked &&
     document.getElementById('consent2').checked &&
     chaperoneOk;
-  document.getElementById('btn-step3').disabled = !(nameOk && emailOk && phoneOk && addressOk && genderOk && consentsOk);
+  document.getElementById('btn-step4').disabled = !(nameOk && emailOk && phoneOk && addressOk && genderOk && consentsOk);
   syncFooter();
 }
 
@@ -1691,7 +1801,7 @@ function buildSummary() {
   const service = SERVICES[state.category][state.serviceIndex];
   const catLabel = { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package' }[state.category];
   const dateStr = state.date ? state.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
-  const locationLabel = 'Mobile — your home';
+  const locationLabel = isClinic() ? `Clinic Day — ${CLINIC_VENUE_NAME}` : 'Home visit';
   const name = document.getElementById('fullname').value.trim();
   return { service, catLabel, dateStr, locationLabel, name };
 }
@@ -1705,7 +1815,7 @@ function renderSummary() {
       <div class="pass-when">
         <div class="pass-date">${dateStr}</div>
         <div class="pass-time">${state.time}</div>
-        <div class="pass-at">${locationLabel} · Manchester</div>
+        <div class="pass-at">${isClinic() ? `${locationLabel} · ${CLINIC_VENUE_ADDRESS}` : `${locationLabel} · Manchester`}</div>
       </div>
       <div class="pass-perf"><span></span></div>
       <div class="pass-what">
@@ -1719,43 +1829,39 @@ function renderSummary() {
   `;
 }
 
-async function handlePayment(type) {
+async function handlePayment() {
   if (state.serviceIndex === null) { alert("Please go back and select a treatment."); return; }
   const { service, dateStr, locationLabel } = buildSummary();
   const name  = document.getElementById('fullname').value.trim();
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const notes = document.getElementById('notes') ? document.getElementById('notes').value : '';
-  const address = document.getElementById('address').value.trim();
+  const address = isClinic() ? '' : document.getElementById('address').value.trim();
   const gender = document.getElementById('gender').value;
   const chaperone = gender === 'male' && document.getElementById('consent3').checked;
 
   // Final guard — never reach Stripe with missing or invalid contact details.
   if (!name) {
     alert("Please go back and enter your full name before paying.");
-    goToStep(3); return;
+    goToStep(4); return;
   }
   if (!isValidEmail(email)) {
     alert("Please go back and enter a valid email address — we send your intake form there.");
-    goToStep(3); return;
+    goToStep(4); return;
   }
   if (!isValidPhone(phone)) {
     alert("Please go back and enter a valid UK mobile number so Halima can confirm your booking.");
-    goToStep(3); return;
+    goToStep(4); return;
   }
-  if (!isValidAddress(address)) {
+  if (!isClinic() && !isValidAddress(address)) {
     alert("Please go back and enter the full address, including postcode, where your session will take place.");
-    goToStep(3); return;
+    goToStep(4); return;
   }
 
-  const depositBtn = document.getElementById('btn-deposit');
   const fullBtn = document.getElementById('btn-full');
-  if (depositBtn) depositBtn.disabled = true;
-  if (fullBtn) fullBtn.disabled = true;
-  if (depositBtn) depositBtn.textContent = 'Redirecting to payment…';
+  if (fullBtn) { fullBtn.disabled = true; fullBtn.textContent = 'Redirecting to payment…'; }
 
-  const net = netPrice(service); // discounted price — never charge service.price
-  let amount = type === 'deposit' ? Math.min(2500, net * 100) : net * 100; // pence
+  const amount = netPrice(service) * 100; // pence — every booking is paid in full
 
   try {
     const res = await fetch('/create-checkout', {
@@ -1764,13 +1870,12 @@ async function handlePayment(type) {
       body: JSON.stringify({
         amount,
         treatmentName: service.name,
-        paymentType: type,
         customerEmail: email,
         customerName: name,
         customerPhone: phone,
         date: dateStr,
         time: state.time,
-        location: locationLabel,
+        location: state.location,
         notes,
         customerAddress: address,
         gender,
@@ -1788,7 +1893,7 @@ async function handlePayment(type) {
       alert('Sorry — that time was just booked by someone else. Please choose another slot.');
       state.time = null;
       resetPayButtons();
-      goToStep(2);
+      goToStep(3);
       if (state.date) selectDate(state.date.getFullYear(), state.date.getMonth(), state.date.getDate());
       return;
     }
@@ -1809,14 +1914,6 @@ async function handlePayment(type) {
   }
 }
 
-// £25 deposit, but never more than the treatment itself (the £1 test item).
-function depositLabel() {
-  const svc = (state.serviceIndex !== null && SERVICES[state.category])
-    ? SERVICES[state.category][state.serviceIndex] : null;
-  const amount = svc ? Math.min(25, netPrice(svc)) : 25;
-  return `Pay £${amount} deposit`;
-}
-
 function fullLabel() {
   const svc = (state.serviceIndex !== null && SERVICES[state.category])
     ? SERVICES[state.category][state.serviceIndex] : null;
@@ -1824,9 +1921,7 @@ function fullLabel() {
 }
 
 function resetPayButtons() {
-  const depositBtn = document.getElementById('btn-deposit');
   const fullBtn = document.getElementById('btn-full');
-  if (depositBtn) { depositBtn.disabled = false; depositBtn.textContent = depositLabel(); }
   if (fullBtn) { fullBtn.disabled = false; fullBtn.textContent = fullLabel(); }
 }
 
@@ -1835,7 +1930,7 @@ function notifyWhatsApp(paymentType) {
 }
 
 function goToStep(n) {
-  if (n === 4 && state.serviceIndex === null) { alert("Please select a treatment first."); return; }
+  if (n === 5 && state.serviceIndex === null) { alert("Please select a treatment first."); return; }
   currentStep = n;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById(`panel-${n}`).classList.add('active');
@@ -1844,20 +1939,22 @@ function goToStep(n) {
     if (i + 1 < n) s.classList.add('done');
     else if (i + 1 === n) s.classList.add('active');
   });
-  // Re-validate the time when arriving at step 2: the treatment (and so its
-  // duration) may have changed since a slot was picked, turning a once-free slot
-  // into an overlapping one. Drop a now-invalid selection and re-render.
-  if (n === 2 && state.date) {
-    if (state.time && slotIsTaken(state.time)) {
-      state.time = null;
-      document.getElementById('btn-step2').disabled = true;
+  // Re-validate the time when arriving at Date & Time: the treatment (and so
+  // its duration) may have changed since a slot was picked, turning a
+  // once-free slot into an overlapping one. Drop a now-invalid selection and
+  // re-render.
+  if (n === 3) {
+    renderCalendar();
+    if (state.date) {
+      if (state.time && slotIsTaken(state.time)) {
+        state.time = null;
+        document.getElementById('btn-step3').disabled = true;
+      }
+      renderTimes();
     }
-    renderTimes();
   }
-  if (n === 4) {
+  if (n === 5) {
     renderSummary();
-    const dep = document.getElementById('btn-deposit');
-    if (dep) dep.textContent = depositLabel();
     const full = document.getElementById('btn-full');
     if (full) full.textContent = fullLabel();
   }

@@ -14,6 +14,7 @@ import {
   sendEmail, esc, emailHeader, emailFooter, emailShell, heroRow, infoCard,
 } from './_email.js';
 import { confirmBooking } from './_bookings.js';
+import { CLINIC_VENUE_ADDRESS } from './_clinic.js';
 
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
@@ -92,10 +93,10 @@ export async function onRequestPost(context) {
     const name = md.customerName || 'there';
     const phone = md.customerPhone || '';
     const treatment = md.treatmentName || 'Your treatment';
-    const paymentType = md.paymentType || '';
     const date = md.date || '';
     const time = md.time || '';
-    const location = md.location || '';
+    const location = md.location || 'mobile';
+    const venue = md.venue || '';
     const address = upperPostcode(md.customerAddress || '');
     const notes = md.notes || '';
     const gender = md.gender || '';
@@ -106,8 +107,8 @@ export async function onRequestPost(context) {
         ? session.amount_total
         : parseInt(md.amount || '0', 10);
     const amount = formatGBP(amountPence);
-    const isDeposit = paymentType === 'deposit';
-    const paymentLabel = isDeposit ? `${amount} deposit paid` : `${amount} — paid in full`;
+    const paymentLabel = `${amount} — paid in full`;
+    // Every booking is paid in full — there is no deposit path.
 
     // Confirm the held slot so it converts from a temporary hold into a firm
     // booking that keeps blocking the time. Best-effort: if the row lapsed or the
@@ -121,7 +122,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    const detail = { name, phone, email, treatment, date, time, location, address, amount, isDeposit, paymentLabel, notes, gender, chaperone };
+    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, gender, chaperone };
 
     // WhatsApp notification to Halima. Sent before the email block and wrapped in
     // its own try/catch so it still fires if Resend is unconfigured or failing —
@@ -259,8 +260,8 @@ async function sendWhatsAppNotification(env, d) {
     `Treatment: ${d.treatment}`,
     d.date ? `Date: ${d.date}` : null,
     d.time ? `Time: ${d.time}` : null,
-    d.location ? `Location: ${d.location}` : null,
-    d.address ? `Address: ${d.address}` : null,
+    `Location: ${locationLabel(d)}`,
+    d.location === 'mobile' && d.address ? `Address: ${d.address}` : null,
     `Payment: ${d.paymentLabel}`,
     d.notes ? `Notes: ${d.notes}` : null,
   ]
@@ -304,6 +305,11 @@ function upperPostcode(str) {
   );
 }
 
+// Friendly display label for the enum stored in metadata[location].
+function locationLabel(d) {
+  return d.location === 'clinic' ? 'Clinic Day' : 'Home visit';
+}
+
 function detailRow(label, value) {
   if (!value) return '';
   return `
@@ -320,9 +326,10 @@ function detailRow(label, value) {
 // Warm, premium, on-brand confirmation for the customer.
 // COMPLIANCE: wellness/symptom language only — no claims to treat/cure/manage conditions.
 function clientEmailHtml(d) {
-  const depositNote = d.isDeposit
-    ? `<p style="color:${MUTED};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Your deposit secures your appointment. The remaining balance is payable on the day.</p>`
+  const clinicNote = d.location === 'clinic'
+    ? `<p style="color:${MUTED};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Your session is at ${esc(d.venue)}: ${esc(CLINIC_VENUE_ADDRESS)}. Check in at reception on arrival.</p>`
     : '';
+  const cancellationNote = `<p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>`;
 
   const inner = `${emailHeader()}
               <!-- Intro -->
@@ -333,17 +340,18 @@ function clientEmailHtml(d) {
                   <p style="color:${MUTED};font-size:15px;line-height:1.75;margin:0;font-family:${FONT};">Thank you for booking with haloe. Your payment has been received and your appointment is reserved. We look forward to welcoming you for a calm, restorative session.</p>
                 </td>
               </tr>
-              ${heroRow(d.date, d.time, 'Mobile visit')}
+              ${heroRow(d.date, d.time, locationLabel(d))}
               ${infoCard([
                 { label: 'Treatment', value: d.treatment },
                 { label: 'Paid', value: d.paymentLabel, gold: true },
               ])}
-              <!-- Deposit note -->
-              ${depositNote ? `<tr><td style="padding:4px 4px 14px;">${depositNote}</td></tr>` : ''}
+              <!-- Clinic venue note -->
+              ${clinicNote ? `<tr><td style="padding:4px 4px 14px;">${clinicNote}</td></tr>` : ''}
               <!-- Personal note + compliance -->
               <tr>
                 <td style="padding:6px 4px 0;">
                   <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">Halima will be in touch personally on WhatsApp to confirm the final details, send your health form, and answer any questions you may have.</p>
+                  ${cancellationNote}
                   <p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">haloe offers complementary wellness therapy to support your general wellbeing, relaxation and everyday tension. It is not a substitute for medical advice, diagnosis or treatment.</p>
                 </td>
               </tr>
@@ -360,13 +368,14 @@ function halimaEmailHtml(d) {
                   <h1 style="color:${CREAM};font-size:20px;font-weight:500;margin:8px 0 0;font-family:${FONT};">${esc(d.name)}</h1>
                 </td>
               </tr>
-              ${heroRow(d.date, d.time, 'Mobile visit')}
+              ${heroRow(d.date, d.time, locationLabel(d))}
               ${infoCard([
                 { label: 'Treatment', value: d.treatment },
                 { label: 'Paid', value: d.paymentLabel, gold: true },
               ])}
               ${infoCard([
-                { label: 'Address', value: d.address },
+                { label: 'Location', value: d.location === 'clinic' ? `${locationLabel(d)} — ${d.venue}` : locationLabel(d) },
+                { label: 'Address', value: d.location === 'clinic' ? CLINIC_VENUE_ADDRESS : d.address },
                 { label: 'Phone', value: d.phone },
                 { label: 'Email', value: d.email },
                 { label: 'Gender', value: d.gender ? (d.gender.charAt(0).toUpperCase() + d.gender.slice(1)) : '' },
