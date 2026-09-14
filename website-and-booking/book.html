@@ -19,7 +19,7 @@
 <meta name="twitter:title" content="Book a Session — haloe Hijama Manchester">
 <meta name="twitter:description" content="Book your hijama or cupping session in Manchester with haloe. Secure online booking.">
 <meta name="twitter:image" content="https://haloe.health/og-image.jpg">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 <style>
   /* ── Branded loading screen (presentation only) ── */
   #haloeLoader {
@@ -60,6 +60,30 @@
     --step-active: var(--gold);
     --step-done: var(--gold-dark);
     --step-idle: #D0C8BC;
+
+    /* --- New design-system tokens (Stitch spec) — additive, existing
+       tokens above are untouched and still drive most of the page. --- */
+    --obsidian-base: #0D0D0D;
+    --obsidian-elevated: #181716;
+    --obsidian-floating: #22201D;
+    --obsidian-inset: #141312;
+    --gold-primary: #C8A96E;
+    --gold-highlight: #DFC38E;
+    --gold-burnished: #A38548;
+    --hairline-border: rgba(200, 169, 110, 0.2);
+    --active-border: rgba(223, 195, 142, 0.5);
+    --text-cream: #F5F0E8;
+    --text-cashmere: #C8C2B7;
+    --text-sand: #8E887F;
+
+    --radius-sm: 0.5rem;
+    --radius-default: 1rem;
+    --radius-md: 1.5rem;
+    --radius-lg: 2rem;
+    --radius-xl: 3rem;
+    --radius-full: 9999px;
+
+    --font-heading: 'Playfair Display', 'Poppins', serif;
   }
 
   /* Scales the whole booking page down in one place — every size below is in
@@ -202,12 +226,12 @@
   .panel.active { display: block; }
 
   .panel-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 1.85rem;
-    font-weight: 400;
+    font-weight: 500;
     color: var(--cream);
     margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
     line-height: 1.15;
   }
   .panel-sub {
@@ -415,10 +439,10 @@
     margin-bottom: 0.7rem;
   }
   .calendar {
-    border: none;
-    border-radius: 12px;
+    border: 1px solid var(--hairline-border);
+    border-radius: var(--radius-md);
     padding: 0.9rem;
-    background: #1C1C1E;
+    background: var(--obsidian-elevated);
   }
   .cal-header {
     display: flex;
@@ -481,7 +505,7 @@
   .cal-day.today { color: var(--gold); font-weight: 500; }
   /* Selection must win over .today — otherwise selecting today's date turned
      the number gold-on-gold and it vanished. */
-  .cal-day.selected { background: var(--gold); color: #000; font-weight: 500; }
+  .cal-day.selected { background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); font-weight: 500; box-shadow: 0 0 0 3px var(--active-border); }
   .cal-day.disabled { color: #48484A; cursor: default; }
   .cal-day.empty { cursor: default; }
 
@@ -517,7 +541,7 @@
   @media (hover: hover) {
     .time-slot:hover:not(.taken):not(.selected) { border-color: var(--gold); color: var(--gold); }
   }
-  .time-slot.selected { border-color: var(--gold); background: var(--gold); color: #000; font-weight: 500; }
+  .time-slot.selected { border-color: var(--gold-primary); background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); font-weight: 500; box-shadow: 0 0 0 3px var(--active-border); }
   .time-slot.taken { color: #48484A; cursor: not-allowed; border-color: rgba(255,255,255,0.06); }
 
   /* ---- Form Fields ---- */
@@ -574,8 +598,8 @@
   .ios-row select:-webkit-autofill,
   .ios-row textarea:-webkit-autofill {
     -webkit-text-fill-color: var(--cream);
-    -webkit-box-shadow: 0 0 0 1000px #1C1C1E inset;
-            box-shadow: 0 0 0 1000px #1C1C1E inset;
+    -webkit-box-shadow: 0 0 0 1000px var(--obsidian-elevated) inset;
+            box-shadow: 0 0 0 1000px var(--obsidian-elevated) inset;
     caret-color: var(--cream);
     transition: background-color 100000s ease 0s;
   }
@@ -652,8 +676,9 @@
   }
   /* ---- Step 3: grouped inset list (iOS Settings) ---- */
   .ios-group {
-    background: #1C1C1E;
-    border-radius: 12px;
+    background: var(--obsidian-elevated);
+    border: 1px solid var(--hairline-border);
+    border-radius: var(--radius-md);
     overflow: hidden;
     margin-bottom: 0.8rem;
   }
@@ -697,8 +722,28 @@
   .ios-row input::placeholder,
   .ios-row textarea::placeholder { color: #5A5A5F; }
   .ios-row select { direction: rtl; }
-  .ios-row select option { direction: ltr; background: #1C1C1E; }
+  .ios-row select option { direction: ltr; background: var(--obsidian-elevated); }
   .ios-row input.invalid, .ios-row textarea.invalid { color: #E5736A; }
+
+  /* Gender select — pill-style control rather than a plain inline field,
+     matching the new design system's "selection" look. Still a native
+     <select id="gender">; checkStep3()/toggleChaperone() read its .value
+     exactly as before — this is a styling-only change. */
+  #gender {
+    flex: none;
+    background: var(--obsidian-floating);
+    border: 1px solid var(--hairline-border);
+    border-radius: var(--radius-full);
+    padding: 0.35rem 1rem;
+    text-align: center;
+    color: var(--gold-primary);
+    font-weight: 500;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  #gender:focus-visible {
+    border-color: var(--active-border);
+    box-shadow: 0 0 0 3px rgba(223,195,142,0.2);
+  }
 
   /* Consent toggles */
   .ios-toggle {
@@ -725,13 +770,13 @@
     width: 18px; height: 18px; border-radius: 50%;
     background: var(--cream); transition: transform 0.2s;
   }
-  .ios-toggle input:checked + .switch { background: var(--gold); }
+  .ios-toggle input:checked + .switch { background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); }
   .ios-toggle input:checked + .switch::after { transform: translateX(16px); }
-  .ios-toggle input:focus-visible + .switch { box-shadow: 0 0 0 3px rgba(201,160,64,0.35); }
+  .ios-toggle input:focus-visible + .switch { box-shadow: 0 0 0 3px var(--active-border); }
 
   /* ---- Step 4: appointment pass ---- */
   .summary-card { background: none; border-radius: 0; overflow: visible; }
-  .pass { background: #1C1C1E; border-radius: 14px; overflow: hidden; }
+  .pass { background: var(--obsidian-elevated); border: 1px solid var(--hairline-border); border-radius: var(--radius-md); overflow: hidden; }
   .pass-when { padding: 1.15rem 1rem 0.95rem; text-align: center; }
   .pass-date {
     font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
@@ -775,8 +820,8 @@
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s, opacity 0.2s;
   }
-  .pay-primary { background: var(--gold); color: #000; border: none; }
-  .pay-primary:hover:not(:disabled) { background: var(--gold-light); }
+  .pay-primary { background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); border: none; }
+  .pay-primary:hover:not(:disabled) { filter: brightness(1.08); }
   .pay-secondary { background: none; color: var(--cream); border: 1px solid rgba(255,255,255,0.16); }
   .pay-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.06); }
   .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -787,9 +832,9 @@
 
   /* ---- Summary ---- */
   .summary-card {
-    border: none;
-    border-radius: 12px;
-    background: #1C1C1E;
+    border: 1px solid var(--hairline-border);
+    border-radius: var(--radius-md);
+    background: var(--obsidian-elevated);
     overflow: hidden;
   }
   /* Hero block — treatment name + price */
@@ -861,10 +906,10 @@
     display: block;
     width: 100%;
     padding: 1rem;
-    background: var(--gold);
-    color: var(--black);
+    background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary));
+    color: var(--obsidian-base);
     border: none;
-    border-radius: 50px;
+    border-radius: var(--radius-full);
     font-family: 'Poppins', sans-serif;
     font-size: 0.75rem;
     font-weight: 500;
@@ -896,12 +941,12 @@
   .foot-label { font-size: 0.98rem; letter-spacing: 0.02em; text-transform: none; color: #A1A1A6; line-height: 1.4; }
   .foot-total { font-size: 1rem; font-weight: 500; color: var(--cream); }
   .foot-cta {
-    background: var(--gold); color: #000; border: none;
+    background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); border: none;
     font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 0.95rem;
-    padding: 0.72rem 1.8rem; border-radius: 999px; cursor: pointer;
-    transition: background 0.2s;
+    padding: 0.72rem 1.8rem; border-radius: var(--radius-full); cursor: pointer;
+    transition: filter 0.2s;
   }
-  .foot-cta:hover:not(:disabled) { background: var(--gold-light); }
+  .foot-cta:hover:not(:disabled) { filter: brightness(1.08); }
   .foot-cta:disabled { background: #2C2C2E; color: #6E6E73; cursor: not-allowed; }
   .foot-cta.hidden { display: none; }
   .footbar.hidden { display: none; }
