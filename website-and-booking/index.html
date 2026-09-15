@@ -1143,9 +1143,14 @@
 
 <!-- BOOK -->
 <section id="book" style="display:none;" style="padding:0;background:var(--bg);">
-<div style="max-width:900px;margin:0 auto;padding:130px 80px;">
+<div class="hb-book-wrap" style="max-width:900px;margin:0 auto;">
 
 <style>
+/* The wrap's own padding used to be inline (130px 80px, no mobile override) —
+   at narrow widths that left barely 200px for the Where cards, clipping the
+   chip text. Moved to a class so it can shrink responsively. */
+.hb-book-wrap { padding:130px 80px; }
+@media(max-width:600px){ .hb-book-wrap { padding:64px 20px; } }
 #haloe-booking * { box-sizing:border-box; margin:0; padding:0; font-family:'Poppins',sans-serif; }
 #haloe-booking { color:var(--cream,#F5F0E8); }
 #haloe-booking h2.section-title { font-size:clamp(2.2rem,4vw,3.2rem); letter-spacing:-0.03em; }
@@ -1283,31 +1288,54 @@
 /* Where step: two selectable cards. The radio is the real source of truth
    (native keyboard nav) but visually hidden — the <label> wrapping it is
    the whole clickable/visible card. */
-.hb-where-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:0.5rem 0 1.5rem; }
-@media(max-width:600px){ .hb-where-grid { grid-template-columns:1fr; } }
+/* #haloe-booking * resets padding/margin to 0 on every descendant (see the
+   very first rule in this block) — that's an ID selector, so it silently
+   beats a bare .hb-where-card class on padding/margin. Every rule below that
+   sets padding or margin is prefixed with #haloe-booking to reliably win. */
+#haloe-booking .hb-where-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:0.5rem 0 1.5rem; }
+@media(max-width:600px){ #haloe-booking .hb-where-grid { grid-template-columns:1fr; } }
 .hb-where-card {
-  position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem;
-  padding:1.75rem 1.5rem;
+  position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem;
   background:var(--obsidian-elevated); border:1px solid var(--hairline-border);
   border-radius:var(--radius-xl);
   cursor:pointer; transition:border-color 0.2s, box-shadow 0.2s;
 }
+#haloe-booking .hb-where-card { padding:1.75rem 1.5rem; }
 @media(hover:hover){ .hb-where-card:hover { border-color:var(--active-border); } }
 .hb-where-card input[type="radio"] { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
 .hb-where-card:has(input:focus-visible) { outline:2px solid var(--gold-primary); outline-offset:3px; }
 .hb-where-card.selected { border-color:var(--active-border); box-shadow:0 0 0 3px var(--active-border); }
 .hb-where-check {
-  position:absolute; top:0.9rem; right:0.9rem; width:1.5rem; height:1.5rem; border-radius:999px;
+  position:absolute; top:0.9rem; right:0.9rem; z-index:2; width:1.5rem; height:1.5rem; border-radius:999px;
   background:linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color:var(--obsidian-base);
   display:flex; align-items:center; justify-content:center;
   opacity:0; transform:scale(0.6); transition:opacity 0.2s, transform 0.2s;
 }
 .hb-where-card.selected .hb-where-check { opacity:1; transform:scale(1); }
-.hb-where-icon { display:flex; color:var(--gold-primary); margin-bottom:0.25rem; }
-.hb-where-icon svg { width:48px; height:48px; display:block; }
-.hb-where-name { display:block; font-family:var(--font-heading,'Playfair Display',serif); font-size:1.1rem; color:#F5F0E8; font-weight:500; }
-.hb-where-venue { display:block; font-size:0.9rem; color:var(--gold-primary); margin-top:0.15rem; }
-.hb-where-desc { display:block; font-size:0.8rem; color:rgba(245,240,232,0.5); line-height:1.5; margin-top:0.2rem; }
+/* Editorial header: small icon + uppercase kicker, then title/subtitle/chips.
+   Everything but the watermark sits at z-index:1 so the oversized
+   background icon never reads on top of the real content. */
+.hb-where-top { display:flex; align-items:center; gap:0.6rem; position:relative; z-index:1; }
+.hb-where-icon { display:flex; color:var(--gold-primary); }
+.hb-where-icon svg { width:36px; height:36px; display:block; }
+.hb-where-kicker { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-sand); }
+.hb-where-name { display:block; font-family:var(--font-heading,'Playfair Display',serif); font-size:22px; color:#F5F0E8; font-weight:500; line-height:1.2; position:relative; z-index:1; }
+.hb-where-venue { display:block; font-size:14px; color:var(--gold-highlight); position:relative; z-index:1; }
+#haloe-booking .hb-where-venue { margin-top:0.15rem; }
+.hb-where-chips { display:flex; flex-wrap:wrap; gap:8px; position:relative; z-index:1; }
+#haloe-booking .hb-where-chips { margin-top:0.25rem; }
+.hb-where-card .chip {
+  font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; border-radius:999px; white-space:nowrap;
+  background:rgba(200,169,110,0.08); border:1px solid rgba(200,169,110,0.25); color:var(--gold-highlight);
+}
+#haloe-booking .hb-where-card .chip { padding:6px 12px; }
+.hb-where-card .chip.solid {
+  background:linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color:var(--obsidian-base); font-weight:600; border:none;
+}
+/* Oversized watermark of the same icon, bleeding past the card's edge —
+   the card's own overflow:hidden crops it back to the rounded corner. */
+.hb-where-watermark { position:absolute; bottom:-30px; right:-30px; z-index:0; opacity:0.08; color:var(--gold-primary); pointer-events:none; }
+.hb-where-watermark svg { width:150px; height:150px; display:block; }
 @media(max-width:500px){ .hb-form-row { grid-template-columns:1fr; } .hb-times { grid-template-columns:repeat(3,1fr); } }
 </style>
 
@@ -1333,7 +1361,7 @@
         <span class="hb-where-check" aria-hidden="true">
           <svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 10 8 14 16 5"/></svg>
         </span>
-        <span class="hb-where-icon" aria-hidden="true">
+        <span class="hb-where-watermark" aria-hidden="true">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="9" y="7" width="30" height="35"/>
             <rect x="20" y="30" width="8" height="12"/>
@@ -1343,16 +1371,33 @@
             <rect x="28" y="24" width="6" height="6"/>
           </svg>
         </span>
+        <span class="hb-where-top">
+          <span class="hb-where-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="7" width="30" height="35"/>
+              <rect x="20" y="30" width="8" height="12"/>
+              <rect x="14" y="14" width="6" height="6"/>
+              <rect x="28" y="14" width="6" height="6"/>
+              <rect x="14" y="24" width="6" height="6"/>
+              <rect x="28" y="24" width="6" height="6"/>
+            </svg>
+          </span>
+          <span class="hb-where-kicker">At the Clinic</span>
+        </span>
         <span class="hb-where-name">Clinic Day</span>
         <span class="hb-where-venue" id="hb-where-clinic-venue"></span>
-        <span class="hb-where-desc">Tuesdays &middot; Private treatment room &middot; Full payment at booking</span>
+        <span class="hb-where-chips">
+          <span class="chip solid">Tuesdays</span>
+          <span class="chip solid">Private room</span>
+          <span class="chip solid">Reception</span>
+        </span>
       </label>
       <label class="hb-where-card" id="hb-where-mobile" for="hb-where-mobile-radio">
         <input type="radio" name="hbWhereLocation" id="hb-where-mobile-radio" value="mobile" onchange="hbSelectLocation('mobile')">
         <span class="hb-where-check" aria-hidden="true">
           <svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 10 8 14 16 5"/></svg>
         </span>
-        <span class="hb-where-icon" aria-hidden="true">
+        <span class="hb-where-watermark" aria-hidden="true">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
             <path d="M4 29v6h4"/>
@@ -1362,9 +1407,25 @@
             <path d="M17.5 35h13"/>
           </svg>
         </span>
+        <span class="hb-where-top">
+          <span class="hb-where-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
+              <path d="M4 29v6h4"/>
+              <path d="M40 35h4v-4a2 2 0 0 0-2-2"/>
+              <circle cx="14" cy="35" r="3.5"/>
+              <circle cx="34" cy="35" r="3.5"/>
+              <path d="M17.5 35h13"/>
+            </svg>
+          </span>
+          <span class="hb-where-kicker">At Your Home</span>
+        </span>
         <span class="hb-where-name">Home Visit</span>
         <span class="hb-where-venue">Halima comes to you</span>
-        <span class="hb-where-desc">Across Greater Manchester &middot; Full payment at booking</span>
+        <span class="hb-where-chips">
+          <span class="chip solid">Any day</span>
+          <span class="chip solid">Greater Manchester</span>
+        </span>
       </label>
     </div>
     <div class="hb-loc-notice" id="hb-loc-notice">Halima comes to your home. Travel is free in Manchester city centre; outside it, travel is charged at the cost of a taxi, which she&rsquo;ll confirm when she contacts you.</div>

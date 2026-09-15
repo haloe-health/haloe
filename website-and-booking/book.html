@@ -428,6 +428,7 @@
   }
   .where-card {
     position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -461,6 +462,7 @@
     position: absolute;
     top: 0.9rem;
     right: 0.9rem;
+    z-index: 2;
     width: 1.5rem;
     height: 1.5rem;
     border-radius: 999px;
@@ -474,27 +476,76 @@
     transition: opacity 0.2s, transform 0.2s;
   }
   .where-card.selected .where-check { opacity: 1; transform: scale(1); }
-  .where-icon {
+  /* Editorial header: small icon + uppercase kicker, then title/subtitle/chips.
+     Everything but the watermark sits at z-index:1 so the oversized
+     background icon never reads on top of the real content. */
+  .where-top {
     display: flex;
-    color: var(--gold-primary);
-    margin-bottom: 0.25rem;
+    align-items: center;
+    gap: 0.6rem;
+    position: relative;
+    z-index: 1;
   }
-  .where-icon svg { width: 48px; height: 48px; display: block; }
+  .where-icon { display: flex; color: var(--gold-primary); }
+  .where-icon svg { width: 36px; height: 36px; display: block; }
+  .where-kicker {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-sand);
+  }
   .where-title {
     font-family: var(--font-heading);
-    font-size: 1.15rem;
+    font-size: 22px;
     color: var(--cream);
     font-weight: 500;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
   }
   .where-subtitle {
-    font-size: 0.92rem;
+    font-size: 14px;
+    color: var(--gold-highlight);
+    position: relative;
+    z-index: 1;
+  }
+  .where-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 0.25rem;
+    position: relative;
+    z-index: 1;
+  }
+  .chip {
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+    background: rgba(200, 169, 110, 0.08);
+    border: 1px solid rgba(200, 169, 110, 0.25);
+    color: var(--gold-highlight);
+  }
+  .chip.solid {
+    background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary));
+    color: var(--obsidian-base);
+    font-weight: 600;
+    border: none;
+  }
+  /* Oversized watermark of the same icon, bleeding past the card's edge —
+     the card's own overflow:hidden crops it back to the rounded corner. */
+  .where-watermark {
+    position: absolute;
+    bottom: -30px;
+    right: -30px;
+    z-index: 0;
+    opacity: 0.08;
     color: var(--gold-primary);
+    pointer-events: none;
   }
-  .where-desc {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    line-height: 1.5;
-  }
+  .where-watermark svg { width: 150px; height: 150px; display: block; }
 
   /* ---- Location Toggle ---- (styling reuses the shared .segmented / .seg-option component) */
   /* Apple step 1: the travel-fee note is a quiet line, not a bordered box */
@@ -1204,7 +1255,7 @@
         <span class="where-check" aria-hidden="true">
           <svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 10 8 14 16 5"/></svg>
         </span>
-        <span class="where-icon" aria-hidden="true">
+        <span class="where-watermark" aria-hidden="true">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <rect x="9" y="7" width="30" height="35"/>
             <rect x="20" y="30" width="8" height="12"/>
@@ -1214,16 +1265,33 @@
             <rect x="28" y="24" width="6" height="6"/>
           </svg>
         </span>
+        <span class="where-top">
+          <span class="where-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="7" width="30" height="35"/>
+              <rect x="20" y="30" width="8" height="12"/>
+              <rect x="14" y="14" width="6" height="6"/>
+              <rect x="28" y="14" width="6" height="6"/>
+              <rect x="14" y="24" width="6" height="6"/>
+              <rect x="28" y="24" width="6" height="6"/>
+            </svg>
+          </span>
+          <span class="where-kicker">At the Clinic</span>
+        </span>
         <span class="where-title">Clinic Day</span>
         <span class="where-subtitle" id="where-clinic-venue"></span>
-        <span class="where-desc">Tuesdays &middot; Private treatment room &middot; Full payment at booking</span>
+        <span class="where-chips">
+          <span class="chip solid">Tuesdays</span>
+          <span class="chip solid">Private room</span>
+          <span class="chip solid">Reception</span>
+        </span>
       </label>
       <label class="where-card" id="where-mobile" for="where-mobile-radio">
         <input type="radio" name="whereLocation" id="where-mobile-radio" value="mobile" onchange="selectLocation('mobile')">
         <span class="where-check" aria-hidden="true">
           <svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 10 8 14 16 5"/></svg>
         </span>
-        <span class="where-icon" aria-hidden="true">
+        <span class="where-watermark" aria-hidden="true">
           <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
             <path d="M4 29v6h4"/>
@@ -1233,9 +1301,25 @@
             <path d="M17.5 35h13"/>
           </svg>
         </span>
+        <span class="where-top">
+          <span class="where-icon" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
+              <path d="M4 29v6h4"/>
+              <path d="M40 35h4v-4a2 2 0 0 0-2-2"/>
+              <circle cx="14" cy="35" r="3.5"/>
+              <circle cx="34" cy="35" r="3.5"/>
+              <path d="M17.5 35h13"/>
+            </svg>
+          </span>
+          <span class="where-kicker">At Your Home</span>
+        </span>
         <span class="where-title">Home Visit</span>
         <span class="where-subtitle">Halima comes to you</span>
-        <span class="where-desc">Across Greater Manchester &middot; Full payment at booking</span>
+        <span class="where-chips">
+          <span class="chip solid">Any day</span>
+          <span class="chip solid">Greater Manchester</span>
+        </span>
       </label>
     </div>
 
