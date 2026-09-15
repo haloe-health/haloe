@@ -409,6 +409,89 @@
     line-height: 1.5;
   }
 
+  /* ---- Where step: two selectable cards ----
+     The radio input is the real source of truth (native keyboard nav: Tab
+     into the group, arrow keys / Space to switch) but is visually hidden —
+     the <label> wrapping it is the whole clickable/visible card. */
+  .where-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 0.5rem 0 1.5rem;
+  }
+  @media (max-width: 600px) {
+    .where-grid { grid-template-columns: 1fr; }
+  }
+  .where-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.75rem 1.5rem;
+    background: var(--obsidian-elevated);
+    border: 1px solid var(--hairline-border);
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  @media (hover: hover) {
+    .where-card:hover { border-color: var(--active-border); }
+  }
+  .where-card input[type="radio"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .where-card:has(input:focus-visible) {
+    outline: 2px solid var(--gold-primary);
+    outline-offset: 3px;
+  }
+  .where-card.selected {
+    border-color: var(--active-border);
+    box-shadow: 0 0 0 3px var(--active-border);
+  }
+  .where-check {
+    position: absolute;
+    top: 0.9rem;
+    right: 0.9rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary));
+    color: var(--obsidian-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .where-card.selected .where-check { opacity: 1; transform: scale(1); }
+  .where-icon {
+    display: flex;
+    color: var(--gold-primary);
+    margin-bottom: 0.25rem;
+  }
+  .where-icon svg { width: 48px; height: 48px; display: block; }
+  .where-title {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    color: var(--cream);
+    font-weight: 500;
+  }
+  .where-subtitle {
+    font-size: 0.92rem;
+    color: var(--gold-primary);
+  }
+  .where-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
   /* ---- Location Toggle ---- (styling reuses the shared .segmented / .seg-option component) */
   /* Apple step 1: the travel-fee note is a quiet line, not a bordered box */
   .loc-line {
@@ -1110,21 +1193,45 @@
     <p class="panel-title">Where would you like your session?</p>
     <p class="panel-sub">Choose a clinic day appointment or a home visit.</p>
 
-    <div class="service-grid" id="where-grid">
-      <div class="service-card" id="where-clinic" onclick="selectLocation('clinic')">
-        <span class="svc-ring"></span>
-        <span class="svc-main">
-          <span class="svc-name">Clinic Day — <span id="where-clinic-venue"></span></span>
-          <span class="svc-desc">A weekly clinic day, one fixed venue. Full payment at booking, no travel fee.</span>
+    <div class="where-grid" id="where-grid">
+      <label class="where-card" id="where-clinic" for="where-clinic-radio">
+        <input type="radio" name="whereLocation" id="where-clinic-radio" value="clinic" onchange="selectLocation('clinic')">
+        <span class="where-check" aria-hidden="true">
+          <svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 10 8 14 16 5"/></svg>
         </span>
-      </div>
-      <div class="service-card" id="where-mobile" onclick="selectLocation('mobile')">
-        <span class="svc-ring"></span>
-        <span class="svc-main">
-          <span class="svc-name">Home visit</span>
-          <span class="svc-desc">Halima comes to you, across Greater Manchester.</span>
+        <span class="where-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="7" width="30" height="35"/>
+            <rect x="20" y="30" width="8" height="12"/>
+            <rect x="14" y="14" width="6" height="6"/>
+            <rect x="28" y="14" width="6" height="6"/>
+            <rect x="14" y="24" width="6" height="6"/>
+            <rect x="28" y="24" width="6" height="6"/>
+          </svg>
         </span>
-      </div>
+        <span class="where-title">Clinic Day</span>
+        <span class="where-subtitle" id="where-clinic-venue"></span>
+        <span class="where-desc">Tuesdays &middot; Private treatment room &middot; Full payment at booking</span>
+      </label>
+      <label class="where-card" id="where-mobile" for="where-mobile-radio">
+        <input type="radio" name="whereLocation" id="where-mobile-radio" value="mobile" onchange="selectLocation('mobile')">
+        <span class="where-check" aria-hidden="true">
+          <svg viewBox="0 0 20 20" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 10 8 14 16 5"/></svg>
+        </span>
+        <span class="where-icon" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
+            <path d="M4 29v6h4"/>
+            <path d="M40 35h4v-4a2 2 0 0 0-2-2"/>
+            <circle cx="14" cy="35" r="3.5"/>
+            <circle cx="34" cy="35" r="3.5"/>
+            <path d="M17.5 35h13"/>
+          </svg>
+        </span>
+        <span class="where-title">Home Visit</span>
+        <span class="where-subtitle">Halima comes to you</span>
+        <span class="where-desc">Across Greater Manchester &middot; Full payment at booking</span>
+      </label>
     </div>
 
     <p class="loc-line" id="loc-notice" style="display:none;">Halima comes to you. Travel is free in Manchester city centre. Outside it, travel is charged at the cost of a taxi, which she&rsquo;ll confirm when she contacts you.</p>
@@ -1349,6 +1456,11 @@ function selectLocation(loc) {
   state.location = loc;
   document.getElementById('where-clinic').classList.toggle('selected', loc === 'clinic');
   document.getElementById('where-mobile').classList.toggle('selected', loc === 'mobile');
+  // The radio inputs are the source of truth for the cards' checked state —
+  // keep them in sync even when selectLocation() is called programmatically
+  // (e.g. the ?location= deep link), not just from the radio's own onchange.
+  document.getElementById('where-clinic-radio').checked = (loc === 'clinic');
+  document.getElementById('where-mobile-radio').checked = (loc === 'mobile');
   document.getElementById('loc-notice').style.display = loc === 'mobile' ? '' : 'none';
   document.getElementById('btn-step1').disabled = false;
   // Changing location can invalidate a date/time picked under the other
