@@ -334,6 +334,10 @@
       padding: 0.8rem 1.3rem;
       white-space: nowrap;
     }
+    /* Drop the location prefix on the footer summary at phone widths —
+       "Clinic Day · Full Back Hijama · 1 hour" wraps awkwardly next to the
+       total and CTA button in the cramped footbar. */
+    .foot-loc-prefix { display: none; }
   }
 
   /* ---- Service Cards ---- */
@@ -1022,6 +1026,7 @@
     display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   }
   .foot-label { font-size: 0.98rem; letter-spacing: 0.02em; text-transform: none; color: #A1A1A6; line-height: 1.4; }
+  .foot-loc-prefix { color: var(--gold-primary, var(--gold)); }
   .foot-total { font-size: 1rem; font-weight: 500; color: var(--cream); }
   .foot-cta {
     background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); border: none;
@@ -1565,15 +1570,25 @@ function updateRail() {
   if (lbl) lbl.textContent = `${currentStep}/5`;
 
   // Frosted footer (Apple layout): running selection + total.
+  const locFootLabel = state.location === 'clinic' ? 'Clinic Day'
+    : state.location === 'mobile' ? 'Home visit' : '';
   const fs = document.getElementById('foot-sum');
   if (fs) {
-    if (!svc) {
+    if (currentStep === 1) {
+      // Nothing to pick a treatment for yet — the Where step gets its own
+      // copy instead of the stale "No treatment selected" default.
+      fs.textContent = state.location === 'clinic' ? `Clinic Day · ${CLINIC_VENUE_NAME}`
+        : state.location === 'mobile' ? 'Home visit · Greater Manchester'
+        : "Choose where you'd like your session";
+    } else if (!svc) {
       fs.textContent = 'No treatment selected';
     } else {
       const bits = [svc.name, svc.time];
       if (dateStr) bits.push(dateStr);
       if (state.time) bits.push(state.time);
-      fs.textContent = bits.join(' · ');
+      // Location prefix on Treatment step onwards, dropped on phone widths
+      // (.foot-loc-prefix) where it would wrap.
+      fs.innerHTML = (locFootLabel ? `<span class="foot-loc-prefix">${locFootLabel} · </span>` : '') + bits.join(' · ');
     }
   }
   const ft = document.getElementById('foot-total');
