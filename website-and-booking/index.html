@@ -1463,10 +1463,8 @@ const HB_CLINIC_VENUE_NAME = 'Milton Hall, Deansgate';
 const HB_CLINIC_VENUE_ADDRESS = 'Milton Hall, 3rd Floor, 244 Deansgate, Manchester M3 4BQ';
 const HB_CLINIC_WEEKDAY = 2; // 0=Sunday ... 6=Saturday. 2 = Tuesday.
 const HB_CLINIC_SLOT_TEMPLATE = ['09:30', '11:15', '13:00', '14:45', '16:30', '18:15'];
-// Unset until Halima confirms the first Tuesday after her venue viewing.
-// The calendar must show NO bookable clinic dates while this is null —
-// never default to "next Tuesday".
-const HB_CLINIC_START_DATE = null;
+// First bookable clinic day, confirmed by Halima after her venue viewing.
+const HB_CLINIC_START_DATE = '2026-09-29';
 function hbTo12h(t){
   const [h,m]=t.split(':').map(Number);
   const period=h>=12?'pm':'am';
