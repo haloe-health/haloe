@@ -155,6 +155,41 @@
     text-decoration:none !important;
   }
 
+  /* Hamburger + full-screen overlay menu (mobile nav). Hidden by default;
+     shown only under the 860px breakpoint where nav ul already hides (see
+     MOBILE section) so there's never a gap with no way to reach the menu. */
+  .nav-hamburger {
+    display:none; background:none; border:none; cursor:pointer;
+    flex-direction:column; justify-content:center; align-items:center; gap:5px;
+    width:44px; height:44px; padding:0; flex:none;
+  }
+  .nav-hamburger span { display:block; width:22px; height:2px; background:var(--white); border-radius:1px; transition:transform 0.3s, opacity 0.3s; }
+  .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+  .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity:0; }
+  .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+  .nav-overlay {
+    position:fixed; inset:0; z-index:200;
+    background:rgba(8,8,6,0.98);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:40px;
+    opacity:0; visibility:hidden; transform:translateY(-12px);
+    transition:opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  }
+  .nav-overlay.open { opacity:1; visibility:visible; transform:translateY(0); }
+  .nav-overlay-close {
+    position:absolute; top:18px; right:20px; background:none; border:none;
+    color:var(--white); font-size:2.2rem; line-height:1; cursor:pointer;
+    width:44px; height:44px;
+  }
+  .nav-overlay-links { list-style:none; text-align:center; display:flex; flex-direction:column; gap:28px; }
+  .nav-overlay-links a {
+    color:var(--white); text-decoration:none;
+    font-family:var(--font-heading); font-size:1.5rem; letter-spacing:0.01em;
+    padding:8px 0; display:inline-block; min-height:44px;
+  }
+  .nav-overlay-links a:hover { color:var(--gold); }
+  .nav-overlay-cta { min-height:44px; display:inline-flex; align-items:center; justify-content:center; }
+  body.nav-open { overflow:hidden; }
+
   /* HERO */
   #hero {
     min-height:100vh; display:grid; grid-template-columns:1fr 1fr;
@@ -411,12 +446,46 @@
   .flower-centre svg { width:40px; height:40px; opacity:0.8; }
 
   @media(max-width:680px){
-    .flower-wrap { width:340px; }
-    .flower-petal { width:110px; height:110px; padding:10px 8px; }
-    .flower-label { font-size:0.5rem; }
-    .flower-centre { width:76px; height:76px; }
-    .flower-centre svg { width:24px; }
-    .flower-centre span { font-size:0.44rem; }
+    /* The desktop honeycomb positions every petal with an inline
+       left/top (calibrated for the 660px radial layout) and a centre hub
+       badge absolutely centred over them — neither survives shrinking in
+       place; shrinking just the petal boxes left the *positions* at
+       full-size coordinates, overflowing the page horizontally. Below this
+       breakpoint the petals become a plain 2-column grid instead: !important
+       cancels each petal's inline left/top (offsets, since the petal stays
+       position:relative for its own absolutely-positioned SVG background/
+       echo children to keep anchoring correctly), and the centre hub —
+       which only makes sense in the radial arrangement — is hidden. */
+    .flower-section { overflow-x:hidden; } /* safety clamp: never let the grid below push the page wider */
+    .flower-wrap {
+      /* height:auto needs !important — it's fighting the element's own
+         inline style="...height:790px" (set for the desktop radial layout),
+         which otherwise wins the cascade over a plain external rule.
+         width is calc(100vw - 48px) rather than 100% — this grid container
+         kept resolving wider than its flex parent's actual content box
+         (a sizing quirk with the nested flex/grid + aspect-ratio children),
+         so pin it directly to the viewport instead of trusting the
+         percentage to resolve against the right box. */
+      /* Actual width is set directly via JS (reposition()) using the
+         reliable document.documentElement.clientWidth — this is a fallback
+         for the instant before that runs / if JS is unavailable. */
+      width:calc(100vw - 48px); max-width:380px; height:auto !important;
+      margin:0 auto;
+      display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px;
+    }
+    .flower-petal {
+      position:relative !important; left:0 !important; top:0 !important;
+      width:auto !important; height:auto !important; aspect-ratio:1;
+      padding:10px 8px;
+      /* Grid items default to min-width:auto, so a track can grow past its
+         1fr share to fit content's natural minimum size (here: a few px
+         wider than the math implied, just enough to push column 2 past the
+         container's right edge). min-width:0 lets the track actually honour
+         1fr. */
+      min-width:0;
+    }
+    .flower-label { font-size:0.62rem; }
+    .flower-centre { display:none; }
   }
 
   /* PRICING */
@@ -561,6 +630,7 @@
   @media(max-width:860px){
     nav { padding:18px 24px; }
     nav ul { display:none; }
+    .nav-hamburger { display:flex; }
     section { padding:64px 24px; }
     #hero { grid-template-columns:1fr; }
     .hero-left { padding:96px 24px 60px; }
@@ -761,7 +831,23 @@
     <li><a href="#process">What to Expect</a></li>
     <li><a href="book.html" class="nav-cta">Book Now</a></li>
   </ul>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navOverlay" onclick="toggleNavOverlay()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div class="nav-overlay" id="navOverlay">
+  <button class="nav-overlay-close" aria-label="Close menu" onclick="toggleNavOverlay()">&times;</button>
+  <ul class="nav-overlay-links">
+    <li><a href="#about" onclick="toggleNavOverlay()">About</a></li>
+    <li><a href="#conditions" onclick="toggleNavOverlay()">Conditions</a></li>
+    <li><a href="#clinic-day" onclick="toggleNavOverlay()">Clinic Day</a></li>
+    <li><a href="#process" onclick="toggleNavOverlay()">What to Expect</a></li>
+    <li><a href="hijama-manchester.html">Hijama in Manchester</a></li>
+    <li><a href="chaperone-policy.html">Chaperone Policy</a></li>
+  </ul>
+  <a href="book.html" class="btn btn-gold nav-overlay-cta">Book Now</a>
+</div>
 
 <!-- HERO -->
 <section id="hero">
@@ -966,10 +1052,21 @@
   }, {threshold:0.15});
   observer.observe(wrap);
 
-  // Mobile scaling
+  // Mobile scaling — only in the narrow 681-699px gap above the ≤680px
+  // breakpoint, where the CSS below switches .flower-wrap to a static
+  // 2-column grid (real reflow, not a shrunk copy of the radial layout).
+  // Scaling AND the grid rule must never both be live on the same element:
+  // this old whole-group transform:scale() was fighting the grid's own
+  // width/position, compounding into petals rendered far smaller than
+  // either approach intended on its own.
   function reposition(){
+    // documentElement.clientWidth is the true CSS layout viewport; vw units
+    // and window.innerWidth both resolve unreliably in at least one
+    // environment this site is tested in, so the grid-mode width below is
+    // pinned via JS off this instead of trusted to CSS alone.
+    var cw = document.documentElement.clientWidth;
     var vw = window.innerWidth;
-    if(vw < 700){
+    if(vw < 700 && vw > 680){
       var s = (vw - 32) / 660;
       wrap.style.transform = 'scale(' + s + ')';
       wrap.style.transformOrigin = 'top center';
@@ -977,6 +1074,14 @@
     } else {
       wrap.style.transform = '';
       wrap.style.marginBottom = '';
+    }
+    if (cw <= 680) {
+      // Set the width directly (inline style always wins the cascade,
+      // sidestepping whatever was making % / vw-based widths resolve
+      // wider than the actual viewport for this grid in some environments).
+      wrap.style.width = Math.min(380, cw - 48) + 'px';
+    } else {
+      wrap.style.width = '';
     }
   }
   window.addEventListener('resize', reposition);
@@ -2643,6 +2748,24 @@ void main() {
     });
   }
 }());
+</script>
+
+<script>
+// Mobile hamburger nav: full-screen overlay toggle. Purely presentational —
+// no booking/site logic involved.
+function toggleNavOverlay() {
+  const overlay = document.getElementById('navOverlay');
+  const btn = document.getElementById('navHamburger');
+  const willOpen = !overlay.classList.contains('open');
+  overlay.classList.toggle('open', willOpen);
+  btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  document.body.classList.toggle('nav-open', willOpen);
+}
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && document.getElementById('navOverlay').classList.contains('open')) {
+    toggleNavOverlay();
+  }
+});
 </script>
 </body>
 </html>

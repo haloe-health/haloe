@@ -597,6 +597,8 @@
     padding: 0.2rem 0.55rem;
     border-radius: 6px;
     transition: background 0.15s, color 0.15s;
+    min-width: 44px;
+    min-height: 44px;
   }
   .cal-nav:hover { background: rgba(255,255,255,0.07); color: var(--cream); }
   .cal-nav:hover { color: var(--gold-light); }
@@ -1070,13 +1072,22 @@
     background: rgba(20,20,22,0.86);
     backdrop-filter: blur(14px);
     border-top: 1px solid rgba(255,255,255,0.10);
+    /* Room for the home-bar on notched iPhones, so the bar's own bottom
+       padding grows with it rather than the CTA sitting under the bar. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .footbar-inner {
     max-width: 560px; margin: 0 auto;
     padding: 0.7rem clamp(1rem, 4vw, 1.5rem);
     display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   }
-  .foot-label { font-size: 0.98rem; letter-spacing: 0.02em; text-transform: none; color: #A1A1A6; line-height: 1.4; }
+  /* Lets the summary column actually shrink and ellipsize instead of the
+     flex item defaulting to min-width:auto (its content's natural width). */
+  .foot-summary-col { min-width: 0; flex: 1 1 auto; overflow: hidden; }
+  .foot-label {
+    font-size: 0.98rem; letter-spacing: 0.02em; text-transform: none; color: #A1A1A6; line-height: 1.4;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
   .foot-loc-prefix { color: var(--gold-primary, var(--gold)); }
   .foot-total { font-size: 1rem; font-weight: 500; color: var(--cream); }
   .foot-cta {
@@ -1084,12 +1095,16 @@
     font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 0.95rem;
     padding: 0.72rem 1.8rem; border-radius: var(--radius-full); cursor: pointer;
     transition: filter 0.2s;
+    min-height: 44px; flex: none;
   }
   .foot-cta:hover:not(:disabled) { filter: brightness(1.08); }
   .foot-cta:disabled { background: #2C2C2E; color: #6E6E73; cursor: not-allowed; }
   .foot-cta.hidden { display: none; }
   .footbar.hidden { display: none; }
-  body { padding-bottom: 76px; }
+  body { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+  /* So the last field on any step scrolls clear of the sticky footer rather
+     than ending up hidden underneath it. */
+  html { scroll-padding-bottom: 96px; }
 
   .btn-back { display: none; }
   .btn-back-unused {
@@ -1181,6 +1196,34 @@
   @media (max-width: 500px) {
     .form-row { grid-template-columns: 1fr; }
     .time-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  /* Narrower phones (iPhone SE/mini-class, ~375px): 3 columns squeezes each
+     slot to ~90px, tight against the "booked" tag. Drop to 2 below 430px;
+     430px+ keeps the 3-column rule above. */
+  @media (max-width: 429px) {
+    .time-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  /* Mobile touch targets + iOS zoom fix: Safari auto-zooms the page on focus
+     of any text input under 16px — the step-3 fields were 1.05rem (~13px at
+     this page's 78% base scale). Bump to a real 16px and grow row height so
+     each field is a full 44px+ tap target, without touching validation or
+     checkStep3()/toggleChaperone() logic. */
+  @media (max-width: 600px) {
+    .ios-row { padding: 0.9rem 0.85rem; min-height: 48px; }
+    .ios-row input, .ios-row select, .ios-row textarea { font-size: 16px; }
+    .ios-row select { min-height: 44px; }
+    #gender { padding: 0.6rem 1.2rem; min-height: 44px; }
+    .back-link, .back-link:link, .back-link:visited { min-height: 44px; }
+    .foot-cta { min-height: 48px; }
+    /* Real body copy (instructions, descriptions, legal/consent text, error
+       messages) gets a 15px floor. Short UI-control labels (chips, kickers,
+       step dots, the 4-across category tabs) are left at their compact,
+       deliberately-designed size — bumping those risks wrapping the tab row. */
+    .panel-sub, .foot-label, .svc-desc, .loc-line, #loc-notice, .pay-note,
+    .ios-toggle span, .field-error, .time-hint, .section-label,
+    .ios-group-label, .confirm-sub, .confirm-intake {
+      font-size: 15px;
+    }
   }
 </style>
 </head>
@@ -2152,7 +2195,7 @@ if (document.readyState === 'loading') {
 </script>
 <div class="footbar">
   <div class="footbar-inner">
-    <div>
+    <div class="foot-summary-col">
       <div class="foot-label" id="foot-sum">No treatment selected</div>
       <div class="foot-total" id="foot-total">—</div>
     </div>
