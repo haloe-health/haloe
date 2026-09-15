@@ -225,6 +225,13 @@
   .panel { display: none; }
   .panel.active { display: block; }
 
+  .panel-kicker {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-sand);
+    margin-bottom: 0.5rem;
+  }
   .panel-title {
     font-family: var(--font-heading);
     font-size: 1.85rem;
@@ -233,6 +240,10 @@
     margin-bottom: 0.5rem;
     letter-spacing: -0.01em;
     line-height: 1.15;
+  }
+  .panel-title em {
+    font-style: italic;
+    color: var(--gold-highlight);
   }
   .panel-sub {
     font-size: 1rem;
@@ -416,24 +427,24 @@
   /* ---- Where step: two selectable cards ----
      The radio input is the real source of truth (native keyboard nav: Tab
      into the group, arrow keys / Space to switch) but is visually hidden —
-     the <label> wrapping it is the whole clickable/visible card. */
+     the <label> wrapping it is the whole clickable/visible card. Layout
+     follows design/where-step-stitch.html (a Stitch export): icon tile +
+     tag/radio row, title, subtitle-with-icon, hairline divider, two bullet
+     lines — reskinned with this page's own tokens instead of the mockup's. */
   .where-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 1rem;
     margin: 0.5rem 0 1.5rem;
   }
-  @media (max-width: 600px) {
-    .where-grid { grid-template-columns: 1fr; }
+  @media (min-width: 768px) {
+    .where-grid { grid-template-columns: 1fr 1fr; }
   }
   .where-card {
     position: relative;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding: 1.75rem 1.5rem;
+    padding: 1.5rem;
     background: var(--obsidian-elevated);
     border: 1px solid var(--hairline-border);
     border-radius: var(--radius-xl);
@@ -458,76 +469,81 @@
     border-color: var(--active-border);
     box-shadow: 0 0 0 3px var(--active-border);
   }
-  /* Editorial header: small icon + uppercase kicker, then title/subtitle/chips.
-     Everything but the watermark sits at z-index:1 so the oversized
-     background icon never reads on top of the real content. */
-  .where-top {
+  .where-top-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 1.1rem;
+  }
+  .where-icon-tile {
+    width: 84px;
+    height: 84px;
+    flex: none;
+    border-radius: var(--radius-md);
+    background: rgba(200, 169, 110, 0.08);
+    border: 1px solid var(--hairline-border);
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    position: relative;
-    z-index: 1;
+    justify-content: center;
+    color: var(--gold-primary);
   }
-  .where-icon { display: flex; color: var(--gold-primary); }
-  .where-icon svg { width: 36px; height: 36px; display: block; }
-  .where-kicker {
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-sand);
-  }
-  .where-title {
-    font-family: var(--font-heading);
-    font-size: 22px;
-    color: var(--cream);
-    font-weight: 500;
-    line-height: 1.2;
-    position: relative;
-    z-index: 1;
-  }
-  .where-subtitle {
-    font-size: 14px;
-    color: var(--gold-highlight);
-    position: relative;
-    z-index: 1;
-  }
-  .where-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 0.25rem;
-    position: relative;
-    z-index: 1;
-  }
-  .chip {
-    font-size: 10.5px;
+  .where-icon-tile svg { width: 40px; height: 40px; display: block; }
+  .where-top-right { display: flex; align-items: center; gap: 0.55rem; flex: none; }
+  .where-tag {
+    font-size: 10px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 6px 12px;
+    padding: 5px 11px;
     border-radius: 999px;
     white-space: nowrap;
     background: rgba(200, 169, 110, 0.08);
     border: 1px solid rgba(200, 169, 110, 0.25);
     color: var(--gold-highlight);
   }
-  .chip.solid {
-    background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary));
-    color: var(--obsidian-base);
-    font-weight: 600;
-    border: none;
+  /* Decorative — the real selection state lives on the hidden radio input,
+     which screen readers read natively. This ring is purely visual. */
+  .where-radio-ring {
+    width: 22px;
+    height: 22px;
+    flex: none;
+    border-radius: 999px;
+    border: 1px solid var(--hairline-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
   }
-  /* Oversized watermark of the same icon, bleeding past the card's edge —
-     the card's own overflow:hidden crops it back to the rounded corner. */
-  .where-watermark {
-    position: absolute;
-    bottom: -30px;
-    right: -30px;
-    z-index: 0;
-    opacity: 0.08;
-    color: var(--gold-primary);
-    pointer-events: none;
+  .where-radio-ring::after {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: transparent;
+    transition: background 0.2s;
   }
-  .where-watermark svg { width: 150px; height: 150px; display: block; }
+  .where-card.selected .where-radio-ring { border-color: var(--gold-primary); background: rgba(200, 169, 110, 0.12); }
+  .where-card.selected .where-radio-ring::after { background: var(--gold-primary); }
+  .where-title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    color: var(--cream);
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
+  }
+  .where-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 14px;
+    color: var(--gold-highlight);
+  }
+  .where-subtitle svg { width: 14px; height: 14px; flex: none; }
+  .where-divider { border-top: 1px solid var(--hairline-border); margin: 1rem 0 0.75rem; }
+  .where-bullets { display: flex; flex-direction: column; gap: 0.45rem; }
+  .where-bullet { display: flex; align-items: center; gap: 0.5rem; font-size: 13px; color: var(--text-cashmere); line-height: 1.4; }
+  .where-dot { width: 4px; height: 4px; flex: none; border-radius: 999px; background: var(--gold-primary); }
 
   /* ---- Location Toggle ---- (styling reuses the shared .segmented / .seg-option component) */
   /* Apple step 1: the travel-fee note is a quiet line, not a bordered box */
@@ -1072,13 +1088,17 @@
   }
   .foot-loc-prefix { color: var(--gold-primary, var(--gold)); }
   .foot-total { font-size: 1rem; font-weight: 500; color: var(--cream); }
+  .foot-helper { font-size: 0.82rem; color: var(--text-sand, #A1A1A6); margin-top: 0.15rem; }
+  .foot-helper.hidden { display: none; }
   .foot-cta {
+    display: inline-flex; align-items: center; gap: 0.4rem;
     background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); border: none;
     font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 0.95rem;
     padding: 0.72rem 1.8rem; border-radius: var(--radius-full); cursor: pointer;
     transition: filter 0.2s;
     min-height: 44px; flex: none;
   }
+  .foot-cta svg { width: 16px; height: 16px; flex: none; }
   .foot-cta:hover:not(:disabled) { filter: brightness(1.08); }
   .foot-cta:disabled { background: #2C2C2E; color: #6E6E73; cursor: not-allowed; }
   .foot-cta.hidden { display: none; }
@@ -1271,24 +1291,15 @@
 
   <!-- STEP 1: Where -->
   <div class="panel active" id="panel-1">
-    <p class="panel-title">Where would you like your session?</p>
+    <p class="panel-kicker">Consultation preference</p>
+    <p class="panel-title">Where would you like<br><em>your session?</em></p>
     <p class="panel-sub">Choose a clinic day appointment or a home visit.</p>
 
     <div class="where-grid" id="where-grid">
       <label class="where-card" id="where-clinic" for="where-clinic-radio">
         <input type="radio" name="whereLocation" id="where-clinic-radio" value="clinic" onchange="selectLocation('clinic')">
-        <span class="where-watermark" aria-hidden="true">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="7" width="30" height="35"/>
-            <rect x="20" y="30" width="8" height="12"/>
-            <rect x="14" y="14" width="6" height="6"/>
-            <rect x="28" y="14" width="6" height="6"/>
-            <rect x="14" y="24" width="6" height="6"/>
-            <rect x="28" y="24" width="6" height="6"/>
-          </svg>
-        </span>
-        <span class="where-top">
-          <span class="where-icon" aria-hidden="true">
+        <span class="where-top-row">
+          <span class="where-icon-tile" aria-hidden="true">
             <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="9" y="7" width="30" height="35"/>
               <rect x="20" y="30" width="8" height="12"/>
@@ -1298,30 +1309,26 @@
               <rect x="28" y="24" width="6" height="6"/>
             </svg>
           </span>
-          <span class="where-kicker">At the Clinic</span>
+          <span class="where-top-right">
+            <span class="where-tag">City centre</span>
+            <span class="where-radio-ring" aria-hidden="true"></span>
+          </span>
         </span>
         <span class="where-title">Clinic Day</span>
-        <span class="where-subtitle" id="where-clinic-venue"></span>
-        <span class="where-chips">
-          <span class="chip solid">Tuesdays</span>
-          <span class="chip">Private room</span>
-          <span class="chip">Reception</span>
+        <span class="where-subtitle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg>
+          <span id="where-clinic-venue"></span>
+        </span>
+        <span class="where-divider" aria-hidden="true"></span>
+        <span class="where-bullets">
+          <span class="where-bullet"><span class="where-dot" aria-hidden="true"></span>Every Tuesday &middot; Private treatment room</span>
+          <span class="where-bullet"><span class="where-dot" aria-hidden="true"></span>Reception and lift access</span>
         </span>
       </label>
       <label class="where-card" id="where-mobile" for="where-mobile-radio">
         <input type="radio" name="whereLocation" id="where-mobile-radio" value="mobile" onchange="selectLocation('mobile')">
-        <span class="where-watermark" aria-hidden="true">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
-            <path d="M4 29v6h4"/>
-            <path d="M40 35h4v-4a2 2 0 0 0-2-2"/>
-            <circle cx="14" cy="35" r="3.5"/>
-            <circle cx="34" cy="35" r="3.5"/>
-            <path d="M17.5 35h13"/>
-          </svg>
-        </span>
-        <span class="where-top">
-          <span class="where-icon" aria-hidden="true">
+        <span class="where-top-row">
+          <span class="where-icon-tile" aria-hidden="true">
             <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
               <path d="M4 29v6h4"/>
@@ -1331,13 +1338,20 @@
               <path d="M17.5 35h13"/>
             </svg>
           </span>
-          <span class="where-kicker">At Your Home</span>
+          <span class="where-top-right">
+            <span class="where-tag">Across Manchester</span>
+            <span class="where-radio-ring" aria-hidden="true"></span>
+          </span>
         </span>
         <span class="where-title">Home Visit</span>
-        <span class="where-subtitle">Halima comes to you</span>
-        <span class="where-chips">
-          <span class="chip solid">Any day</span>
-          <span class="chip">Greater Manchester</span>
+        <span class="where-subtitle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 4.9 5.3.6-4 3.6 1.1 5.3L12 14.9l-4.6 2.5 1.1-5.3-4-3.6 5.3-.6z"/></svg>
+          Halima comes to you
+        </span>
+        <span class="where-divider" aria-hidden="true"></span>
+        <span class="where-bullets">
+          <span class="where-bullet"><span class="where-dot" aria-hidden="true"></span>Across Greater Manchester</span>
+          <span class="where-bullet"><span class="where-dot" aria-hidden="true"></span>Full sterile setup brought to you</span>
         </span>
       </label>
     </div>
@@ -1696,6 +1710,8 @@ function updateRail() {
   }
   const ft = document.getElementById('foot-total');
   if (ft) ft.innerHTML = svc ? priceHtml(svc) : '—';
+  const fh = document.getElementById('foot-helper');
+  if (fh) fh.classList.toggle('hidden', !(currentStep === 1 && !state.location));
   syncFooter();
 }
 
@@ -1716,7 +1732,8 @@ function syncFooter() {
   if (currentStep === 5) { cta.classList.add('hidden'); return; }
   cta.classList.remove('hidden');
   const src = document.getElementById('btn-step' + currentStep);
-  cta.textContent = currentStep === 4 ? 'Review booking' : 'Continue';
+  const label = document.getElementById('foot-cta-label');
+  if (label) label.textContent = currentStep === 4 ? 'Review booking' : 'Continue';
   cta.disabled = src ? src.disabled : true;
 }
 
@@ -2174,8 +2191,9 @@ if (document.readyState === 'loading') {
     <div class="foot-summary-col">
       <div class="foot-label" id="foot-sum">No treatment selected</div>
       <div class="foot-total" id="foot-total">—</div>
+      <div class="foot-helper hidden" id="foot-helper">Select a venue to continue</div>
     </div>
-    <button class="foot-cta" id="foot-cta" onclick="footerContinue()" disabled>Continue</button>
+    <button class="foot-cta" id="foot-cta" onclick="footerContinue()" disabled><span id="foot-cta-label">Continue</span><svg id="foot-cta-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
   </div>
 </div>
 </body>

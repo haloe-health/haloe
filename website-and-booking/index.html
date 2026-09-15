@@ -1276,8 +1276,15 @@
 .hb-panel.active { display:block; }
 
 /* Panel header */
+.hb-kicker { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-sand); }
+#haloe-booking .hb-kicker { margin-bottom:0.5rem; }
 .hb-title { font-size:2rem; font-weight:500; color:#F5F0E8; margin-bottom:1rem; letter-spacing:-0.02em; }
+.hb-title em { font-style:italic; color:var(--gold-highlight); }
+@media(max-width:480px){ #hb-panel-1 .hb-title { font-size:1.6rem; } }
 .hb-sub { font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(201,160,64,0.5); margin-bottom:3.5rem; }
+.hb-where-helper { font-size:0.82rem; color:var(--text-sand); }
+#haloe-booking .hb-where-helper { margin-top:1rem; }
+.hb-where-helper.hidden { display:none; }
 
 /* Category tabs */
 .hb-tabs { display:flex; gap:0.8rem; margin-bottom:2.8rem; flex-wrap:wrap; }
@@ -1370,6 +1377,8 @@
 
 /* CTA buttons */
 .hb-btn { display:block; width:100%; padding:1.4rem; background:var(--gold,#c9a040); color:#0D0D0D; border:none; font-family:'Poppins',sans-serif; font-size:0.72rem; font-weight:600; letter-spacing:0.18em; text-transform:uppercase; cursor:pointer; transition:all 0.25s; margin-top:3rem; border-radius:50px; }
+#hb-btn1 { display:flex; align-items:center; justify-content:center; gap:0.5rem; }
+#hb-btn1 svg { width:16px; height:16px; flex:none; }
 .hb-btn:hover { background:#dbb85a; }
 .hb-btn:disabled { background:#2a2520; color:rgba(201,160,64,0.3); cursor:not-allowed; }
 .hb-back { background:none; border:1px solid rgba(201,160,64,0.2); color:rgba(201,160,64,0.5); font-family:'Poppins',sans-serif; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; padding:0.6rem 1.2rem; cursor:pointer; margin-bottom:2rem; transition:all 0.2s; border-radius:50px; }
@@ -1397,43 +1406,51 @@
    very first rule in this block) — that's an ID selector, so it silently
    beats a bare .hb-where-card class on padding/margin. Every rule below that
    sets padding or margin is prefixed with #haloe-booking to reliably win. */
-#haloe-booking .hb-where-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:0.5rem 0 1.5rem; }
-@media(max-width:600px){ #haloe-booking .hb-where-grid { grid-template-columns:1fr; } }
+#haloe-booking .hb-where-grid { display:grid; grid-template-columns:1fr; gap:1rem; margin:0.5rem 0 1.5rem; }
+@media(min-width:768px){ #haloe-booking .hb-where-grid { grid-template-columns:1fr 1fr; } }
 .hb-where-card {
-  position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:flex-start; gap:0.5rem;
+  position:relative; display:flex; flex-direction:column;
   background:var(--obsidian-elevated); border:1px solid var(--hairline-border);
   border-radius:var(--radius-xl);
   cursor:pointer; transition:border-color 0.2s, box-shadow 0.2s;
 }
-#haloe-booking .hb-where-card { padding:1.75rem 1.5rem; }
+#haloe-booking .hb-where-card { padding:1.5rem; }
 @media(hover:hover){ .hb-where-card:hover { border-color:var(--active-border); } }
 .hb-where-card input[type="radio"] { position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
 .hb-where-card:has(input:focus-visible) { outline:2px solid var(--gold-primary); outline-offset:3px; }
 .hb-where-card.selected { border-color:var(--active-border); box-shadow:0 0 0 3px var(--active-border); }
-/* Editorial header: small icon + uppercase kicker, then title/subtitle/chips.
-   Everything but the watermark sits at z-index:1 so the oversized
-   background icon never reads on top of the real content. */
-.hb-where-top { display:flex; align-items:center; gap:0.6rem; position:relative; z-index:1; }
-.hb-where-icon { display:flex; color:var(--gold-primary); }
-.hb-where-icon svg { width:36px; height:36px; display:block; }
-.hb-where-kicker { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-sand); }
-.hb-where-name { display:block; font-family:var(--font-heading,'Playfair Display',serif); font-size:22px; color:#F5F0E8; font-weight:500; line-height:1.2; position:relative; z-index:1; }
-.hb-where-venue { display:block; font-size:14px; color:var(--gold-highlight); position:relative; z-index:1; }
-#haloe-booking .hb-where-venue { margin-top:0.15rem; }
-.hb-where-chips { display:flex; flex-wrap:wrap; gap:8px; position:relative; z-index:1; }
-#haloe-booking .hb-where-chips { margin-top:0.25rem; }
-.hb-where-card .chip {
-  font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; border-radius:999px; white-space:nowrap;
+.hb-where-top-row { display:flex; align-items:flex-start; justify-content:space-between; gap:0.75rem; }
+#haloe-booking .hb-where-top-row { margin-bottom:1.1rem; }
+.hb-where-icon-tile {
+  width:84px; height:84px; flex:none; border-radius:var(--radius-md);
+  background:rgba(200,169,110,0.08); border:1px solid var(--hairline-border);
+  display:flex; align-items:center; justify-content:center; color:var(--gold-primary);
+}
+.hb-where-icon-tile svg { width:40px; height:40px; display:block; }
+.hb-where-top-right { display:flex; align-items:center; gap:0.55rem; flex:none; }
+.hb-where-tag {
+  font-size:10px; letter-spacing:0.1em; text-transform:uppercase; border-radius:999px; white-space:nowrap;
   background:rgba(200,169,110,0.08); border:1px solid rgba(200,169,110,0.25); color:var(--gold-highlight);
 }
-#haloe-booking .hb-where-card .chip { padding:6px 12px; }
-.hb-where-card .chip.solid {
-  background:linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color:var(--obsidian-base); font-weight:600; border:none;
+#haloe-booking .hb-where-tag { padding:5px 11px; }
+/* Decorative only — hbSelectLocation() already drives the hidden radio input,
+   which is the real (accessible) selection state; this ring just mirrors it visually. */
+.hb-where-radio-ring {
+  width:22px; height:22px; flex:none; border-radius:999px; border:1px solid var(--hairline-border);
+  display:flex; align-items:center; justify-content:center; transition:border-color 0.2s, background 0.2s;
 }
-/* Oversized watermark of the same icon, bleeding past the card's edge —
-   the card's own overflow:hidden crops it back to the rounded corner. */
-.hb-where-watermark { position:absolute; bottom:-30px; right:-30px; z-index:0; opacity:0.08; color:var(--gold-primary); pointer-events:none; }
-.hb-where-watermark svg { width:150px; height:150px; display:block; }
+.hb-where-radio-ring::after { content:''; width:9px; height:9px; border-radius:999px; background:transparent; transition:background 0.2s; }
+.hb-where-card.selected .hb-where-radio-ring { border-color:var(--gold-primary); background:rgba(200,169,110,0.12); }
+.hb-where-card.selected .hb-where-radio-ring::after { background:var(--gold-primary); }
+.hb-where-name { display:block; font-family:var(--font-heading,'Playfair Display',serif); font-size:22px; color:#F5F0E8; font-weight:500; line-height:1.2; }
+#haloe-booking .hb-where-name { margin-bottom:0.35rem; }
+.hb-where-venue { display:flex; align-items:center; gap:0.4rem; font-size:14px; color:var(--gold-highlight); }
+.hb-where-venue svg { width:14px; height:14px; flex:none; }
+.hb-where-divider { border-top:1px solid var(--hairline-border); }
+#haloe-booking .hb-where-divider { margin:1rem 0 0.75rem; }
+.hb-where-bullets { display:flex; flex-direction:column; gap:0.45rem; }
+.hb-where-bullet { display:flex; align-items:center; gap:0.5rem; font-size:13px; color:var(--text-cashmere); line-height:1.4; }
+.hb-where-dot { width:4px; height:4px; flex:none; border-radius:999px; background:var(--gold-primary); }
 @media(max-width:500px){ .hb-form-row { grid-template-columns:1fr; } .hb-times { grid-template-columns:repeat(3,1fr); } }
 </style>
 
@@ -1451,23 +1468,14 @@
 
   <!-- Step 1 -->
   <div class="hb-panel active" id="hb-panel-1">
-    <p class="hb-title">Where would you like your session?</p>
+    <p class="hb-kicker">Consultation preference</p>
+    <p class="hb-title">Where would you like<br><em>your session?</em></p>
     <p class="hb-sub">Choose a clinic day appointment or a home visit</p>
     <div class="hb-where-grid" id="hb-where-grid">
       <label class="hb-where-card" id="hb-where-clinic" for="hb-where-clinic-radio">
         <input type="radio" name="hbWhereLocation" id="hb-where-clinic-radio" value="clinic" onchange="hbSelectLocation('clinic')">
-        <span class="hb-where-watermark" aria-hidden="true">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="7" width="30" height="35"/>
-            <rect x="20" y="30" width="8" height="12"/>
-            <rect x="14" y="14" width="6" height="6"/>
-            <rect x="28" y="14" width="6" height="6"/>
-            <rect x="14" y="24" width="6" height="6"/>
-            <rect x="28" y="24" width="6" height="6"/>
-          </svg>
-        </span>
-        <span class="hb-where-top">
-          <span class="hb-where-icon" aria-hidden="true">
+        <span class="hb-where-top-row">
+          <span class="hb-where-icon-tile" aria-hidden="true">
             <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <rect x="9" y="7" width="30" height="35"/>
               <rect x="20" y="30" width="8" height="12"/>
@@ -1477,30 +1485,26 @@
               <rect x="28" y="24" width="6" height="6"/>
             </svg>
           </span>
-          <span class="hb-where-kicker">At the Clinic</span>
+          <span class="hb-where-top-right">
+            <span class="hb-where-tag">City centre</span>
+            <span class="hb-where-radio-ring" aria-hidden="true"></span>
+          </span>
         </span>
         <span class="hb-where-name">Clinic Day</span>
-        <span class="hb-where-venue" id="hb-where-clinic-venue"></span>
-        <span class="hb-where-chips">
-          <span class="chip solid">Tuesdays</span>
-          <span class="chip">Private room</span>
-          <span class="chip">Reception</span>
+        <span class="hb-where-venue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg>
+          <span id="hb-where-clinic-venue"></span>
+        </span>
+        <span class="hb-where-divider" aria-hidden="true"></span>
+        <span class="hb-where-bullets">
+          <span class="hb-where-bullet"><span class="hb-where-dot" aria-hidden="true"></span>Every Tuesday &middot; Private treatment room</span>
+          <span class="hb-where-bullet"><span class="hb-where-dot" aria-hidden="true"></span>Reception and lift access</span>
         </span>
       </label>
       <label class="hb-where-card" id="hb-where-mobile" for="hb-where-mobile-radio">
         <input type="radio" name="hbWhereLocation" id="hb-where-mobile-radio" value="mobile" onchange="hbSelectLocation('mobile')">
-        <span class="hb-where-watermark" aria-hidden="true">
-          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
-            <path d="M4 29v6h4"/>
-            <path d="M40 35h4v-4a2 2 0 0 0-2-2"/>
-            <circle cx="14" cy="35" r="3.5"/>
-            <circle cx="34" cy="35" r="3.5"/>
-            <path d="M17.5 35h13"/>
-          </svg>
-        </span>
-        <span class="hb-where-top">
-          <span class="hb-where-icon" aria-hidden="true">
+        <span class="hb-where-top-row">
+          <span class="hb-where-icon-tile" aria-hidden="true">
             <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
               <path d="M4 29v6h4"/>
@@ -1510,18 +1514,26 @@
               <path d="M17.5 35h13"/>
             </svg>
           </span>
-          <span class="hb-where-kicker">At Your Home</span>
+          <span class="hb-where-top-right">
+            <span class="hb-where-tag">Across Manchester</span>
+            <span class="hb-where-radio-ring" aria-hidden="true"></span>
+          </span>
         </span>
         <span class="hb-where-name">Home Visit</span>
-        <span class="hb-where-venue">Halima comes to you</span>
-        <span class="hb-where-chips">
-          <span class="chip solid">Any day</span>
-          <span class="chip">Greater Manchester</span>
+        <span class="hb-where-venue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 4.9 5.3.6-4 3.6 1.1 5.3L12 14.9l-4.6 2.5 1.1-5.3-4-3.6 5.3-.6z"/></svg>
+          Halima comes to you
+        </span>
+        <span class="hb-where-divider" aria-hidden="true"></span>
+        <span class="hb-where-bullets">
+          <span class="hb-where-bullet"><span class="hb-where-dot" aria-hidden="true"></span>Across Greater Manchester</span>
+          <span class="hb-where-bullet"><span class="hb-where-dot" aria-hidden="true"></span>Full sterile setup brought to you</span>
         </span>
       </label>
     </div>
     <div class="hb-loc-notice" id="hb-loc-notice">Halima comes to your home. Travel is free in Manchester city centre; outside it, travel is charged at the cost of a taxi, which she&rsquo;ll confirm when she contacts you.</div>
-    <button class="hb-btn" id="hb-btn1" onclick="hbGoTo(2)" disabled>Continue</button>
+    <p class="hb-where-helper hidden" id="hb-where-helper">Select a venue to continue</p>
+    <button class="hb-btn" id="hb-btn1" onclick="hbGoTo(2)" disabled><span id="hb-btn1-label">Continue</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
   </div>
 
   <!-- Step 2 -->
@@ -1701,6 +1713,7 @@ function hbSelectLocation(loc){
   document.getElementById('hb-where-mobile-radio').checked = (loc==='mobile');
   document.getElementById('hb-loc-notice').classList.toggle('visible', loc==='mobile');
   document.getElementById('hb-btn1').disabled=false;
+  document.getElementById('hb-where-helper').classList.add('hidden');
   // A date/time picked under the other location's calendar/slots may no
   // longer be valid — drop it rather than carry over a bad pick.
   hbState.date=null; hbState.time=null;
