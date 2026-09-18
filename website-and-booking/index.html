@@ -35,7 +35,7 @@
     "name": "Milton Hall (Remedy Lounge) — Clinic Day, Tuesdays",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Milton Hall, 3rd Floor, 244 Deansgate",
+      "streetAddress": "Milton Hall, 244 Deansgate",
       "addressLocality": "Manchester",
       "postalCode": "M3 4BQ",
       "addressCountry": "GB"
@@ -1668,7 +1668,7 @@ function hbNet(svc){ return Math.round(svc.price * (1 - HB_PROMO_DISCOUNT)); }
 /* ---- Weekly Clinic Day config ----
    Must stay in step with the same constants in book.html and functions/_clinic.js. */
 const HB_CLINIC_VENUE_NAME = 'Milton Hall, Deansgate';
-const HB_CLINIC_VENUE_ADDRESS = 'Milton Hall, 3rd Floor, 244 Deansgate, Manchester M3 4BQ';
+const HB_CLINIC_VENUE_ADDRESS = 'Milton Hall, 244 Deansgate, Manchester, M3 4BQ';
 const HB_CLINIC_WEEKDAY = 2; // 0=Sunday ... 6=Saturday. 2 = Tuesday.
 const HB_CLINIC_SLOT_TEMPLATE = ['09:30', '11:15', '13:00', '14:45', '16:30', '18:15'];
 // First bookable clinic day, confirmed by Halima after her venue viewing.
@@ -1909,7 +1909,7 @@ hbInit();
       <div class="cert-tag">Lift access</div>
       <div class="cert-tag">Full payment at booking</div>
     </div>
-    <p style="margin-top:28px;color:var(--dim);">Milton Hall, 3rd Floor, 244 Deansgate, Manchester M3 4BQ</p>
+    <p style="margin-top:28px;color:var(--dim);">Milton Hall, 244 Deansgate, Manchester, M3 4BQ</p>
     <br>
     <a href="book.html?location=clinic" class="btn btn-gold">Book a Tuesday Slot</a>
   </div>
