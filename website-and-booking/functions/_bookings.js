@@ -29,6 +29,21 @@ export async function ensureBookingsTable(db) {
     )`),
     db.prepare('CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings (booking_date)'),
   ]);
+  // Additive migration for columns introduced after the original schema — the
+  // admin calendar needs location/address/price, which the original hold/confirm
+  // flow never had to know about. D1/SQLite has no ADD COLUMN IF NOT EXISTS, so
+  // attempt the ALTER and swallow the "already exists" error.
+  await addColumnIfMissing(db, 'location', 'TEXT');
+  await addColumnIfMissing(db, 'address', 'TEXT');
+  await addColumnIfMissing(db, 'amount_pence', 'INTEGER');
+}
+
+async function addColumnIfMissing(db, column, type) {
+  try {
+    await db.prepare(`ALTER TABLE bookings ADD COLUMN ${column} ${type}`).run();
+  } catch (e) {
+    if (!/duplicate column/i.test(String(e && e.message || e))) throw e;
+  }
 }
 
 // '6:00 pm' -> 1080 (minutes from midnight). Returns null if unparseable.
@@ -90,8 +105,8 @@ export async function reserveSlot(db, b, now) {
   const res = await db
     .prepare(
       `INSERT INTO bookings
-         (booking_date, start_min, end_min, treatment, customer_name, customer_email, customer_phone, status, hold_expires_at, created_at)
-       SELECT ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?
+         (booking_date, start_min, end_min, treatment, customer_name, customer_email, customer_phone, location, address, amount_pence, status, hold_expires_at, created_at)
+       SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?
        WHERE NOT EXISTS (
          SELECT 1 FROM bookings x
          WHERE x.booking_date = ?
@@ -103,6 +118,7 @@ export async function reserveSlot(db, b, now) {
     .bind(
       b.bookingDate, b.startMin, b.endMin, b.treatment || null,
       b.name || null, b.email || null, b.phone || null,
+      b.location || null, b.address || null, Number.isFinite(b.amountPence) ? b.amountPence : null,
       holdExpires, now,
       b.bookingDate, b.endMin, b.startMin, now
     )
@@ -110,6 +126,24 @@ export async function reserveSlot(db, b, now) {
 
   if (!res.meta || res.meta.changes !== 1) return null; // lost the race — slot taken
   return res.meta.last_row_id;
+}
+
+// Every active booking (confirmed, plus not-yet-lapsed pending holds), oldest
+// first, for the admin calendar. Upcoming/past filtering happens client-side
+// in the admin page so the toggle is instant with no re-fetch.
+export async function listBookings(db) {
+  const now = Math.floor(Date.now() / 1000);
+  const { results } = await db
+    .prepare(
+      `SELECT id, booking_date, start_min, end_min, treatment, customer_name, customer_email,
+              customer_phone, location, address, amount_pence, status, hold_expires_at, created_at
+       FROM bookings
+       WHERE status = 'confirmed' OR (status = 'pending' AND hold_expires_at > ?)
+       ORDER BY booking_date ASC, start_min ASC`
+    )
+    .bind(now)
+    .all();
+  return results || [];
 }
 
 export async function confirmBooking(db, bookingId) {

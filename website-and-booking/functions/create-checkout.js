@@ -1,5 +1,5 @@
 import { ensureBookingsTable, reserveSlot, releaseBooking, slotToMinutes, HOLD_SECONDS } from './_bookings.js';
-import { CLINIC_VENUE_NAME } from './_clinic.js';
+import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
 
 export async function onRequestPost(context) {
   try {
@@ -32,6 +32,9 @@ export async function onRequestPost(context) {
           name: customerName,
           email: customerEmail,
           phone: customerPhone,
+          location: location || 'mobile',
+          address: location === 'clinic' ? `${venue} — ${CLINIC_VENUE_ADDRESS}` : customerAddress,
+          amountPence: Number(amount),
         }, now);
 
         if (bookingId === null) {
