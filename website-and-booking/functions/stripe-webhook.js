@@ -109,12 +109,12 @@ export async function onRequestPost(context) {
     // Every booking is paid in full — there is no deposit path.
 
     // Confirm the held slot so it converts from a temporary hold into a firm
-    // booking that keeps blocking the time. Best-effort: if the row lapsed or the
-    // DB is unbound, the notifications below must still go out.
+    // booking that keeps blocking the time. Best-effort: if the row lapsed or
+    // Supabase isn't configured, the notifications below must still go out.
     const bookingId = md.bookingId;
-    if (bookingId && context.env.DB) {
+    if (bookingId && context.env.SUPABASE_URL && context.env.SUPABASE_SERVICE_ROLE_KEY) {
       try {
-        await confirmBooking(context.env.DB, Number(bookingId));
+        await confirmBooking(context.env, Number(bookingId));
       } catch (err) {
         console.error('Failed to confirm booking slot:', err);
       }

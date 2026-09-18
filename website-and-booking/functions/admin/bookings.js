@@ -1,20 +1,18 @@
 // GET /admin/bookings — JSON data for the admin calendar. Gated by
 // functions/admin/_middleware.js (Basic Auth), same as the page itself.
 
-import { ensureBookingsTable, listBookings } from '../_bookings.js';
+import { listBookings } from '../_bookings.js';
 
 export async function onRequestGet(context) {
-  const db = context.env.DB;
-  if (!db) {
-    return new Response(JSON.stringify({ error: 'DB not bound' }), {
+  if (!context.env.SUPABASE_URL || !context.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return new Response(JSON.stringify({ error: 'Supabase not configured' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
   try {
-    await ensureBookingsTable(db);
-    const rows = await listBookings(db);
+    const rows = await listBookings(context.env);
     return new Response(JSON.stringify({ bookings: rows }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },

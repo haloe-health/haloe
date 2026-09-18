@@ -23,6 +23,7 @@ import {
   BLACK, GOLD, CREAM, MUTED, HAIRLINE,
   sendEmail, esc, emailButton, emailHeader, emailFooter, emailShell,
 } from './_email.js';
+import { sbRequest } from './_supabase.js';
 
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
@@ -82,7 +83,7 @@ export async function onRequestPost(context) {
     const phone = str(data.phone);
     const dob = str(data.date_of_birth);
 
-    const clientRows = await sbRequest(supabaseUrl, serviceKey, {
+    const clientRows = await sbRequest(context.env, {
       path: '/rest/v1/clients?on_conflict=email',
       method: 'POST',
       prefer: 'resolution=merge-duplicates,return=representation',
@@ -134,7 +135,7 @@ export async function onRequestPost(context) {
       signature_name: orNull(data.signature_name),
       signature_date: orNull(data.signature_date),
     };
-    await sbRequest(supabaseUrl, serviceKey, {
+    await sbRequest(context.env, {
       path: '/rest/v1/intake_forms',
       method: 'POST',
       prefer: 'return=minimal',
@@ -175,29 +176,6 @@ function json(obj, status) {
     status,
     headers: { 'Content-Type': 'application/json' },
   });
-}
-
-// Call the Supabase REST API (PostgREST) with the service-role key. The key goes
-// in BOTH the apikey header and the Bearer token — PostgREST needs both. Throws
-// on a non-2xx response so the caller's try/catch returns a 500. Parses and
-// returns JSON when the response has a body (e.g. return=representation).
-async function sbRequest(baseUrl, serviceKey, { path, method, prefer, body }) {
-  const res = await fetch(`${baseUrl}${path}`, {
-    method,
-    headers: {
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
-      'Content-Type': 'application/json',
-      ...(prefer ? { Prefer: prefer } : {}),
-    },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Supabase ${method} ${path} responded ${res.status}: ${text}`);
-  }
-  const text = await res.text();
-  return text ? JSON.parse(text) : null;
 }
 
 // Trim a value to a string ('' for null/undefined/non-string-ish).

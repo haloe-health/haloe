@@ -1,4 +1,4 @@
-import { ensureBookingsTable, reserveSlot, releaseBooking, slotToMinutes, HOLD_SECONDS } from './_bookings.js';
+import { reserveSlot, releaseBooking, slotToMinutes, HOLD_SECONDS } from './_bookings.js';
 import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
 
 export async function onRequestPost(context) {
@@ -12,19 +12,18 @@ export async function onRequestPost(context) {
 
     // --- Reserve the slot before taking payment (prevents double-booking) ---
     // Held as 'pending' for HOLD_SECONDS; the webhook confirms it on payment, and
-    // an abandoned checkout's hold simply lapses. If the DB isn't bound, or the
-    // time can't be parsed, we fail OPEN and let the booking proceed unreserved —
-    // never block a paying customer over an availability bug.
-    const db = context.env.DB;
+    // an abandoned checkout's hold simply lapses. If Supabase isn't configured,
+    // or the time can't be parsed, we fail OPEN and let the booking proceed
+    // unreserved — never block a paying customer over an availability bug.
+    const hasSupabase = Boolean(context.env.SUPABASE_URL && context.env.SUPABASE_SERVICE_ROLE_KEY);
     const now = Math.floor(Date.now() / 1000);
     const startMin = slotToMinutes(time);
     const duration = Number(durationMin) > 0 ? Number(durationMin) : 60;
     let bookingId = null;
 
-    if (db && bookingDate && startMin !== null) {
+    if (hasSupabase && bookingDate && startMin !== null) {
       try {
-        await ensureBookingsTable(db);
-        bookingId = await reserveSlot(db, {
+        bookingId = await reserveSlot(context.env, {
           bookingDate,
           startMin,
           endMin: startMin + duration,
@@ -102,8 +101,8 @@ export async function onRequestPost(context) {
     if (!response.ok) {
       console.error('Stripe error:', session);
       // Payment setup failed — free the slot we just held so it isn't stuck.
-      if (db && bookingId !== null) {
-        try { await releaseBooking(db, bookingId); } catch (e) { console.error('releaseBooking failed:', e); }
+      if (hasSupabase && bookingId !== null) {
+        try { await releaseBooking(context.env, bookingId); } catch (e) { console.error('releaseBooking failed:', e); }
       }
       return new Response(JSON.stringify({ error: session.error?.message || 'Stripe error' }), {
         status: 500,

@@ -7,7 +7,7 @@
 // The client owns the fixed slot list and its treatment durations, so it decides
 // which of its slots overlap — this endpoint just reports what's taken.
 
-import { ensureBookingsTable, busyIntervals, purgeExpiredHolds } from './_bookings.js';
+import { busyIntervals, purgeExpiredHolds } from './_bookings.js';
 
 export async function onRequestGet(context) {
   const url = new URL(context.request.url);
@@ -18,17 +18,15 @@ export async function onRequestGet(context) {
     return json({ busy: [] });
   }
 
-  const db = context.env.DB;
-  if (!db) {
-    // No database bound — availability is simply unknown; don't block anyone.
+  if (!context.env.SUPABASE_URL || !context.env.SUPABASE_SERVICE_ROLE_KEY) {
+    // Not configured — availability is simply unknown; don't block anyone.
     return json({ busy: [] });
   }
 
   try {
-    await ensureBookingsTable(db);
     const now = Math.floor(Date.now() / 1000);
-    await purgeExpiredHolds(db, now);
-    const busy = await busyIntervals(db, date, now);
+    await purgeExpiredHolds(context.env, now);
+    const busy = await busyIntervals(context.env, date, now);
     return json({ busy });
   } catch (err) {
     console.error('availability error:', err);

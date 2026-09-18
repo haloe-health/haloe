@@ -1,50 +1,26 @@
-// Shared booking/availability helpers for the D1-backed slot reservation system.
-// The `_` prefix keeps this file from becoming a route.
+// Shared booking/availability helpers for the Supabase-backed slot
+// reservation system. The `_` prefix keeps this file from becoming a route.
 //
-// One table, `bookings`, lives in the existing D1 database (`haloe-clients`, bound
-// as DB). A row is written the moment a customer starts Stripe checkout, with
-// status 'pending' and a hold that expires after HOLD_SECONDS. On payment the
-// webhook flips it to 'confirmed'. Abandoned checkouts simply expire — the overlap
-// check ignores pending rows whose hold has lapsed, so the slot frees itself.
+// One table, public.bookings, lives in Supabase (Postgres), created once via
+// supabase-bookings-schema.sql — there's no lazy CREATE TABLE step here, the
+// way there was under D1. A row is written the moment a customer starts
+// Stripe checkout, with status 'pending' and a hold that expires after
+// HOLD_SECONDS. On payment the webhook flips it to 'confirmed'. Abandoned
+// checkouts simply expire — the overlap check ignores pending rows whose
+// hold has lapsed, so the slot frees itself.
+//
+// Migrated from Cloudflare D1 in Sep 2026. D1/SQLite serializes all writes,
+// so a plain "INSERT...SELECT...WHERE NOT EXISTS" was atomic on its own.
+// Postgres has real concurrent writers, so reserveSlot() below calls a
+// Postgres function (reserve_slot, in the schema file) via Supabase's RPC
+// endpoint instead of running the check and the insert as two separate
+// REST calls — the function takes a transaction-scoped advisory lock keyed
+// by booking_date, which closes the race a plain check-then-insert would
+// reopen.
+
+import { sbRequest } from './_supabase.js';
 
 export const HOLD_SECONDS = 35 * 60; // 35 min — at or above Stripe's 30-min minimum session lifetime
-
-// Created lazily so there is no separate migration step to run against D1.
-// CREATE TABLE IF NOT EXISTS is cheap and idempotent.
-export async function ensureBookingsTable(db) {
-  await db.batch([
-    db.prepare(`CREATE TABLE IF NOT EXISTS bookings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      booking_date TEXT NOT NULL,
-      start_min INTEGER NOT NULL,
-      end_min INTEGER NOT NULL,
-      treatment TEXT,
-      customer_name TEXT,
-      customer_email TEXT,
-      customer_phone TEXT,
-      status TEXT NOT NULL DEFAULT 'pending',
-      stripe_session_id TEXT,
-      hold_expires_at INTEGER,
-      created_at INTEGER NOT NULL
-    )`),
-    db.prepare('CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings (booking_date)'),
-  ]);
-  // Additive migration for columns introduced after the original schema — the
-  // admin calendar needs location/address/price, which the original hold/confirm
-  // flow never had to know about. D1/SQLite has no ADD COLUMN IF NOT EXISTS, so
-  // attempt the ALTER and swallow the "already exists" error.
-  await addColumnIfMissing(db, 'location', 'TEXT');
-  await addColumnIfMissing(db, 'address', 'TEXT');
-  await addColumnIfMissing(db, 'amount_pence', 'INTEGER');
-}
-
-async function addColumnIfMissing(db, column, type) {
-  try {
-    await db.prepare(`ALTER TABLE bookings ADD COLUMN ${column} ${type}`).run();
-  } catch (e) {
-    if (!/duplicate column/i.test(String(e && e.message || e))) throw e;
-  }
-}
 
 // '6:00 pm' -> 1080 (minutes from midnight). Returns null if unparseable.
 export function slotToMinutes(timeStr) {
@@ -69,93 +45,86 @@ export function durationToMinutes(timeStr) {
   return total > 0 ? total : 60;
 }
 
-// Best-effort cleanup of lapsed holds, so the table doesn't accumulate dead rows.
-// Safe to skip — the overlap query already ignores expired pending rows.
-export async function purgeExpiredHolds(db, now) {
+// Best-effort cleanup of lapsed holds, so the table doesn't accumulate dead
+// rows. Safe to skip — every query below already ignores expired pending rows.
+export async function purgeExpiredHolds(env, now) {
   try {
-    await db
-      .prepare(`DELETE FROM bookings WHERE status = 'pending' AND hold_expires_at < ?`)
-      .bind(now)
-      .run();
+    await sbRequest(env, {
+      path: `/rest/v1/bookings?status=eq.pending&hold_expires_at=lt.${now}`,
+      method: 'DELETE',
+      prefer: 'return=minimal',
+    });
   } catch (e) {
     console.error('purgeExpiredHolds failed:', e);
   }
 }
 
-// Active (blocking) bookings for a date: everything confirmed, plus pending holds
-// that haven't lapsed. Returns [{ s: startMin, e: endMin }].
-export async function busyIntervals(db, bookingDate, now) {
-  const { results } = await db
-    .prepare(
-      `SELECT start_min AS s, end_min AS e FROM bookings
-       WHERE booking_date = ?
-         AND (status = 'confirmed' OR (status = 'pending' AND hold_expires_at > ?))`
-    )
-    .bind(bookingDate, now)
-    .all();
-  return results || [];
+// Active (blocking) bookings for a date: everything confirmed, plus pending
+// holds that haven't lapsed. Returns [{ s: startMin, e: endMin }].
+export async function busyIntervals(env, bookingDate, now) {
+  const rows = await sbRequest(env, {
+    path: `/rest/v1/bookings?select=start_min,end_min&booking_date=eq.${bookingDate}`
+      + `&or=(status.eq.confirmed,and(status.eq.pending,hold_expires_at.gt.${now}))`,
+    method: 'GET',
+  });
+  return (rows || []).map(r => ({ s: r.start_min, e: r.end_min }));
 }
 
-// Atomically reserve a slot iff it doesn't overlap an active booking. The
-// INSERT…SELECT…WHERE NOT EXISTS is evaluated as a single serialized write in
-// D1/SQLite, so two racing requests can't both succeed. Returns the new row id,
-// or null if the slot was already taken.
-export async function reserveSlot(db, b, now) {
+// Reserve a slot iff it doesn't overlap an active booking, via the
+// reserve_slot Postgres function (see the file header for why this can't be
+// a plain check-then-insert against Postgres). Returns the new row id, or
+// null if the slot was already taken.
+export async function reserveSlot(env, b, now) {
   const holdExpires = now + HOLD_SECONDS;
-  const res = await db
-    .prepare(
-      `INSERT INTO bookings
-         (booking_date, start_min, end_min, treatment, customer_name, customer_email, customer_phone, location, address, amount_pence, status, hold_expires_at, created_at)
-       SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?
-       WHERE NOT EXISTS (
-         SELECT 1 FROM bookings x
-         WHERE x.booking_date = ?
-           AND x.start_min < ?
-           AND x.end_min > ?
-           AND (x.status = 'confirmed' OR (x.status = 'pending' AND x.hold_expires_at > ?))
-       )`
-    )
-    .bind(
-      b.bookingDate, b.startMin, b.endMin, b.treatment || null,
-      b.name || null, b.email || null, b.phone || null,
-      b.location || null, b.address || null, Number.isFinite(b.amountPence) ? b.amountPence : null,
-      holdExpires, now,
-      b.bookingDate, b.endMin, b.startMin, now
-    )
-    .run();
-
-  if (!res.meta || res.meta.changes !== 1) return null; // lost the race — slot taken
-  return res.meta.last_row_id;
+  const result = await sbRequest(env, {
+    path: '/rest/v1/rpc/reserve_slot',
+    method: 'POST',
+    body: {
+      p_booking_date: b.bookingDate,
+      p_start_min: b.startMin,
+      p_end_min: b.endMin,
+      p_treatment: b.treatment || null,
+      p_customer_name: b.name || null,
+      p_customer_email: b.email || null,
+      p_customer_phone: b.phone || null,
+      p_location: b.location || null,
+      p_address: b.address || null,
+      p_amount_pence: Number.isFinite(b.amountPence) ? b.amountPence : null,
+      p_hold_expires_at: holdExpires,
+      p_now: now,
+    },
+  });
+  return result; // the function returns the new id, or null if the slot was taken
 }
 
 // Every active booking (confirmed, plus not-yet-lapsed pending holds), oldest
 // first, for the admin calendar. Upcoming/past filtering happens client-side
 // in the admin page so the toggle is instant with no re-fetch.
-export async function listBookings(db) {
+export async function listBookings(env) {
   const now = Math.floor(Date.now() / 1000);
-  const { results } = await db
-    .prepare(
-      `SELECT id, booking_date, start_min, end_min, treatment, customer_name, customer_email,
-              customer_phone, location, address, amount_pence, status, hold_expires_at, created_at
-       FROM bookings
-       WHERE status = 'confirmed' OR (status = 'pending' AND hold_expires_at > ?)
-       ORDER BY booking_date ASC, start_min ASC`
-    )
-    .bind(now)
-    .all();
-  return results || [];
+  const rows = await sbRequest(env, {
+    path: '/rest/v1/bookings?select=id,booking_date,start_min,end_min,treatment,customer_name,'
+      + 'customer_email,customer_phone,location,address,amount_pence,status,hold_expires_at,created_at'
+      + `&or=(status.eq.confirmed,and(status.eq.pending,hold_expires_at.gt.${now}))`
+      + '&order=booking_date.asc,start_min.asc',
+    method: 'GET',
+  });
+  return rows || [];
 }
 
-export async function confirmBooking(db, bookingId) {
-  await db
-    .prepare(`UPDATE bookings SET status = 'confirmed' WHERE id = ?`)
-    .bind(bookingId)
-    .run();
+export async function confirmBooking(env, bookingId) {
+  await sbRequest(env, {
+    path: `/rest/v1/bookings?id=eq.${bookingId}`,
+    method: 'PATCH',
+    prefer: 'return=minimal',
+    body: { status: 'confirmed' },
+  });
 }
 
-export async function releaseBooking(db, bookingId) {
-  await db
-    .prepare(`DELETE FROM bookings WHERE id = ? AND status = 'pending'`)
-    .bind(bookingId)
-    .run();
+export async function releaseBooking(env, bookingId) {
+  await sbRequest(env, {
+    path: `/rest/v1/bookings?id=eq.${bookingId}&status=eq.pending`,
+    method: 'DELETE',
+    prefer: 'return=minimal',
+  });
 }
