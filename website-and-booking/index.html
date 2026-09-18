@@ -646,8 +646,8 @@
     .footer-links { flex-wrap:wrap; justify-content:center; }
   }
 
-  /* Footer now carries more links (Clinic Day, Hijama in Manchester,
-     Chaperone Policy) than it used to, so it needs to stack sooner than the
+  /* Footer now carries more links (Clinic Day, Hijama in Manchester)
+     than it used to, so it needs to stack sooner than the
      860px mobile breakpoint above — otherwise it overlaps footer-right on
      ordinary laptop-width windows. */
   @media(max-width:1200px){
@@ -844,7 +844,6 @@
     <li><a href="#clinic-day" onclick="toggleNavOverlay()">Clinic Day</a></li>
     <li><a href="#process" onclick="toggleNavOverlay()">What to Expect</a></li>
     <li><a href="hijama-manchester.html">Hijama in Manchester</a></li>
-    <li><a href="chaperone-policy.html">Chaperone Policy</a></li>
   </ul>
   <a href="book.html" class="btn btn-gold nav-overlay-cta">Book Now</a>
 </div>
@@ -909,7 +908,7 @@
     <h2>Healing rooted in <em>the Sunnah</em></h2>
     <p>Hijama — wet cupping — is one of the oldest traditions in natural wellbeing. Practised for thousands of years and encouraged by the Prophet Muhammad ﷺ, it uses gentle suction and a few small, superficial incisions. Most clients describe feeling lighter and more settled afterwards.</p>
     <p>haloe offers three kinds of session. <strong>Massage</strong> to ease everyday tension and help you unwind. <strong>Dry cupping</strong>, which uses suction alone and leaves the skin unbroken. And <strong>wet cupping</strong> — hijama itself. Each can be booked on its own, or as a package of sessions spread over several weeks.</p>
-    <p>It is a practice for women and men based in Manchester, run by Halima Yasmin — a CMA and IPHM accredited therapist who graduated with an 88% distinction from The Suuk Academy's L5 Diploma in Health and Cupping Therapy. Women are treated directly by Halima; men's sessions are conducted with a chaperone present.</p>
+    <p>It is a practice for women and men based in Manchester, run by Halima Yasmin — a CMA and IPHM accredited therapist who graduated with an 88% distinction from The Suuk Academy's L5 Diploma in Health and Cupping Therapy.</p>
     <p>Every session is private, dignified, and designed entirely around your comfort — I come to you, so you can rest in your own space afterwards. Flat pricing, unlimited cups, and take-home black seed oil aftercare every time.</p>
     <br>
     <a href="book.html" class="btn btn-gold">Book a Consultation</a>
@@ -1590,16 +1589,12 @@
         <select id="hb-ref"><option value="">Please select</option><option>Instagram</option><option>TikTok</option><option>Friend or family</option><option>Google search</option><option>Word of mouth</option><option>Other</option></select>
       </div>
       <div class="hb-field"><label>Anything Halima should know?</label><textarea id="hb-notes" placeholder="Health notes, questions, or preferences…"></textarea></div>
-      <div class="hb-field"><label>Gender *</label>
-        <select id="hb-gender" onchange="hbToggleChaperone();hbCheck3()"><option value="">Please select</option><option value="female">Female</option><option value="male">Male</option></select>
-      </div>
       <div class="hb-field">
         <p class="hb-sec-label" style="margin-bottom:0.7rem;">Consent & acknowledgements</p>
         <div class="hb-checks">
           <label class="hb-check"><input type="checkbox" id="hb-c1" onchange="hbCheck3()">I confirm I am 18 or over, or booking for a family member with their consent.</label>
           <label class="hb-check"><input type="checkbox" id="hb-c2" onchange="hbCheck3()">I understand haloe offers complementary wellness therapy, not a substitute for medical diagnosis.</label>
           <label class="hb-check"><input type="checkbox" id="hb-c3" onchange="hbCheck3()">I will complete the full health intake form sent after this booking, before my appointment.</label>
-          <label class="hb-check" id="hb-c4-wrap" style="display:none;"><input type="checkbox" id="hb-c4" onchange="hbCheck3()">I understand my session will be conducted with a chaperone present.</label>
         </div>
       </div>
     </div>
@@ -1806,12 +1801,6 @@ function hbValidAddress(v){
   return v.trim().length>=8 && /\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i.test(v);
 }
 
-function hbToggleChaperone(){
-  const isMale=document.getElementById('hb-gender').value==='male';
-  document.getElementById('hb-c4-wrap').style.display=isMale?'':'none';
-  if(!isMale) document.getElementById('hb-c4').checked=false;
-}
-
 // Clinic sessions happen at a fixed venue, so there's no client address to
 // collect for them — the field is hidden and skipped from validation.
 function hbIsClinic(){ return hbState.loc==='clinic'; }
@@ -1826,18 +1815,14 @@ function hbCheck3(){
     venueField.style.display='none';
   }
 
-  const gender=document.getElementById('hb-gender').value;
-  const chaperoneOk=gender!=='male'||document.getElementById('hb-c4').checked;
   const ok=document.getElementById('hb-fname').value.trim()&&
     document.getElementById('hb-lname').value.trim()&&
     document.getElementById('hb-phone').value.trim()&&
     document.getElementById('hb-email').value.trim()&&
     (hbIsClinic()||hbValidAddress(document.getElementById('hb-address').value))&&
-    gender&&
     document.getElementById('hb-c1').checked&&
     document.getElementById('hb-c2').checked&&
-    document.getElementById('hb-c3').checked&&
-    chaperoneOk;
+    document.getElementById('hb-c3').checked;
   document.getElementById('hb-btn4').disabled=!ok;
 }
 
@@ -1942,7 +1927,6 @@ hbInit();
     <a href="#clinic-day">Clinic Day</a>
     <a href="#process">What to Expect</a>
     <a href="hijama-manchester.html">Hijama in Manchester</a>
-    <a href="chaperone-policy.html">Chaperone Policy</a>
     <a href="book.html">Book</a>
     <a href="https://instagram.com/haloe.health" target="_blank">Instagram</a>
   </div>

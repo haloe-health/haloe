@@ -3,7 +3,7 @@ import { CLINIC_VENUE_NAME } from './_clinic.js';
 
 export async function onRequestPost(context) {
   try {
-    const { amount, treatmentName, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin, gender, chaperone } = await context.request.json();
+    const { amount, treatmentName, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin } = await context.request.json();
     // location is 'clinic' | 'mobile'. Every booking is paid in full — there is
     // no deposit path.
     const venue = location === 'clinic' ? CLINIC_VENUE_NAME : '';
@@ -69,8 +69,6 @@ export async function onRequestPost(context) {
     if (venue) params.append('metadata[venue]', venue);
     params.append('metadata[customerAddress]', customerAddress || '');
     params.append('metadata[notes]', notes || '');
-    params.append('metadata[gender]', gender || '');
-    params.append('metadata[chaperone]', chaperone ? 'true' : 'false');
     if (bookingId !== null) params.append('metadata[bookingId]', String(bookingId));
     // Expire the Checkout Session in step with the slot hold, so an abandoned
     // payment and its reservation lapse together.

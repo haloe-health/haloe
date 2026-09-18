@@ -863,25 +863,6 @@
   .ios-row select option { direction: ltr; background: var(--obsidian-elevated); }
   .ios-row input.invalid, .ios-row textarea.invalid { color: #E5736A; }
 
-  /* Gender select — pill-style control rather than a plain inline field,
-     matching the new design system's "selection" look. Still a native
-     <select id="gender">; checkStep3()/toggleChaperone() read its .value
-     exactly as before — this is a styling-only change. */
-  #gender {
-    flex: none;
-    background: var(--obsidian-floating);
-    border: 1px solid var(--hairline-border);
-    border-radius: var(--radius-full);
-    padding: 0.35rem 1rem;
-    text-align: center;
-    color: var(--gold-primary);
-    font-weight: 500;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  #gender:focus-visible {
-    border-color: var(--active-border);
-    box-shadow: 0 0 0 3px rgba(223,195,142,0.2);
-  }
 
   /* Consent toggles */
   .ios-toggle {
@@ -1208,13 +1189,12 @@
   /* Mobile touch targets + iOS zoom fix: Safari auto-zooms the page on focus
      of any text input under 16px — the step-3 fields were 1.05rem (~13px at
      this page's 78% base scale). Bump to a real 16px and grow row height so
-     each field is a full 44px+ tap target, without touching validation or
-     checkStep3()/toggleChaperone() logic. */
+     each field is a full 44px+ tap target, without touching validation
+     logic. */
   @media (max-width: 600px) {
     .ios-row { padding: 0.9rem 0.85rem; min-height: 48px; }
     .ios-row input, .ios-row select, .ios-row textarea { font-size: 16px; }
     .ios-row select { min-height: 44px; }
-    #gender { padding: 0.6rem 1.2rem; min-height: 44px; }
     .back-link, .back-link:link, .back-link:visited { min-height: 44px; }
     .foot-cta { min-height: 48px; }
     /* Real body copy (instructions, descriptions, legal/consent text, error
@@ -1439,14 +1419,6 @@
 
     <div class="ios-group">
       <div class="ios-row">
-        <label for="gender">Gender</label>
-        <select id="gender" onchange="toggleChaperone();checkStep3()">
-          <option value="">Please select</option>
-          <option value="female">Female</option>
-          <option value="male">Male</option>
-        </select>
-      </div>
-      <div class="ios-row">
         <label for="referral">Heard via</label>
         <select id="referral">
           <option value="">Please select</option>
@@ -1474,11 +1446,6 @@
       <label class="ios-toggle">
         <span>I understand haloe offers complementary wellness therapy, not a substitute for medical diagnosis or treatment.</span>
         <input type="checkbox" id="consent2" onchange="checkStep3()">
-        <span class="switch"></span>
-      </label>
-      <label class="ios-toggle" id="consent3-wrap" style="display:none;">
-        <span>I understand my session will be conducted with a chaperone present. <a href="chaperone-policy.html" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--gold);">Read the chaperone policy →</a></span>
-        <input type="checkbox" id="consent3" onchange="checkStep3()">
         <span class="switch"></span>
       </label>
     </div>
@@ -1962,12 +1929,6 @@ function validateField(inputId, errorId, validatorFn, message) {
   return ok;
 }
 
-function toggleChaperone() {
-  const isMale = document.getElementById('gender').value === 'male';
-  document.getElementById('consent3-wrap').style.display = isMale ? '' : 'none';
-  if (!isMale) document.getElementById('consent3').checked = false;
-}
-
 // Clinic sessions happen at a fixed venue, so there's no client address to
 // collect — the field is hidden and skipped from validation entirely.
 function isClinic() {
@@ -1993,16 +1954,10 @@ function checkStep3() {
     'Please enter a valid email address so we can send your intake form.');
   const phoneOk = validateField('phone', 'phone-error', isValidPhone,
     'Please enter a valid UK mobile number (e.g. 07700 900900 or +44 7700 900900).');
-  const addressOk = isClinic() || validateField('address', 'address-error', isValidAddress,
-    'Please include your full address and postcode so Halima knows where to travel to.');
-  const gender = document.getElementById('gender').value;
-  const genderOk = gender.length > 0;
-  const chaperoneOk = gender !== 'male' || document.getElementById('consent3').checked;
   const consentsOk =
     document.getElementById('consent1').checked &&
-    document.getElementById('consent2').checked &&
-    chaperoneOk;
-  document.getElementById('btn-step4').disabled = !(nameOk && emailOk && phoneOk && addressOk && genderOk && consentsOk);
+    document.getElementById('consent2').checked;
+  document.getElementById('btn-step4').disabled = !(nameOk && emailOk && phoneOk && addressOk && consentsOk);
   syncFooter();
 }
 
@@ -2048,8 +2003,6 @@ async function handlePayment() {
   const phone = document.getElementById('phone').value.trim();
   const notes = document.getElementById('notes') ? document.getElementById('notes').value : '';
   const address = isClinic() ? '' : document.getElementById('address').value.trim();
-  const gender = document.getElementById('gender').value;
-  const chaperone = gender === 'male' && document.getElementById('consent3').checked;
 
   // Final guard — never reach Stripe with missing or invalid contact details.
   if (!name) {
@@ -2089,8 +2042,6 @@ async function handlePayment() {
         location: state.location,
         notes,
         customerAddress: address,
-        gender,
-        chaperone,
         // Machine-readable fields for slot reservation (the strings above are
         // for display and the WhatsApp/email copy).
         bookingDate: state.date ? toISODate(state.date) : '',

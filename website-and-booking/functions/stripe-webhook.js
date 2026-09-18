@@ -99,8 +99,6 @@ export async function onRequestPost(context) {
     const venue = md.venue || '';
     const address = upperPostcode(md.customerAddress || '');
     const notes = md.notes || '';
-    const gender = md.gender || '';
-    const chaperone = md.chaperone === 'true';
 
     const amountPence =
       typeof session.amount_total === 'number'
@@ -122,7 +120,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, gender, chaperone };
+    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes };
 
     // WhatsApp notification to Halima. Sent before the email block and wrapped in
     // its own try/catch so it still fires if Resend is unconfigured or failing —
@@ -378,8 +376,6 @@ function halimaEmailHtml(d) {
                 { label: 'Address', value: d.location === 'clinic' ? CLINIC_VENUE_ADDRESS : d.address },
                 { label: 'Phone', value: d.phone },
                 { label: 'Email', value: d.email },
-                { label: 'Gender', value: d.gender ? (d.gender.charAt(0).toUpperCase() + d.gender.slice(1)) : '' },
-                ...(d.gender === 'male' ? [{ label: 'Chaperone', value: d.chaperone ? 'Confirmed — required' : 'NOT confirmed — required', gold: !d.chaperone }] : []),
                 { label: 'Notes', value: d.notes },
               ])}
               <tr>
