@@ -2115,6 +2115,9 @@ function goToStep(n) {
       renderTimes();
     }
   }
+  if (n === 4) {
+    checkStep3();
+  }
   if (n === 5) {
     renderSummary();
     const full = document.getElementById('btn-full');
