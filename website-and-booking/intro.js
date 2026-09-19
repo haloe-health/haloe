@@ -328,6 +328,24 @@
     finished = true;
     if (flightRAF) { cancelAnimationFrame(flightRAF); flightRAF = null; }
     window.clearTimeout(hardCapTimer);
+
+    // The hero section has its own independent GSAP reveal (image fade+scale,
+    // word stagger) that starts on page load and isn't synced to this intro's
+    // timing — it can still be visibly mid-fade once this overlay clears,
+    // reading as a second, unexplained delay right after the first. Snap it
+    // straight to its finished state so the hero is fully settled the instant
+    // this overlay starts fading — a no-op if GSAP never loaded, reduced
+    // motion was on (that script skips itself entirely in that case), or the
+    // hero markup isn't present on this page.
+    try {
+      if (window.gsap) {
+        var heroImg = document.querySelector('#hero .hero-right img');
+        var heroWords = document.querySelectorAll('#hero h1 .hw-word');
+        if (heroImg) gsap.set(heroImg, { opacity: 1, scale: 1 });
+        if (heroWords.length) gsap.set(heroWords, { yPercent: 0, opacity: 1 });
+      }
+    } catch (e) {}
+
     overlay.classList.add('haloe-intro-out');
     window.setTimeout(function () {
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
