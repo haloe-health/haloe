@@ -238,14 +238,9 @@
      HERO
      ============================================================ */
   .hero { padding-top:28px; }
-  .illustration-placeholder {
-    aspect-ratio:4/3; border-radius:var(--card-radius);
-    background:linear-gradient(135deg, var(--gold-soft), rgba(200,169,110,0.06));
-    border:1.5px dashed var(--gold);
-    display:flex; align-items:center; justify-content:center;
-    color:var(--gold-deep); font-size:0.9rem; font-weight:600; letter-spacing:0.04em;
-    text-align:center; padding:20px;
-  }
+  .hero-photo { position:relative; overflow:hidden; border-radius:var(--card-radius); aspect-ratio:3/4; }
+  .hero-photo img { width:100%; height:100%; object-fit:cover; object-position:50% 30%; display:block; }
+  @media (min-width:768px) { .hero-photo { aspect-ratio:16/10; } }
   .badge-pill {
     display:inline-flex; align-items:center; gap:8px;
     background:var(--white); border-radius:999px; padding:10px 18px; margin-top:22px;
@@ -313,8 +308,12 @@
     .about-card { padding:48px; flex-direction:row; align-items:center; gap:48px; }
     .about-card .about-copy { flex:1.3; }
     .about-card .about-figure { flex:1; text-align:center; }
+    .about-figure img { max-width:360px; }
   }
-  .about-figure img { width:140px; margin:0 auto; }
+  .about-figure img {
+    width:100%; max-width:280px; aspect-ratio:3/4; object-fit:cover;
+    object-position:50% 25%; border-radius:var(--card-radius); margin:0 auto; display:block;
+  }
 
   /* ============================================================
      CONDITIONS
@@ -555,7 +554,13 @@
      ============================================================ -->
 <section class="hero">
   <div class="container">
-    <div class="illustration-placeholder reveal" aria-hidden="true">Illustration coming soon</div>
+    <figure class="hero-photo reveal">
+      <picture>
+        <source type="image/webp" srcset="images/halima-hero-640.webp 640w, images/halima-hero.webp 1024w" sizes="(min-width: 768px) 600px, 100vw">
+        <source type="image/jpeg" srcset="images/halima-hero-640.jpg 640w, images/halima-hero.jpg 1024w" sizes="(min-width: 768px) 600px, 100vw">
+        <img src="images/halima-hero.jpg" width="1024" height="1024" alt="Halima Yasmin, founder of haloe, seated with a cup of tea" loading="eager" fetchpriority="high">
+      </picture>
+    </figure>
     <div class="badge-pill reveal">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
       Women &amp; men welcome
@@ -632,7 +637,11 @@
         <div style="margin-top:20px;"><a href="book.html" class="btn-pill btn-gold">Book a consultation</a></div>
       </div>
       <div class="about-figure">
-        <img src="haloe-logo-flower.svg" alt="haloe flower mark">
+        <picture>
+          <source type="image/webp" srcset="images/halima-about-640.webp 640w, images/halima-about.webp 1024w" sizes="(min-width: 1024px) 360px, 280px">
+          <source type="image/jpeg" srcset="images/halima-about-640.jpg 640w, images/halima-about.jpg 1024w" sizes="(min-width: 1024px) 360px, 280px">
+          <img src="images/halima-about.jpg" width="1024" height="1024" alt="Halima Yasmin, founder of haloe, seated with a cup of tea" loading="lazy">
+        </picture>
       </div>
     </div>
   </div>
