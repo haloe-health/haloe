@@ -2001,6 +2001,8 @@ function checkStep3() {
     'Please enter a valid email address so we can send your intake form.');
   const phoneOk = validateField('phone', 'phone-error', isValidPhone,
     'Please enter a valid UK mobile number (e.g. 07700 900900 or +44 7700 900900).');
+  const addressOk = isClinic() || validateField('address', 'address-error', isValidAddress,
+    'Please include your full address and postcode so Halima knows where to travel to.');
   const consentsOk =
     document.getElementById('consent1').checked &&
     document.getElementById('consent2').checked;
