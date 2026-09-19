@@ -272,9 +272,10 @@
   .hero-rays .light-rays { position:relative; width:100%; height:100%; overflow:hidden; }
   .hero-rays .light-rays canvas { display:block; width:100%; height:100%; }
 
-  /* About → Conditions divider: soft dithered wave texture (WebGL), adapted
-     from the components "Dither" background pack. Pure vanilla JS, no
-     dependencies, mouse interaction off for a quiet, non-distracting strip. */
+  /* About → Process divider (was About → Conditions before Conditions moved
+     to the top of the page, Sep 2026): soft dithered wave texture (WebGL),
+     adapted from the components "Dither" background pack. Pure vanilla JS,
+     no dependencies, mouse interaction off for a quiet, non-distracting strip. */
   .about-divider { position:relative; width:100%; height:110px; background:var(--deep); overflow:hidden; }
   .about-divider canvas { display:block; width:100%; height:100%; }
   @media(max-width:680px){ .about-divider { height:80px; } }
@@ -334,7 +335,13 @@
   }
 
   /* CONDITIONS */
-  #conditions { background:#080806; }
+  /* Now the first section on the page (moved above the hero) -- padding-top
+     clears the fixed nav and lands the heading roughly where the hero
+     heading used to sit (matches .hero-left's own 140px top padding).
+     border-bottom keeps the golden divider that used to appear here only
+     because #process's own border-top happened to follow it directly --
+     now explicit, so it survives regardless of what section comes next. */
+  #conditions { background:#080806; padding-top:140px; border-bottom:1px solid var(--border); }
 
   /* Flower spiral layout */
   .flower-section { display:flex; flex-direction:column; align-items:center; gap:24px; margin-top:0; }
@@ -850,87 +857,6 @@
   <a href="book.html" class="btn btn-gold nav-overlay-cta">Book Now</a>
 </div>
 
-<!-- HERO -->
-<section id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-left">
-  <div class="hero-rays" aria-hidden="true">
-    <div class="light-rays"
-         data-origin="top-center"
-         data-color="#e0b862"
-         data-speed="0.4"
-         data-spread="0.65"
-         data-length="1.6"
-         data-follow="false"
-         data-mouse="0"
-         data-noise="0.08"
-         data-distortion="0.15"
-         data-pulsating="false"
-         data-fade="1"
-         data-saturation="1"></div>
-  </div>
-  <div class="hero-content">
-    <div class="hero-eyebrow">Women &amp; Men · Mobile across Manchester · Tuesdays at Deansgate</div>
-    <h1>Ancient healing.<br><em>Modern standards.</em></h1>
-    <p class="hero-sub">Massage, dry cupping and hijama for women and men across Manchester — unhurried sessions in the comfort of your own home, rooted in the prophetic tradition and held to modern professional standards&hellip;or visit our weekly clinic day at Milton Hall, Deansgate.</p>
-    <div class="hero-btns">
-      <a href="book.html" class="btn btn-gold">Book Your Session</a>
-    </div>
-  </div>
-  </div>
-  <div class="hero-right">
-    <img src="hero.jpg" alt="Halima Yasmin performing hijama therapy">
-  </div>
-</section>
-
-<!-- STATS -->
-<div class="stats-row">
-  <div class="stat reveal">
-    <div class="stat-num">88%</div>
-    <div class="stat-label">Distinction Grade</div>
-  </div>
-  <div class="stat reveal">
-    <div class="stat-num">L5</div>
-    <div class="stat-label">Diploma · Health & Cupping</div>
-  </div>
-  <div class="stat reveal">
-    <div class="stat-num">CMA</div>
-    <div class="stat-label">& IPHM Accredited</div>
-  </div>
-  <div class="stat reveal">
-    <div class="stat-num">♀♂</div>
-    <div class="stat-label">Women &amp; Men Welcome</div>
-  </div>
-</div>
-
-<!-- ABOUT -->
-<section id="about">
-  <div class="about-text reveal">
-    <div class="section-tag">About haloe</div>
-    <h2>Healing rooted in <em>the Sunnah</em></h2>
-    <p>Hijama — wet cupping — is one of the oldest traditions in natural wellbeing. Practised for thousands of years and encouraged by the Prophet Muhammad ﷺ, it uses gentle suction and a few small, superficial incisions. Most clients describe feeling lighter and more settled afterwards.</p>
-    <p>haloe offers three kinds of session. <strong>Massage</strong> to ease everyday tension and help you unwind. <strong>Dry cupping</strong>, which uses suction alone and leaves the skin unbroken. And <strong>wet cupping</strong> — hijama itself. Each can be booked on its own, or as a package of sessions spread over several weeks.</p>
-    <p>It is a practice for women and men based in Manchester, run by Halima Yasmin — a CMA and IPHM accredited therapist who graduated with an 88% distinction from The Suuk Academy's L5 Diploma in Health and Cupping Therapy.</p>
-    <p>Every session is private, dignified, and designed entirely around your comfort — I come to you, so you can rest in your own space afterwards. Flat pricing, unlimited cups, and take-home black seed oil aftercare every time.</p>
-    <br>
-    <a href="book.html" class="btn btn-gold">Book a Consultation</a>
-    <div class="cert-strip">
-      <div class="cert-tag">L5 Diploma</div>
-      <div class="cert-tag">CMA Accredited</div>
-      <div class="cert-tag">IPHM Accredited</div>
-      <div class="cert-tag">Fully Insured</div>
-    </div>
-  </div>
-  <div class="about-img reveal" style="display:none;">
-    <div class="logo-hero-wrap">
-      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6IG5vbmU7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogI2NmOGEyYTsKICAgICAgfQoKICAgICAgLmNscy00IHsKICAgICAgICBvcGFjaXR5OiAwOwogICAgICB9CgogICAgICAuY2xzLTUgewogICAgICAgIGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7CiAgICAgIH0KCiAgICAgIC5jbHMtNiB7CiAgICAgICAgZmlsbDogI2U2ZTdlODsKICAgICAgfQoKICAgICAgLmNscy03IHsKICAgICAgICBmaWxsOiAjZmJiNzE2OwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+CiAgICAgIDxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT → CONDITIONS DIVIDER: soft dithered wave texture -->
-<div class="about-divider" id="aboutDither" aria-hidden="true"></div>
-
 <!-- CONDITIONS -->
 <section id="conditions">
   <div class="reveal">
@@ -1216,6 +1142,91 @@
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
 }());
 </script>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-left">
+  <div class="hero-rays" aria-hidden="true">
+    <div class="light-rays"
+         data-origin="top-center"
+         data-color="#e0b862"
+         data-speed="0.4"
+         data-spread="0.65"
+         data-length="1.6"
+         data-follow="false"
+         data-mouse="0"
+         data-noise="0.08"
+         data-distortion="0.15"
+         data-pulsating="false"
+         data-fade="1"
+         data-saturation="1"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Women &amp; Men · Mobile across Manchester · Tuesdays at Deansgate</div>
+    <h1>Ancient healing.<br><em>Modern standards.</em></h1>
+    <p class="hero-sub">Massage, dry cupping and hijama for women and men across Manchester — unhurried sessions in the comfort of your own home, rooted in the prophetic tradition and held to modern professional standards&hellip;or visit our weekly clinic day at Milton Hall, Deansgate.</p>
+    <div class="hero-btns">
+      <a href="book.html" class="btn btn-gold">Book Your Session</a>
+    </div>
+  </div>
+  </div>
+  <div class="hero-right">
+    <img src="hero.jpg" alt="Halima Yasmin performing hijama therapy">
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat reveal">
+    <div class="stat-num">88%</div>
+    <div class="stat-label">Distinction Grade</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-num">L5</div>
+    <div class="stat-label">Diploma · Health & Cupping</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-num">CMA</div>
+    <div class="stat-label">& IPHM Accredited</div>
+  </div>
+  <div class="stat reveal">
+    <div class="stat-num">♀♂</div>
+    <div class="stat-label">Women &amp; Men Welcome</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-text reveal">
+    <div class="section-tag">About haloe</div>
+    <h2>Healing rooted in <em>the Sunnah</em></h2>
+    <p>Hijama — wet cupping — is one of the oldest traditions in natural wellbeing. Practised for thousands of years and encouraged by the Prophet Muhammad ﷺ, it uses gentle suction and a few small, superficial incisions. Most clients describe feeling lighter and more settled afterwards.</p>
+    <p>haloe offers three kinds of session. <strong>Massage</strong> to ease everyday tension and help you unwind. <strong>Dry cupping</strong>, which uses suction alone and leaves the skin unbroken. And <strong>wet cupping</strong> — hijama itself. Each can be booked on its own, or as a package of sessions spread over several weeks.</p>
+    <p>It is a practice for women and men based in Manchester, run by Halima Yasmin — a CMA and IPHM accredited therapist who graduated with an 88% distinction from The Suuk Academy's L5 Diploma in Health and Cupping Therapy.</p>
+    <p>Every session is private, dignified, and designed entirely around your comfort — I come to you, so you can rest in your own space afterwards. Flat pricing, unlimited cups, and take-home black seed oil aftercare every time.</p>
+    <br>
+    <a href="book.html" class="btn btn-gold">Book a Consultation</a>
+    <div class="cert-strip">
+      <div class="cert-tag">L5 Diploma</div>
+      <div class="cert-tag">CMA Accredited</div>
+      <div class="cert-tag">IPHM Accredited</div>
+      <div class="cert-tag">Fully Insured</div>
+    </div>
+  </div>
+  <div class="about-img reveal" style="display:none;">
+    <div class="logo-hero-wrap">
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6IG5vbmU7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogI2NmOGEyYTsKICAgICAgfQoKICAgICAgLmNscy00IHsKICAgICAgICBvcGFjaXR5OiAwOwogICAgICB9CgogICAgICAuY2xzLTUgewogICAgICAgIGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7CiAgICAgIH0KCiAgICAgIC5jbHMtNiB7CiAgICAgICAgZmlsbDogI2U2ZTdlODsKICAgICAgfQoKICAgICAgLmNscy03IHsKICAgICAgICBmaWxsOiAjZmJiNzE2OwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+CiAgICAgIDxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT → PROCESS DIVIDER: soft dithered wave texture. Originally sat
+     between About and Conditions before Conditions moved to the top of the
+     page (Sep 2026) -- it's a generic transition visual, not tied to either
+     section's content, so it just kept its position after About. -->
+<div class="about-divider" id="aboutDither" aria-hidden="true"></div>
+
 
 <!-- PROCESS -->
 <section id="process">
@@ -2387,9 +2398,10 @@ void main(){
 }());
 </script>
 
-<!-- About → Conditions divider: soft dithered wave texture (WebGL), adapted
-     from the components "Dither" background pack. Pure vanilla JS, no
-     dependencies. Mouse interaction disabled and tuned for a slow, quiet
+<!-- About → Process divider (was About → Conditions before Conditions moved
+     to the top of the page, Sep 2026): soft dithered wave texture (WebGL),
+     adapted from the components "Dither" background pack. Pure vanilla JS,
+     no dependencies. Mouse interaction disabled and tuned for a slow, quiet
      effect — an accent strip, not something meant to draw the eye. -->
 <script>
 (function () {
