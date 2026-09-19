@@ -47,12 +47,6 @@ export const SERVICES = {
 // is done.
 export const TEST_SERVICE = { name: 'TEST — £1 (do not book)', price: 1 };
 
-// One-off £1 LIVE-mode test booking — mirrors book.html's SERVICES.__livetest
-// (reachable only via ?treatment=test1, not shown in the picker). Remove
-// alongside that block, and its handling in applyDeepLink(), once live
-// testing is done.
-export const LIVE_TEST_SERVICE = { name: 'Test booking (£1)', price: 1 };
-
 // Same as services-data.js — ended Sep 2026, kept at 0 in step with that
 // file. HALOE20 (functions/_discounts.js) is the only discount left,
 // applied on top of this full price server-side in create-checkout.js.
@@ -76,7 +70,6 @@ export function netPrice(svc) {
 // off it.
 export function findService(treatmentName, category) {
   if (treatmentName === TEST_SERVICE.name) return TEST_SERVICE;
-  if (treatmentName === LIVE_TEST_SERVICE.name) return LIVE_TEST_SERVICE;
   if (category) {
     const list = SERVICES[category];
     if (!list) return null;
