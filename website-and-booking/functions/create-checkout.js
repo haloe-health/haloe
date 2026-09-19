@@ -2,24 +2,28 @@ import { reserveSlot, releaseBooking, slotToMinutes, HOLD_SECONDS } from './_boo
 import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
 import { findService, netPrice } from './_services.js';
 import { validateDiscountCode, applyDiscount } from './_discounts.js';
+import { travelZoneFor, travelFeeFor } from './_travel.js';
 
 export async function onRequestPost(context) {
   try {
-    const { treatmentName, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin, discountCode } = await context.request.json();
+    const { treatmentName, treatmentCategory, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin, discountCode, travelPostcode } = await context.request.json();
     // location is 'clinic' | 'mobile'. Every booking is paid in full — there is
     // no deposit path.
     const venue = location === 'clinic' ? CLINIC_VENUE_NAME : '';
 
     // Price comes from the server-side catalogue, never the client — a
     // tampered request body must never be able to set its own amount.
-    const svc = findService(treatmentName);
+    // treatmentCategory is required: four names are reused across dry/wet
+    // cupping at different prices (see the comment on findService()) — a
+    // category-less lookup would silently resolve to the wrong one.
+    const svc = findService(treatmentName, treatmentCategory);
     if (!svc) {
       return new Response(JSON.stringify({ error: 'unknown_treatment' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    const originalAmount = netPrice(svc) * 100; // pence
+    const originalAmount = netPrice(svc) * 100; // pence — the TREATMENT price only
 
     // The discount is re-validated from scratch here — never trust that the
     // client's earlier /apply-discount check still holds. A code could have
@@ -27,7 +31,12 @@ export async function onRequestPost(context) {
     // another tab in the meantime. A code that fails re-validation rejects
     // the checkout outright (rather than silently charging full price)
     // rather than surprise a customer who saw a discounted total.
-    let amount = originalAmount;
+    //
+    // Deliberately applied to `originalAmount` (the treatment price) alone,
+    // before travelPence is computed or added anywhere below — a discount
+    // code can never reach the travel fee, because the travel figure simply
+    // doesn't exist yet at this point in the function.
+    let treatmentAmount = originalAmount;
     let appliedCode = null;
     let appliedPercent = 0;
     let discountPenceApplied = 0;
@@ -47,11 +56,25 @@ export async function onRequestPost(context) {
         });
       }
       const applied = applyDiscount(originalAmount, result.percent);
-      amount = applied.finalPence;
+      treatmentAmount = applied.finalPence;
       discountPenceApplied = applied.discountPence;
       appliedCode = result.code;
       appliedPercent = result.percent;
     }
+
+    // Travel fee — home visits only, zone computed server-side from the
+    // postcode, never trusted from the client. Clinic Day bookings have a
+    // fixed venue and never get a travel line. An unparseable postcode
+    // (shouldn't happen — book.html validates the format before letting the
+    // customer continue) falls back to Zone C rather than blocking payment.
+    let travelZone = null;
+    let travelPence = 0;
+    if (location === 'mobile') {
+      travelZone = travelZoneFor(travelPostcode) || 'C';
+      travelPence = travelFeeFor(travelZone);
+    }
+
+    const totalAmount = treatmentAmount + travelPence;
 
     const secretKey = context.env.STRIPE_SECRET_KEY;
     const origin = new URL(context.request.url).origin;
@@ -79,9 +102,11 @@ export async function onRequestPost(context) {
           phone: customerPhone,
           location: location || 'mobile',
           address: location === 'clinic' ? `${venue} — ${CLINIC_VENUE_ADDRESS}` : customerAddress,
-          amountPence: Number(amount),
+          amountPence: Number(totalAmount),
           discountCode: appliedCode,
           discountPence: discountPenceApplied,
+          travelZone,
+          travelPence,
         }, now);
 
         if (bookingId === null) {
@@ -99,7 +124,7 @@ export async function onRequestPost(context) {
 
     const productName = `Full payment — ${treatmentName}`;
 
-    const discountNote = appliedCode ? ` ${appliedCode} applied: ${appliedPercent}% off.` : '';
+    const discountNote = appliedCode ? ` ${appliedCode} applied: ${appliedPercent}% off the treatment price.` : '';
     const description = `Full payment for ${treatmentName} with haloe.${discountNote} Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.`;
 
     const params = new URLSearchParams();
@@ -109,8 +134,23 @@ export async function onRequestPost(context) {
     params.append('line_items[0][price_data][currency]', 'gbp');
     params.append('line_items[0][price_data][product_data][name]', productName);
     params.append('line_items[0][price_data][product_data][description]', description);
-    params.append('line_items[0][price_data][unit_amount]', String(amount));
+    params.append('line_items[0][price_data][unit_amount]', String(treatmentAmount));
     params.append('line_items[0][quantity]', '1');
+    // Travel is always its own line item for a home visit — never merged into
+    // the treatment price, and never discounted (see the comment above where
+    // treatmentAmount is computed). Zone C has no fixed fee, but still gets a
+    // £0 line so it's itemised everywhere a real fee would be, rather than
+    // silently missing.
+    if (location === 'mobile') {
+      const travelName = travelZone === 'A' ? 'Travel — Zone A (Oldham & nearby)'
+        : travelZone === 'B' ? 'Travel — Zone B (Greater Manchester)'
+        : 'Travel — confirmed by WhatsApp before your session';
+      params.append('line_items[1][price_data][currency]', 'gbp');
+      params.append('line_items[1][price_data][product_data][name]', travelName);
+      params.append('line_items[1][price_data][product_data][description]', 'Home-visit travel fee. Never discounted by promotional codes.');
+      params.append('line_items[1][price_data][unit_amount]', String(travelPence));
+      params.append('line_items[1][quantity]', '1');
+    }
     params.append('metadata[customerName]', customerName);
     params.append('metadata[customerPhone]', customerPhone || '');
     params.append('metadata[treatmentName]', treatmentName);
@@ -126,6 +166,10 @@ export async function onRequestPost(context) {
       params.append('metadata[discountPence]', String(discountPenceApplied));
       params.append('metadata[originalAmountPence]', String(originalAmount));
     }
+    if (location === 'mobile') {
+      params.append('metadata[travelZone]', travelZone);
+      params.append('metadata[travelPence]', String(travelPence));
+    }
     // Expire the Checkout Session in step with the slot hold, so an abandoned
     // payment and its reservation lapse together.
     params.append('expires_at', String(now + HOLD_SECONDS));
@@ -136,11 +180,16 @@ export async function onRequestPost(context) {
       time: time || '',
       location: location || 'mobile',
       venue: venue || '',
-      amount: String(amount),
+      amount: String(totalAmount),
+      treatmentAmount: String(treatmentAmount),
       ...(appliedCode ? {
         discountCode: appliedCode,
         discountAmount: String(discountPenceApplied),
         originalAmount: String(originalAmount),
+      } : {}),
+      ...(location === 'mobile' ? {
+        travelZone,
+        travelPence: String(travelPence),
       } : {}),
     });
     params.append('success_url', `${origin}/booking-confirmed.html?${successParams.toString()}`);

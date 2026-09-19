@@ -53,21 +53,35 @@ export const TEST_SERVICE = { name: 'TEST — £1 (do not book)', price: 1 };
 // testing is done.
 export const LIVE_TEST_SERVICE = { name: 'Test booking (£1)', price: 1 };
 
-// Same 20% promotional discount as services-data.js — keep PROMO_DISCOUNT in
-// step with that file. Dry, wet and package prices are already whole pounds
-// after the cut; Math.round is belt-and-braces for any future price that isn't.
-const PROMO_DISCOUNT = 0.20;
+// Same as services-data.js — ended Sep 2026, kept at 0 in step with that
+// file. HALOE20 (functions/_discounts.js) is the only discount left,
+// applied on top of this full price server-side in create-checkout.js.
+const PROMO_DISCOUNT = 0;
 
 export function netPrice(svc) {
   return Math.round(svc.price * (1 - PROMO_DISCOUNT));
 }
 
-// Looks a treatment up by its exact display name across every category —
-// the only input the client sends that identifies price. Returns null for an
-// unrecognised name rather than guessing.
-export function findService(treatmentName) {
+// Looks a treatment up by its exact display name, scoped to `category` when
+// given. Four names are deliberately reused with different prices across dry
+// and wet cupping (e.g. "Full Back" is £80 dry, £90 wet) — searching without
+// a category silently returns whichever one is defined first in SERVICES
+// (dry, since it comes before wet), undercharging every wet booking of a
+// shared name. Both callers (create-checkout.js, apply-discount.js) must
+// pass the category the client actually picked; when a category is given,
+// the search is scoped to it and does NOT fall back to other categories on a
+// miss, so a wrong/stale category can't silently resolve to a different
+// treatment's price. Category-less lookup (the old behaviour) is kept only
+// for callers that genuinely have no category, and callers should migrate
+// off it.
+export function findService(treatmentName, category) {
   if (treatmentName === TEST_SERVICE.name) return TEST_SERVICE;
   if (treatmentName === LIVE_TEST_SERVICE.name) return LIVE_TEST_SERVICE;
+  if (category) {
+    const list = SERVICES[category];
+    if (!list) return null;
+    return list.find(s => s.name === treatmentName) || null;
+  }
   for (const list of Object.values(SERVICES)) {
     const svc = list.find(s => s.name === treatmentName);
     if (svc) return svc;

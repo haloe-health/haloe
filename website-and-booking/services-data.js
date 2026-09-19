@@ -45,17 +45,13 @@ const SERVICES = {
 };
 
 /* ---- Promotional discount ----
-   Every entry in SERVICES keeps its FULL price, so it can be shown struck
-   through. netPrice() is the amount actually displayed and charged — nothing
-   should read svc.price directly for money.
-
-   To end the promotion, set PROMO_DISCOUNT to 0. The strikethroughs disappear
-   and full prices are charged again; no other line needs touching.
-
-   Every price is a multiple of 5, so a 20% cut lands on a whole pound in each
-   case (£75 -> £60, £115 -> £92, £340 -> £272). Math.round is belt-and-braces
-   for any future price that isn't. */
-const PROMO_DISCOUNT = 0.20;
+   Ended Sep 2026 — PROMO_DISCOUNT is 0, so netPrice() now just returns
+   svc.price (the full list price) and every strikethrough disappears on its
+   own. HALOE20 (see functions/_discounts.js) is the only discount left,
+   applied on top of this full price rather than stacking with a promo.
+   netPrice() is still the amount actually displayed and charged — nothing
+   should read svc.price directly for money, in case a promo returns later. */
+const PROMO_DISCOUNT = 0;
 
 function netPrice(svc) {
   return Math.round(svc.price * (1 - PROMO_DISCOUNT));

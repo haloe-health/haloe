@@ -244,15 +244,24 @@ function render() {
       const phone = normalizePhone(b.customer_phone);
       const isClinic = (b.location || 'mobile') === 'clinic';
       const conflict = conflictIds.has(b.id);
+      const needsTravelConfirm = !isClinic && b.travel_zone === 'C';
+      const travelBadge = isClinic ? '' :
+        '<span class="loc">' + (
+          b.travel_zone === 'A' ? 'Zone A · ' + money(b.travel_pence) :
+          b.travel_zone === 'B' ? 'Zone B · ' + money(b.travel_pence) :
+          b.travel_zone === 'C' ? 'Zone C · travel TBC' : 'Travel —'
+        ) + '</span>';
       return '<div class="row' + (conflict ? ' conflict' : '') + '">' +
         '<span class="time">' + minutesToLabel(b.start_min) + '</span>' +
         '<span class="name">' + escapeHtml(b.customer_name || 'Unknown') + '</span>' +
         '<span class="meta">' + escapeHtml(b.treatment || '') + '</span>' +
         '<span class="loc' + (isClinic ? ' clinic' : '') + '">' + (isClinic ? 'Clinic Day' : 'Mobile') + '</span>' +
+        travelBadge +
         '<span class="meta">' + escapeHtml(b.address || '') + '</span>' +
         '<span class="amount">' + money(b.amount_pence) + '</span>' +
         '<span class="status ' + escapeHtml(b.status) + '">' + (b.status === 'confirmed' ? 'Paid' : 'Pending payment') + '</span>' +
         (conflict ? '<span class="conflict-flag">⚠ Overlaps another booking</span>' : '') +
+        (needsTravelConfirm ? '<span class="conflict-flag">⚠ Confirm travel cost</span>' : '') +
         '<span class="actions">' +
           (phone ? '<a href="tel:+' + phone + '">Call</a><a href="https://wa.me/' + phone + '" target="_blank" rel="noopener">WhatsApp</a>' : '') +
         '</span>' +

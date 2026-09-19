@@ -26,7 +26,9 @@ create table if not exists public.bookings (
   hold_expires_at bigint,                              -- unix seconds
   created_at      bigint not null,
   discount_code   text,                                -- e.g. 'HALOE20'; null if none applied
-  discount_pence  integer                               -- amount knocked off amount_pence; null/0 if none
+  discount_pence  integer,                              -- amount knocked off amount_pence; null/0 if none
+  travel_zone     text,                                 -- 'A' | 'B' | 'C'; null for clinic bookings
+  travel_pence    integer                               -- travel fee charged online; 0 for clinic and Zone C
 );
 
 -- Added Sep 2026 alongside discount codes (supabase-discounts-schema.sql) —
@@ -34,6 +36,10 @@ create table if not exists public.bookings (
 -- created before these two columns existed.
 alter table public.bookings add column if not exists discount_code text;
 alter table public.bookings add column if not exists discount_pence integer;
+
+-- Added Sep 2026 alongside the zone-based travel fee (functions/_travel.js).
+alter table public.bookings add column if not exists travel_zone text;
+alter table public.bookings add column if not exists travel_pence integer;
 
 create index if not exists bookings_date_idx on public.bookings(booking_date);
 
@@ -49,17 +55,21 @@ create index if not exists bookings_date_idx on public.bookings(booking_date);
 -- gave us for free, without serializing different days against each other.
 -- Returns the new row's id, or NULL if the slot was already taken.
 --
--- The two discount_* params were added Sep 2026 as trailing DEFAULT NULL
--- arguments — deliberately, so existing callers keep working unchanged.
--- Postgres identifies a function by name AND argument types though, so
--- adding params doesn't replace the old 12-arg version in place; it creates
--- a second, overloaded function with the same name, which then makes
--- `grant execute on function public.reserve_slot` ambiguous ("function name
--- ... is not unique"). Drop the old signature by its exact original argument
--- list first so only the current 14-arg version remains.
+-- The discount_* and (now) travel_* params were each added as trailing
+-- DEFAULT NULL arguments — deliberately, so existing callers keep working
+-- unchanged. Postgres identifies a function by name AND argument types
+-- though, so adding params doesn't replace the previous version in place;
+-- it creates a second, overloaded function with the same name, which then
+-- makes `grant execute on function public.reserve_slot` ambiguous
+-- ("function name ... is not unique"). Drop every prior signature by its
+-- exact original argument list first so only the current 16-arg version
+-- remains.
 -- ------------------------------------------------------------------ --
 drop function if exists public.reserve_slot(
   date, integer, integer, text, text, text, text, text, text, integer, bigint, bigint
+);
+drop function if exists public.reserve_slot(
+  date, integer, integer, text, text, text, text, text, text, integer, bigint, bigint, text, integer
 );
 
 create or replace function public.reserve_slot(
@@ -76,7 +86,9 @@ create or replace function public.reserve_slot(
   p_hold_expires_at bigint,
   p_now bigint,
   p_discount_code text default null,
-  p_discount_pence integer default null
+  p_discount_pence integer default null,
+  p_travel_zone text default null,
+  p_travel_pence integer default null
 ) returns bigint
 language plpgsql
 as $$
@@ -98,11 +110,11 @@ begin
   insert into public.bookings
     (booking_date, start_min, end_min, treatment, customer_name, customer_email,
      customer_phone, location, address, amount_pence, status, hold_expires_at, created_at,
-     discount_code, discount_pence)
+     discount_code, discount_pence, travel_zone, travel_pence)
   values
     (p_booking_date, p_start_min, p_end_min, p_treatment, p_customer_name, p_customer_email,
      p_customer_phone, p_location, p_address, p_amount_pence, 'pending', p_hold_expires_at, p_now,
-     p_discount_code, p_discount_pence)
+     p_discount_code, p_discount_pence, p_travel_zone, p_travel_pence)
   returning id into v_id;
 
   return v_id;
@@ -120,5 +132,5 @@ alter table public.bookings enable row level security;
 grant select, insert, update, delete on public.bookings to service_role;
 grant usage, select on sequence public.bookings_id_seq to service_role;
 grant execute on function public.reserve_slot(
-  date, integer, integer, text, text, text, text, text, text, integer, bigint, bigint, text, integer
+  date, integer, integer, text, text, text, text, text, text, integer, bigint, bigint, text, integer, text, integer
 ) to service_role;

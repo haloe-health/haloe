@@ -566,6 +566,15 @@
   }
   .loc-notice.visible { display: block; }
 
+  /* ---- Postcode / travel fee (Step 1, home visit only) ---- */
+  .postcode-block { margin-top: 1.1rem; }
+  .postcode-row input { text-transform: uppercase; letter-spacing: 0.04em; }
+  .travel-fee-line {
+    display: flex; justify-content: space-between; align-items: center; gap: 0.6rem;
+    padding: 0.7rem 0.85rem; font-size: 0.85rem; color: var(--gold-deep);
+  }
+  .travel-fee-line.pending { color: var(--text-muted); }
+
   /* ---- Date Picker ---- */
   .date-section { margin-bottom: 2rem; }
   .section-label {
@@ -929,6 +938,16 @@
   .pass-name { font-size: 1rem; color: var(--cream); letter-spacing: -0.01em; }
   .pass-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem; }
   .pass-price { font-size: 1.35rem; font-weight: 500; color: var(--gold-deep); white-space: nowrap; }
+  /* Travel (its own line, never part of the treatment price above) and the
+     running total, when a home visit adds a travel fee. */
+  .pass-extra {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.6rem 1rem; border-top: 1px dashed rgba(13,13,13,0.14);
+    font-size: 0.85rem; color: var(--text-muted);
+  }
+  .pass-extra.total { color: var(--cream); font-weight: 500; font-size: 0.95rem; }
+  .pass-extra .v { color: var(--gold-deep); font-weight: 500; }
+  .pass-extra.total .v { color: var(--gold-deep); font-size: 1.1rem; }
 
   /* ---- Step 4 payment actions ---- */
   .pay-actions { display: flex; flex-direction: column; align-items: center; gap: 0.65rem; margin-top: 1.2rem; }
@@ -1366,7 +1385,16 @@
       </label>
     </div>
 
-    <p class="loc-line" id="loc-notice" style="display:none;">Halima comes to you. Travel is free in Manchester city centre. Outside it, travel is charged at the cost of a taxi, which she&rsquo;ll confirm when she contacts you.</p>
+    <p class="loc-line" id="loc-notice" style="display:none;">Home visits: £15 travel in Oldham and nearby, £35 across the rest of Greater Manchester. Or come to our Tuesday clinic on Deansgate &mdash; no travel fee.</p>
+
+    <div class="ios-group postcode-block hidden" id="postcode-block">
+      <div class="ios-row postcode-row">
+        <label for="travel-postcode">Postcode</label>
+        <input type="text" id="travel-postcode" placeholder="e.g. M1 1AA" autocapitalize="characters" oninput="onTravelPostcodeInput()">
+      </div>
+      <p class="field-error" id="travel-postcode-error"></p>
+      <div class="travel-fee-line hidden" id="travel-fee-line"></div>
+    </div>
 
     <button class="btn-primary" id="btn-step1" onclick="whereContinue()" disabled>Continue</button>
   </div>
@@ -1581,6 +1609,43 @@ function to12h(t) {
 }
 const CLINIC_TIME_SLOTS = CLINIC_SLOT_TEMPLATE.map(to12h);
 
+/* ---- Travel fee (home visits only) ----
+   Mirrors functions/_travel.js — browser JS can't import that module, same
+   reasoning as CLINIC_VENUE_NAME/_clinic.js. This copy only drives the
+   live fee shown on Step 1; the server recomputes the zone from the
+   postcode itself in create-checkout.js and never trusts this figure. */
+const TRAVEL_ZONE_A_PENCE = 1500; // £15 — Oldham & nearby
+const TRAVEL_ZONE_B_PENCE = 3500; // £35 — rest of Greater Manchester
+const TRAVEL_ZONE_A_M_DISTRICTS = new Set([9, 24, 35, 40, 43]);
+const TRAVEL_ZONE_B_AREAS = new Set(['M', 'SK', 'BL', 'WN', 'WA']);
+
+function parseOutwardCode(raw) {
+  const cleaned = String(raw || '').toUpperCase().replace(/\s+/g, '');
+  if (cleaned.length < 5 || cleaned.length > 7) return null;
+  const inward = cleaned.slice(-3);
+  const outward = cleaned.slice(0, -3);
+  if (!/^[0-9][A-Z]{2}$/.test(inward)) return null;
+  const m = /^([A-Z]{1,2})(\d{1,2})[A-Z]?$/.exec(outward);
+  if (!m) return null;
+  return { area: m[1], district: parseInt(m[2], 10) };
+}
+
+function travelZoneFor(postcode) {
+  const parsed = parseOutwardCode(postcode);
+  if (!parsed) return null;
+  const { area, district } = parsed;
+  if (area === 'OL' && district >= 1 && district <= 16) return 'A';
+  if (area === 'M' && TRAVEL_ZONE_A_M_DISTRICTS.has(district)) return 'A';
+  if (TRAVEL_ZONE_B_AREAS.has(area)) return 'B';
+  return 'C';
+}
+
+function travelFeeFor(zone) {
+  if (zone === 'A') return TRAVEL_ZONE_A_PENCE;
+  if (zone === 'B') return TRAVEL_ZONE_B_PENCE;
+  return 0;
+}
+
 function priceHtml(svc) {
   // The £1 test item rounds back to £1, so it gets no misleading strikethrough.
   return netPrice(svc) < svc.price
@@ -1604,6 +1669,8 @@ let state = {
   calYear: null,
   calMonth: null,
   discount: null, // { code, percent, discountPence, finalPence } once server-validated
+  travelPostcode: '',
+  travelZone: null, // 'A' | 'B' | 'C', or null until a valid-looking postcode is entered
 };
 
 // A ?code= deep link (e.g. the homepage offer box) pre-fills the discount
@@ -1626,12 +1693,70 @@ function selectLocation(loc) {
   document.getElementById('where-clinic-radio').checked = (loc === 'clinic');
   document.getElementById('where-mobile-radio').checked = (loc === 'mobile');
   document.getElementById('loc-notice').style.display = loc === 'mobile' ? '' : 'none';
-  document.getElementById('btn-step1').disabled = false;
+  document.getElementById('postcode-block').classList.toggle('hidden', loc !== 'mobile');
+  // Clinic has a fixed venue and no travel fee — a mobile booking can't
+  // continue past Step 1 until it has a postcode to price travel from
+  // (see onTravelPostcodeInput()), so the fee is always visible before the
+  // customer gets to Date & Time.
+  document.getElementById('btn-step1').disabled = (loc === 'mobile') ? (state.travelZone === null) : false;
   // Changing location can invalidate a date/time picked under the other
   // location's calendar/slots — drop it rather than carry over a bad pick.
   state.date = null;
   state.time = null;
   updateRail();
+}
+
+// Live postcode -> travel zone/fee, shown on Step 1 before the customer
+// can continue to Date & Time. The server (create-checkout.js) recomputes
+// the zone itself from the same postcode at payment time — this is a
+// preview only, never trusted for the actual charge.
+function onTravelPostcodeInput() {
+  const input = document.getElementById('travel-postcode');
+  const errEl = document.getElementById('travel-postcode-error');
+  const raw = input.value;
+  state.travelPostcode = raw;
+  errEl.textContent = '';
+  errEl.classList.remove('visible');
+
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    state.travelZone = null;
+  } else {
+    const zone = travelZoneFor(trimmed);
+    if (!zone) {
+      state.travelZone = null;
+      errEl.textContent = 'Please enter a full postcode (e.g. M1 1AA).';
+      errEl.classList.add('visible');
+    } else {
+      state.travelZone = zone;
+    }
+  }
+
+  renderTravelFeeLine();
+  document.getElementById('btn-step1').disabled = (state.location === 'mobile') ? (state.travelZone === null) : false;
+  syncFooter();
+}
+
+function renderTravelFeeLine() {
+  const el = document.getElementById('travel-fee-line');
+  const zone = state.travelZone;
+  if (!zone) {
+    el.classList.add('hidden');
+    el.innerHTML = '';
+    return;
+  }
+  el.classList.remove('hidden');
+  el.classList.toggle('pending', zone === 'C');
+  const label = zone === 'A' ? 'Travel (Oldham & nearby)'
+    : zone === 'B' ? 'Travel (Greater Manchester)'
+    : 'Travel';
+  const value = zone === 'C' ? 'Confirmed by WhatsApp' : formatPounds(travelFeeFor(zone));
+  el.innerHTML = '';
+  const kEl = document.createElement('span');
+  kEl.textContent = label;
+  const vEl = document.createElement('span');
+  vEl.textContent = value;
+  el.append(kEl, vEl);
 }
 
 function whereContinue() {
@@ -2075,14 +2200,35 @@ function buildSummary() {
   return { service, catLabel, dateStr, locationLabel, name };
 }
 
+// Travel fee for whatever's currently selected — 0 for clinic (no travel
+// line, ever) or until a mobile booking has a priceable postcode.
+function travelPenceForSelection() {
+  return (!isClinic() && state.travelZone) ? travelFeeFor(state.travelZone) : 0;
+}
+
 function renderSummary() {
   const { service, catLabel, dateStr, locationLabel, name } = buildSummary();
   const card = document.getElementById('summary-card');
   // A discount code can undercut the site-wide promo price shown by
   // priceHtml() — once one's applied, show what's actually being charged.
+  // Always the TREATMENT price alone — travel (below) is never discounted.
+  const treatmentPence = state.discount ? state.discount.finalPence : netPrice(service) * 100;
   const priceHtmlOut = state.discount
     ? `<s class="was">${formatPounds(netPrice(service) * 100)}</s> ${formatPounds(state.discount.finalPence)}`
     : priceHtml(service);
+
+  const travelPence = travelPenceForSelection();
+  const travelRow = !isClinic() && state.travelZone ? `
+      <div class="pass-extra">
+        <span>Travel${state.travelZone === 'C' ? '' : ` (Zone ${state.travelZone})`}</span>
+        <span class="v">${state.travelZone === 'C' ? 'Confirmed by WhatsApp' : formatPounds(travelPence)}</span>
+      </div>` : '';
+  const totalRow = travelRow ? `
+      <div class="pass-extra total">
+        <span>Total</span>
+        <span class="v">${formatPounds(treatmentPence + travelPence)}</span>
+      </div>` : '';
+
   // Presented as an appointment pass: when it is, then what it is.
   card.innerHTML = `
     <div class="pass">
@@ -2099,6 +2245,8 @@ function renderSummary() {
         </div>
         <div class="pass-price">${priceHtmlOut}</div>
       </div>
+      ${travelRow}
+      ${totalRow}
     </div>
   `;
 }
@@ -2129,6 +2277,10 @@ async function handlePayment() {
     alert("Please go back and enter the full address, including postcode, where your session will take place.");
     goToStep(4); return;
   }
+  if (!isClinic() && state.travelZone === null) {
+    alert("Please go back to Step 1 and enter your postcode so we can price travel.");
+    goToStep(1); return;
+  }
   const consentCancellation = document.getElementById('consent-cancellation');
   if (!consentCancellation || !consentCancellation.checked) {
     alert("Please tick the box to confirm you accept the cancellation policy before paying.");
@@ -2147,6 +2299,7 @@ async function handlePayment() {
       body: JSON.stringify({
         amount,
         treatmentName: service.name,
+        treatmentCategory: state.category,
         customerEmail: email,
         customerName: name,
         customerPhone: phone,
@@ -2160,6 +2313,7 @@ async function handlePayment() {
         bookingDate: state.date ? toISODate(state.date) : '',
         durationMin: selectedDurationMin(),
         discountCode: state.discount ? state.discount.code : '',
+        travelPostcode: isClinic() ? '' : state.travelPostcode,
       }),
     });
 
@@ -2211,8 +2365,9 @@ function fullLabel() {
   const svc = (state.serviceIndex !== null && SERVICES[state.category])
     ? SERVICES[state.category][state.serviceIndex] : null;
   if (!svc) return 'Pay in full';
-  const amount = state.discount ? formatPounds(state.discount.finalPence) : `£${netPrice(svc)}`;
-  return `Pay in full — ${amount}`;
+  const treatmentPence = state.discount ? state.discount.finalPence : netPrice(svc) * 100;
+  const totalPence = treatmentPence + travelPenceForSelection();
+  return `Pay in full — ${formatPounds(totalPence)}`;
 }
 
 // The pay button stays disabled until the cancellation-policy tick-box is checked.
@@ -2280,7 +2435,7 @@ async function applyDiscountCode(codeOverride) {
     const res = await fetch('/apply-discount', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, email, treatmentName: svc.name }),
+      body: JSON.stringify({ code, email, treatmentName: svc.name, treatmentCategory: state.category }),
     });
     const data = await res.json();
 

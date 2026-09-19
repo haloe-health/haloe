@@ -110,11 +110,23 @@ export async function onRequestPost(context) {
 
     // Discount code, if one was applied — create-checkout.js only sets these
     // metadata fields when a code passed its final, server-side re-validation.
+    // It's always computed against the treatment price alone (see the
+    // comment in create-checkout.js) — travelPence below is never part of
+    // originalAmountPence/discountPence, so it can never be discounted.
     const discountCode = md.discountCode || '';
     const discountPence = parseInt(md.discountPence || '0', 10);
     const originalAmountPence = parseInt(md.originalAmountPence || '0', 10);
     const originalAmountLabel = discountCode ? formatGBP(originalAmountPence) : '';
     const discountLabel = discountCode ? `${discountCode} — -${formatGBP(discountPence)}` : '';
+
+    // Travel fee — home visits only; create-checkout.js never sets these for
+    // a Clinic Day booking. Zone C has no fixed fee, so it reads as a note
+    // rather than an amount.
+    const travelPence = location === 'mobile' ? parseInt(md.travelPence || '0', 10) : 0;
+    const travelZone = location === 'mobile' ? (md.travelZone || '') : '';
+    const travelLabel = location === 'mobile'
+      ? (travelZone === 'C' ? 'Confirmed by WhatsApp before the session' : formatGBP(travelPence))
+      : '';
 
     // Confirm the held slot so it converts from a temporary hold into a firm
     // booking that keeps blocking the time. Best-effort: if the row lapsed or
@@ -128,7 +140,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountLabel };
+    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountLabel, travelLabel, travelZone };
 
     // WhatsApp notification to Halima. Sent before the email block and wrapped in
     // its own try/catch so it still fires if Resend is unconfigured or failing —
@@ -351,6 +363,7 @@ function clientEmailHtml(d) {
                 { label: 'Treatment', value: d.treatment },
                 { label: 'Price', value: d.originalAmountLabel },
                 { label: 'Discount', value: d.discountLabel },
+                { label: 'Travel', value: d.travelLabel },
                 { label: 'Paid', value: d.paymentLabel, gold: true },
               ])}
               <!-- Clinic venue note -->
@@ -381,6 +394,7 @@ function halimaEmailHtml(d) {
                 { label: 'Treatment', value: d.treatment },
                 { label: 'Price', value: d.originalAmountLabel },
                 { label: 'Discount', value: d.discountLabel },
+                { label: 'Travel', value: d.travelLabel },
                 { label: 'Paid', value: d.paymentLabel, gold: true },
               ])}
               ${infoCard([
@@ -389,6 +403,7 @@ function halimaEmailHtml(d) {
                 { label: 'Phone', value: d.phone },
                 { label: 'Email', value: d.email },
                 { label: 'Notes', value: d.notes },
+                { label: 'Travel note', value: d.travelZone === 'C' ? '⚠ Confirm travel cost with the client before the session' : '' },
               ])}
               <tr>
                 <td style="padding:6px 2px 0;">

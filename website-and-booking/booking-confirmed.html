@@ -82,6 +82,22 @@
     font-size: 0.88rem; margin-top: 0.2rem;
   }
 
+  .items {
+    background: var(--s1); border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(13,13,13,0.06);
+    overflow: hidden; margin-top: 1rem;
+  }
+  .item {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 1rem;
+    padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--sep);
+    font-size: 0.88rem;
+  }
+  .item:last-child { border-bottom: none; }
+  .item .k { color: var(--t2); }
+  .item .v { font-weight: 500; text-align: right; }
+  .item.total .k, .item.total .v { font-weight: 600; }
+  .item.total .v { color: var(--gold); }
+
   .cta {
     display: block; width: 100%; text-align: center;
     background: var(--gold); color: #000;
@@ -110,12 +126,13 @@
   </div>
   <h1>You&rsquo;re booked.</h1>
   <p class="sub" id="payment-sub"></p>
+  <div class="items" id="items"></div>
 
   <div class="group">
     <div class="next now">
       <span class="num">1</span>
       <p>Halima will be in touch
-        <span id="contact-note">On WhatsApp, to confirm the details, send your health form, and let you know your travel cost if you&rsquo;re outside the city centre.</span>
+        <span id="contact-note">On WhatsApp, to confirm the details and send your health form.</span>
       </p>
     </div>
     <div class="next">
@@ -146,25 +163,59 @@
   const bookingLocation = params.get('location') || 'mobile';
   const venue     = params.get('venue')     || '';
   const amount    = parseInt(params.get('amount') || '0', 10);
+  const treatmentAmount = parseInt(params.get('treatmentAmount') || params.get('amount') || '0', 10);
   const discountCode   = params.get('discountCode')   || '';
   const discountAmount = parseInt(params.get('discountAmount') || '0', 10);
   const originalAmount = parseInt(params.get('originalAmount') || '0', 10);
+  const travelZone  = params.get('travelZone')  || '';
+  const travelPence = parseInt(params.get('travelPence') || '0', 10);
 
   // Derived from the amount actually charged — every booking is paid in full.
   const gbp = (pence) => '£' + (pence / 100).toFixed(2).replace(/\.00$/, '');
   const paid = gbp(amount);
 
   const bits = [treatment, [date, time].filter(Boolean).join(', ')].filter(Boolean);
-  bits.push(discountCode
-    ? `Paid in full — ${paid} (was ${gbp(originalAmount)} · ${discountCode} saved ${gbp(discountAmount)})`
-    : `Paid in full — ${paid}`);
+  bits.push(`Paid in full — ${paid}`);
   document.getElementById('payment-sub').textContent = bits.join(' · ');
+
+  // Itemised breakdown — treatment, discount (never applied to travel),
+  // travel (home visits only), total. Rows with nothing to show are skipped
+  // rather than left blank.
+  const rows = [];
+  if (discountCode) {
+    rows.push(['Treatment', gbp(originalAmount)]);
+    rows.push([`${discountCode} discount`, `−${gbp(discountAmount)}`]);
+  } else {
+    rows.push(['Treatment', gbp(treatmentAmount)]);
+  }
+  if (bookingLocation === 'mobile') {
+    rows.push(['Travel', travelZone === 'C' ? 'Confirmed by WhatsApp' : gbp(travelPence)]);
+  }
+  rows.push(['Total paid', paid]);
+  const itemsEl = document.getElementById('items');
+  rows.forEach(([k, v], i) => {
+    const row = document.createElement('div');
+    row.className = 'item' + (i === rows.length - 1 ? ' total' : '');
+    const kEl = document.createElement('span');
+    kEl.className = 'k';
+    kEl.textContent = k; // discountCode is reflected from the URL — never use innerHTML here
+    const vEl = document.createElement('span');
+    vEl.className = 'v';
+    vEl.textContent = v;
+    row.append(kEl, vEl);
+    itemsEl.appendChild(row);
+  });
 
   if (bookingLocation === 'clinic') {
     document.getElementById('contact-note').textContent =
       'On WhatsApp, to confirm the details and send your health form.';
     document.getElementById('balance-note').textContent =
       `Check in at reception${venue ? ' at ' + venue : ''} on the ground floor — they'll direct you to the room. Lift access is available.`;
+  } else if (travelZone === 'C') {
+    // Zones A/B are already paid in full above — only Zone C (no fixed fee)
+    // still needs Halima to confirm a travel cost after booking.
+    document.getElementById('contact-note').textContent =
+      'On WhatsApp, to confirm the details, send your health form, and confirm your travel cost.';
   }
 
   // The address was only ever held for the old WhatsApp hand-off, which has gone.

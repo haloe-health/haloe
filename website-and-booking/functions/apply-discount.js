@@ -10,9 +10,12 @@ import { findService, netPrice } from './_services.js';
 
 export async function onRequestPost(context) {
   try {
-    const { code, email, treatmentName } = await context.request.json();
+    const { code, email, treatmentName, treatmentCategory } = await context.request.json();
 
-    const svc = findService(treatmentName);
+    // Category-scoped — see the comment on findService() (_services.js):
+    // four treatment names are reused across dry/wet cupping at different
+    // prices, so a category-less lookup can silently price the wrong one.
+    const svc = findService(treatmentName, treatmentCategory);
     if (!svc) {
       return new Response(JSON.stringify({ ok: false, error: 'unknown_treatment' }), {
         status: 200,
