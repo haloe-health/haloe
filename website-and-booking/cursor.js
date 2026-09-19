@@ -15,7 +15,12 @@
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  var GOLD = '#C8A96E';
+  // The trail reads too faint in the plain #C8A96E gold against the light
+  // pages' cream/white backgrounds, so those pages set class="theme-light"
+  // on <html> and the trail switches to the same deeper gold used for body
+  // text there. The bee's own colours are untouched — dark-filled, so it
+  // already reads fine on any background.
+  var GOLD = document.documentElement.classList.contains('theme-light') ? '#8a6a2c' : '#C8A96E';
 
   // ---- bee ----
   var POS_LERP = 0.2;          // how quickly the drawn position eases toward the real pointer

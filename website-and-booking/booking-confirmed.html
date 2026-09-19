@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,21 +10,22 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --gold: #C9A040;
+    /* Light theme (Sep 2026) — was true-black/dark-surface. */
+    --gold: #C8A96E;
     --gold-light: #DBB85A;
-    --black: #000;
-    --cream: #F5F0E8;
-    --t2: #A1A1A6;
-    --t3: #6E6E73;
-    --s1: #1C1C1E;
-    --s3: #3A3A3C;
-    --sep: rgba(255,255,255,0.10);
-    --sep2: rgba(255,255,255,0.16);
+    --page-bg: #F5F0E8;
+    --ink: #0D0D0D;
+    --t2: #5a5247;
+    --t3: #8a8272;
+    --s1: #FFFFFF;
+    --s3: #F0EAE0;
+    --sep: rgba(13,13,13,0.08);
+    --sep2: rgba(13,13,13,0.14);
   }
   html { font-size: 78%; }
   body {
-    background: var(--black);
-    color: var(--cream);
+    background: var(--page-bg);
+    color: var(--ink);
     font-family: 'Poppins', sans-serif;
     font-weight: 300;
     min-height: 100vh;
@@ -57,7 +58,8 @@
   }
 
   .group {
-    background: var(--s1); border-radius: 12px;
+    background: var(--s1); border-radius: 28px;
+    box-shadow: 0 8px 24px rgba(13,13,13,0.06);
     overflow: hidden; margin-top: 1.3rem;
   }
   .next {
@@ -68,7 +70,7 @@
   .next:last-child { border-bottom: none; }
   .num {
     width: 24px; height: 24px; border-radius: 50%;
-    background: var(--s3); color: var(--cream);
+    background: var(--s3); color: var(--ink);
     font-size: 0.74rem; font-weight: 500;
     display: flex; align-items: center; justify-content: center;
     flex: none; margin-top: 0.1rem;
@@ -95,7 +97,7 @@
     font-size: 0.8rem; margin-top: 1rem;
     transition: color 0.2s;
   }
-  .quiet:hover { color: var(--cream); }
+  .quiet:hover { color: var(--ink); }
 </style>
 <link rel="stylesheet" href="cursor.css">
 <script src="cursor.js" defer></script>

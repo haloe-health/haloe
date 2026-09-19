@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,34 +47,35 @@
     --gold: #c9a040;
     --gold-light: #dbb85a;
     --gold-dark: #a8842f;
-    --black: #0D0D0D;
-    --cream: #F5F0E8;
+    --gold-deep: #8a6a2c;
+    --black: #F5F0E8;
+    --cream: #0D0D0D;
     --cream-mid: #EDE6D6;
     --white: #FFFFFF;
-    --text-muted: #6B6357;
+    --text-muted: #5a5247;
     --border: rgba(201, 160, 64, 0.18);
     --border-strong: rgba(201, 160, 64, 0.4);
-    --surface: #15120D;
+    --surface: #FFFFFF;
     --radius: 16px;
     --focus-glow: 0 0 0 3px rgba(201, 160, 64, 0.15);
     --step-active: var(--gold);
     --step-done: var(--gold-dark);
-    --step-idle: #D0C8BC;
+    --step-idle: #C6BCA9;
 
     /* --- New design-system tokens (Stitch spec) — additive, existing
        tokens above are untouched and still drive most of the page. --- */
     --obsidian-base: #0D0D0D;
-    --obsidian-elevated: #181716;
-    --obsidian-floating: #22201D;
-    --obsidian-inset: #141312;
+    --obsidian-elevated: #FFFFFF;
+    --obsidian-floating: #F0EAE0;
+    --obsidian-inset: #F0EAE0;
     --gold-primary: #C8A96E;
     --gold-highlight: #DFC38E;
     --gold-burnished: #A38548;
     --hairline-border: rgba(200, 169, 110, 0.2);
     --active-border: rgba(223, 195, 142, 0.5);
-    --text-cream: #F5F0E8;
-    --text-cashmere: #C8C2B7;
-    --text-sand: #8E887F;
+    --text-cream: #0D0D0D;
+    --text-cashmere: #6b6357;
+    --text-sand: #8a8272;
 
     --radius-sm: 0.5rem;
     --radius-default: 1rem;
@@ -183,15 +184,15 @@
     position: relative; z-index: 1;
     transition: all 0.3s;
   }
-  .step.active .step-dot { border-color: var(--gold); color: var(--gold); }
-  .step.done .step-dot { border-color: var(--gold); background: var(--gold); color: var(--black); }
+  .step.active .step-dot { border-color: var(--gold); color: var(--gold-deep); }
+  .step.done .step-dot { border-color: var(--gold); background: var(--gold); color: var(--obsidian-base); }
   .step-label {
     font-size: 0.6rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--text-muted);
   }
-  .step.active .step-label { color: var(--gold); }
+  .step.active .step-label { color: var(--gold-deep); }
 
   /* ---- Two-column shell (Option B: living summary) ---- */
   .book-shell {
@@ -208,7 +209,7 @@
   .step-label { display: none; }
   .step-dot {
     width: 6px; height: 6px; border-radius: 999px;
-    border: none; background: #3A3A3C; color: transparent;
+    border: none; background: var(--obsidian-floating); color: transparent;
     font-size: 0; transition: background 0.25s, width 0.25s;
   }
   .step.done .step-dot { background: rgba(201,160,64,0.55); }
@@ -260,7 +261,7 @@
     gap: 2px;
     margin-bottom: 1.2rem;
     padding: 2px;
-    background: #1C1A16;
+    background: var(--obsidian-floating);
     border: none;
     border-radius: 9px;
   }
@@ -287,7 +288,7 @@
   @media (pointer: coarse) { .seg-option { min-height: 44px; } }
   .seg-option:hover:not(.active) { color: var(--gold-light); }
   .seg-option.active {
-    background: #3A362E;
+    background: var(--obsidian-floating);
     color: var(--cream);
     font-weight: 500;
   }
@@ -307,15 +308,15 @@
      they read as buttons (not disabled text), and the selected one fills with
      brand gold. */
   .category-tabs .seg-option {
-    background: rgba(255,255,255,0.06);
-    color: #D8D1C4;
+    background: rgba(13,13,13,0.06);
+    color: var(--text-muted);
   }
   .category-tabs .seg-option.active {
     background: var(--gold);
     color: #2A2013;
   }
   .category-tabs .seg-option:hover:not(.active) {
-    background: rgba(255,255,255,0.10);
+    background: rgba(13,13,13,0.10);
     color: var(--cream);
   }
   /* Phones: keep the four categories on one row, but make each grey segment
@@ -369,7 +370,7 @@
   .service-card:hover { background: rgba(201,160,64,0.045); }
   .svc-ring {
     width: 19px; height: 19px; border-radius: 50%;
-    border: 1.5px solid #4A453C; flex: none;
+    border: 1.5px solid #C4BBA8; flex: none;
     transition: border-color 0.18s, border-width 0.18s;
   }
   .service-card .svc-ring { margin-top: 2px; }
@@ -381,7 +382,7 @@
   .svc-chip {
     display: inline-block;
     font-size: 0.62rem; letter-spacing: 0.02em;
-    color: var(--gold);
+    color: var(--gold-deep);
     border: 1px solid rgba(201,160,64,0.32);
     border-radius: 99px;
     padding: 1.5px 8px;
@@ -416,7 +417,7 @@
     letter-spacing: 0.08em;
     color: var(--text-muted);
   }
-  .service-price { color: var(--gold); font-weight: 400; }
+  .service-price { color: var(--gold-deep); font-weight: 400; }
   .service-desc {
     font-size: 0.78rem;
     color: var(--text-muted);
@@ -571,7 +572,7 @@
     font-size: 0.95rem;
     letter-spacing: 0;
     text-transform: none;
-    color: #A1A1A6;
+    color: var(--text-muted);
     margin-bottom: 0.7rem;
   }
   .calendar {
@@ -589,7 +590,7 @@
   .cal-nav {
     background: none;
     border: none;
-    color: #A1A1A6;
+    color: var(--text-muted);
     cursor: pointer;
     font-size: 1rem;
     padding: 0.2rem 0.55rem;
@@ -598,7 +599,7 @@
     min-width: 44px;
     min-height: 44px;
   }
-  .cal-nav:hover { background: rgba(255,255,255,0.07); color: var(--cream); }
+  .cal-nav:hover { background: rgba(13,13,13,0.07); color: var(--cream); }
   .cal-nav:hover { color: var(--gold-light); }
   .cal-month {
     font-family: 'Poppins', sans-serif;
@@ -618,7 +619,7 @@
     font-weight: 500;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #A1A1A6;
+    color: var(--text-muted);
     padding: 0.3rem 0;
   }
   .cal-day {
@@ -637,14 +638,14 @@
      the last thing tapped, and these rules out-specify .selected — so the
      chosen day rendered gold text on a gold fill and vanished. */
   @media (hover: hover) {
-    .cal-day:not(.disabled):not(.selected):hover { background: rgba(255,255,255,0.08); }
-    .cal-day:hover:not(.disabled):not(.empty):not(.selected) { border-color: var(--border-strong); color: var(--gold); }
+    .cal-day:not(.disabled):not(.selected):hover { background: rgba(13,13,13,0.08); }
+    .cal-day:hover:not(.disabled):not(.empty):not(.selected) { border-color: var(--border-strong); color: var(--gold-deep); }
   }
-  .cal-day.today { color: var(--gold); font-weight: 500; }
+  .cal-day.today { color: var(--gold-deep); font-weight: 500; }
   /* Selection must win over .today — otherwise selecting today's date turned
      the number gold-on-gold and it vanished. */
   .cal-day.selected { background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); font-weight: 500; box-shadow: 0 0 0 3px var(--active-border); }
-  .cal-day.disabled { color: #48484A; cursor: default; }
+  .cal-day.disabled { color: #C4BBA8; cursor: default; }
   .cal-day.empty { cursor: default; }
 
   /* ---- Time Slots ---- */
@@ -660,7 +661,7 @@
     align-items: center;
     justify-content: center;
     padding: 0.3rem;
-    border: 1px solid rgba(255,255,255,0.14);
+    border: 1px solid rgba(13,13,13,0.14);
     border-radius: 9px;
     text-align: center;
     font-size: 1rem;
@@ -677,10 +678,10 @@
   /* Same sticky-hover trap as .cal-day above — the selected slot went gold
      on gold and its time disappeared on a phone. */
   @media (hover: hover) {
-    .time-slot:hover:not(.taken):not(.selected) { border-color: var(--gold); color: var(--gold); }
+    .time-slot:hover:not(.taken):not(.selected) { border-color: var(--gold-deep); color: var(--gold-deep); }
   }
   .time-slot.selected { border-color: var(--gold-primary); background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); font-weight: 500; box-shadow: 0 0 0 3px var(--active-border); }
-  .time-slot.taken { color: #48484A; cursor: not-allowed; border-color: rgba(255,255,255,0.06); }
+  .time-slot.taken { color: #C4BBA8; cursor: not-allowed; border-color: rgba(13,13,13,0.06); }
 
   /* ---- Form Fields ---- */
   .form-grid { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -690,15 +691,15 @@
     font-size: 0.75rem;
     letter-spacing: 0;
     text-transform: none;
-    color: #A1A1A6;
+    color: var(--text-muted);
     margin-bottom: 0.4rem;
   }
   .form-field input,
   .form-field select,
   .form-field textarea {
     width: 100%;
-    background: #1C1C1E;
-    border: 1px solid rgba(255,255,255,0.12);
+    background: #FFFFFF;
+    border: 1px solid rgba(13,13,13,0.12);
     color: var(--cream);
     font-family: 'Poppins', sans-serif;
     font-size: 0.88rem;
@@ -715,7 +716,7 @@
     border-color: var(--gold);
     box-shadow: var(--focus-glow);
   }
-  .form-field select option { background: #1A1710; color: var(--cream); }
+  .form-field select option { background: #FFFFFF; color: var(--cream); }
   .form-field textarea { resize: vertical; min-height: 70px; }
   /* Error state wins over focus — declared last so the red border isn't overridden */
   .form-field input.invalid,
@@ -766,7 +767,7 @@
     padding: 0 0.85rem 0.5rem;
     font-size: 0.7rem;
     line-height: 1.45;
-    border-bottom: 1px solid rgba(255,255,255,0.10);
+    border-bottom: 1px solid rgba(13,13,13,0.10);
   }
   .ios-group .ios-row:has(+ .field-error.visible) { border-bottom: none; }
   .ios-group > *:last-child { border-bottom: none; }
@@ -824,7 +825,7 @@
     font-size: 0.9rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #6E6E73;
+    color: var(--text-muted);
     padding: 0.3rem 0.2rem 0.45rem;
   }
   .ios-row {
@@ -832,7 +833,7 @@
     align-items: center;
     gap: 0.9rem;
     padding: 0.6rem 0.85rem;
-    border-bottom: 1px solid rgba(255,255,255,0.10);
+    border-bottom: 1px solid rgba(13,13,13,0.10);
   }
   .ios-group .ios-row:last-child { border-bottom: none; }
   .ios-row label {
@@ -858,7 +859,7 @@
   }
   .ios-row textarea { resize: none; height: 2.5rem; line-height: 1.45; }
   .ios-row input::placeholder,
-  .ios-row textarea::placeholder { color: #5A5A5F; }
+  .ios-row textarea::placeholder { color: #9C9486; }
   .ios-row select { direction: rtl; }
   .ios-row select option { direction: ltr; background: var(--obsidian-elevated); }
   .ios-row input.invalid, .ios-row textarea.invalid { color: #E5736A; }
@@ -868,7 +869,7 @@
   .ios-toggle {
     display: flex; align-items: flex-start; gap: 0.85rem;
     padding: 0.62rem 0.85rem;
-    border-bottom: 1px solid rgba(255,255,255,0.10);
+    border-bottom: 1px solid rgba(13,13,13,0.10);
     cursor: pointer;
   }
   .ios-group .ios-toggle:last-child { border-bottom: none; }
@@ -881,13 +882,16 @@
   .ios-toggle .switch {
     position: relative; flex: none;
     width: 38px; height: 22px; border-radius: 999px;
-    background: #3A3A3C; margin-top: 0.1rem;
+    background: var(--obsidian-floating); margin-top: 0.1rem;
     transition: background 0.2s;
   }
   .ios-toggle .switch::after {
     content: ''; position: absolute; top: 2px; left: 2px;
     width: 18px; height: 18px; border-radius: 50%;
-    background: var(--cream); transition: transform 0.2s;
+    /* Knob stays light regardless of theme or track state (off-track is now
+       light grey, on-track gold) — --cream means dark ink text now, so it
+       can't double as the knob colour any more. */
+    background: #FFFFFF; transition: transform 0.2s;
   }
   .ios-toggle input:checked + .switch { background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); }
   .ios-toggle input:checked + .switch::after { transform: translateX(16px); }
@@ -899,13 +903,13 @@
   .pass-when { padding: 1.15rem 1rem 0.95rem; text-align: center; }
   .pass-date {
     font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase;
-    color: var(--gold);
+    color: var(--gold-deep);
   }
   .pass-time {
     font-size: 2.1rem; font-weight: 500; letter-spacing: -0.03em;
     line-height: 1.05; margin: 0.25rem 0 0.15rem; color: var(--cream);
   }
-  .pass-at { font-size: 0.85rem; color: #A1A1A6; }
+  .pass-at { font-size: 0.85rem; color: var(--text-muted); }
   /* Perforated edge: two notches punched out of the card, dashes between */
   .pass-perf { position: relative; height: 14px; }
   .pass-perf::before, .pass-perf::after {
@@ -916,15 +920,15 @@
   .pass-perf::after { right: -7px; }
   .pass-perf span {
     position: absolute; left: 12px; right: 12px; top: 7px;
-    border-top: 1px dashed rgba(255,255,255,0.18);
+    border-top: 1px dashed rgba(13,13,13,0.18);
   }
   .pass-what {
     padding: 0.25rem 1rem 1.05rem;
     display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem;
   }
   .pass-name { font-size: 1rem; color: var(--cream); letter-spacing: -0.01em; }
-  .pass-meta { font-size: 0.72rem; color: #6E6E73; margin-top: 0.15rem; }
-  .pass-price { font-size: 1.35rem; font-weight: 500; color: var(--gold); white-space: nowrap; }
+  .pass-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem; }
+  .pass-price { font-size: 1.35rem; font-weight: 500; color: var(--gold-deep); white-space: nowrap; }
 
   /* ---- Step 4 payment actions ---- */
   .pay-actions { display: flex; flex-direction: column; align-items: center; gap: 0.65rem; margin-top: 1.2rem; }
@@ -941,11 +945,11 @@
   }
   .pay-primary { background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); border: none; }
   .pay-primary:hover:not(:disabled) { filter: brightness(1.08); }
-  .pay-secondary { background: none; color: var(--cream); border: 1px solid rgba(255,255,255,0.16); }
-  .pay-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.06); }
+  .pay-secondary { background: none; color: var(--cream); border: 1px solid rgba(13,13,13,0.16); }
+  .pay-secondary:hover:not(:disabled) { background: rgba(13,13,13,0.06); }
   .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .pay-note {
-    font-size: 0.72rem; color: #6E6E73; text-align: center;
+    font-size: 0.72rem; color: var(--text-muted); text-align: center;
     margin-top: 0.7rem; line-height: 1.6;
   }
   .cancellation-policy {
@@ -963,7 +967,7 @@
   /* Hero block — treatment name + price */
   .sc-hero {
     padding: 0.95rem 0.85rem 0.85rem;
-    border-bottom: 1px solid rgba(255,255,255,0.10);
+    border-bottom: 1px solid rgba(13,13,13,0.10);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -988,7 +992,7 @@
     font-family: 'Poppins', sans-serif;
     font-size: 1.6rem;
     font-weight: 500;
-    color: var(--gold);
+    color: var(--gold-deep);
     white-space: nowrap;
   }
   /* Detail rows */
@@ -1000,12 +1004,12 @@
     padding: 0.6rem 0.85rem;
     gap: 1rem;
   }
-  .sc-row + .sc-row { border-top: 1px solid rgba(255,255,255,0.10); }
+  .sc-row + .sc-row { border-top: 1px solid rgba(13,13,13,0.10); }
   .sc-label {
     font-size: 0.82rem;
     letter-spacing: 0;
     text-transform: none;
-    color: #A1A1A6;
+    color: var(--text-muted);
     flex-shrink: 0;
   }
   .sc-value {
@@ -1017,7 +1021,7 @@
 
   .whatsapp-note {
     font-size: 0.75rem;
-    color: #6E6E73;
+    color: var(--text-muted);
     line-height: 1.6;
     margin: 0.7rem 0 0;
     padding: 0 0.85rem;
@@ -1044,7 +1048,7 @@
   }
   .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 12px 40px rgba(201,160,64,0.25); }
   .btn-primary:active { transform: scale(0.98); }
-  .btn-primary:disabled { background: #3A3530; color: #6B6357; cursor: not-allowed; opacity: 0.6; transform: none; }
+  .btn-primary:disabled { background: var(--obsidian-floating); color: #a89f8c; cursor: not-allowed; opacity: 0.6; transform: none; }
   /* Steps 1–4 are driven from the frosted footer; these stay in the DOM so all
      the existing enable/disable logic keeps working, but aren't shown. */
   #btn-step1, #btn-step2, #btn-step3, #btn-step4 { display: none; }
@@ -1052,9 +1056,9 @@
   /* ---- Frosted footer bar (Apple buy-flow) ---- */
   .footbar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
-    background: rgba(20,20,22,0.86);
+    background: rgba(245,240,232,0.9);
     backdrop-filter: blur(14px);
-    border-top: 1px solid rgba(255,255,255,0.10);
+    border-top: 1px solid rgba(13,13,13,0.10);
     /* Room for the home-bar on notched iPhones, so the bar's own bottom
        padding grows with it rather than the CTA sitting under the bar. */
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -1068,12 +1072,12 @@
      flex item defaulting to min-width:auto (its content's natural width). */
   .foot-summary-col { min-width: 0; flex: 1 1 auto; overflow: hidden; }
   .foot-label {
-    font-size: 0.98rem; letter-spacing: 0.02em; text-transform: none; color: #A1A1A6; line-height: 1.4;
+    font-size: 0.98rem; letter-spacing: 0.02em; text-transform: none; color: var(--text-muted); line-height: 1.4;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .foot-loc-prefix { color: var(--gold-primary, var(--gold)); }
   .foot-total { font-size: 1rem; font-weight: 500; color: var(--cream); }
-  .foot-helper { font-size: 0.82rem; color: var(--text-sand, #A1A1A6); margin-top: 0.15rem; }
+  .foot-helper { font-size: 0.82rem; color: var(--text-sand, #8a8272); margin-top: 0.15rem; }
   .foot-helper.hidden { display: none; }
   .foot-cta {
     display: inline-flex; align-items: center; gap: 0.4rem;
@@ -1085,7 +1089,7 @@
   }
   .foot-cta svg { width: 16px; height: 16px; flex: none; }
   .foot-cta:hover:not(:disabled) { filter: brightness(1.08); }
-  .foot-cta:disabled { background: #2C2C2E; color: #6E6E73; cursor: not-allowed; }
+  .foot-cta:disabled { background: var(--obsidian-floating); color: var(--text-muted); cursor: not-allowed; }
   .foot-cta.hidden { display: none; }
   .footbar.hidden { display: none; }
   body { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
@@ -1096,9 +1100,9 @@
   .btn-back { display: none; }
   .btn-back-unused {
     background: none;
-    border: 1px solid rgba(255,255,255,0.16);
+    border: 1px solid rgba(13,13,13,0.16);
     border-radius: 999px;
-    color: #A1A1A6;
+    color: var(--text-muted);
     font-family: 'Poppins', sans-serif;
     font-size: 0.72rem;
     letter-spacing: 0;
@@ -1108,7 +1112,7 @@
     margin-bottom: 1.2rem;
     transition: border-color 0.2s, color 0.2s, background 0.2s;
   }
-  .btn-back:hover { background: rgba(255,255,255,0.05); color: var(--cream); }
+  .btn-back:hover { background: rgba(13,13,13,0.05); color: var(--cream); }
   .btn-back:hover { border-color: var(--border-strong); color: var(--cream); }
   .btn-back:active { transform: scale(0.98); }
 
@@ -1126,7 +1130,7 @@
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 1.5rem;
     font-size: 1.4rem;
-    color: var(--gold);
+    color: var(--gold-deep);
   }
   .confirm-title {
     font-family: 'Poppins', sans-serif;
@@ -1141,7 +1145,7 @@
     font-size: 0.8rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--gold-deep);
     margin-bottom: 2rem;
   }
   .confirm-details {
@@ -1154,7 +1158,7 @@
   }
   .confirm-details .sc-hero { padding: 1.2rem 1.4rem 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
   .confirm-details .sc-hero-name { font-size: 1.1rem; font-weight: 500; color: var(--cream); }
-  .confirm-details .sc-hero-price { font-size: 1.4rem; font-weight: 500; color: var(--gold); white-space: nowrap; }
+  .confirm-details .sc-hero-price { font-size: 1.4rem; font-weight: 500; color: var(--gold-deep); white-space: nowrap; }
   .confirm-detail-row {
     display: flex;
     justify-content: space-between;
@@ -1176,7 +1180,7 @@
     max-width: 420px;
     margin: 0 auto;
   }
-  .confirm-intake a { color: var(--gold); text-decoration: none; }
+  .confirm-intake a { color: var(--gold-deep); text-decoration: none; }
   .confirm-intake a:hover { text-decoration: underline; }
 
   /* Mobile */
@@ -1237,7 +1241,7 @@
 })();
 </script>
 
-<nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:12px clamp(1rem,3vw,2.5rem);background:rgba(13,13,13,0.92);backdrop-filter:blur(12px);">
+<nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:12px clamp(1rem,3vw,2.5rem);background:rgba(245,240,232,0.92);border-bottom:1px solid rgba(13,13,13,0.08);backdrop-filter:blur(12px);">
   <a href="index.html" class="back-link" id="back-control" onclick="backControl(event)">← Back to site</a>
   <div class="steps" id="steps">
     <div class="step active" data-step="1">

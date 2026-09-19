@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,21 +23,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --black: #080806;
-    --deep: #0d0d0b;
-    --gold: #c9a040;
-    --gold-light: #dbb85a;
-    --gold-dim: rgba(201,160,64,0.12);
-    --white: #f7f2ea;
-    --dim: #7a7060;
-    --border: rgba(201,160,64,0.12);
+    /* Light theme (Sep 2026) — was true-black; --white/--dim are still the
+       text-colour tokens (light text on dark before, now dark text on
+       light), --page-bg is new for the former --black page background. */
+    --page-bg: #F5F0E8;
+    --deep: #FFFFFF;
+    --gold: #C8A96E;
+    --gold-light: #DBB85A;
+    --gold-deep: #8a6a2c;
+    --gold-dim: rgba(200,169,110,0.14);
+    --white: #0D0D0D;
+    --dim: #5a5247;
+    --border: rgba(13,13,13,0.1);
     --radius: 0px;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
 
   body {
-    background:var(--black);
+    background:var(--page-bg);
     color:var(--white);
     font-family:'Poppins',sans-serif;
     font-weight:300;
@@ -46,29 +50,21 @@
     line-height:1.7;
   }
 
-  /* Grain overlay — matches index.html */
-  body::before {
-    content:'';
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    opacity:0.025;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size:200px;
-  }
-
-  /* NAV — copied from index.html */
+  /* NAV — copied from index.html, retheme light */
   nav {
     position:fixed; top:0; left:0; right:0; z-index:100;
     padding:22px 80px;
     display:flex; justify-content:space-between; align-items:center;
-    background:rgba(8,8,6,0.88);
+    background:rgba(245,240,232,0.9);
     backdrop-filter:blur(20px);
     -webkit-backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
   }
   .nav-logo { display:flex; align-items:center; gap:14px; text-decoration:none; }
   .nav-logo img { height:32px; width:auto; }
   .nav-logo span {
     font-family:'Poppins',sans-serif;
-    font-size:1.4rem; color:var(--gold);
+    font-size:1.4rem; color:var(--gold-deep);
     letter-spacing:0.2em; font-weight:300;
     text-transform:lowercase;
   }
@@ -79,10 +75,10 @@
     text-transform:uppercase; transition:color 0.4s;
     font-weight:400;
   }
-  nav ul a:hover { color:var(--gold); text-decoration:none; }
+  nav ul a:hover { color:var(--gold-deep); text-decoration:none; }
   .nav-cta {
     border:1px solid rgba(201,160,64,0.5) !important;
-    color:var(--gold) !important;
+    color:var(--gold-deep) !important;
     padding:10px 26px;
     font-weight:400 !important;
     background:transparent !important;
@@ -108,13 +104,13 @@
   }
   .btn-gold { background:var(--gold); color:#080806; font-weight:500; }
   .btn-gold:hover { background:var(--gold-light); transform:translateY(-3px); box-shadow:0 12px 40px rgba(201,160,64,0.25); }
-  .btn-outline { border:1px solid rgba(201,160,64,0.35); color:var(--gold); }
+  .btn-outline { border:1px solid rgba(201,160,64,0.35); color:var(--gold-deep); }
   .btn-outline:hover { border-color:var(--gold); background:rgba(201,160,64,0.06); }
 
   /* Section tag / eyebrow — copied from index.html */
   .section-tag {
     font-size:0.65rem; letter-spacing:0.28em; text-transform:uppercase;
-    color:var(--gold); margin-bottom:24px;
+    color:var(--gold-deep); margin-bottom:24px;
     display:flex; align-items:center; gap:12px; opacity:0.9;
   }
   .section-tag.center { justify-content:center; }
@@ -127,17 +123,17 @@
     font-weight:300; line-height:1.08;
     margin-bottom:24px; letter-spacing:-0.01em;
   }
-  h1 em { font-style:italic; color:var(--gold); display:block; }
+  h1 em { font-style:italic; color:var(--gold-deep); display:block; }
   h2 {
     font-family:'Poppins',sans-serif;
     font-size:clamp(1.7rem,3.5vw,2.4rem);
     font-weight:300; line-height:1.15; margin-bottom:20px;
     letter-spacing:-0.025em;
   }
-  h2 em { font-style:italic; color:var(--gold); }
+  h2 em { font-style:italic; color:var(--gold-deep); }
   .cert-tag {
     font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase;
-    border:1px solid var(--border); color:var(--gold);
+    border:1px solid var(--border); color:var(--gold-deep);
     padding:9px 18px; opacity:0.85; border-radius:50px;
     display:inline-block;
   }
@@ -146,19 +142,19 @@
   .article-hero {
     padding:160px 24px 64px;
     text-align:center;
-    background:radial-gradient(ellipse 80% 70% at 50% 0%, rgba(201,160,64,0.05) 0%, transparent 70%), var(--black);
+    background:radial-gradient(ellipse 80% 70% at 50% 0%, rgba(201,160,64,0.05) 0%, transparent 70%), var(--page-bg);
     position:relative; z-index:1;
   }
   .article-hero .hero-pill {
     display:inline-block;
     font-size:0.6rem; letter-spacing:0.28em; text-transform:uppercase;
-    color:var(--gold); border:1px solid rgba(201,160,64,0.4);
+    color:var(--gold-deep); border:1px solid rgba(201,160,64,0.4);
     padding:8px 20px; border-radius:50px; margin-bottom:32px;
   }
   .article-hero h1 { margin-bottom:8px; }
   .article-hero .hero-sub {
     font-family:'Poppins',sans-serif; font-style:italic;
-    font-size:clamp(1.1rem,2.4vw,1.5rem); color:var(--gold);
+    font-size:clamp(1.1rem,2.4vw,1.5rem); color:var(--gold-deep);
     font-weight:300; margin-bottom:32px;
   }
   .article-hero .creds {
@@ -176,19 +172,19 @@
 
   .eyebrow-label {
     font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase;
-    color:var(--gold); margin-bottom:16px; opacity:0.9;
+    color:var(--gold-deep); margin-bottom:16px; opacity:0.9;
   }
 
   /* Info cards — mirror the booking card style (.hb-card) */
   .info-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
   .info-card {
-    border:1px solid rgba(201,160,64,0.2);
-    background:rgba(255,255,255,0.02);
-    border-radius:6px; padding:28px 24px;
+    background:var(--deep);
+    box-shadow:0 8px 24px rgba(13,13,13,0.06);
+    border-radius:20px; padding:28px 24px;
   }
   .info-card h3 {
     font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase;
-    color:var(--gold); font-weight:500; margin-bottom:14px;
+    color:var(--gold-deep); font-weight:500; margin-bottom:14px;
   }
   .info-card p { font-size:0.88rem; line-height:1.8; color:var(--dim); margin:0; }
 
@@ -197,7 +193,7 @@
     border:1px solid rgba(201,160,64,0.3);
     border-left:3px solid var(--gold);
     background:rgba(201,160,64,0.04);
-    border-radius:6px; padding:32px 30px;
+    border-radius:16px; padding:32px 30px;
   }
   .alert h2 { margin-bottom:18px; }
   .alert p { color:var(--dim); }
@@ -214,10 +210,10 @@
     margin-top:24px; padding:18px 22px;
     background:rgba(201,160,64,0.08);
     border:1px solid rgba(201,160,64,0.25);
-    border-radius:6px;
+    border-radius:16px;
     color:var(--white); font-size:0.92rem; line-height:1.7;
   }
-  .note-highlight strong { color:var(--gold); }
+  .note-highlight strong { color:var(--gold-deep); }
 
   /* Numbered steps */
   .steps { list-style:none; counter-reset:step; margin-bottom:24px; }
@@ -232,7 +228,7 @@
     position:absolute; left:0; top:18px;
     width:36px; height:36px;
     border:1px solid rgba(201,160,64,0.4); border-radius:50%;
-    color:var(--gold); font-size:0.85rem;
+    color:var(--gold-deep); font-size:0.85rem;
     display:flex; align-items:center; justify-content:center;
   }
   .caption { font-size:0.88rem; color:var(--dim); font-style:italic; line-height:1.8; }
@@ -250,7 +246,7 @@
   }
   .pull-quote cite {
     display:block; font-style:normal; font-size:0.75rem;
-    letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); opacity:0.85;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--gold-deep); opacity:0.85;
   }
 
   /* Offer list */
@@ -270,7 +266,7 @@
   /* Marks timeline */
   .timeline {
     display:flex; gap:0; margin-top:28px;
-    border:1px solid var(--border); border-radius:6px; overflow:hidden;
+    border:1px solid var(--border); border-radius:16px; overflow:hidden;
   }
   .timeline .t-step {
     flex:1; padding:18px 10px; text-align:center;
@@ -279,20 +275,20 @@
   .timeline .t-step:last-child { border-right:none; }
   .timeline .t-day {
     display:block; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase;
-    color:var(--gold); margin-bottom:6px;
+    color:var(--gold-deep); margin-bottom:6px;
   }
   .timeline .t-label { font-size:0.78rem; color:var(--dim); }
 
   /* Before / after columns */
   .checklists { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px; }
   .checklist {
-    border:1px solid rgba(201,160,64,0.2);
-    background:rgba(255,255,255,0.02);
-    border-radius:6px; padding:28px 26px;
+    background:var(--deep);
+    box-shadow:0 8px 24px rgba(13,13,13,0.06);
+    border-radius:20px; padding:28px 26px;
   }
   .checklist h3 {
     font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase;
-    color:var(--gold); font-weight:500; margin-bottom:18px;
+    color:var(--gold-deep); font-weight:500; margin-bottom:18px;
   }
   .checklist ul { list-style:none; }
   .checklist ul li {
@@ -302,7 +298,7 @@
   .checklist ul li:last-child { margin-bottom:0; }
   .checklist ul li::before {
     content:'✓'; position:absolute; left:0; top:0;
-    color:var(--gold); font-size:0.85rem;
+    color:var(--gold-deep); font-size:0.85rem;
   }
   .reassure { font-size:0.92rem; color:var(--dim); line-height:1.9; font-style:italic; }
 
@@ -339,22 +335,72 @@
   }
   .footer-links { display:flex; gap:32px; }
   .footer-links a {
-    color:var(--dim); text-decoration:none;
+    /* Footer keeps its dark background even on the light theme (matches
+       index.html), so its text stays hardcoded light rather than following
+       --dim/--white, which now mean dark-on-light for the rest of the page. */
+    color:#f7f2ea; text-decoration:none;
     font-size:0.68rem; letter-spacing:0.14em;
-    text-transform:uppercase; transition:color 0.4s; opacity:0.7;
+    text-transform:uppercase; transition:color 0.4s; opacity:0.6;
   }
   .footer-links a:hover { color:var(--gold); opacity:1; }
-  .footer-right { font-size:0.65rem; color:rgba(122,112,96,0.5); text-align:right; line-height:1.8; }
+  .footer-right { font-size:0.65rem; color:rgba(247,242,234,0.5); text-align:right; line-height:1.8; }
 
   ::selection { background:rgba(201,160,64,0.2); color:var(--white); }
   ::-webkit-scrollbar { width:4px; }
-  ::-webkit-scrollbar-track { background:var(--black); }
+  ::-webkit-scrollbar-track { background:var(--page-bg); }
   ::-webkit-scrollbar-thumb { background:rgba(201,160,64,0.3); border-radius:2px; }
 
   /* MOBILE — mirrors index.html breakpoint */
+  /* Hamburger + full-screen overlay menu — same pattern as index.html. */
+  .nav-hamburger {
+    display:none; background:none; border:none; cursor:pointer;
+    flex-direction:column; justify-content:center; align-items:center; gap:5px;
+    width:44px; height:44px; padding:0; flex:none;
+  }
+  .nav-hamburger span { display:block; width:22px; height:2px; background:var(--white); border-radius:1px; transition:transform 0.3s, opacity 0.3s; }
+  .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+  .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity:0; }
+  .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+  .nav-overlay {
+    position:fixed; inset:0; z-index:200;
+    background:var(--page-bg);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:40px;
+    opacity:0; visibility:hidden; transform:translateY(-12px);
+    transition:opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  }
+  .nav-overlay.open { opacity:1; visibility:visible; transform:translateY(0); }
+  .nav-overlay-close {
+    position:absolute; top:18px; right:20px; background:none; border:none;
+    color:var(--white); font-size:2.2rem; line-height:1; cursor:pointer;
+    width:44px; height:44px;
+  }
+  .nav-overlay-links { list-style:none; text-align:center; display:flex; flex-direction:column; gap:28px; }
+  .nav-overlay-links a {
+    color:var(--white); text-decoration:none;
+    font-family:'Poppins',sans-serif; font-size:1.5rem; letter-spacing:0.01em;
+    padding:8px 0; display:inline-block; min-height:44px;
+  }
+  .nav-overlay-links a:hover { color:var(--gold-deep); }
+  .nav-overlay-cta { min-height:44px; display:inline-flex; align-items:center; justify-content:center; }
+  body.nav-open { overflow:hidden; }
+  @media (prefers-reduced-motion: reduce) { .nav-overlay { transition:none; } }
+
+  /* Sticky mobile CTA bar — this page's one action is booking, so it gets one. */
+  .mobile-bar {
+    position:fixed; bottom:0; left:0; right:0; z-index:90;
+    background:rgba(245,240,232,0.96); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--border);
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));
+    display:none; gap:10px;
+  }
+  .mobile-bar .btn { flex:1; text-align:center; padding:14px 20px; }
+
   @media(max-width:860px){
     nav { padding:18px 24px; }
     nav ul { display:none; }
+    .nav-hamburger { display:flex; }
+    .mobile-bar { display:flex; }
+    body { padding-bottom:78px; }
     .article-hero { padding:120px 20px 48px; }
     .article { padding:0 20px 24px; }
     .block { padding:40px 0; }
@@ -375,7 +421,7 @@
 <!-- NAV -->
 <nav>
   <a href="index.html" class="nav-logo">
-    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6IG5vbmU7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogI2NmOGEyYTsKICAgICAgfQoKICAgICAgLmNscy00IHsKICAgICAgICBvcGFjaXR5OiAwOwogICAgICB9CgogICAgICAuY2xzLTUgewogICAgICAgIGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7CiAgICAgIH0KCiAgICAgIC5jbHMtNiB7CiAgICAgICAgZmlsbDogI2U2ZTdlODsKICAgICAgfQoKICAgICAgLmNscy03IHsKICAgICAgICBmaWxsOiAjZmJiNzE2OwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+CiAgICAgIDxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
+    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjcuNSAxMjMuNzUiPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuY2xzLTEgeyBmaWxsOiAjOGE2YTJjOyB9CiAgICAgIC5jbHMtMiB7IGZpbGw6IG5vbmU7IH0KICAgICAgLmNscy0zIHsgZmlsbDogI2NmOGEyYTsgfQogICAgICAuY2xzLTQgeyBvcGFjaXR5OiAwOyB9CiAgICAgIC5jbHMtNSB7IGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7IH0KICAgICAgLmNscy02IHsgZmlsbDogI2Q5Y2JiMDsgfQogICAgICAuY2xzLTcgeyBmaWxsOiAjZmJiNzE2OyB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+PHJlY3QgY2xhc3M9ImNscy0yIiB5PSIwIiB3aWR0aD0iMTI3LjUiIGhlaWdodD0iMTIzLjc1Ii8+PC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
     <span>haloe</span>
   </a>
   <ul>
@@ -384,7 +430,20 @@
     <li><a href="index.html#process">What to Expect</a></li>
     <li><a href="book.html" class="nav-cta">Book Now</a></li>
   </ul>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navOverlay" onclick="toggleNavOverlay()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div class="nav-overlay" id="navOverlay">
+  <button class="nav-overlay-close" aria-label="Close menu" onclick="toggleNavOverlay()">&times;</button>
+  <ul class="nav-overlay-links">
+    <li><a href="index.html#about" onclick="toggleNavOverlay()">About</a></li>
+    <li><a href="index.html#conditions" onclick="toggleNavOverlay()">Conditions</a></li>
+    <li><a href="index.html#process" onclick="toggleNavOverlay()">What to Expect</a></li>
+  </ul>
+  <a href="book.html" class="btn btn-gold nav-overlay-cta">Book Now</a>
+</div>
 
 <!-- HERO -->
 <header class="article-hero">
@@ -584,6 +643,27 @@
     CMA &amp; IPHM Accredited · Fully Insured · Manchester
   </div>
 </footer>
+
+<div class="mobile-bar">
+  <a href="book.html" class="btn btn-gold">Book your session</a>
+</div>
+
+<script>
+// Mobile hamburger nav: full-screen overlay toggle.
+function toggleNavOverlay() {
+  const overlay = document.getElementById('navOverlay');
+  const btn = document.getElementById('navHamburger');
+  const willOpen = !overlay.classList.contains('open');
+  overlay.classList.toggle('open', willOpen);
+  btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  document.body.classList.toggle('nav-open', willOpen);
+}
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape' && document.getElementById('navOverlay').classList.contains('open')) {
+    toggleNavOverlay();
+  }
+});
+</script>
 
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,20 +36,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --black: #080806;
-    --deep: #0d0d0b;
-    --gold: #c9a040;
-    --gold-light: #dbb85a;
-    --white: #f7f2ea;
-    --dim: #7a7060;
-    --border: rgba(201,160,64,0.12);
+    /* Light theme (Sep 2026) — was true-black; --white/--dim are still the
+       text-colour tokens (light-on-dark before, dark-on-light now). */
+    --page-bg: #F5F0E8;
+    --deep: #FFFFFF;
+    --gold: #C8A96E;
+    --gold-light: #DBB85A;
+    --gold-deep: #8a6a2c;
+    --white: #0D0D0D;
+    --dim: #5a5247;
+    --border: rgba(13,13,13,0.1);
     --font-heading: 'Playfair Display', 'Poppins', serif;
     --font-body: 'Poppins', sans-serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
   body {
-    background:var(--black); color:var(--white);
+    background:var(--page-bg); color:var(--white);
     font-family:var(--font-body); font-weight:300;
     font-size:16px; line-height:1.7;
   }
@@ -59,7 +62,7 @@
     position:sticky; top:0; z-index:100;
     padding:20px 80px;
     display:flex; justify-content:space-between; align-items:center;
-    background:rgba(8,8,6,0.92); backdrop-filter:blur(20px);
+    background:rgba(245,240,232,0.92); backdrop-filter:blur(20px);
     border-bottom:1px solid var(--border);
   }
   .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
@@ -73,10 +76,10 @@
     font-size:0.68rem; letter-spacing:0.18em; text-transform:uppercase;
     transition:color 0.3s;
   }
-  nav ul a:hover { color:var(--gold); }
+  nav ul a:hover { color:var(--gold-deep); }
   .nav-cta {
     background:linear-gradient(135deg, var(--gold-light), var(--gold));
-    color:var(--black) !important; padding:10px 24px;
+    color:#0D0D0D !important; padding:10px 24px;
     border-radius:999px; font-weight:500 !important; text-decoration:none !important;
   }
 
@@ -92,12 +95,13 @@
   .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
   .nav-overlay {
     position:fixed; inset:0; z-index:200;
-    background:rgba(8,8,6,0.98);
+    background:var(--page-bg);
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:40px;
     opacity:0; visibility:hidden; transform:translateY(-12px);
     transition:opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
   }
   .nav-overlay.open { opacity:1; visibility:visible; transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .nav-overlay { transition:none; } }
   .nav-overlay-close {
     position:absolute; top:18px; right:20px; background:none; border:none;
     color:var(--white); font-size:2.2rem; line-height:1; cursor:pointer;
@@ -109,7 +113,7 @@
     font-family:var(--font-heading); font-size:1.5rem; letter-spacing:0.01em;
     padding:8px 0; display:inline-block; min-height:44px;
   }
-  .nav-overlay-links a:hover { color:var(--gold); }
+  .nav-overlay-links a:hover { color:var(--gold-deep); }
   .nav-overlay-cta { min-height:44px; display:inline-flex; align-items:center; justify-content:center; }
   body.nav-open { overflow:hidden; }
 
@@ -118,7 +122,7 @@
   .eyebrow {
     display:inline-flex; align-items:center; gap:14px;
     font-size:0.65rem; letter-spacing:0.28em; text-transform:uppercase;
-    color:var(--gold); margin-bottom:24px;
+    color:var(--gold-deep); margin-bottom:24px;
   }
   .eyebrow::before, .eyebrow::after { content:''; width:32px; height:1px; background:var(--gold); opacity:0.6; }
   h1 {
@@ -132,7 +136,7 @@
   section:first-of-type { border-top:none; padding-top:0; }
   .section-tag {
     font-size:0.65rem; letter-spacing:0.26em; text-transform:uppercase;
-    color:var(--gold); margin-bottom:18px; display:flex; align-items:center; gap:12px;
+    color:var(--gold-deep); margin-bottom:18px; display:flex; align-items:center; gap:12px;
   }
   .section-tag::before { content:''; width:22px; height:1px; background:var(--gold); opacity:0.6; }
   h2 {
@@ -140,12 +144,12 @@
     font-size:clamp(1.5rem,3vw,2rem); line-height:1.2; margin-bottom:22px;
     letter-spacing:-0.01em;
   }
-  h2 em { font-style:italic; color:var(--gold); }
+  h2 em { font-style:italic; color:var(--gold-deep); }
   p { color:var(--dim); line-height:1.9; margin-bottom:18px; font-size:0.97rem; }
   p:last-child { margin-bottom:0; }
   strong { color:var(--white); font-weight:500; }
 
-  .inline-link { color:var(--gold); text-decoration:underline; text-underline-offset:3px; }
+  .inline-link { color:var(--gold-deep); text-decoration:underline; text-underline-offset:3px; }
   .inline-link:hover { color:var(--gold-light); }
 
   .btn {
@@ -157,14 +161,14 @@
   }
   .btn-gold {
     background:linear-gradient(135deg, var(--gold-light), var(--gold));
-    color:var(--black);
+    color:#0D0D0D;
   }
   .btn-gold:hover { filter:brightness(1.08); transform:translateY(-2px); }
 
   .tag-strip { margin-top:28px; display:flex; gap:12px; flex-wrap:wrap; }
   .tag {
     font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase;
-    border:1px solid var(--border); color:var(--gold);
+    border:1px solid var(--border); color:var(--gold-deep);
     padding:9px 16px; border-radius:999px; opacity:0.9;
   }
 
@@ -182,17 +186,17 @@
     flex:none; white-space:nowrap; min-height:44px;
     cursor:pointer; transition:all 0.25s;
   }
-  .price-tab.active { color:var(--black); background:var(--gold); border-color:var(--gold); }
+  .price-tab.active { color:#0D0D0D; background:var(--gold); border-color:var(--gold); }
   .price-list { display:none; flex-direction:column; }
   .price-list.active { display:flex; }
   .price-row {
     display:flex; justify-content:space-between; align-items:baseline; gap:16px;
-    padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.06);
+    padding:16px 0; border-bottom:1px solid var(--border);
   }
   .price-row:last-child { border-bottom:none; }
   .price-name { color:var(--white); font-size:0.95rem; }
   .price-meta { display:block; color:var(--dim); font-size:0.78rem; margin-top:4px; }
-  .price-amount { font-family:var(--font-body); font-size:1.05rem; color:var(--gold); white-space:nowrap; }
+  .price-amount { font-family:var(--font-body); font-size:1.05rem; color:var(--gold-deep); white-space:nowrap; }
   .price-was { color:var(--dim); font-weight:400; font-size:0.78em; margin-right:0.4em; text-decoration:line-through; }
 
   /* FAQ */
@@ -206,7 +210,7 @@
   }
   .faq-item summary::-webkit-details-marker { display:none; }
   .faq-item summary::after {
-    content:'+'; color:var(--gold); font-size:1.3rem; font-weight:300; flex:none;
+    content:'+'; color:var(--gold-deep); font-size:1.3rem; font-weight:300; flex:none;
     transition:transform 0.25s;
   }
   .faq-item[open] summary::after { transform:rotate(45deg); }
@@ -224,16 +228,30 @@
   .footer-left span { font-family:var(--font-body); font-size:1.1rem; color:var(--gold); letter-spacing:0.2em; font-weight:300; }
   .footer-links { display:flex; gap:28px; flex-wrap:wrap; }
   .footer-links a {
-    color:var(--dim); text-decoration:none; font-size:0.66rem; letter-spacing:0.12em;
-    text-transform:uppercase; opacity:0.7; transition:color 0.3s;
+    /* Footer keeps its dark background even on the light theme, so its text
+       stays hardcoded light rather than following --dim (now dark-on-light). */
+    color:#f7f2ea; text-decoration:none; font-size:0.66rem; letter-spacing:0.12em;
+    text-transform:uppercase; opacity:0.6; transition:color 0.3s;
   }
   .footer-links a:hover { color:var(--gold); opacity:1; }
-  .footer-right { font-size:0.63rem; color:rgba(122,112,96,0.5); text-align:right; line-height:1.8; }
+  .footer-right { font-size:0.63rem; color:rgba(247,242,234,0.5); text-align:right; line-height:1.8; }
+
+  /* Sticky mobile CTA bar — this page's one action is booking, so it gets one. */
+  .mobile-bar {
+    position:fixed; bottom:0; left:0; right:0; z-index:90;
+    background:rgba(245,240,232,0.96); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--border);
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));
+    display:none;
+  }
+  .mobile-bar .btn { width:100%; text-align:center; }
 
   @media (max-width:720px) {
     nav { padding:16px 20px; }
     nav ul { display:none; }
     .nav-hamburger { display:flex; }
+    .mobile-bar { display:block; }
+    body { padding-bottom:78px; }
     main { padding:56px 20px 32px; }
     footer { padding:36px 20px; flex-direction:column; text-align:center; }
     .footer-right { text-align:center; }
@@ -241,8 +259,8 @@
        undifferentiated block on a phone; a bordered card per treatment gives
        each row its own tap/reading target. */
     .price-row {
-      background:var(--black, #080806); border:1px solid var(--border);
-      border-radius:12px; padding:14px 16px; margin-bottom:10px;
+      background:var(--deep); box-shadow:0 8px 24px rgba(13,13,13,0.06);
+      border-radius:16px; padding:14px 16px; margin-bottom:10px;
     }
     .price-row:last-child { border-bottom:1px solid var(--border); margin-bottom:0; }
   }
@@ -386,6 +404,10 @@
     CMA & IPHM Accredited · Fully Insured · Manchester
   </div>
 </footer>
+
+<div class="mobile-bar">
+  <a href="book.html" class="btn btn-gold">Book your session</a>
+</div>
 
 <script src="services-data.js"></script>
 <script>
