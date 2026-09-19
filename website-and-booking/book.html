@@ -1511,6 +1511,17 @@ if (new URLSearchParams(location.search).get('test') === '1') {
   SERVICES.massage.unshift({ name: 'TEST — £1 (do not book)', time: '15 min', price: 1 });
 }
 
+// One-off £1 LIVE-mode test booking, for verifying a real Stripe charge +
+// both confirmation emails end to end before relying on the payment flow for
+// real customers. Deliberately NOT in any of the four real categories, so it
+// never renders in the public treatment picker (renderServices()/the
+// category-tabs only ever touch massage/dry/wet/packages) — reachable only
+// via the ?treatment=test1 deep link below, which also skips step 2 since
+// there's nothing to pick. Remove this block, its handling in
+// applyDeepLink(), and the matching LIVE_TEST_SERVICE in
+// functions/_services.js once live testing is done.
+SERVICES.__livetest = [{ name: 'Test booking (£1)', time: '15 min', price: 1, desc: 'Internal test booking — not a real treatment.' }];
+
 /* ---- Weekly Clinic Day config ----
    Single source of truth for the browser side. functions/_clinic.js carries
    the same values for the Functions — browser JS can't import that module,
@@ -1595,6 +1606,18 @@ function applyDeepLink() {
     selectLocation(wantedLocation);
   }
 
+  // Hidden £1 LIVE-mode test booking — see the SERVICES.__livetest block
+  // above. Combine with ?location=mobile or ?location=clinic to test each
+  // location once. Remove alongside that block when live testing is done.
+  if (params.get('treatment') === 'test1') {
+    state.category = '__livetest';
+    state.serviceIndex = 0;
+    const btn = document.getElementById('btn-step2');
+    if (btn) btn.disabled = false;
+    skipTreatmentConfirm = true;
+    return;
+  }
+
   const cat = params.get('cat');
   if (!cat || !SERVICES[cat]) return;
 
@@ -1630,7 +1653,11 @@ function init() {
   state.calYear = now.getFullYear();
   state.calMonth = now.getMonth();
   applyDeepLink();
-  renderServices();
+  // Skip populating the picker for the hidden __livetest category — it has
+  // no category-tab of its own, so rendering it would leak the £1 test
+  // treatment into the (inactive but present) step-2 DOM. Remove this
+  // condition alongside the rest of the __livetest handling.
+  if (state.category !== '__livetest') renderServices();
   renderCalendar();
   updateRail();
 }

@@ -47,6 +47,12 @@ export const SERVICES = {
 // is done.
 export const TEST_SERVICE = { name: 'TEST — £1 (do not book)', price: 1 };
 
+// One-off £1 LIVE-mode test booking — mirrors book.html's SERVICES.__livetest
+// (reachable only via ?treatment=test1, not shown in the picker). Remove
+// alongside that block, and its handling in applyDeepLink(), once live
+// testing is done.
+export const LIVE_TEST_SERVICE = { name: 'Test booking (£1)', price: 1 };
+
 // Same 20% promotional discount as services-data.js — keep PROMO_DISCOUNT in
 // step with that file. Dry, wet and package prices are already whole pounds
 // after the cut; Math.round is belt-and-braces for any future price that isn't.
@@ -61,6 +67,7 @@ export function netPrice(svc) {
 // unrecognised name rather than guessing.
 export function findService(treatmentName) {
   if (treatmentName === TEST_SERVICE.name) return TEST_SERVICE;
+  if (treatmentName === LIVE_TEST_SERVICE.name) return LIVE_TEST_SERVICE;
   for (const list of Object.values(SERVICES)) {
     const svc = list.find(s => s.name === treatmentName);
     if (svc) return svc;
