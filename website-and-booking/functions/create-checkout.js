@@ -1,6 +1,6 @@
 import { reserveSlot, releaseBooking, slotToMinutes, HOLD_SECONDS } from './_bookings.js';
 import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
-import { findService, netPrice } from './_services.js';
+import { findService, netPrice, LIVE_TEST_SERVICE, LIVE_TEST_TRAVEL_PENCE } from './_services.js';
 import { validateDiscountCode, applyDiscount } from './_discounts.js';
 import { travelZoneFor, travelFeeFor } from './_travel.js';
 
@@ -23,7 +23,10 @@ export async function onRequestPost(context) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    const originalAmount = netPrice(svc) * 100; // pence — the TREATMENT price only
+    // pricePence (LIVE_TEST_SERVICE only) is a fractional-pound price already
+    // in pence — netPrice() rounds to whole pounds, which is right for every
+    // real treatment but would round 50p up to £1.
+    const originalAmount = typeof svc.pricePence === 'number' ? svc.pricePence : netPrice(svc) * 100; // pence — the TREATMENT price only
 
     // The discount is re-validated from scratch here — never trust that the
     // client's earlier /apply-discount check still holds. A code could have
@@ -71,7 +74,12 @@ export async function onRequestPost(context) {
     let travelPence = 0;
     if (location === 'mobile') {
       travelZone = travelZoneFor(travelPostcode) || 'C';
-      travelPence = travelFeeFor(travelZone);
+      // LIVE_TEST_SERVICE overrides the real £15/£35 fee with a flat 5p for
+      // Zone A/B — see the comment on LIVE_TEST_TRAVEL_PENCE. Zone C is
+      // untouched (still £0) since it was never a fixed fee to override.
+      travelPence = (svc === LIVE_TEST_SERVICE && (travelZone === 'A' || travelZone === 'B'))
+        ? LIVE_TEST_TRAVEL_PENCE
+        : travelFeeFor(travelZone);
     }
 
     const totalAmount = treatmentAmount + travelPence;

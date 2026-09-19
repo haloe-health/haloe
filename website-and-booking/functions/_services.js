@@ -47,11 +47,24 @@ export const SERVICES = {
 // is done.
 export const TEST_SERVICE = { name: 'TEST — £1 (do not book)', price: 1 };
 
-// One-off £1 LIVE-mode test booking — mirrors book.html's SERVICES.__livetest
+// One-off 50p LIVE-mode test booking — mirrors book.html's SERVICES.__livetest
 // (reachable only via ?treatment=test1, not shown in the picker). Remove
 // alongside that block, and its handling in applyDeepLink(), once live
 // testing is done.
-export const LIVE_TEST_SERVICE = { name: 'Test booking (£1)', price: 1 };
+//
+// pricePence (not price) because it's fractional-pound (£0.50) — netPrice()
+// rounds to whole pounds before converting to pence, which is right for
+// every real treatment (all whole-pound prices) but would round 50p up to
+// £1. Any caller pricing a service must check for pricePence first and use
+// it directly, falling back to netPrice(svc)*100 otherwise.
+export const LIVE_TEST_SERVICE = { name: 'Test booking (50p)', pricePence: 50 };
+
+// Real travel fees are deliberately not used for this test item — a live
+// Zone A/B postcode would otherwise add £15/£35, making the smallest
+// possible live-mode charge £15.50 instead of a genuine ~50p sanity check.
+// Zone C is left alone (still £0, "confirmed by WhatsApp") since it isn't a
+// fixed fee to override.
+export const LIVE_TEST_TRAVEL_PENCE = 5;
 
 // Same as services-data.js — ended Sep 2026, kept at 0 in step with that
 // file. HALOE20 (functions/_discounts.js) is the only discount left,

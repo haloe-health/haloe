@@ -41,7 +41,9 @@ export async function onRequestPost(context) {
       });
     }
 
-    const originalAmountPence = netPrice(svc) * 100;
+    // pricePence (LIVE_TEST_SERVICE only) is a fractional-pound price already
+    // in pence — see the comment on it in _services.js.
+    const originalAmountPence = typeof svc.pricePence === 'number' ? svc.pricePence : netPrice(svc) * 100;
     const { discountPence, finalPence } = applyDiscount(originalAmountPence, result.percent);
 
     return new Response(JSON.stringify({
