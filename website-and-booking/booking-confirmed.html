@@ -146,12 +146,18 @@
   const bookingLocation = params.get('location') || 'mobile';
   const venue     = params.get('venue')     || '';
   const amount    = parseInt(params.get('amount') || '0', 10);
+  const discountCode   = params.get('discountCode')   || '';
+  const discountAmount = parseInt(params.get('discountAmount') || '0', 10);
+  const originalAmount = parseInt(params.get('originalAmount') || '0', 10);
 
   // Derived from the amount actually charged — every booking is paid in full.
-  const paid = '£' + (amount / 100).toFixed(2).replace(/\.00$/, '');
+  const gbp = (pence) => '£' + (pence / 100).toFixed(2).replace(/\.00$/, '');
+  const paid = gbp(amount);
 
   const bits = [treatment, [date, time].filter(Boolean).join(', ')].filter(Boolean);
-  bits.push(`Paid in full — ${paid}`);
+  bits.push(discountCode
+    ? `Paid in full — ${paid} (was ${gbp(originalAmount)} · ${discountCode} saved ${gbp(discountAmount)})`
+    : `Paid in full — ${paid}`);
   document.getElementById('payment-sub').textContent = bits.join(' · ');
 
   if (bookingLocation === 'clinic') {

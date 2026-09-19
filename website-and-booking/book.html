@@ -957,6 +957,26 @@
     line-height: 1.6; margin: 1rem 0 0.9rem;
   }
 
+  /* ---- Step 5: discount code ---- */
+  .discount-row input { text-transform: uppercase; letter-spacing: 0.04em; }
+  .discount-apply-btn {
+    flex: none; font-family: 'Poppins', sans-serif; font-size: 0.78rem; font-weight: 600;
+    padding: 0.5rem 0.95rem; border-radius: 999px; cursor: pointer;
+    background: none; color: var(--gold-deep); border: 1px solid rgba(201,160,64,0.5);
+    transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+  }
+  .discount-apply-btn:hover:not(:disabled) { background: rgba(201,160,64,0.08); border-color: var(--gold); }
+  .discount-apply-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .discount-line {
+    display: flex; justify-content: space-between; align-items: center; gap: 0.6rem;
+    padding: 0.7rem 0.85rem; font-size: 0.85rem; color: var(--gold-deep);
+  }
+  .discount-line .discount-remove {
+    font-size: 0.72rem; color: var(--text-muted); text-decoration: underline;
+    background: none; border: none; cursor: pointer; padding: 0; flex: none;
+  }
+  .hidden { display: none !important; }
+
   /* ---- Summary ---- */
   .summary-card {
     border: 1px solid var(--hairline-border);
@@ -1471,6 +1491,16 @@
 
     <div class="summary-card" id="summary-card"></div>
 
+    <div class="ios-group">
+      <div class="ios-row discount-row">
+        <label for="discount-code">Have a code?</label>
+        <input type="text" id="discount-code" placeholder="e.g. HALOE20" autocapitalize="characters" oninput="onDiscountCodeInput()">
+        <button type="button" class="discount-apply-btn" id="discount-apply-btn" onclick="applyDiscountCode()">Apply</button>
+      </div>
+      <p class="field-error" id="discount-error"></p>
+      <div class="discount-line hidden" id="discount-applied"></div>
+    </div>
+
     <p class="cancellation-policy">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>
 
     <div class="ios-group">
@@ -1558,6 +1588,13 @@ function priceHtml(svc) {
     : `£${svc.price}`;
 }
 
+// A discount code can knock a whole-pound price into pence (e.g. £72 - 20% =
+// £57.60), unlike the site-wide promo, which never does — so this trims
+// trailing ".00" rather than assuming a whole number the way priceHtml() does.
+function formatPounds(pence) {
+  return '£' + (pence / 100).toFixed(2).replace(/\.00$/, '');
+}
+
 let state = {
   category: 'massage',
   serviceIndex: null,
@@ -1566,7 +1603,14 @@ let state = {
   time: null,
   calYear: null,
   calMonth: null,
+  discount: null, // { code, percent, discountPence, finalPence } once server-validated
 };
+
+// A ?code= deep link (e.g. the homepage offer box) pre-fills the discount
+// field but can't be applied until step 5, since validation needs the
+// customer's email from step 4. Tried once, automatically, the first time
+// step 5 is reached — see goToStep().
+let pendingDiscountCode = null;
 
 // A package deep link already picks the treatment, so once location is chosen
 // its own confirm step (Treatment) is redundant — skip straight to Date & Time.
@@ -1609,6 +1653,16 @@ function applyDeepLink() {
   const wantedLocation = params.get('location');
   if (wantedLocation === 'clinic' || wantedLocation === 'mobile') {
     selectLocation(wantedLocation);
+  }
+
+  // A discount code deep link (e.g. the hero offer box's book.html?code=HALOE20).
+  // Pre-fills the field now; applyDiscountCode() runs it for real once step 5
+  // is reached and we have an email to validate it against.
+  const wantedCode = params.get('code');
+  if (wantedCode) {
+    pendingDiscountCode = wantedCode;
+    const input = document.getElementById('discount-code');
+    if (input) input.value = wantedCode.toUpperCase();
   }
 
   // Hidden £1 LIVE-mode test booking — see the SERVICES.__livetest block
@@ -2024,6 +2078,11 @@ function buildSummary() {
 function renderSummary() {
   const { service, catLabel, dateStr, locationLabel, name } = buildSummary();
   const card = document.getElementById('summary-card');
+  // A discount code can undercut the site-wide promo price shown by
+  // priceHtml() — once one's applied, show what's actually being charged.
+  const priceHtmlOut = state.discount
+    ? `<s class="was">${formatPounds(netPrice(service) * 100)}</s> ${formatPounds(state.discount.finalPence)}`
+    : priceHtml(service);
   // Presented as an appointment pass: when it is, then what it is.
   card.innerHTML = `
     <div class="pass">
@@ -2038,7 +2097,7 @@ function renderSummary() {
           <div class="pass-name">${service.name}</div>
           <div class="pass-meta">${catLabel}${service.time ? ' · ' + service.time : ''}${name ? ' · ' + name : ''}</div>
         </div>
-        <div class="pass-price">${priceHtml(service)}</div>
+        <div class="pass-price">${priceHtmlOut}</div>
       </div>
     </div>
   `;
@@ -2079,7 +2138,7 @@ async function handlePayment() {
   const fullBtn = document.getElementById('btn-full');
   if (fullBtn) { fullBtn.disabled = true; fullBtn.textContent = 'Redirecting to payment…'; }
 
-  const amount = netPrice(service) * 100; // pence — every booking is paid in full
+  const amount = netPrice(service) * 100; // pence — every booking is paid in full; create-checkout.js recomputes this itself if a discount code is present, never trusting this figure for the actual charge.
 
   try {
     const res = await fetch('/create-checkout', {
@@ -2100,6 +2159,7 @@ async function handlePayment() {
         // for display and the WhatsApp/email copy).
         bookingDate: state.date ? toISODate(state.date) : '',
         durationMin: selectedDurationMin(),
+        discountCode: state.discount ? state.discount.code : '',
       }),
     });
 
@@ -2111,6 +2171,23 @@ async function handlePayment() {
       resetPayButtons();
       goToStep(3);
       if (state.date) selectDate(state.date.getFullYear(), state.date.getMonth(), state.date.getDate());
+      return;
+    }
+
+    // The discount passed its live check a moment ago but failed create-checkout.js's
+    // own, final re-validation (expired/deactivated/redeemed elsewhere in the
+    // meantime) — never silently fall back to charging full price for a total
+    // the customer was shown as discounted.
+    if (res.status === 400) {
+      const errBody = await res.json().catch(() => ({}));
+      if (errBody.error === 'discount_invalid' || errBody.error === 'discount_unavailable') {
+        alert('Sorry — your discount code is no longer valid. It has been removed; please review your total and pay again.');
+        removeDiscountCode();
+        resetPayButtons();
+        return;
+      }
+      alert('Payment setup failed. Please try again.');
+      resetPayButtons();
       return;
     }
 
@@ -2133,7 +2210,9 @@ async function handlePayment() {
 function fullLabel() {
   const svc = (state.serviceIndex !== null && SERVICES[state.category])
     ? SERVICES[state.category][state.serviceIndex] : null;
-  return svc ? `Pay in full — £${netPrice(svc)}` : 'Pay in full';
+  if (!svc) return 'Pay in full';
+  const amount = state.discount ? formatPounds(state.discount.finalPence) : `£${netPrice(svc)}`;
+  return `Pay in full — ${amount}`;
 }
 
 // The pay button stays disabled until the cancellation-policy tick-box is checked.
@@ -2147,6 +2226,111 @@ function resetPayButtons() {
   const fullBtn = document.getElementById('btn-full');
   if (fullBtn) fullBtn.textContent = fullLabel();
   checkStep5();
+}
+
+// Clears any stale error/applied state as soon as the customer edits the
+// code — an old "invalid" message shouldn't linger once they've changed it.
+function onDiscountCodeInput() {
+  const input = document.getElementById('discount-code');
+  if (input) input.value = input.value.toUpperCase();
+  if (state.discount) return; // already applied; editing further needs Remove first
+  const errEl = document.getElementById('discount-error');
+  if (errEl) { errEl.textContent = ''; errEl.classList.remove('visible'); }
+}
+
+function discountErrorMessage(reason) {
+  return {
+    unknown_treatment: 'Please select a treatment first.',
+    unavailable: 'Sorry — codes can’t be checked right now. Please try again shortly.',
+    missing_code: 'Enter a code.',
+    missing_email: 'Please add your email on the previous step first.',
+    invalid_code: 'That code isn’t valid.',
+    expired: 'That code has expired.',
+    already_used: 'That code has already been used with this email.',
+  }[reason] || 'That code isn’t valid.';
+}
+
+async function applyDiscountCode(codeOverride) {
+  const input = document.getElementById('discount-code');
+  const errEl = document.getElementById('discount-error');
+  const btn = document.getElementById('discount-apply-btn');
+  const code = (codeOverride !== undefined ? codeOverride : (input ? input.value : '')).trim();
+
+  if (errEl) { errEl.textContent = ''; errEl.classList.remove('visible'); }
+
+  if (!code) {
+    if (errEl) { errEl.textContent = discountErrorMessage('missing_code'); errEl.classList.add('visible'); }
+    return;
+  }
+  if (state.serviceIndex === null || !SERVICES[state.category]) {
+    if (errEl) { errEl.textContent = discountErrorMessage('unknown_treatment'); errEl.classList.add('visible'); }
+    return;
+  }
+  const emailField = document.getElementById('email');
+  const email = emailField ? emailField.value.trim() : '';
+  if (!isValidEmail(email)) {
+    if (errEl) { errEl.textContent = discountErrorMessage('missing_email'); errEl.classList.add('visible'); }
+    return;
+  }
+
+  const svc = SERVICES[state.category][state.serviceIndex];
+  if (btn) { btn.disabled = true; btn.textContent = 'Checking…'; }
+
+  try {
+    const res = await fetch('/apply-discount', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, email, treatmentName: svc.name }),
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      state.discount = {
+        code: data.code,
+        percent: data.percent,
+        discountPence: data.discountAmountPence,
+        finalPence: data.finalAmountPence,
+      };
+      if (input) { input.value = data.code; input.disabled = true; }
+    } else {
+      state.discount = null;
+      if (errEl) { errEl.textContent = discountErrorMessage(data.error); errEl.classList.add('visible'); }
+    }
+  } catch (err) {
+    state.discount = null;
+    if (errEl) { errEl.textContent = 'Something went wrong checking your code. Please try again.'; errEl.classList.add('visible'); }
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Apply'; }
+  renderDiscountLine();
+  renderSummary();
+  const full = document.getElementById('btn-full');
+  if (full) full.textContent = fullLabel();
+}
+
+function removeDiscountCode() {
+  state.discount = null;
+  const input = document.getElementById('discount-code');
+  if (input) { input.value = ''; input.disabled = false; }
+  const errEl = document.getElementById('discount-error');
+  if (errEl) { errEl.textContent = ''; errEl.classList.remove('visible'); }
+  renderDiscountLine();
+  renderSummary();
+  const full = document.getElementById('btn-full');
+  if (full) full.textContent = fullLabel();
+}
+
+function renderDiscountLine() {
+  const el = document.getElementById('discount-applied');
+  if (!el) return;
+  if (state.discount) {
+    el.classList.remove('hidden');
+    el.innerHTML = `<span>${state.discount.code} applied — ${state.discount.percent}% off</span>`
+      + `<button type="button" class="discount-remove" onclick="removeDiscountCode()">Remove</button>`;
+  } else {
+    el.classList.add('hidden');
+    el.innerHTML = '';
+  }
 }
 
 function notifyWhatsApp(paymentType) {
@@ -2185,6 +2369,13 @@ function goToStep(n) {
     const full = document.getElementById('btn-full');
     if (full) full.textContent = fullLabel();
     checkStep5();
+    // A ?code= deep link tries itself once, automatically, the first time we
+    // land here — by now step 4 has given us the email it needs to validate.
+    if (pendingDiscountCode) {
+      const code = pendingDiscountCode;
+      pendingDiscountCode = null;
+      applyDiscountCode(code);
+    }
   }
   updateRail();
   window.scrollTo(0, 0);

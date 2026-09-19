@@ -92,6 +92,8 @@ export async function reserveSlot(env, b, now) {
       p_amount_pence: Number.isFinite(b.amountPence) ? b.amountPence : null,
       p_hold_expires_at: holdExpires,
       p_now: now,
+      p_discount_code: b.discountCode || null,
+      p_discount_pence: Number.isFinite(b.discountPence) ? b.discountPence : null,
     },
   });
   return result; // the function returns the new id, or null if the slot was taken
@@ -104,7 +106,8 @@ export async function listBookings(env) {
   const now = Math.floor(Date.now() / 1000);
   const rows = await sbRequest(env, {
     path: '/rest/v1/bookings?select=id,booking_date,start_min,end_min,treatment,customer_name,'
-      + 'customer_email,customer_phone,location,address,amount_pence,status,hold_expires_at,created_at'
+      + 'customer_email,customer_phone,location,address,amount_pence,status,hold_expires_at,created_at,'
+      + 'discount_code,discount_pence'
       + `&or=(status.eq.confirmed,and(status.eq.pending,hold_expires_at.gt.${now}))`
       + '&order=booking_date.asc,start_min.asc',
     method: 'GET',

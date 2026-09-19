@@ -108,6 +108,14 @@ export async function onRequestPost(context) {
     const paymentLabel = `${amount} — paid in full`;
     // Every booking is paid in full — there is no deposit path.
 
+    // Discount code, if one was applied — create-checkout.js only sets these
+    // metadata fields when a code passed its final, server-side re-validation.
+    const discountCode = md.discountCode || '';
+    const discountPence = parseInt(md.discountPence || '0', 10);
+    const originalAmountPence = parseInt(md.originalAmountPence || '0', 10);
+    const originalAmountLabel = discountCode ? formatGBP(originalAmountPence) : '';
+    const discountLabel = discountCode ? `${discountCode} — -${formatGBP(discountPence)}` : '';
+
     // Confirm the held slot so it converts from a temporary hold into a firm
     // booking that keeps blocking the time. Best-effort: if the row lapsed or
     // Supabase isn't configured, the notifications below must still go out.
@@ -120,7 +128,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes };
+    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountLabel };
 
     // WhatsApp notification to Halima. Sent before the email block and wrapped in
     // its own try/catch so it still fires if Resend is unconfigured or failing —
@@ -341,6 +349,8 @@ function clientEmailHtml(d) {
               ${heroRow(d.date, d.time, locationLabel(d))}
               ${infoCard([
                 { label: 'Treatment', value: d.treatment },
+                { label: 'Price', value: d.originalAmountLabel },
+                { label: 'Discount', value: d.discountLabel },
                 { label: 'Paid', value: d.paymentLabel, gold: true },
               ])}
               <!-- Clinic venue note -->
@@ -369,6 +379,8 @@ function halimaEmailHtml(d) {
               ${heroRow(d.date, d.time, locationLabel(d))}
               ${infoCard([
                 { label: 'Treatment', value: d.treatment },
+                { label: 'Price', value: d.originalAmountLabel },
+                { label: 'Discount', value: d.discountLabel },
                 { label: 'Paid', value: d.paymentLabel, gold: true },
               ])}
               ${infoCard([

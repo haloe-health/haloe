@@ -1,10 +1,11 @@
 import { reserveSlot, releaseBooking, slotToMinutes, HOLD_SECONDS } from './_bookings.js';
 import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
 import { findService, netPrice } from './_services.js';
+import { validateDiscountCode, applyDiscount } from './_discounts.js';
 
 export async function onRequestPost(context) {
   try {
-    const { treatmentName, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin } = await context.request.json();
+    const { treatmentName, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin, discountCode } = await context.request.json();
     // location is 'clinic' | 'mobile'. Every booking is paid in full — there is
     // no deposit path.
     const venue = location === 'clinic' ? CLINIC_VENUE_NAME : '';
@@ -18,7 +19,40 @@ export async function onRequestPost(context) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    const amount = netPrice(svc) * 100; // pence
+    const originalAmount = netPrice(svc) * 100; // pence
+
+    // The discount is re-validated from scratch here — never trust that the
+    // client's earlier /apply-discount check still holds. A code could have
+    // expired, been deactivated, or been redeemed by the same email in
+    // another tab in the meantime. A code that fails re-validation rejects
+    // the checkout outright (rather than silently charging full price)
+    // rather than surprise a customer who saw a discounted total.
+    let amount = originalAmount;
+    let appliedCode = null;
+    let appliedPercent = 0;
+    let discountPenceApplied = 0;
+    if (discountCode) {
+      if (!context.env.SUPABASE_URL || !context.env.SUPABASE_SERVICE_ROLE_KEY) {
+        return new Response(JSON.stringify({ error: 'discount_unavailable' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      const now = Math.floor(Date.now() / 1000);
+      const result = await validateDiscountCode(context.env, discountCode, customerEmail, now);
+      if (!result.ok) {
+        return new Response(JSON.stringify({ error: 'discount_invalid', reason: result.reason }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      const applied = applyDiscount(originalAmount, result.percent);
+      amount = applied.finalPence;
+      discountPenceApplied = applied.discountPence;
+      appliedCode = result.code;
+      appliedPercent = result.percent;
+    }
+
     const secretKey = context.env.STRIPE_SECRET_KEY;
     const origin = new URL(context.request.url).origin;
 
@@ -46,6 +80,8 @@ export async function onRequestPost(context) {
           location: location || 'mobile',
           address: location === 'clinic' ? `${venue} — ${CLINIC_VENUE_ADDRESS}` : customerAddress,
           amountPence: Number(amount),
+          discountCode: appliedCode,
+          discountPence: discountPenceApplied,
         }, now);
 
         if (bookingId === null) {
@@ -63,7 +99,8 @@ export async function onRequestPost(context) {
 
     const productName = `Full payment — ${treatmentName}`;
 
-    const description = `Full payment for ${treatmentName} with haloe. Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.`;
+    const discountNote = appliedCode ? ` ${appliedCode} applied: ${appliedPercent}% off.` : '';
+    const description = `Full payment for ${treatmentName} with haloe.${discountNote} Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.`;
 
     const params = new URLSearchParams();
     params.append('payment_method_types[]', 'card');
@@ -84,6 +121,11 @@ export async function onRequestPost(context) {
     params.append('metadata[customerAddress]', customerAddress || '');
     params.append('metadata[notes]', notes || '');
     if (bookingId !== null) params.append('metadata[bookingId]', String(bookingId));
+    if (appliedCode) {
+      params.append('metadata[discountCode]', appliedCode);
+      params.append('metadata[discountPence]', String(discountPenceApplied));
+      params.append('metadata[originalAmountPence]', String(originalAmount));
+    }
     // Expire the Checkout Session in step with the slot hold, so an abandoned
     // payment and its reservation lapse together.
     params.append('expires_at', String(now + HOLD_SECONDS));
@@ -95,6 +137,11 @@ export async function onRequestPost(context) {
       location: location || 'mobile',
       venue: venue || '',
       amount: String(amount),
+      ...(appliedCode ? {
+        discountCode: appliedCode,
+        discountAmount: String(discountPenceApplied),
+        originalAmount: String(originalAmount),
+      } : {}),
     });
     params.append('success_url', `${origin}/booking-confirmed.html?${successParams.toString()}`);
     params.append('cancel_url', `${origin}/book.html`);

@@ -250,10 +250,13 @@
   .offer-box {
     margin-top:24px; border:1.5px dashed var(--gold); border-radius:var(--card-radius-sm);
     padding:16px 20px; display:inline-flex; flex-direction:column; gap:2px;
-    background:rgba(255,255,255,0.5);
+    background:rgba(255,255,255,0.5); text-decoration:none;
+    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   }
+  .offer-box:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); background:rgba(255,255,255,0.75); }
   .offer-box .offer-label { font-size:0.72rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold-deep); }
   .offer-box .offer-value { font-family:var(--font-heading); font-size:1.3rem; color:var(--ink); }
+  .offer-box .offer-detail { font-size:0.78rem; color:var(--body); margin-top:2px; }
   .hero-talk { margin-top:20px; font-size:0.95rem; }
 
   /* ============================================================
@@ -557,10 +560,11 @@
     </div>
     <h1 class="hero-title reveal">Ancient healing.<br><em>Modern standards.</em></h1>
     <p class="hero-sub reveal">Massage, dry cupping and hijama across Manchester — unhurried sessions rooted in the prophetic tradition, held to modern professional standards.</p>
-    <div class="offer-box reveal">
+    <a href="book.html?code=HALOE20" class="offer-box reveal">
       <span class="offer-label">First session</span>
-      <span class="offer-value">[YOUR OFFER]</span>
-    </div>
+      <span class="offer-value">HALOE20</span>
+      <span class="offer-detail">20% off your first booking · online only · ends 31 Oct</span>
+    </a>
     <p class="hero-talk reveal">Rather talk? <a href="https://wa.me/447474833643" class="link-gold" target="_blank" rel="noopener">Message us on WhatsApp →</a></p>
   </div>
 </section>
@@ -853,6 +857,7 @@
       <h2>Ready to feel lighter?</h2>
       <p>Massage, dry cupping and hijama — mobile across Manchester or every Tuesday at Deansgate.</p>
       <div class="cta-benefits">
+        <span class="cta-benefit">HALOE20 — 20% off your first booking</span>
         <span class="cta-benefit">Unlimited cups</span>
         <span class="cta-benefit">Black seed oil aftercare</span>
         <span class="cta-benefit">Paid in full, no deposit</span>
