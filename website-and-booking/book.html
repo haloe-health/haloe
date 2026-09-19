@@ -1574,22 +1574,16 @@ if (new URLSearchParams(location.search).get('test') === '1') {
   SERVICES.massage.unshift({ name: 'TEST — £1 (do not book)', time: '15 min', price: 1 });
 }
 
-// One-off 50p LIVE-mode test booking, for verifying a real Stripe charge +
+// One-off £1 LIVE-mode test booking, for verifying a real Stripe charge +
 // both confirmation emails end to end before relying on the payment flow for
 // real customers. Deliberately NOT in any of the four real categories, so it
 // never renders in the public treatment picker (renderServices()/the
 // category-tabs only ever touch massage/dry/wet/packages) — reachable only
 // via the ?treatment=test1 deep link below, which also skips step 2 since
 // there's nothing to pick. Remove this block, its handling in
-// applyDeepLink(), and the matching LIVE_TEST_SERVICE/LIVE_TEST_TRAVEL_PENCE
-// in functions/_services.js once live testing is done.
-//
-// pricePence (not price) because it's fractional-pound (£0.50) — see
-// treatmentPenceFor() below and the matching comment in _services.js.
-SERVICES.__livetest = [{ name: 'Test booking (50p)', time: '15 min', pricePence: 50, desc: 'Internal test booking — not a real treatment.' }];
-// Overrides the real £15/£35 travel fee for this item only — see the
-// comment on LIVE_TEST_TRAVEL_PENCE in _services.js.
-const LIVE_TEST_TRAVEL_PENCE = 5;
+// applyDeepLink(), and the matching LIVE_TEST_SERVICE in
+// functions/_services.js once live testing is done.
+SERVICES.__livetest = [{ name: 'Test booking (£1)', time: '15 min', price: 1, desc: 'Internal test booking — not a real treatment.' }];
 
 /* ---- Weekly Clinic Day config ----
    Single source of truth for the browser side. functions/_clinic.js carries
@@ -1653,7 +1647,7 @@ function travelFeeFor(zone) {
 }
 
 function priceHtml(svc) {
-  if (typeof svc.pricePence === 'number') return formatPounds(svc.pricePence);
+  // The £1 test item rounds back to £1, so it gets no misleading strikethrough.
   return netPrice(svc) < svc.price
     ? `<s class="was">£${svc.price}</s> £${netPrice(svc)}`
     : `£${svc.price}`;
@@ -1664,13 +1658,6 @@ function priceHtml(svc) {
 // trailing ".00" rather than assuming a whole number the way priceHtml() does.
 function formatPounds(pence) {
   return '£' + (pence / 100).toFixed(2).replace(/\.00$/, '');
-}
-
-// The charged pence for a service — pricePence (LIVE_TEST_SERVICE only, a
-// fractional-pound price already in pence) if present, else the normal
-// whole-pound netPrice() path every real treatment uses.
-function treatmentPenceFor(svc) {
-  return (typeof svc.pricePence === 'number') ? svc.pricePence : netPrice(svc) * 100;
 }
 
 let state = {
@@ -1750,13 +1737,6 @@ function onTravelPostcodeInput() {
   syncFooter();
 }
 
-// The real fee for a zone, unless the current selection is the 50p live
-// test item, which overrides Zone A/B to a flat 5p (see LIVE_TEST_TRAVEL_PENCE).
-function travelPenceForZone(zone) {
-  if (state.category === '__livetest' && (zone === 'A' || zone === 'B')) return LIVE_TEST_TRAVEL_PENCE;
-  return travelFeeFor(zone);
-}
-
 function renderTravelFeeLine() {
   const el = document.getElementById('travel-fee-line');
   const zone = state.travelZone;
@@ -1770,7 +1750,7 @@ function renderTravelFeeLine() {
   const label = zone === 'A' ? 'Travel (Oldham & nearby)'
     : zone === 'B' ? 'Travel (Greater Manchester)'
     : 'Travel';
-  const value = zone === 'C' ? 'Confirmed by WhatsApp' : formatPounds(travelPenceForZone(zone));
+  const value = zone === 'C' ? 'Confirmed by WhatsApp' : formatPounds(travelFeeFor(zone));
   el.innerHTML = '';
   const kEl = document.createElement('span');
   kEl.textContent = label;
@@ -2223,7 +2203,7 @@ function buildSummary() {
 // Travel fee for whatever's currently selected — 0 for clinic (no travel
 // line, ever) or until a mobile booking has a priceable postcode.
 function travelPenceForSelection() {
-  return (!isClinic() && state.travelZone) ? travelPenceForZone(state.travelZone) : 0;
+  return (!isClinic() && state.travelZone) ? travelFeeFor(state.travelZone) : 0;
 }
 
 function renderSummary() {
@@ -2232,9 +2212,9 @@ function renderSummary() {
   // A discount code can undercut the site-wide promo price shown by
   // priceHtml() — once one's applied, show what's actually being charged.
   // Always the TREATMENT price alone — travel (below) is never discounted.
-  const treatmentPence = state.discount ? state.discount.finalPence : treatmentPenceFor(service);
+  const treatmentPence = state.discount ? state.discount.finalPence : netPrice(service) * 100;
   const priceHtmlOut = state.discount
-    ? `<s class="was">${formatPounds(treatmentPenceFor(service))}</s> ${formatPounds(state.discount.finalPence)}`
+    ? `<s class="was">${formatPounds(netPrice(service) * 100)}</s> ${formatPounds(state.discount.finalPence)}`
     : priceHtml(service);
 
   const travelPence = travelPenceForSelection();
@@ -2310,7 +2290,7 @@ async function handlePayment() {
   const fullBtn = document.getElementById('btn-full');
   if (fullBtn) { fullBtn.disabled = true; fullBtn.textContent = 'Redirecting to payment…'; }
 
-  const amount = treatmentPenceFor(service); // pence — every booking is paid in full; create-checkout.js recomputes this itself (discount code, live-test overrides), never trusting this figure for the actual charge.
+  const amount = netPrice(service) * 100; // pence — every booking is paid in full; create-checkout.js recomputes this itself if a discount code is present, never trusting this figure for the actual charge.
 
   try {
     const res = await fetch('/create-checkout', {
@@ -2385,7 +2365,7 @@ function fullLabel() {
   const svc = (state.serviceIndex !== null && SERVICES[state.category])
     ? SERVICES[state.category][state.serviceIndex] : null;
   if (!svc) return 'Pay in full';
-  const treatmentPence = state.discount ? state.discount.finalPence : treatmentPenceFor(svc);
+  const treatmentPence = state.discount ? state.discount.finalPence : netPrice(svc) * 100;
   const totalPence = treatmentPence + travelPenceForSelection();
   return `Pay in full — ${formatPounds(totalPence)}`;
 }
