@@ -41,12 +41,6 @@ export const SERVICES = {
   ],
 };
 
-// Mirrors book.html's hidden ?test=1 £1 treatment (SERVICES.massage.unshift
-// in book.html) so the live Stripe test flow still prices correctly once the
-// amount is validated server-side. Remove alongside that block when testing
-// is done.
-export const TEST_SERVICE = { name: 'TEST — £1 (do not book)', price: 1 };
-
 // Same as services-data.js — ended Sep 2026, kept at 0 in step with that
 // file. HALOE20 (functions/_discounts.js) is the only discount left,
 // applied on top of this full price server-side in create-checkout.js.
@@ -69,7 +63,6 @@ export function netPrice(svc) {
 // for callers that genuinely have no category, and callers should migrate
 // off it.
 export function findService(treatmentName, category) {
-  if (treatmentName === TEST_SERVICE.name) return TEST_SERVICE;
   if (category) {
     const list = SERVICES[category];
     if (!list) return null;

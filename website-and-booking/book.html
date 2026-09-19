@@ -1567,13 +1567,6 @@
 // same file hijama-manchester.html loads, so the two price lists can't
 // silently diverge from each other. See that file to change a price.
 
-// £1 test treatment for verifying the live Stripe flow end to end.
-// Hidden from customers — only appears when the URL has ?test=1
-// (e.g. /book.html?test=1). Remove this block once testing is done.
-if (new URLSearchParams(location.search).get('test') === '1') {
-  SERVICES.massage.unshift({ name: 'TEST — £1 (do not book)', time: '15 min', price: 1 });
-}
-
 /* ---- Weekly Clinic Day config ----
    Single source of truth for the browser side. functions/_clinic.js carries
    the same values for the Functions — browser JS can't import that module,
