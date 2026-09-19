@@ -948,6 +948,10 @@
     font-size: 0.72rem; color: #6E6E73; text-align: center;
     margin-top: 0.7rem; line-height: 1.6;
   }
+  .cancellation-policy {
+    font-size: 0.82rem; color: var(--cream); opacity: 0.75; text-align: center;
+    line-height: 1.6; margin: 1rem 0 0.9rem;
+  }
 
   /* ---- Summary ---- */
   .summary-card {
@@ -1462,10 +1466,20 @@
 
     <div class="summary-card" id="summary-card"></div>
 
-    <div class="pay-actions">
-      <button class="pay-btn pay-primary" id="btn-full" onclick="handlePayment()">Pay in full</button>
+    <p class="cancellation-policy">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>
+
+    <div class="ios-group">
+      <label class="ios-toggle">
+        <span>I understand and accept the cancellation policy above.</span>
+        <input type="checkbox" id="consent-cancellation" onchange="checkStep5()">
+        <span class="switch"></span>
+      </label>
     </div>
-    <p class="pay-note">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.<br>Halima confirms by WhatsApp after payment — please check your number is right.</p>
+
+    <div class="pay-actions">
+      <button class="pay-btn pay-primary" id="btn-full" onclick="handlePayment()" disabled>Pay in full</button>
+    </div>
+    <p class="pay-note">Halima confirms by WhatsApp after payment — please check your number is right.</p>
   </div>
 
   <!-- Confirmation Screen -->
@@ -2022,6 +2036,11 @@ async function handlePayment() {
     alert("Please go back and enter the full address, including postcode, where your session will take place.");
     goToStep(4); return;
   }
+  const consentCancellation = document.getElementById('consent-cancellation');
+  if (!consentCancellation || !consentCancellation.checked) {
+    alert("Please tick the box to confirm you accept the cancellation policy before paying.");
+    return;
+  }
 
   const fullBtn = document.getElementById('btn-full');
   if (fullBtn) { fullBtn.disabled = true; fullBtn.textContent = 'Redirecting to payment…'; }
@@ -2083,9 +2102,17 @@ function fullLabel() {
   return svc ? `Pay in full — £${netPrice(svc)}` : 'Pay in full';
 }
 
+// The pay button stays disabled until the cancellation-policy tick-box is checked.
+function checkStep5() {
+  const fullBtn = document.getElementById('btn-full');
+  const consent = document.getElementById('consent-cancellation');
+  if (fullBtn) fullBtn.disabled = !(consent && consent.checked);
+}
+
 function resetPayButtons() {
   const fullBtn = document.getElementById('btn-full');
-  if (fullBtn) { fullBtn.disabled = false; fullBtn.textContent = fullLabel(); }
+  if (fullBtn) fullBtn.textContent = fullLabel();
+  checkStep5();
 }
 
 function notifyWhatsApp(paymentType) {
@@ -2123,6 +2150,7 @@ function goToStep(n) {
     renderSummary();
     const full = document.getElementById('btn-full');
     if (full) full.textContent = fullLabel();
+    checkStep5();
   }
   updateRail();
   window.scrollTo(0, 0);

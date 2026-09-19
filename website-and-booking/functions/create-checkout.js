@@ -1,12 +1,24 @@
 import { reserveSlot, releaseBooking, slotToMinutes, HOLD_SECONDS } from './_bookings.js';
 import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
+import { findService, netPrice } from './_services.js';
 
 export async function onRequestPost(context) {
   try {
-    const { amount, treatmentName, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin } = await context.request.json();
+    const { treatmentName, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin } = await context.request.json();
     // location is 'clinic' | 'mobile'. Every booking is paid in full — there is
     // no deposit path.
     const venue = location === 'clinic' ? CLINIC_VENUE_NAME : '';
+
+    // Price comes from the server-side catalogue, never the client — a
+    // tampered request body must never be able to set its own amount.
+    const svc = findService(treatmentName);
+    if (!svc) {
+      return new Response(JSON.stringify({ error: 'unknown_treatment' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    const amount = netPrice(svc) * 100; // pence
     const secretKey = context.env.STRIPE_SECRET_KEY;
     const origin = new URL(context.request.url).origin;
 
