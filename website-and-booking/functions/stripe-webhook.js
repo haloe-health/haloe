@@ -10,7 +10,7 @@
 //   RESEND_API_KEY         — Resend API key for sending email
 
 import {
-  BLACK, GOLD, CREAM, MUTED, HAIRLINE, FONT,
+  WHITE, INK, BODY_TEXT, GOLD_DEEP, HAIRLINE, FONT,
   sendEmail, esc, emailHeader, emailFooter, emailShell, heroRow, infoCard,
 } from './_email.js';
 import { confirmBooking } from './_bookings.js';
@@ -117,7 +117,10 @@ export async function onRequestPost(context) {
     const discountPence = parseInt(md.discountPence || '0', 10);
     const originalAmountPence = parseInt(md.originalAmountPence || '0', 10);
     const originalAmountLabel = discountCode ? formatGBP(originalAmountPence) : '';
-    const discountLabel = discountCode ? `${discountCode} — -${formatGBP(discountPence)}` : '';
+    // Matches booking-confirmed.html's row exactly: "{code} discount" / "−£x.xx"
+    // (a single, real minus sign — not an em dash followed by a hyphen).
+    const discountRowLabel = discountCode ? `${discountCode} discount` : '';
+    const discountLabel = discountCode ? `−${formatGBP(discountPence)}` : '';
 
     // Travel fee — home visits only; create-checkout.js never sets these for
     // a Clinic Day booking. Zone C has no fixed fee, so it reads as a note
@@ -140,7 +143,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountLabel, travelLabel, travelZone };
+    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel, discountLabel, travelLabel, travelZone, travelPence };
 
     // WhatsApp notification to Halima. Sent before the email block and wrapped in
     // its own try/catch so it still fires if Resend is unconfigured or failing —
@@ -328,15 +331,6 @@ function locationLabel(d) {
   return d.location === 'clinic' ? 'Clinic Day' : 'Home visit';
 }
 
-function detailRow(label, value) {
-  if (!value) return '';
-  return `
-    <tr>
-      <td style="width:34%;padding:13px 20px;border-top:1px solid ${HAIRLINE};color:${MUTED};font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-family:Arial,Helvetica,sans-serif;vertical-align:top;">${esc(label)}</td>
-      <td align="right" style="width:66%;padding:13px 20px;border-top:1px solid ${HAIRLINE};color:${CREAM};font-size:14px;text-align:right;font-family:Arial,Helvetica,sans-serif;word-break:break-word;overflow-wrap:anywhere;">${esc(value)}</td>
-    </tr>`;
-}
-
 /* ------------------------------------------------------------------ */
 /* Email templates                                                     */
 /* ------------------------------------------------------------------ */
@@ -345,35 +339,35 @@ function detailRow(label, value) {
 // COMPLIANCE: wellness/symptom language only — no claims to treat/cure/manage conditions.
 function clientEmailHtml(d) {
   const clinicNote = d.location === 'clinic'
-    ? `<p style="color:${MUTED};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Your session is at ${esc(d.venue)}: ${esc(CLINIC_VENUE_ADDRESS)}. Check in at reception on the ground floor — they'll direct you to the room. Lift access is available.</p>`
+    ? `<p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Your session is at ${esc(d.venue)}: ${esc(CLINIC_VENUE_ADDRESS)}. Check in at reception on the ground floor — they'll direct you to the room. Lift access is available.</p>`
     : '';
-  const cancellationNote = `<p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>`;
+  const cancellationNote = `<p style="color:${BODY_TEXT};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>`;
 
   const inner = `${emailHeader()}
               <!-- Intro -->
               <tr>
                 <td style="padding:28px 4px 18px;">
-                  <h1 style="color:${CREAM};font-size:22px;font-weight:500;margin:0 0 16px;font-family:${FONT};">Your booking is confirmed</h1>
-                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 14px;font-family:${FONT};">Dear ${esc(d.name)},</p>
-                  <p style="color:${MUTED};font-size:15px;line-height:1.75;margin:0;font-family:${FONT};">Thank you for booking with haloe. Your payment has been received and your appointment is reserved. We look forward to welcoming you for a calm, restorative session.</p>
+                  <h1 style="color:${INK};font-size:22px;font-weight:600;margin:0 0 16px;font-family:${FONT_HEADING};">Your booking is confirmed</h1>
+                  <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 14px;font-family:${FONT};">Dear ${esc(d.name)},</p>
+                  <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0;font-family:${FONT};">Thank you for booking with haloe. Your payment has been received and your appointment is reserved. We look forward to welcoming you for a calm, restorative session.</p>
                 </td>
               </tr>
               ${heroRow(d.date, d.time, locationLabel(d))}
               ${infoCard([
                 { label: 'Treatment', value: d.treatment },
                 { label: 'Price', value: d.originalAmountLabel },
-                { label: 'Discount', value: d.discountLabel },
+                { label: d.discountRowLabel, value: d.discountLabel },
                 { label: 'Travel', value: d.travelLabel },
-                { label: 'Paid', value: d.paymentLabel, gold: true },
+                { label: 'Total paid', value: d.amount, gold: true },
               ])}
               <!-- Clinic venue note -->
               ${clinicNote ? `<tr><td style="padding:4px 4px 14px;">${clinicNote}</td></tr>` : ''}
               <!-- Personal note + compliance -->
               <tr>
                 <td style="padding:6px 4px 0;">
-                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">Halima will be in touch personally on WhatsApp to confirm the final details, send your health form, and answer any questions you may have.</p>
+                  <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">Halima will be in touch personally on WhatsApp to confirm the final details, send your health form, and answer any questions you may have.</p>
                   ${cancellationNote}
-                  <p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">haloe offers complementary wellness therapy to support your general wellbeing, relaxation and everyday tension. It is not a substitute for medical advice, diagnosis or treatment.</p>
+                  <p style="color:${BODY_TEXT};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">haloe offers complementary wellness therapy to support your general wellbeing, relaxation and everyday tension. It is not a substitute for medical advice, diagnosis or treatment.</p>
                 </td>
               </tr>
               ${emailFooter()}`;
@@ -383,23 +377,30 @@ function clientEmailHtml(d) {
 
 // Plain, information-dense notification for Halima with everything she needs to follow up.
 function halimaEmailHtml(d) {
+  const travelZoneLabel = d.location === 'mobile'
+    ? (d.travelZone === 'A' ? `Zone A — ${formatGBP(d.travelPence)}`
+      : d.travelZone === 'B' ? `Zone B — ${formatGBP(d.travelPence)}`
+      : d.travelZone === 'C' ? 'Zone C — travel TBC' : '')
+    : '';
+
   const inner = `<tr>
                 <td style="padding:0 0 16px;">
-                  <div style="color:${GOLD};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:${FONT};">New booking &middot; payment received</div>
-                  <h1 style="color:${CREAM};font-size:20px;font-weight:500;margin:8px 0 0;font-family:${FONT};">${esc(d.name)}</h1>
+                  <div style="color:${GOLD_DEEP};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:${FONT};font-weight:600;">New booking &middot; payment received</div>
+                  <h1 style="color:${INK};font-size:20px;font-weight:600;margin:8px 0 0;font-family:${FONT_HEADING};">${esc(d.name)}</h1>
                 </td>
               </tr>
               ${heroRow(d.date, d.time, locationLabel(d))}
               ${infoCard([
                 { label: 'Treatment', value: d.treatment },
                 { label: 'Price', value: d.originalAmountLabel },
-                { label: 'Discount', value: d.discountLabel },
+                { label: d.discountRowLabel, value: d.discountLabel },
                 { label: 'Travel', value: d.travelLabel },
-                { label: 'Paid', value: d.paymentLabel, gold: true },
+                { label: 'Total paid', value: d.amount, gold: true },
               ])}
               ${infoCard([
                 { label: 'Location', value: d.location === 'clinic' ? `${locationLabel(d)} — ${d.venue}` : locationLabel(d) },
                 { label: 'Address', value: d.location === 'clinic' ? CLINIC_VENUE_ADDRESS : d.address },
+                { label: 'Postcode zone', value: travelZoneLabel },
                 { label: 'Phone', value: d.phone },
                 { label: 'Email', value: d.email },
                 { label: 'Notes', value: d.notes },
@@ -407,7 +408,7 @@ function halimaEmailHtml(d) {
               ])}
               <tr>
                 <td style="padding:6px 2px 0;">
-                  <p style="color:${MUTED};font-size:13px;line-height:1.7;margin:0;font-family:${FONT};">Reply to this email to reach ${esc(d.name)} directly${d.phone ? `, or message them on ${esc(d.phone)}` : ''}.</p>
+                  <p style="color:${BODY_TEXT};font-size:13px;line-height:1.7;margin:0;font-family:${FONT};">Reply to this email to reach ${esc(d.name)} directly${d.phone ? `, or message them on ${esc(d.phone)}` : ''}.</p>
                 </td>
               </tr>`;
   return emailShell(inner);

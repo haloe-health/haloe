@@ -20,7 +20,7 @@
 //   RESEND_API_KEY             — Resend API key for sending email
 
 import {
-  BLACK, GOLD, CREAM, MUTED, HAIRLINE,
+  INK, BODY_TEXT, FONT, FONT_HEADING,
   sendEmail, esc, emailButton, emailHeader, emailFooter, emailShell,
 } from './_email.js';
 import { sbRequest } from './_supabase.js';
@@ -208,10 +208,10 @@ function guideEmailHtml(fullName) {
               <!-- Intro -->
               <tr>
                 <td style="padding:30px 4px 4px;">
-                  <h1 style="color:${CREAM};font-size:22px;font-weight:normal;margin:0 0 18px;font-family:Georgia,'Times New Roman',serif;">Your form is in — thank you</h1>
-                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">${greeting}</p>
-                  <p style="color:${MUTED};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">Thank you for completing your intake form — that's everything I need, and you're all set for your session.</p>
-                  <p style="color:${MUTED};font-size:15px;line-height:1.75;margin:0 0 22px;font-family:Arial,Helvetica,sans-serif;">Before you come, please take a couple of minutes to read your short pre-session guide. It walks you through exactly what to expect on the day and how to prepare so you feel completely at ease.</p>
+                  <h1 style="color:${INK};font-size:22px;font-weight:600;margin:0 0 18px;font-family:${FONT_HEADING};">Your form is in — thank you</h1>
+                  <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">${greeting}</p>
+                  <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">Thank you for completing your intake form — that's everything I need, and you're all set for your session.</p>
+                  <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0 0 22px;font-family:${FONT};">Before you come, please take a couple of minutes to read your short pre-session guide. It walks you through exactly what to expect on the day and how to prepare so you feel completely at ease.</p>
                 </td>
               </tr>
               <!-- Guide button -->
@@ -223,8 +223,8 @@ function guideEmailHtml(fullName) {
               <!-- Sign-off + compliance -->
               <tr>
                 <td style="padding:4px 4px 0;">
-                  <p style="color:${CREAM};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;">I look forward to seeing you. — Halima &middot; @haloe.health</p>
-                  <p style="color:${MUTED};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;">Hijama at haloe is a complementary wellness therapy. It supports how you feel and does not diagnose, treat or replace medical care. Please continue any medication prescribed by your doctor and speak to your GP about any health concern.</p>
+                  <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">I look forward to seeing you. — Halima &middot; @haloe.health</p>
+                  <p style="color:${BODY_TEXT};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Hijama at haloe is a complementary wellness therapy. It supports how you feel and does not diagnose, treat or replace medical care. Please continue any medication prescribed by your doctor and speak to your GP about any health concern.</p>
                 </td>
               </tr>
               ${emailFooter()}`;

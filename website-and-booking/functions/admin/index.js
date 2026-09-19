@@ -3,6 +3,10 @@
 // request. Inline CSS/JS, same hand-written-per-page convention as the rest
 // of the site — this page just happens to be served from a Function instead
 // of a static file, since it needs the auth middleware in front of it.
+//
+// Light theme (Sep 2026) — brand tokens mirror index.html's :root custom
+// properties, and the list is one card per booking (mobile-first) instead of
+// the old dense single-line rows.
 
 export async function onRequestGet() {
   return new Response(HTML, {
@@ -22,87 +26,97 @@ const HTML = `<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --gold: #C8A96E;
-    --black: #0D0D0D;
-    --surface: #1C1C1E;
-    --surface2: #232325;
-    --hairline: rgba(255,255,255,0.10);
     --cream: #F5F0E8;
-    --dim: #9B9B9F;
-    --red: #E5736A;
+    --white: #FFFFFF;
+    --ink: #0D0D0D;
+    --body: #5a5247;
+    --gold: #C8A96E;
+    --gold-deep: #8a6a2c;
+    --gold-soft: rgba(200,169,110,0.16);
+    --hairline: rgba(13,13,13,0.08);
+    --card-shadow: 0 8px 24px rgba(13,13,13,0.06);
+    --red: #b3413a;
+    --red-soft: rgba(179,65,58,0.08);
+    --green: #3f8a5c;
+    --green-soft: rgba(63,138,92,0.12);
     font-size: 87.5%;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    background: var(--black);
-    color: var(--cream);
+    background: var(--cream);
+    color: var(--ink);
     font-family: 'Poppins', Arial, sans-serif;
-    padding: 1.5rem;
+    padding: 1.25rem;
     padding-bottom: 6rem;
   }
-  h1 { font-size: 1.4rem; margin: 0 0 0.2rem; }
-  .sub { color: var(--dim); margin: 0 0 1.5rem; font-size: 0.85rem; }
+  h1 { font-size: 1.4rem; margin: 0 0 0.2rem; font-weight: 600; }
+  .sub { color: var(--body); margin: 0 0 1.5rem; font-size: 0.85rem; }
   .toolbar {
     display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;
     margin-bottom: 1.5rem;
   }
   .seg {
-    display: inline-flex; background: var(--surface); border: 1px solid var(--hairline);
-    border-radius: 999px; padding: 3px;
+    display: inline-flex; background: var(--white); border: 1px solid var(--hairline);
+    border-radius: 999px; padding: 3px; box-shadow: var(--card-shadow);
   }
   .seg button {
-    background: none; border: none; color: var(--dim); font-family: inherit;
+    background: none; border: none; color: var(--body); font-family: inherit;
     font-size: 0.8rem; padding: 0.4rem 0.9rem; border-radius: 999px; cursor: pointer;
   }
-  .seg button.active { background: var(--gold); color: var(--black); font-weight: 600; }
+  .seg button.active { background: var(--gold); color: var(--ink); font-weight: 600; }
   .spacer { flex: 1; }
   .btn {
-    background: var(--gold); color: var(--black); border: none; border-radius: 999px;
+    background: var(--gold); color: var(--ink); border: none; border-radius: 999px;
     padding: 0.5rem 1.1rem; font-family: inherit; font-size: 0.8rem; font-weight: 600;
     cursor: pointer;
   }
+  .btn:hover { background: #d4bb85; }
   .btn:disabled { opacity: 0.5; cursor: default; }
-  .btn.ghost { background: none; border: 1px solid var(--hairline); color: var(--cream); }
+  .btn.ghost { background: var(--white); border: 1px solid var(--hairline); color: var(--ink); }
   .day-group { margin-bottom: 1.6rem; }
   .day-heading {
-    font-size: 0.95rem; font-weight: 600; color: var(--gold); margin: 0 0 0.6rem;
+    font-size: 0.95rem; font-weight: 600; color: var(--gold-deep); margin: 0 0 0.7rem;
     padding-bottom: 0.4rem; border-bottom: 1px solid var(--hairline);
   }
-  .row {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 1rem;
-    background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px;
-    padding: 0.8rem 1rem; margin-bottom: 0.5rem;
+  .cards { display: flex; flex-direction: column; gap: 0.6rem; }
+  .card {
+    background: var(--white); border-radius: 16px; box-shadow: var(--card-shadow);
+    border: 1px solid var(--hairline); padding: 0.9rem 1rem;
   }
-  .row.conflict { border-color: var(--red); background: rgba(229,115,106,0.08); }
-  .row .time { font-weight: 600; min-width: 5.2rem; }
-  .row .name { font-weight: 600; min-width: 9rem; }
-  .row .meta { color: var(--dim); font-size: 0.82rem; }
-  .row .loc { font-size: 0.78rem; padding: 0.15rem 0.55rem; border-radius: 999px; border: 1px solid var(--hairline); }
-  .row .loc.clinic { color: var(--gold); border-color: var(--gold); }
-  .row .amount { font-weight: 600; }
-  .row .status { font-size: 0.75rem; padding: 0.15rem 0.55rem; border-radius: 999px; }
-  .row .status.confirmed { background: rgba(120,200,140,0.15); color: #8FD6A3; }
-  .row .status.pending { background: rgba(200,169,110,0.15); color: var(--gold); }
-  .row .conflict-flag { color: var(--red); font-size: 0.78rem; font-weight: 600; }
-  .row .actions { display: flex; gap: 0.5rem; margin-left: auto; }
-  .row .actions a {
-    color: var(--cream); text-decoration: none; border: 1px solid var(--hairline);
-    border-radius: 999px; padding: 0.3rem 0.7rem; font-size: 0.78rem;
+  .card.conflict { border-color: var(--red); background: var(--red-soft); }
+  .card-top {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem;
   }
-  .row .actions a:hover { border-color: var(--gold); color: var(--gold); }
-  .empty { color: var(--dim); padding: 2rem 0; text-align: center; }
+  .card-time { font-weight: 700; font-size: 1.02rem; color: var(--ink); }
+  .card-amount { font-weight: 700; font-size: 1.02rem; color: var(--gold-deep); }
+  .card-name { font-weight: 600; font-size: 0.98rem; margin-top: 0.2rem; }
+  .card-treatment { color: var(--body); font-size: 0.85rem; margin-top: 0.15rem; }
+  .card-badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+  .badge {
+    font-size: 0.74rem; padding: 0.2rem 0.6rem; border-radius: 999px;
+    border: 1px solid var(--hairline); color: var(--body); background: var(--cream);
+  }
+  .badge.loc-clinic { color: var(--gold-deep); border-color: var(--gold); background: var(--gold-soft); }
+  .badge.status-confirmed { background: var(--green-soft); color: var(--green); border-color: transparent; font-weight: 600; }
+  .badge.status-pending { background: var(--gold-soft); color: var(--gold-deep); border-color: transparent; font-weight: 600; }
+  .badge.discount { color: var(--gold-deep); border-color: var(--gold); }
+  .badge.warn { color: var(--red); border-color: var(--red); background: transparent; font-weight: 600; }
+  .card-address { color: var(--body); font-size: 0.8rem; margin-top: 0.5rem; }
+  .card-actions { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
+  .card-actions a {
+    color: var(--ink); text-decoration: none; border: 1px solid var(--hairline);
+    border-radius: 999px; padding: 0.32rem 0.8rem; font-size: 0.78rem; background: var(--cream);
+  }
+  .card-actions a:hover { border-color: var(--gold); color: var(--gold-deep); }
+  .empty { color: var(--body); padding: 2rem 0; text-align: center; }
   .toast {
     position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-    background: var(--gold); color: var(--black); padding: 0.6rem 1.2rem;
+    background: var(--gold); color: var(--ink); padding: 0.6rem 1.2rem;
     border-radius: 999px; font-weight: 600; font-size: 0.85rem; opacity: 0;
-    pointer-events: none; transition: opacity 0.2s;
+    pointer-events: none; transition: opacity 0.2s; box-shadow: var(--card-shadow);
   }
   .toast.show { opacity: 1; }
-  @media (max-width: 600px) {
-    .row .name { min-width: 100%; order: -1; }
-    .row .actions { margin-left: 0; }
-  }
 </style>
 </head>
 <body>
@@ -240,34 +254,49 @@ function render() {
   if (whenFilter === 'past') dates.reverse();
 
   listEl.innerHTML = dates.map(date => {
-    const rows = byDate[date].map(b => {
+    const cards = byDate[date].map(b => {
       const phone = normalizePhone(b.customer_phone);
       const isClinic = (b.location || 'mobile') === 'clinic';
       const conflict = conflictIds.has(b.id);
       const needsTravelConfirm = !isClinic && b.travel_zone === 'C';
-      const travelBadge = isClinic ? '' :
-        '<span class="loc">' + (
-          b.travel_zone === 'A' ? 'Zone A · ' + money(b.travel_pence) :
-          b.travel_zone === 'B' ? 'Zone B · ' + money(b.travel_pence) :
-          b.travel_zone === 'C' ? 'Zone C · travel TBC' : 'Travel —'
-        ) + '</span>';
-      return '<div class="row' + (conflict ? ' conflict' : '') + '">' +
-        '<span class="time">' + minutesToLabel(b.start_min) + '</span>' +
-        '<span class="name">' + escapeHtml(b.customer_name || 'Unknown') + '</span>' +
-        '<span class="meta">' + escapeHtml(b.treatment || '') + '</span>' +
-        '<span class="loc' + (isClinic ? ' clinic' : '') + '">' + (isClinic ? 'Clinic Day' : 'Mobile') + '</span>' +
-        travelBadge +
-        '<span class="meta">' + escapeHtml(b.address || '') + '</span>' +
-        '<span class="amount">' + money(b.amount_pence) + '</span>' +
-        '<span class="status ' + escapeHtml(b.status) + '">' + (b.status === 'confirmed' ? 'Paid' : 'Pending payment') + '</span>' +
-        (conflict ? '<span class="conflict-flag">⚠ Overlaps another booking</span>' : '') +
-        (needsTravelConfirm ? '<span class="conflict-flag">⚠ Confirm travel cost</span>' : '') +
-        '<span class="actions">' +
-          (phone ? '<a href="tel:+' + phone + '">Call</a><a href="https://wa.me/' + phone + '" target="_blank" rel="noopener">WhatsApp</a>' : '') +
-        '</span>' +
+
+      const locBadge = isClinic
+        ? '<span class="badge loc-clinic">Clinic day</span>'
+        : '<span class="badge">' + (
+            b.travel_zone === 'A' ? 'Zone A · ' + money(b.travel_pence) :
+            b.travel_zone === 'B' ? 'Zone B · ' + money(b.travel_pence) :
+            b.travel_zone === 'C' ? 'Zone C · travel TBC' : 'Mobile'
+          ) + '</span>';
+
+      const statusBadge = '<span class="badge status-' + escapeHtml(b.status) + '">' +
+        (b.status === 'confirmed' ? 'Paid' : 'Pending payment') + '</span>';
+
+      const discountBadge = b.discount_code
+        ? '<span class="badge discount">' + escapeHtml(b.discount_code) + '</span>'
+        : '';
+
+      const conflictBadge = conflict ? '<span class="badge warn">⚠ Overlaps another booking</span>' : '';
+      const travelWarnBadge = needsTravelConfirm ? '<span class="badge warn">⚠ Confirm travel cost</span>' : '';
+
+      const address = !isClinic && b.address ? '<p class="card-address">' + escapeHtml(b.address) + '</p>' : '';
+
+      const actions = phone
+        ? '<div class="card-actions"><a href="tel:+' + phone + '">Call</a><a href="https://wa.me/' + phone + '" target="_blank" rel="noopener">WhatsApp</a></div>'
+        : '';
+
+      return '<div class="card' + (conflict ? ' conflict' : '') + '">' +
+        '<div class="card-top">' +
+          '<span class="card-time">' + minutesToLabel(b.start_min) + '</span>' +
+          '<span class="card-amount">' + money(b.amount_pence) + '</span>' +
+        '</div>' +
+        '<div class="card-name">' + escapeHtml(b.customer_name || 'Unknown') + '</div>' +
+        '<div class="card-treatment">' + escapeHtml(b.treatment || '') + '</div>' +
+        '<div class="card-badges">' + locBadge + statusBadge + discountBadge + conflictBadge + travelWarnBadge + '</div>' +
+        address +
+        actions +
       '</div>';
     }).join('');
-    return '<div class="day-group"><p class="day-heading">' + dateLabel(date) + '</p>' + rows + '</div>';
+    return '<div class="day-group"><p class="day-heading">' + dateLabel(date) + '</p><div class="cards">' + cards + '</div></div>';
   }).join('');
 }
 
