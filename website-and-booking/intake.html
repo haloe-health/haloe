@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your health &amp; consent form · haloe</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="description" content="Your private health and consent form for haloe — a short, confidential intake before your hijama session in Manchester.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,6 +44,15 @@
     --border: rgba(13,13,13,0.1);
     --surface: #FFFFFF;
     --error: #C0392B;
+    --font-wordmark: 'Tan Ashford', 'Playfair Display', Georgia, serif;
+  }
+  @font-face {
+    font-family: 'Tan Ashford';
+    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
+         url('fonts/TAN-ASHFORD.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -68,7 +78,7 @@
     background:#FFFFFF; border-radius:999px; padding:7px;
     box-shadow:0 2px 6px rgba(13,13,13,0.08);
   }
-  .nav-logo span { font-size:1.4rem; color:var(--gold-deep); letter-spacing:0.2em; font-weight:300; text-transform:lowercase; }
+  .nav-logo span { font-family:var(--font-wordmark); font-size:1.5rem; color:var(--gold-deep); letter-spacing:0.02em; font-weight:normal; text-transform:none; }
   nav ul { list-style:none; display:flex; gap:48px; align-items:center; }
   nav ul a { color:var(--dim); text-decoration:none; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; transition:color 0.4s; font-weight:400; }
   nav ul a:hover { color:var(--gold-deep); }
@@ -181,7 +191,7 @@
   footer { position:relative; z-index:1; background:#040403; padding:64px 80px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
   .footer-left { display:flex; align-items:center; gap:14px; }
   .footer-left img { height:24px; }
-  .footer-left span { font-size:1.2rem; color:var(--gold); letter-spacing:0.2em; font-weight:300; }
+  .footer-left span { font-family:var(--font-wordmark); font-size:1.3rem; color:var(--gold); letter-spacing:0.02em; font-weight:normal; }
   .footer-links { display:flex; gap:32px; }
   .footer-links a { color:#f7f2ea; text-decoration:none; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; transition:color 0.4s; opacity:0.6; }
   .footer-links a:hover { color:var(--gold); opacity:1; }

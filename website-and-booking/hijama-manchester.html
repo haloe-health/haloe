@@ -7,6 +7,7 @@
 <meta name="description" content="Hijama (wet cupping) in Manchester with haloe. Visit our weekly Tuesday clinic day at Milton Hall, Deansgate, or book a mobile visit across Greater Manchester. Women &amp; men, CMA &amp; IPHM accredited.">
 <link rel="canonical" href="https://haloe.health/hijama-manchester.html">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="haloe">
 <meta property="og:title" content="Hijama in Manchester — Deansgate Clinic &amp; Mobile Visits">
@@ -48,6 +49,15 @@
     --border: rgba(13,13,13,0.1);
     --font-heading: 'Playfair Display', 'Poppins', serif;
     --font-body: 'Poppins', sans-serif;
+    --font-wordmark: 'Tan Ashford', 'Playfair Display', Georgia, serif;
+  }
+  @font-face {
+    font-family: 'Tan Ashford';
+    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
+         url('fonts/TAN-ASHFORD.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -67,8 +77,8 @@
   }
   .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
   .nav-logo span {
-    font-family:var(--font-heading); font-size:1.3rem; color:var(--white);
-    letter-spacing:0.03em; font-weight:700; text-transform:lowercase;
+    font-family:var(--font-wordmark); font-size:1.5rem; color:var(--white);
+    letter-spacing:0.02em; font-weight:normal; text-transform:none;
   }
   nav ul { list-style:none; display:flex; gap:36px; align-items:center; }
   nav ul a {
@@ -225,7 +235,7 @@
     display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;
   }
   .footer-left { display:flex; align-items:center; gap:12px; }
-  .footer-left span { font-family:var(--font-body); font-size:1.1rem; color:var(--gold); letter-spacing:0.2em; font-weight:300; }
+  .footer-left span { font-family:var(--font-wordmark); font-size:1.3rem; color:var(--gold); letter-spacing:0.02em; font-weight:normal; }
   .footer-links { display:flex; gap:28px; flex-wrap:wrap; }
   .footer-links a {
     /* Footer keeps its dark background even on the light theme, so its text

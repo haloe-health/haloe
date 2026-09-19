@@ -7,6 +7,7 @@
 <meta name="description" content="Everything to expect at your haloe hijama session in Manchester, and how to prepare. A calm wellness space for women and men.">
 <link rel="canonical" href="https://haloe.health/before-your-session.html">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="haloe">
@@ -36,6 +37,15 @@
     --dim: #5a5247;
     --border: rgba(13,13,13,0.1);
     --radius: 0px;
+    --font-wordmark: 'Tan Ashford', 'Playfair Display', Georgia, serif;
+  }
+  @font-face {
+    font-family: 'Tan Ashford';
+    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
+         url('fonts/TAN-ASHFORD.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -70,10 +80,10 @@
     box-shadow:0 2px 6px rgba(13,13,13,0.08);
   }
   .nav-logo span {
-    font-family:'Poppins',sans-serif;
-    font-size:1.4rem; color:var(--gold-deep);
-    letter-spacing:0.2em; font-weight:300;
-    text-transform:lowercase;
+    font-family:var(--font-wordmark);
+    font-size:1.5rem; color:var(--gold-deep);
+    letter-spacing:0.02em; font-weight:normal;
+    text-transform:none;
   }
   nav ul { list-style:none; display:flex; gap:48px; align-items:center; }
   nav ul a {
@@ -336,9 +346,9 @@
   .footer-left { display:flex; align-items:center; gap:14px; }
   .footer-left img { height:24px; }
   .footer-left span {
-    font-family:'Poppins',sans-serif;
-    font-size:1.2rem; color:var(--gold);
-    letter-spacing:0.2em; font-weight:300;
+    font-family:var(--font-wordmark);
+    font-size:1.3rem; color:var(--gold);
+    letter-spacing:0.02em; font-weight:normal;
   }
   .footer-links { display:flex; gap:32px; }
   .footer-links a {

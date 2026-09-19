@@ -7,6 +7,7 @@
 <meta name="description" content="Massage, dry cupping and hijama for women and men. Mobile &mdash; Halima comes to you across Manchester &mdash; or visit our weekly Tuesday clinic day at Milton Hall, Deansgate. CMA &amp; IPHM accredited. Book your session.">
 <link rel="canonical" href="https://haloe.health/">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="haloe">
@@ -70,6 +71,15 @@
     --container: 1180px;
     --font-heading: 'Playfair Display', 'Poppins', serif;
     --font-body: 'Poppins', sans-serif;
+    --font-wordmark: 'Tan Ashford', 'Playfair Display', Georgia, serif;
+  }
+  @font-face {
+    font-family: 'Tan Ashford';
+    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
+         url('fonts/TAN-ASHFORD.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -186,7 +196,7 @@
 
   .brand { display:flex; align-items:center; gap:10px; text-decoration:none; flex:1; justify-content:center; }
   .brand img { height:30px; width:auto; display:block; }
-  .brand .wordmark { font-family:var(--font-heading); font-style:italic; font-weight:600; font-size:1.35rem; color:var(--ink); letter-spacing:0.01em; }
+  .brand .wordmark { font-family:var(--font-wordmark); font-style:normal; font-weight:normal; font-size:1.5rem; color:var(--ink); letter-spacing:0.02em; }
   /* Logo badge — the mark itself is never recoloured or edited; on a light
      surface its white facets need a white pill behind them to read clearly,
      the same way they read against the surfaces it was originally drawn for. */
@@ -478,7 +488,7 @@
   @media (min-width:768px) { .footer-top { flex-direction:row; justify-content:space-between; } }
   .footer-brand { display:flex; align-items:center; gap:10px; }
   .footer-brand img { height:30px; }
-  .footer-brand span { font-family:var(--font-heading); font-style:italic; font-size:1.3rem; }
+  .footer-brand span { font-family:var(--font-wordmark); font-style:normal; font-size:1.4rem; }
   .footer-col h5 { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
   .footer-col a, .footer-col p { display:block; color:#C8C2B7; text-decoration:none; font-size:0.9rem; margin-bottom:8px; }
   .footer-col a:hover { color:var(--gold); }
