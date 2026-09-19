@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="theme-light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,756 +47,454 @@
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,700&family=Fraunces:opsz,wght@9..144,300;9..144,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
 <style>
+  /* ============================================================
+     DESIGN TOKENS — light, card-based redesign (Sep 2026).
+     The dark/gold theme that used to live here is gone from this
+     page; book.html, booking-confirmed.html, intake.html etc. are
+     untouched and keep their own dark tokens independently.
+     ============================================================ */
   :root {
-    --black: #080806;
-    --deep: #0d0d0b;
-    --gold: #c9a040;
-    --gold-light: #dbb85a;
-    --gold-dim: rgba(201,160,64,0.12);
-    --white: #f7f2ea;
-    --dim: #7a7060;
-    --border: rgba(201,160,64,0.12);
-    --radius: 0px;
-
-    /* --- New design-system tokens (Stitch spec) — additive, existing
-       gold/black/cream tokens above are untouched and still drive most
-       of the site's current look. --- */
-    --obsidian-base: #0D0D0D;
-    --obsidian-elevated: #181716;
-    --obsidian-floating: #22201D;
-    --obsidian-inset: #141312;
-    --gold-primary: #C8A96E;
-    --gold-highlight: #DFC38E;
-    --gold-burnished: #A38548;
-    --hairline-border: rgba(200, 169, 110, 0.2);
-    --active-border: rgba(223, 195, 142, 0.5);
-    --text-cream: #F5F0E8;
-    --text-cashmere: #C8C2B7;
-    --text-sand: #8E887F;
-
-    --radius-sm: 0.5rem;
-    --radius-default: 1rem;
-    --radius-md: 1.5rem;
-    --radius-lg: 2rem;
-    --radius-xl: 3rem;
-    --radius-full: 9999px;
-
+    --cream: #F5F0E8;
+    --white: #FFFFFF;
+    --ink: #0D0D0D;
+    --body: #5a5247;
+    --gold: #C8A96E;
+    --gold-deep: #8a6a2c;
+    --gold-soft: rgba(200,169,110,0.16);
+    --card-radius: 28px;
+    --card-radius-sm: 18px;
+    --card-shadow: 0 8px 24px rgba(13,13,13,0.06);
+    --dark-card-bg: #0D0D0D;
+    --container: 1180px;
     --font-heading: 'Playfair Display', 'Poppins', serif;
     --font-body: 'Poppins', sans-serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
 
-  /* 1. Body — richer dark background with subtle texture */
   body {
-    background:var(--black);
-    color:var(--white);
-    font-family:'Poppins',sans-serif;
-    font-weight:300;
-    overflow-x:hidden;
+    background:var(--cream);
+    color:var(--body);
+    font-family:var(--font-body);
+    font-weight:400;
     font-size:16px;
-    line-height:1.7;
+    line-height:1.65;
+    overflow-x:hidden;
+    position:relative;
   }
 
-  /* 2. NAV — thinner, more elegant */
-  nav {
-    position:fixed; top:0; left:0; right:0; z-index:100;
-    padding:22px 80px;
-    display:flex; justify-content:space-between; align-items:center;
-    background:rgba(8,8,6,0.88);
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-    /* Glowing gold hairline along the bottom edge — a crisp 1px line plus a
-       soft low-blur glow bleeding just beneath it. */
-    border-bottom:1px solid var(--hairline-border, rgba(200,169,110,0.2));
-    box-shadow:0 1px 16px rgba(200,169,110,0.08);
-  }
-  .nav-logo { display:flex; align-items:center; gap:14px; text-decoration:none; }
-  .nav-logo img { height:32px; width:auto; }
-  /* 3. Nav wordmark — lighter, more spaced. Now Playfair Display (the same
-     heading font used site-wide, e.g. book.html's panel titles) — tried
-     after Italiana and Fraunces. Italic reads more elegant than regular at
-     this letter-spacing and echoes the hero's italic "Modern standards."
-     directly beneath it. Scoped to this element only — the Conditions
-     section's "we treat" keeps its own separate italic treatment. */
-  .nav-logo span {
-    font-family:var(--font-heading);
-    font-style:normal;
-    font-size:1.4rem; color:var(--white);
-    letter-spacing:0.03em; font-weight:700;
-    text-transform:lowercase;
-  }
-  nav ul { list-style:none; display:flex; gap:48px; align-items:center; }
-  nav ul a {
-    color:var(--dim); text-decoration:none;
-    font-size:0.7rem; letter-spacing:0.2em;
-    text-transform:uppercase; transition:color 0.4s;
-    font-weight:400;
-  }
-  nav ul a:hover { color:var(--gold); text-decoration:none; }
-  /* 4. CTA button — solid gold-gradient fill, matching the primary buttons
-     used elsewhere on the site (.btn-gold, .hb-btn). */
-  .nav-cta {
-    border:none !important;
-    background:linear-gradient(135deg, var(--gold-highlight, #dbb85a), var(--gold-primary, var(--gold))) !important;
-    color:var(--obsidian-base, #080806) !important;
-    padding:10px 26px;
-    font-weight:500 !important;
-    transition:all 0.4s !important;
-    border-radius:50px !important;
-    text-decoration:none !important;
-    display:inline-block !important;
-  }
-  .nav-cta:hover {
-    filter:brightness(1.08);
-    transform:translateY(-2px);
-    text-decoration:none !important;
-  }
-
-  /* Hamburger + full-screen overlay menu (mobile nav). Hidden by default;
-     shown only under the 860px breakpoint where nav ul already hides (see
-     MOBILE section) so there's never a gap with no way to reach the menu. */
-  .nav-hamburger {
-    display:none; background:none; border:none; cursor:pointer;
-    flex-direction:column; justify-content:center; align-items:center; gap:5px;
-    width:44px; height:44px; padding:0; flex:none;
-  }
-  .nav-hamburger span { display:block; width:22px; height:2px; background:var(--white); border-radius:1px; transition:transform 0.3s, opacity 0.3s; }
-  .nav-hamburger[aria-expanded="true"] span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
-  .nav-hamburger[aria-expanded="true"] span:nth-child(2) { opacity:0; }
-  .nav-hamburger[aria-expanded="true"] span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
-  .nav-overlay {
-    position:fixed; inset:0; z-index:200;
-    background:rgba(8,8,6,0.98);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:40px;
-    opacity:0; visibility:hidden; transform:translateY(-12px);
-    transition:opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
-  }
-  .nav-overlay.open { opacity:1; visibility:visible; transform:translateY(0); }
-  .nav-overlay-close {
-    position:absolute; top:18px; right:20px; background:none; border:none;
-    color:var(--white); font-size:2.2rem; line-height:1; cursor:pointer;
-    width:44px; height:44px;
-  }
-  .nav-overlay-links { list-style:none; text-align:center; display:flex; flex-direction:column; gap:28px; }
-  .nav-overlay-links a {
-    color:var(--white); text-decoration:none;
-    font-family:var(--font-heading); font-size:1.5rem; letter-spacing:0.01em;
-    padding:8px 0; display:inline-block; min-height:44px;
-  }
-  .nav-overlay-links a:hover { color:var(--gold); }
-  .nav-overlay-cta { min-height:44px; display:inline-flex; align-items:center; justify-content:center; }
-  body.nav-open { overflow:hidden; }
-
-  /* HERO */
-  #hero {
-    min-height:100vh; display:grid; grid-template-columns:1fr 1fr;
-    align-items:center; padding:0; position:relative; overflow:hidden;
-  }
-  .hero-left { padding:140px 80px 100px; position:relative; z-index:1; }
-  .hero-right { height:100vh; overflow:hidden; position:relative; }
-  .hero-right img {
-    width:100%; height:100%; object-fit:cover;
-    object-position:50% 45%; filter:brightness(0.8) saturate(0.9);
-  }
-  .hero-right::after {
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(to right, #080806 0%, rgba(8,8,6,0.3) 50%, transparent 100%);
-  }
-  .hero-bg {
-    position:absolute; inset:0;
-    background:radial-gradient(ellipse 60% 80% at 0% 50%, rgba(201,160,64,0.05) 0%, transparent 70%), #080806;
-  }
-  .hero-content { position:relative; z-index:1; max-width:560px; }
-  .hero-eyebrow {
-    display:inline-flex; align-items:center; gap:16px;
-    font-size:0.65rem; letter-spacing:0.3em; text-transform:uppercase;
-    color:var(--gold); margin-bottom:40px;
-    animation:fadeUp 0.8s ease 0.2s both;
-  }
-  .hero-eyebrow::before { content:''; width:48px; height:1px; background:var(--gold); opacity:0.6; }
-
-  /* 5. Headings — Playfair Display for key moments */
-  h1 {
-    font-family:var(--font-heading);
-    font-size:clamp(1.6rem,3.1vw,2.5rem);
-    font-weight:500; line-height:1.12;
-    margin-bottom:28px;
-    animation:fadeUp 0.8s ease 0.4s both;
-    letter-spacing:-0.01em;
-  }
-  /* Hero h1 word-stagger reveal (JS-driven via GSAP). Only applied once JS wraps
-     the words — .hw-ready suppresses the CSS fadeUp so the two don't fight. */
-  h1.hw-ready { animation:none; opacity:1; }
-  .hw-mask { display:inline-block; overflow:hidden; vertical-align:top; }
-  .hw-word { display:inline-block; will-change:transform; }
-  h1 em { font-style:italic; color:var(--gold); display:block; }
-  .hero-sub {
-    font-size:1rem; color:var(--dim); line-height:2.0;
-    max-width:460px; margin-bottom:56px;
-    animation:fadeUp 0.8s ease 0.6s both;
-    font-weight:300;
-  }
-  .hero-btns { display:flex; gap:16px; flex-wrap:wrap; animation:fadeUp 0.8s ease 0.8s both; }
-
-  /* 6. Buttons — more refined */
-  .btn {
-    display:inline-block; text-decoration:none;
-    font-family:'Poppins',sans-serif; font-size:0.72rem;
-    letter-spacing:0.2em; text-transform:uppercase;
-    padding:16px 44px; transition:all 0.35s;
-    font-weight:400; border-radius:50px;
-  }
-  .btn-gold {
-    background:linear-gradient(135deg, var(--gold-highlight), var(--gold-primary));
-    color:var(--obsidian-base); font-weight:500; border-radius:var(--radius-full);
-  }
-  .btn-gold:hover { filter:brightness(1.08); transform:translateY(-3px); box-shadow:0 12px 40px rgba(201,160,64,0.25); }
-  .btn-outline { border:1px solid rgba(201,160,64,0.35); color:var(--gold); border-radius:var(--radius-full); }
-  .btn-outline:hover { border-color:var(--gold); background:rgba(201,160,64,0.06); }
-
-  /* Soft light rays behind the hero headline (WebGL), adapted from the
-     components "Light Rays" background pack. Pure vanilla JS, no
-     dependencies. Sits behind .hero-content (z-index:1) and never
-     intercepts clicks. */
-  .hero-rays {
-    position:absolute; inset:0; z-index:0;
-    overflow:hidden; pointer-events:none;
-    /* Fade the glow out before it reaches the edge of the text column, so it
-       doesn't get hard-clipped into a visible seam against the photo. */
-    -webkit-mask-image:linear-gradient(to right, #000 55%, transparent 92%);
-    mask-image:linear-gradient(to right, #000 55%, transparent 92%);
-  }
-  .hero-rays .light-rays { position:relative; width:100%; height:100%; overflow:hidden; }
-  .hero-rays .light-rays canvas { display:block; width:100%; height:100%; }
-
-  /* About → Process divider (was About → Conditions before Conditions moved
-     to the top of the page, Sep 2026): soft dithered wave texture (WebGL),
-     adapted from the components "Dither" background pack. Pure vanilla JS,
-     no dependencies, mouse interaction off for a quiet, non-distracting strip. */
-  .about-divider { position:relative; width:100%; height:110px; background:var(--deep); overflow:hidden; }
-  .about-divider canvas { display:block; width:100%; height:100%; }
-  @media(max-width:680px){ .about-divider { height:80px; } }
-
-  /* SECTIONS */
-  section { padding:120px 80px; }
-  .section-tag {
-    font-size:0.65rem; letter-spacing:0.28em; text-transform:uppercase;
-    color:var(--gold); margin-bottom:24px;
-    display:flex; align-items:center; gap:12px; opacity:0.9;
-  }
-  .section-tag::before { content:''; width:24px; height:1px; background:var(--gold); opacity:0.6; }
-
-  /* 8. h2 — refined with tighter tracking */
-  h2 {
-    font-family:var(--font-heading);
-    font-size:clamp(2rem,3.5vw,2.8rem);
-    font-weight:500; line-height:1.12; margin-bottom:32px;
-    letter-spacing:-0.01em;
-  }
-  h2 em { font-style:italic; color:var(--gold); font-size:1.08em; }
-  h3 { font-family:var(--font-heading); font-weight:500; }
-
-  /* ABOUT */
-  #about { display:grid; grid-template-columns:1fr 1fr; gap:100px; align-items:center; background:var(--deep); }
-  .about-text p { color:var(--dim); line-height:2.0; margin-bottom:24px; font-size:0.97rem; }
-  .logo-hero-wrap {
-    background:rgba(201,160,64,0.03);
-    border:1px solid var(--border);
-    display:flex; align-items:center; justify-content:center;
-    padding:80px 60px;
-  }
-  .logo-hero-wrap img { width:160px; height:auto; }
-  .cert-strip { margin-top:36px; display:flex; gap:12px; flex-wrap:wrap; }
-  /* 9. Cert tags — smaller, more refined */
-  .cert-tag {
-    font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase;
-    border:1px solid var(--border); color:var(--gold);
-    padding:9px 18px; opacity:0.85; border-radius:50px;
-  }
-
-  /* CONDITIONS */
-  /* Now the first section on the page (moved above the hero) -- padding-top
-     clears the fixed nav and lands the heading roughly where the hero
-     heading used to sit (matches .hero-left's own 140px top padding).
-     border-bottom keeps the golden divider that used to appear here only
-     because #process's own border-top happened to follow it directly --
-     now explicit, so it survives regardless of what section comes next. */
-  #conditions { background:#080806; padding-top:140px; border-bottom:1px solid var(--border); }
-
-  /* Flower spiral layout */
-  .flower-section { display:flex; flex-direction:column; align-items:center; gap:24px; margin-top:0; }
-  /* The hexagon layout has a 56px top offset baked into the first row's own
-     position (top:56px, part of the symmetric flower arrangement) — on top of
-     .flower-section's 24px flex gap that made the hint-to-grid gap 80px total.
-     Pulling the whole wrap up compensates for that inner offset without
-     touching any individual petal's position, bringing the visible gap to
-     32px — matching the heading-to-hint spacing. */
-  .flower-wrap { position:relative; width:660px; margin:-48px auto 0; }
-  .flower-petal {
-    position:absolute;
-    width:200px;
-    height:200px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:18px 14px;
-    cursor:pointer;
-    opacity:0;
-    transform:scale(0.2) rotate(-120deg);
-    transition:opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 1.2, 0.36, 1);
-    will-change:transform,opacity;
-  }
-  .flower-petal.bloom {
-    opacity:1;
-    transform:scale(1) rotate(0deg);
-  }
-  .flower-capstone { text-decoration:none; }
-  .flower-petal svg.petal-bg {
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    z-index:0;
-    transition:transform 0.25s ease, filter 0.25s ease;
-  }
-  .flower-petal:hover svg.petal-bg {
-    transform:scale(1.08) translateY(-4px);
-    filter:drop-shadow(0 8px 24px rgba(201,160,64,0.35));
-  }
-  /* Hover echo ripple (JS-driven via GSAP) — hexagon-shaped duplicates of the
-     petal that scale out and fade, adapted from the "RepetitionHoverEffect"
-     pattern. Purely decorative: no pointer-events, sits behind the petal svg,
-     and never interferes with the click-to-open-modal behaviour below. */
-  .petal-echo {
-    position:absolute; inset:0; z-index:-1;
-    background:rgba(201,160,64,0.16);
-    clip-path:polygon(50% 4.5%, 91% 27%, 91% 73%, 50% 95.5%, 9% 73%, 9% 27%);
-    opacity:0; pointer-events:none; will-change:transform,opacity;
-  }
-  .flower-petal-inner {
-    position:absolute;
-    bottom:22px;
-    left:0; right:0;
-    z-index:1;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:0 12px;
-    text-align:center;
-  }
-  .flower-label {
-    font-family:'Poppins',sans-serif;
-    font-size:0.68rem;
-    font-weight:600;
-    letter-spacing:0.12em;
-    text-transform:uppercase;
-    line-height:1.4;
-    color:#F5F0E8;
-  }
-  /* Conditions CTA hint */
-  .conditions-hint {
-    font-family:'Poppins',sans-serif;
-    font-size:0.7rem;
-    letter-spacing:0.15em;
-    text-transform:uppercase;
-    color:rgba(201,160,64,0.45);
-    text-align:center;
-    margin-top:0;
-  }
-  /* Centre petal */
-  .flower-centre {
-    position:absolute;
-    top:50%; left:50%;
-    transform:translate(-50%,-50%);
-    width:130px; height:130px;
-    border-radius:50%;
-    background:rgba(201,160,64,0.12);
-    border:1.5px solid rgba(201,160,64,0.4);
-    display:flex; align-items:center; justify-content:center;
-    flex-direction:column; gap:4px;
-    text-align:center;
-    opacity:0;
-    transition:opacity 0.8s ease 1.6s;
-  }
-  .flower-centre.bloom { opacity:1; }
-  .flower-centre span {
-    font-family:'Poppins',sans-serif;
-    font-size:0.58rem;
-    letter-spacing:0.15em;
-    text-transform:uppercase;
-    color:var(--gold,#c9a040);
-    line-height:1.5;
-  }
-  .flower-centre svg { width:40px; height:40px; opacity:0.8; }
-
-  @media(max-width:680px){
-    /* The desktop honeycomb positions every petal with an inline
-       left/top (calibrated for the 660px radial layout) and a centre hub
-       badge absolutely centred over them — neither survives shrinking in
-       place; shrinking just the petal boxes left the *positions* at
-       full-size coordinates, overflowing the page horizontally. Below this
-       breakpoint the petals become a plain 2-column grid instead: !important
-       cancels each petal's inline left/top (offsets, since the petal stays
-       position:relative for its own absolutely-positioned SVG background/
-       echo children to keep anchoring correctly), and the centre hub —
-       which only makes sense in the radial arrangement — is hidden. */
-    .flower-section { overflow-x:hidden; } /* safety clamp: never let the grid below push the page wider */
-    .flower-wrap {
-      /* height:auto needs !important — it's fighting the element's own
-         inline style="...height:790px" (set for the desktop radial layout),
-         which otherwise wins the cascade over a plain external rule.
-         width is calc(100vw - 48px) rather than 100% — this grid container
-         kept resolving wider than its flex parent's actual content box
-         (a sizing quirk with the nested flex/grid + aspect-ratio children),
-         so pin it directly to the viewport instead of trusting the
-         percentage to resolve against the right box. */
-      /* Actual width is set directly via JS (reposition()) using the
-         reliable document.documentElement.clientWidth — this is a fallback
-         for the instant before that runs / if JS is unavailable. */
-      width:calc(100vw - 48px); max-width:380px; height:auto !important;
-      margin:0 auto;
-      display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px;
-    }
-    .flower-petal {
-      position:relative !important; left:0 !important; top:0 !important;
-      width:auto !important; height:auto !important; aspect-ratio:1;
-      padding:10px 8px;
-      /* Grid items default to min-width:auto, so a track can grow past its
-         1fr share to fit content's natural minimum size (here: a few px
-         wider than the math implied, just enough to push column 2 past the
-         container's right edge). min-width:0 lets the track actually honour
-         1fr. */
-      min-width:0;
-    }
-    .flower-label { font-size:0.62rem; }
-    .flower-centre { display:none; }
-  }
-
-  /* PRICING */
-  #pricing { background:var(--deep); }
-  .pricing-inner { display:flex; flex-direction:column; gap:48px; max-width:900px; margin:0 auto; }
-  .price-img img { display:none; }
-  .price-full { display:flex; flex-direction:column; gap:0; }
-  .price-cat { margin-bottom:36px; }
-  /* 11. Price categories — refined uppercase tracking */
-  .price-cat-title {
-    font-size:0.6rem; letter-spacing:0.28em; text-transform:uppercase;
-    color:var(--gold); border-bottom:1px solid rgba(201,160,64,0.12);
-    padding-bottom:12px; margin-bottom:20px; opacity:0.85;
-  }
-  .price-row {
-    display:flex; justify-content:space-between; align-items:baseline;
-    padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.03);
-    font-size:0.9rem; transition:opacity 0.3s;
-  }
-  .price-row:hover { opacity:0.85; }
-  .price-row:last-child { border-bottom:none; }
-  .price-row-name { color:var(--white); font-weight:300; }
-  .price-row-duration { font-size:0.72rem; color:var(--dim); margin-left:8px; }
-  /* 12. Prices — Cormorant for elegance */
-  .price-row-price {
-    font-family:'Poppins',sans-serif;
-    font-size:1.15rem; color:var(--gold); white-space:nowrap;
-    font-weight:400;
-  }
-  .price-text p { color:var(--dim); line-height:1.9; font-size:0.95rem; margin-bottom:20px; }
-  .price-highlights { margin:32px 0; display:flex; flex-direction:column; gap:14px; }
-  .price-highlight {
-    display:flex; justify-content:space-between; align-items:baseline;
-    padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.05);
-  }
-  .price-highlight span:first-child { color:var(--white); font-size:0.9rem; }
-  .price-highlight span:last-child { font-family:'Poppins',sans-serif; font-size:1.2rem; color:var(--gold); }
-
-  /* PROCESS */
-  #process { background:#080806; }
-  .process-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin-top:56px; position:relative; }
-  .process-grid::before {
-    content:''; position:absolute; top:20px; left:12%; right:12%; height:1px;
-    background:linear-gradient(to right, transparent, rgba(201,160,64,0.2), rgba(201,160,64,0.2), transparent);
-  }
-  .p-step { padding:0 28px; text-align:center; }
-  /* 13. Step numbers — smaller, lighter */
-  .p-num {
-    width:44px; height:44px; border-radius:50%;
-    border:1px solid rgba(201,160,64,0.4); margin:0 auto 28px;
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Poppins',sans-serif; font-size:1rem; color:var(--gold);
-    background:var(--black); position:relative; z-index:1;
-  }
-  .p-step h4 {
-    font-family:'Poppins',sans-serif;
-    font-size:1.05rem; font-weight:500; color:var(--white);
-    margin-bottom:14px; letter-spacing:0.01em;
-  }
-  .p-step p { font-size:0.84rem; color:var(--dim); line-height:1.85; }
-
-  /* BOOK */
-  #book {
-    background:linear-gradient(135deg, rgba(201,160,64,0.04) 0%, transparent 60%), var(--deep);
-    border-top:1px solid var(--border);
-  }
-  .book-grid { display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:start; }
-  .book-info p { color:var(--dim); line-height:1.9; margin-bottom:32px; font-size:0.95rem; }
-  .book-list { display:flex; flex-direction:column; gap:14px; margin-bottom:36px; }
-  .book-item { display:flex; gap:14px; align-items:flex-start; font-size:0.87rem; color:var(--dim); }
-  .book-icon { color:var(--gold); flex-shrink:0; margin-top:2px; opacity:0.8; }
-  /* 14. Form — more refined */
-  .book-form {
-    background:rgba(255,255,255,0.02);
-    border:1px solid rgba(201,160,64,0.08);
-    padding:52px;
-  }
-  .form-field { margin-bottom:22px; }
-  .form-field label {
-    display:block; font-size:0.62rem; letter-spacing:0.2em;
-    text-transform:uppercase; color:var(--gold); margin-bottom:10px; opacity:0.8;
-  }
-  .form-field input, .form-field select, .form-field textarea {
-    width:100%; background:rgba(255,255,255,0.025);
-    border:1px solid rgba(201,160,64,0.1);
-    color:var(--white); padding:12px 16px;
-    font-family:'Poppins',sans-serif; font-size:0.88rem;
-    font-weight:300; outline:none; transition:border 0.4s;
-    -webkit-appearance:none;
-  }
-  .form-field select option { background:#111; }
-  .form-field input:focus,
-  .form-field select:focus,
-  .form-field textarea:focus { border-color:rgba(201,160,64,0.4); }
-  .form-field textarea { resize:vertical; min-height:90px; }
-  .form-warn {
-    font-size:0.75rem; color:var(--dim); margin-bottom:22px;
-    line-height:1.6; padding:12px 16px;
-    border-left:1px solid rgba(201,160,64,0.25);
-    opacity:0.75;
-  }
-
-  /* 15. FOOTER — cleaner */
-  footer {
-    background:#040403; padding:64px 80px;
-    border-top:1px solid var(--border);
-    display:flex; justify-content:space-between; align-items:center;
-  }
-  .footer-left { display:flex; align-items:center; gap:14px; }
-  .footer-left img { height:24px; }
-  .footer-left span {
-    font-family:'Poppins',sans-serif;
-    font-size:1.2rem; color:var(--gold);
-    letter-spacing:0.2em; font-weight:300;
-  }
-  .footer-links { display:flex; gap:32px; }
-  .footer-links a {
-    color:var(--dim); text-decoration:none;
-    font-size:0.68rem; letter-spacing:0.14em;
-    text-transform:uppercase; transition:color 0.4s; opacity:0.7;
-  }
-  .footer-links a:hover { color:var(--gold); opacity:1; }
-  .footer-right { font-size:0.65rem; color:rgba(122,112,96,0.5); text-align:right; line-height:1.8; }
-
-  /* 16. Reveal animation — smoother */
-  @keyframes fadeUp {
-    from { opacity:0; transform:translateY(24px); }
-    to { opacity:1; transform:translateY(0); }
-  }
-  .reveal { opacity:0; transform:translateY(28px); transition:opacity 1s cubic-bezier(0.25,0.46,0.45,0.94), transform 1s cubic-bezier(0.25,0.46,0.45,0.94); }
-  .reveal.visible { opacity:1; transform:translateY(0); }
-
-  /* 17. Selection colour */
-  ::selection { background:rgba(201,160,64,0.2); color:var(--white); }
-
-  /* 18. Scrollbar */
-  ::-webkit-scrollbar { width:4px; }
-  ::-webkit-scrollbar-track { background:var(--black); }
-  ::-webkit-scrollbar-thumb { background:rgba(201,160,64,0.3); border-radius:2px; }
-
-  /* 19. MOBILE */
-  @media(max-width:860px){
-    nav { padding:18px 24px; }
-    nav ul { display:none; }
-    .nav-hamburger { display:flex; }
-    section { padding:64px 24px; }
-    #hero { grid-template-columns:1fr; }
-    .hero-left { padding:96px 24px 60px; }
-    .hero-right { height:50vh; }
-    #about, .book-grid { grid-template-columns:1fr; gap:40px; }
-    .cond-grid { grid-template-columns:1fr; }
-    .process-grid { grid-template-columns:1fr 1fr; gap:36px; }
-    .process-grid::before { display:none; }
-    .book-form { padding:28px 20px; }
-    footer { flex-direction:column; gap:28px; text-align:center; }
-    .footer-links { flex-wrap:wrap; justify-content:center; }
-  }
-
-  /* Footer now carries more links (Clinic Day, Hijama in Manchester)
-     than it used to, so it needs to stack sooner than the
-     860px mobile breakpoint above — otherwise it overlaps footer-right on
-     ordinary laptop-width windows. */
-  @media(max-width:1200px){
-    footer { flex-direction:column; gap:24px; text-align:center; }
-    .footer-links { flex-wrap:wrap; justify-content:center; }
-  }
-
-  /* 20. Subtle grain overlay for depth */
+  /* Faint gold line-art wallpaper (cups / leaves / honeycomb), tiled at ~6%
+     opacity behind everything — fixed so it doesn't scroll away, sits below
+     the page content and above nothing (z-index:0, content is z-index:1+). */
   body::before {
     content:'';
-    position:fixed; inset:0; z-index:0; pointer-events:none;
-    opacity:0.025;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size:200px;
+    position:fixed; inset:0; z-index:0;
+    background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAiIGhlaWdodD0iMTYwIiB2aWV3Qm94PSIwIDAgMTYwIDE2MCI+CiAgPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOGE2YTJjIiBzdHJva2Utd2lkdGg9IjEuMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjQsNiA0MCwxNSA0MCwzMyAyNCw0MiA4LDMzIDgsMTUiLz4KICAgIDxwYXRoIGQ9Ik0xMDggMjIgYTE2IDExIDAgMSAwIDAuMSAwIi8+CiAgICA8cGF0aCBkPSJNMTAwIDIyIHEwIDggNCA4Ii8+CiAgICA8cGF0aCBkPSJNMTE2IDIyIHEwIDggLTQgOCIvPgogICAgPGxpbmUgeDE9IjEwOCIgeTE9IjMzIiB4Mj0iMTA4IiB5Mj0iNDAiLz4KICAgIDxwYXRoIGQ9Ik00MCAxMDAgQyAyOCAxMTIgMjggMTMwIDQwIDE0MiBDIDUyIDEzMCA1MiAxMTIgNDAgMTAwIFoiLz4KICAgIDxwYXRoIGQ9Ik00MCAxMTIgTDQwIDE0MiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxMjgsOTYgMTQ0LDEwNSAxNDQsMTIzIDEyOCwxMzIgMTEyLDEyMyAxMTIsMTA1Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjgsMTIwIDI0LDEyOSAyNCwxNDcgOCwxNTYgLTgsMTQ3IC04LDEyOSIvPgogIDwvZz4KPC9zdmc+");
+    background-repeat:repeat;
+    background-size:160px 160px;
+    opacity:0.06;
+    pointer-events:none;
+  }
+  #siteHeader, main, footer.site-footer { position:relative; z-index:1; }
+
+  h1, h2, h3, h4 { font-family:var(--font-heading); font-weight:600; color:var(--ink); line-height:1.15; }
+  a { color:inherit; }
+  img { max-width:100%; display:block; }
+  button { font-family:inherit; }
+
+  .container { max-width:var(--container); margin:0 auto; padding:0 20px; }
+  @media (min-width:768px) { .container { padding:0 40px; } }
+  @media (min-width:1280px) { .container { padding:0 80px; } }
+
+  section { padding:56px 0; }
+  @media (min-width:1024px) { section { padding:88px 0; } }
+
+  .section-eyebrow {
+    font-size:0.72rem; font-weight:600; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--gold-deep); margin-bottom:10px; display:block;
+  }
+  .section-head { max-width:640px; margin:0 0 32px; }
+  .section-head h2 { font-size:clamp(1.7rem,4vw,2.4rem); }
+  .section-head p { margin-top:10px; color:var(--body); font-size:1rem; }
+
+  /* ---- Cards ---- */
+  .card {
+    background:var(--white);
+    border-radius:var(--card-radius);
+    box-shadow:var(--card-shadow);
+  }
+  .card--dark {
+    background:var(--dark-card-bg);
+    color:var(--cream);
+  }
+  .card--dark h3, .card--dark h4 { color:var(--cream); }
+
+  /* ---- Buttons ---- */
+  .btn-pill {
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height:44px; padding:12px 24px;
+    border-radius:999px; font-weight:600; font-size:0.95rem;
+    text-decoration:none; border:none; cursor:pointer;
+    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.2s ease;
+  }
+  .btn-pill:hover, .btn-pill:focus-visible { transform:translateY(-2px); }
+  .btn-pill:active { transform:translateY(0); }
+  .btn-gold { background:var(--gold); color:var(--ink); }
+  .btn-gold:hover { background:#d4bb85; }
+  .btn-outline { background:transparent; color:var(--ink); border:1.5px solid var(--ink); }
+  .btn-outline:hover { background:rgba(13,13,13,0.05); }
+  .btn-outline-gold { background:transparent; color:var(--gold-deep); border:1.5px solid var(--gold); }
+  .btn-outline-gold:hover { background:var(--gold-soft); }
+  @media (prefers-reduced-motion: reduce) {
+    .btn-pill, .action-card, .price-card, .cond-card, .review-card { transition:none !important; }
+    .btn-pill:hover, .action-card:hover, .price-card:hover { transform:none !important; }
   }
 
-  /* ── UI/UX Improvements ── */
+  .link-gold { color:var(--gold-deep); font-weight:600; text-decoration:none; }
+  .link-gold:hover { text-decoration:underline; }
 
-  /* Signifiers: nav active state. Scoped off .nav-cta — that's a filled
-     button, not a section link, so it shouldn't grow an underline. */
-  nav ul a:not(.nav-cta) { position:relative; }
-  nav ul a:not(.nav-cta)::after {
-    content:''; position:absolute; bottom:-4px; left:0; right:0;
-    height:1px; background:var(--gold); transform:scaleX(0);
-    transition:transform 0.3s ease; transform-origin:left;
+  /* ============================================================
+     HEADER
+     ============================================================ */
+  #siteHeader {
+    position:sticky; top:0; z-index:100;
+    background:rgba(245,240,232,0.92);
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(13,13,13,0.06);
   }
-  nav ul a:not(.nav-cta):hover::after { transform:scaleX(1); }
-  /* Section currently scrolled into view (JS-driven, see bottom of body) */
-  nav ul a.nav-active::after { transform:scaleX(1); }
-  nav ul a.nav-active { color:var(--gold); }
+  .header-inner {
+    max-width:var(--container); margin:0 auto; padding:12px 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  @media (min-width:768px) { .header-inner { padding:14px 40px; } }
+  @media (min-width:1280px) { .header-inner { padding:16px 80px; } }
 
-  /* Visual hierarchy: about section divider */
-  .about-text h2 { margin-bottom:20px; }
+  .menu-btn {
+    width:44px; height:44px; border-radius:50%; border:1px solid rgba(13,13,13,0.12);
+    background:var(--white); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    cursor:pointer; flex:none;
+    transition:transform 0.15s ease;
+  }
+  .menu-btn span { display:block; width:18px; height:2px; background:var(--ink); border-radius:1px; transition:transform 0.25s ease, opacity 0.25s ease; }
+  .menu-btn:hover { transform:translateY(-2px); }
+  .menu-btn[aria-expanded="true"] span:nth-child(1) { transform:translateY(6px) rotate(45deg); }
+  .menu-btn[aria-expanded="true"] span:nth-child(2) { opacity:0; }
+  .menu-btn[aria-expanded="true"] span:nth-child(3) { transform:translateY(-6px) rotate(-45deg); }
 
-  /* Feedback & states: process step hover */
-  .p-step {
-    transition:transform 0.3s ease;
-  }
-  .p-step:hover { transform:translateY(-6px); }
-  .p-step:hover .p-num {
-    background:rgba(201,160,64,0.12);
-    border-color:var(--gold);
-  }
+  .brand { display:flex; align-items:center; gap:10px; text-decoration:none; flex:1; justify-content:center; }
+  .brand img { height:30px; width:auto; }
+  .brand .wordmark { font-family:var(--font-heading); font-style:italic; font-weight:600; font-size:1.35rem; color:var(--ink); letter-spacing:0.01em; }
 
-  /* Flower petal hover — lift effect */
-  .flower-petal:hover {
-    transform:scale(1.07) translateY(-4px) !important;
-    filter:brightness(1.15);
-    z-index:10;
+  .header-actions { display:flex; align-items:center; gap:10px; flex:none; }
+  .icon-btn {
+    width:44px; height:44px; border-radius:50%; background:var(--gold);
+    display:flex; align-items:center; justify-content:center; flex:none;
+    text-decoration:none; color:var(--ink);
+    transition:transform 0.15s ease;
   }
+  .icon-btn:hover { transform:translateY(-2px); }
+  .icon-btn svg { width:20px; height:20px; }
+  .header-actions .btn-gold { display:none; }
+  @media (min-width:560px) { .header-actions .btn-gold { display:inline-flex; } }
 
-  /* Cert tag hover signifier */
-  .cert-tag {
-    transition:all 0.3s;
-    cursor:default;
-  }
-  .cert-tag:hover {
-    border-color:rgba(201,160,64,0.6);
-    background:rgba(201,160,64,0.07);
-    opacity:1;
-  }
-
-  /* Section divider accent lines for visual hierarchy */
-  #conditions, #process {
-    border-top:1px solid var(--border);
-  }
-
-  /* Better focus states on inputs (Feedback & States) */
-  .hb-field input:focus,
-  .hb-field select:focus,
-  .hb-field textarea:focus {
-    border-color:var(--gold,#c9a040);
-    box-shadow:0 0 0 3px rgba(201,160,64,0.1);
-    outline:none;
-  }
-  .form-field input:focus,
-  .form-field select:focus,
-  .form-field textarea:focus {
-    border-color:rgba(201,160,64,0.5);
-    box-shadow:0 0 0 3px rgba(201,160,64,0.08);
-  }
-
-  /* Typography: tighten hero sub on large screens */
-  @media(min-width:1200px) {
-    h1 { letter-spacing:-0.04em; }
-    h2 { letter-spacing:-0.03em; }
-  }
-
-  /* Overlay: gradient on hero image for text legibility */
-  .hero-right::after {
-    background:linear-gradient(to right, #080806 0%, rgba(8,8,6,0.6) 45%, rgba(8,8,6,0.1) 100%),
-               linear-gradient(to top, rgba(8,8,6,0.4) 0%, transparent 40%);
-  }
-
-  /* CONDITION MODAL */
-  .cond-overlay {
-    display:none;
-    position:fixed; inset:0; z-index:500;
-    background:rgba(8,8,6,0.85);
-    backdrop-filter:blur(6px);
-    -webkit-backdrop-filter:blur(6px);
-    align-items:center; justify-content:center;
+  /* Mobile nav overlay */
+  .nav-overlay {
+    position:fixed; inset:0; z-index:200;
+    background:var(--cream);
+    display:flex; flex-direction:column;
     padding:20px;
+    opacity:0; visibility:hidden; transform:translateY(-8px);
+    transition:opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
   }
-  .cond-overlay.open { display:flex; }
+  .nav-overlay.open { opacity:1; visibility:visible; transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .nav-overlay { transition:none; } }
+  .nav-overlay-top { display:flex; justify-content:flex-end; }
+  .nav-overlay-close {
+    width:44px; height:44px; border-radius:50%; border:1px solid rgba(13,13,13,0.12);
+    background:var(--white); font-size:1.4rem; line-height:1; cursor:pointer; color:var(--ink);
+  }
+  .nav-overlay-links { list-style:none; margin:40px 0; display:flex; flex-direction:column; gap:6px; }
+  .nav-overlay-links a {
+    display:block; padding:16px 4px; font-family:var(--font-heading); font-size:1.6rem; font-weight:500;
+    text-decoration:none; color:var(--ink); border-bottom:1px solid rgba(13,13,13,0.08);
+  }
+  .nav-overlay-cta { margin-top:auto; width:100%; }
+  body.nav-open { overflow:hidden; }
+
+  /* ============================================================
+     HERO
+     ============================================================ */
+  .hero { padding-top:28px; }
+  .illustration-placeholder {
+    aspect-ratio:4/3; border-radius:var(--card-radius);
+    background:linear-gradient(135deg, var(--gold-soft), rgba(200,169,110,0.06));
+    border:1.5px dashed var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--gold-deep); font-size:0.9rem; font-weight:600; letter-spacing:0.04em;
+    text-align:center; padding:20px;
+  }
+  .badge-pill {
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--white); border-radius:999px; padding:10px 18px; margin-top:22px;
+    box-shadow:var(--card-shadow); font-size:0.85rem; font-weight:600; color:var(--ink);
+  }
+  .badge-pill svg { width:16px; height:16px; flex:none; color:var(--gold-deep); }
+  .hero-title { font-size:clamp(2.2rem,7vw,3.6rem); margin-top:20px; max-width:12ch; }
+  .hero-title em { font-style:italic; color:var(--gold-deep); }
+  .hero-sub { margin-top:14px; max-width:52ch; font-size:1.02rem; }
+  .offer-box {
+    margin-top:24px; border:1.5px dashed var(--gold); border-radius:var(--card-radius-sm);
+    padding:16px 20px; display:inline-flex; flex-direction:column; gap:2px;
+    background:rgba(255,255,255,0.5);
+  }
+  .offer-box .offer-label { font-size:0.72rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold-deep); }
+  .offer-box .offer-value { font-family:var(--font-heading); font-size:1.3rem; color:var(--ink); }
+  .hero-talk { margin-top:20px; font-size:0.95rem; }
+
+  /* ============================================================
+     ACTION CARDS
+     ============================================================ */
+  .action-cards { display:flex; flex-direction:column; gap:14px; padding-top:0; padding-bottom:0; }
+  .action-card {
+    display:flex; align-items:center; gap:16px;
+    padding:20px 22px; text-decoration:none; color:var(--ink);
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .action-card:hover, .action-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
+  .action-card--dark:hover { box-shadow:0 12px 28px rgba(13,13,13,0.28); }
+  .action-icon {
+    width:48px; height:48px; border-radius:50%; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--gold-soft); color:var(--gold-deep);
+  }
+  .action-card--dark .action-icon { background:rgba(200,169,110,0.18); color:var(--gold); }
+  .action-icon svg { width:22px; height:22px; }
+  .action-text { flex:1; font-weight:600; font-size:1rem; }
+  .action-arrow { flex:none; font-size:1.3rem; color:var(--gold-deep); }
+  .action-card--dark .action-arrow { color:var(--gold); }
+
+  @media (min-width:768px) {
+    .action-cards { flex-direction:row; align-items:stretch; }
+    .action-card { flex:1; flex-direction:column; align-items:flex-start; gap:18px; }
+    .action-arrow { align-self:flex-end; }
+  }
+
+  /* ============================================================
+     TRUST STRIP
+     ============================================================ */
+  .trust-strip { display:flex; flex-wrap:wrap; gap:10px; padding-top:0; }
+  .trust-pill {
+    background:var(--white); border-radius:999px; padding:10px 18px;
+    font-size:0.82rem; font-weight:600; color:var(--ink); box-shadow:var(--card-shadow);
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .trust-pill svg { width:14px; height:14px; color:var(--gold-deep); flex:none; }
+
+  /* ============================================================
+     ABOUT
+     ============================================================ */
+  .about-card { padding:32px 24px; display:flex; flex-direction:column; gap:16px; }
+  .about-card p { font-size:0.98rem; }
+  .about-cert-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  @media (min-width:1024px) {
+    .about-card { padding:48px; flex-direction:row; align-items:center; gap:48px; }
+    .about-card .about-copy { flex:1.3; }
+    .about-card .about-figure { flex:1; text-align:center; }
+  }
+  .about-figure img { width:120px; margin:0 auto; }
+
+  /* ============================================================
+     CONDITIONS
+     ============================================================ */
+  .cond-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media (min-width:768px) { .cond-grid { grid-template-columns:repeat(4,1fr); gap:16px; } }
+  .cond-card {
+    padding:22px 16px; text-align:center; cursor:pointer; border:none;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+    width:100%;
+  }
+  .cond-card:hover, .cond-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
+  .cond-icon {
+    width:52px; height:52px; border-radius:50%; border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; color:var(--gold-deep);
+  }
+  .cond-icon svg { width:24px; height:24px; }
+  .cond-card h3 { font-size:0.92rem; font-family:var(--font-body); font-weight:600; color:var(--ink); line-height:1.3; }
+  .cond-hint { text-align:center; color:var(--gold-deep); font-size:0.85rem; font-weight:600; margin-top:-16px; margin-bottom:28px; }
+
+  /* Condition modal — restyled light */
+  .cond-overlay {
+    position:fixed; inset:0; z-index:300;
+    background:rgba(13,13,13,0.45);
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; visibility:hidden; transition:opacity 0.25s ease, visibility 0.25s;
+  }
+  .cond-overlay.open { opacity:1; visibility:visible; }
+  @media (min-width:768px) { .cond-overlay { align-items:center; } }
   .cond-modal {
-    background:#111008;
-    border:1px solid rgba(201,160,64,0.25);
-    border-radius:16px;
-    max-width:520px; width:100%;
-    padding:44px 40px 36px;
-    position:relative;
-    animation:modalIn 0.35s cubic-bezier(0.22,1.2,0.36,1);
+    background:var(--white); border-radius:28px 28px 0 0; width:100%; max-width:560px;
+    max-height:85vh; overflow-y:auto; padding:32px 24px;
+    transform:translateY(24px); transition:transform 0.25s ease;
   }
-  @keyframes modalIn {
-    from { opacity:0; transform:scale(0.88) translateY(16px); }
-    to   { opacity:1; transform:scale(1) translateY(0); }
+  .cond-overlay.open .cond-modal { transform:translateY(0); }
+  @media (min-width:768px) { .cond-modal { border-radius:28px; padding:40px; } }
+  @media (prefers-reduced-motion: reduce) { .cond-overlay, .cond-modal { transition:none; } }
+  .cond-modal-top { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+  .cond-modal-icon {
+    width:56px; height:56px; border-radius:50%; border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; color:var(--gold-deep); flex:none;
   }
+  .cond-modal-icon svg { width:26px; height:26px; }
   .cond-modal-close {
-    position:absolute; top:16px; right:20px;
-    background:none; border:none; cursor:pointer;
-    color:rgba(201,160,64,0.5); font-size:1.4rem; line-height:1;
-    transition:color 0.2s;
+    width:36px; height:36px; border-radius:50%; border:1px solid rgba(13,13,13,0.12);
+    background:var(--cream); font-size:1.2rem; cursor:pointer; color:var(--ink); flex:none;
   }
-  .cond-modal-close:hover { color:var(--gold); }
-  .cond-modal-emoji { font-size:2.8rem; margin-bottom:12px; display:block; }
-  .cond-modal-title {
-    font-family:'Poppins',sans-serif;
-    font-size:0.65rem; font-weight:600;
-    letter-spacing:0.22em; text-transform:uppercase;
-    color:var(--gold); margin-bottom:10px;
+  .cond-modal h3 { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold-deep); margin-top:18px; }
+  .cond-modal h4 { font-size:1.5rem; margin-top:6px; }
+  .cond-modal p { margin-top:14px; font-size:0.98rem; }
+  .cond-modal-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+  .cond-modal-tag { background:var(--cream); border-radius:999px; padding:6px 14px; font-size:0.78rem; font-weight:600; color:var(--ink); }
+  .cond-modal-cta { margin-top:24px; width:100%; text-align:center; }
+
+  /* ============================================================
+     PRICING
+     ============================================================ */
+  .price-grid { display:grid; grid-template-columns:1fr; gap:14px; }
+  @media (min-width:600px) { .price-grid { grid-template-columns:repeat(2,1fr); } }
+  @media (min-width:1024px) { .price-grid { grid-template-columns:repeat(4,1fr); } }
+  .price-card {
+    padding:26px 22px; text-decoration:none; color:var(--ink);
+    display:flex; flex-direction:column; gap:10px;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
   }
-  .cond-modal h3 {
-    font-family:'Cormorant Garamond','Georgia',serif;
-    font-size:1.9rem; font-weight:400;
-    color:var(--white); margin-bottom:18px; line-height:1.2;
+  .price-card:hover, .price-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
+  .price-icon {
+    width:44px; height:44px; border-radius:12px; background:var(--gold-soft); color:var(--gold-deep);
+    display:flex; align-items:center; justify-content:center;
   }
-  .cond-modal p {
-    font-size:0.88rem; line-height:1.85;
-    color:rgba(245,240,234,0.7);
-    margin-bottom:14px;
+  .price-icon svg { width:22px; height:22px; }
+  .price-card h3 { font-size:1.05rem; }
+  .price-from { color:var(--body); font-size:0.92rem; }
+  .price-from strong { color:var(--ink); font-size:1.3rem; font-family:var(--font-heading); }
+  .price-arrow { margin-top:auto; align-self:flex-end; color:var(--gold-deep); font-size:1.2rem; }
+  .price-note { margin-top:20px; font-size:0.82rem; color:var(--body); }
+
+  /* ============================================================
+     PROCESS ("What to expect")
+     ============================================================ */
+  .process-grid { display:grid; grid-template-columns:1fr; gap:14px; }
+  @media (min-width:768px) { .process-grid { grid-template-columns:repeat(2,1fr); } }
+  @media (min-width:1024px) { .process-grid { grid-template-columns:repeat(4,1fr); } }
+  .process-card { padding:24px 22px; }
+  .process-num { font-family:var(--font-heading); font-size:1.6rem; color:var(--gold); margin-bottom:8px; }
+  .process-card h4 { font-size:1rem; }
+  .process-card p { margin-top:8px; font-size:0.9rem; }
+
+  /* ============================================================
+     REVIEWS
+     ============================================================ */
+  .reviews-head { display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-bottom:28px; }
+  .google-badge {
+    display:inline-flex; align-items:center; gap:8px; background:var(--white);
+    border-radius:999px; padding:8px 16px; box-shadow:var(--card-shadow);
+    font-size:0.82rem; font-weight:600; color:var(--ink);
   }
-  .cond-modal-tags {
-    display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 28px;
+  .google-badge svg { width:16px; height:16px; color:var(--gold-deep); }
+  .review-grid { display:grid; grid-template-columns:1fr; gap:14px; }
+  @media (min-width:768px) { .review-grid { grid-template-columns:repeat(3,1fr); } }
+  .review-card { padding:22px 20px; transition:transform 0.15s ease, box-shadow 0.15s ease; }
+  .review-card:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
+  .review-stars { color:var(--gold); font-size:0.95rem; letter-spacing:2px; }
+  .review-card p { margin-top:12px; font-size:0.92rem; font-style:italic; }
+  .review-name { margin-top:14px; font-size:0.82rem; font-weight:600; color:var(--gold-deep); }
+
+  /* ============================================================
+     FAQ
+     ============================================================ */
+  .faq-section { background:var(--gold); }
+  .faq-section .section-eyebrow { color:var(--ink); opacity:0.7; }
+  .faq-section .section-head h2 { color:var(--ink); }
+  .faq-list { display:flex; flex-direction:column; gap:12px; }
+  .faq-item { background:var(--white); border-radius:var(--card-radius-sm); overflow:hidden; }
+  .faq-q {
+    width:100%; text-align:left; background:none; border:none; cursor:pointer;
+    padding:18px 20px; display:flex; justify-content:space-between; align-items:center; gap:16px;
+    font-weight:600; font-size:0.98rem; color:var(--ink); min-height:44px;
   }
-  .cond-modal-tag {
-    font-family:'Poppins',sans-serif;
-    font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase;
-    color:var(--gold); border:1px solid rgba(201,160,64,0.3);
-    padding:5px 12px;
+  .faq-q .faq-chevron { flex:none; transition:transform 0.25s ease; color:var(--gold-deep); }
+  .faq-item.open .faq-q .faq-chevron { transform:rotate(180deg); }
+  .faq-a { max-height:0; overflow:hidden; transition:max-height 0.3s ease; }
+  .faq-a-inner { padding:0 20px 18px; font-size:0.92rem; color:var(--body); }
+  @media (prefers-reduced-motion: reduce) { .faq-a, .faq-q .faq-chevron { transition:none; } }
+
+  /* ============================================================
+     CLINIC DAY
+     ============================================================ */
+  .clinic-card { padding:32px 24px; display:flex; flex-direction:column; gap:16px; }
+  .clinic-facts { display:flex; flex-wrap:wrap; gap:8px; }
+  .clinic-address { color:var(--body); font-size:0.92rem; }
+  @media (min-width:1024px) {
+    .clinic-card { flex-direction:row; align-items:center; gap:40px; padding:48px; }
+    .clinic-card .clinic-copy { flex:1; }
+    .clinic-card .clinic-cta { flex:none; }
   }
-  .cond-modal-cta {
-    display:inline-block;
-    background:var(--gold); color:#080806;
-    font-family:'Poppins',sans-serif;
-    font-size:0.65rem; font-weight:600; letter-spacing:0.18em; text-transform:uppercase;
-    padding:13px 28px; text-decoration:none;
-    border-radius:50px;
-    transition:background 0.3s;
+
+  /* ============================================================
+     BIG CTA
+     ============================================================ */
+  .cta-card {
+    background:var(--gold); border-radius:var(--card-radius);
+    padding:40px 24px; text-align:center;
   }
-  .cond-modal-cta:hover { background:var(--gold-light); }
+  .cta-card h2 { font-size:clamp(1.8rem,5vw,2.6rem); }
+  .cta-card p { margin-top:10px; color:var(--ink); opacity:0.75; }
+  .cta-benefits { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:22px; }
+  .cta-benefit { background:var(--ink); color:var(--cream); border-radius:999px; padding:8px 16px; font-size:0.8rem; font-weight:600; }
+  .cta-card .btn-pill { margin-top:26px; }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+  .site-footer { background:var(--ink); color:var(--cream); padding:56px 0 28px; }
+  .footer-top { display:flex; flex-direction:column; gap:32px; }
+  @media (min-width:768px) { .footer-top { flex-direction:row; justify-content:space-between; } }
+  .footer-brand { display:flex; align-items:center; gap:10px; }
+  .footer-brand img { height:30px; }
+  .footer-brand span { font-family:var(--font-heading); font-style:italic; font-size:1.3rem; }
+  .footer-col h5 { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
+  .footer-col a, .footer-col p { display:block; color:#C8C2B7; text-decoration:none; font-size:0.9rem; margin-bottom:8px; }
+  .footer-col a:hover { color:var(--gold); }
+  .footer-cols { display:grid; grid-template-columns:repeat(2,1fr); gap:24px; }
+  @media (min-width:768px) { .footer-cols { grid-template-columns:repeat(3,1fr); gap:40px; } }
+  .footer-bottom { margin-top:40px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); font-size:0.8rem; color:#8E887F; }
+
+  /* ============================================================
+     STICKY MOBILE BOTTOM BAR
+     ============================================================ */
+  .mobile-bar {
+    position:fixed; bottom:0; left:0; right:0; z-index:90;
+    background:rgba(245,240,232,0.96); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid rgba(13,13,13,0.08);
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));
+    display:flex; gap:10px;
+  }
+  .mobile-bar .btn-pill { flex:1; }
+  @media (min-width:768px) { .mobile-bar { display:none; } }
+  body { padding-bottom:78px; }
+  @media (min-width:768px) { body { padding-bottom:0; } }
+
+  /* ============================================================
+     MOTION — fade + rise on scroll, staggered
+     ============================================================ */
+  .reveal { opacity:0; transform:translateY(18px); transition:opacity 0.35s ease-out, transform 0.35s ease-out; }
+  .reveal.in-view { opacity:1; transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity:1; transform:none; transition:none; }
+  }
 </style>
 <link rel="stylesheet" href="cursor.css">
 <script src="cursor.js" defer></script>
@@ -805,25 +503,31 @@
 
 <script src="intro.js"></script>
 
-<nav>
-  <a href="#" class="nav-logo">
-    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6IG5vbmU7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogI2NmOGEyYTsKICAgICAgfQoKICAgICAgLmNscy00IHsKICAgICAgICBvcGFjaXR5OiAwOwogICAgICB9CgogICAgICAuY2xzLTUgewogICAgICAgIGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7CiAgICAgIH0KCiAgICAgIC5jbHMtNiB7CiAgICAgICAgZmlsbDogI2U2ZTdlODsKICAgICAgfQoKICAgICAgLmNscy03IHsKICAgICAgICBmaWxsOiAjZmJiNzE2OwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+CiAgICAgIDxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
-    <span>haloe</span>
-  </a>
-  <ul>
-    <li><a href="#about">About</a></li>
-    <li><a href="#conditions">Conditions</a></li>
-    <li><a href="#clinic-day">Clinic Day</a></li>
-    <li><a href="#process">What to Expect</a></li>
-    <li><a href="book.html" class="nav-cta">Book Now</a></li>
-  </ul>
-  <button class="nav-hamburger" id="navHamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navOverlay" onclick="toggleNavOverlay()">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header id="siteHeader">
+  <div class="header-inner">
+    <button class="menu-btn" id="navHamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navOverlay" onclick="toggleNavOverlay()">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="#" class="brand" aria-label="haloe home">
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsgZmlsbDogIzhhNmEyYzsgfQogICAgICAuY2xzLTIgeyBmaWxsOiBub25lOyB9CiAgICAgIC5jbHMtMyB7IGZpbGw6ICNjZjhhMmE7IH0KICAgICAgLmNscy00IHsgb3BhY2l0eTogMDsgfQogICAgICAuY2xzLTUgeyBjbGlwLXBhdGg6IHVybCgjY2xpcHBhdGgpOyB9CiAgICAgIC5jbHMtNiB7IGZpbGw6ICNkOWNiYjA7IH0KICAgICAgLmNscy03IHsgZmlsbDogI2ZiYjcxNjsgfQogICAgPC9zdHlsZT4KICAgIDxjbGlwUGF0aCBpZD0iY2xpcHBhdGgiPjxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPjwvY2xpcFBhdGg+CiAgPC9kZWZzPgogIDxnIGNsYXNzPSJjbHMtNSI+CiAgICA8cG9seWdvbiBwb2ludHM9IjIwLjAzIDExMC4zMSAyMC40MSA4Mi43OSA0NC4xMSA2OC43IDY3LjQzIDgyLjE0IDY3LjA1IDEwOS42NiA0My4zNSAxMjMuNzUgMjAuMDMgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ii40MiA3NS42NyAuOCA0OC4xNCAyNC41IDM0LjA1IDQ3LjgyIDQ3LjQ5IDQ3LjQ0IDc1LjAyIDIzLjc0IDg5LjEgLjQyIDc1LjY3Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjQwLjQ2IDc1LjY3IDQwLjg0IDQ4LjE0IDY0LjU0IDM0LjA1IDg3Ljg2IDQ3LjQ5IDg3LjQ4IDc1LjAyIDYzLjc4IDg5LjEgNDAuNDYgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuNjIgMTEwLjMxIDYwIDgyLjc5IDgzLjcxIDY4LjcgMTA3LjAzIDgyLjE0IDEwNi42NSAxMDkuNjYgODIuOTUgMTIzLjc1IDU5LjYyIDExMC4zMSIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI3OS42NyA3NS42NyA4MC4wNSA0OC4xNCAxMDMuNzUgMzQuMDUgMTI3LjA4IDQ3LjQ5IDEyNi43IDc1LjAyIDEwMi45OSA4OS4xIDc5LjY3IDc1LjY3Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjU5LjIgNDEuNjEgNTkuNTggMTQuMDkgODMuMjggMCAxMDYuNiAxMy40NCAxMDYuMjIgNDAuOTYgODIuNTIgNTUuMDUgNTkuMiA0MS42MSIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxOS40OSA0MS42MSAxOS44NyAxNC4wOSA0My41NyAwIDY2Ljg5IDEzLjQ0IDY2LjUxIDQwLjk2IDQyLjgxIDU1LjA1IDE5LjQ5IDQxLjYxIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMzcuMzIgMjcuOSAxOC43MiA0My45MiA5LjE5IDU5LjY5IDE4LjI3IDU5LjQzIDM2Ljg4IDQzLjQxIDQ2LjQgMjcuNjQgMzcuMzIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI0Ny43NCA3MS43OSA0OCA1My4xOCA2NC4wMiA0My42NSA3OS43OSA1Mi43MyA3OS41MyA3MS4zNCA2My41MSA4MC44NyA0Ny43NCA3MS43OSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjcuNyA3MS43OSA3Ljk2IDUzLjE4IDIzLjk4IDQzLjY1IDM5Ljc1IDUyLjczIDM5LjQ5IDcxLjM0IDIzLjQ3IDgwLjg3IDcuNyA3MS43OSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjUzLjQ0IDY4LjgyIDc1LjIxIDU1LjgxIDc1LjQ0IDY4LjU1IDY0LjQzIDc1LjE5IDUzLjQ0IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzIuNjcgMzUuMDYgNTQuNDMgMjIuMDUgNTQuNjYgMzQuNzkgNDMuNjcgNDEuNDMgMzIuNjcgMzUuMDYiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIxMi43MyA2OC44MiAzNC40OSA1NS44MSAzNC43MiA2OC41NSAyMy43MyA3NS4xOSAxMi43MyA2OC44MiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjI3LjY0IDEwNS44OCAyNy45IDg3LjI3IDQzLjkyIDc3Ljc1IDU5LjY5IDg2LjgzIDU5LjQzIDEwNS40NCA0My40MSAxMTQuOTYgMjcuNjQgMTA1Ljg4Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNjYuODggMTA1Ljg4IDY3LjEzIDg3LjI3IDgzLjE2IDc3Ljc1IDk4LjkyIDg2LjgzIDk4LjY3IDEwNS40NCA4Mi42NCAxMTQuOTYgNjYuODggMTA1Ljg4Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iODYuNiA3MS43OSA4Ni44NiA1My4xOCAxMDIuODggNDMuNjUgMTE4LjY0IDUyLjczIDExOC4zOSA3MS4zNCAxMDIuMzYgODAuODcgODYuNiA3MS43OSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjMzLjMxIDEwMi41NyA1NS4wOCA4OS41NyA1NS4zMSAxMDIuMyA0NC4zMSAxMDguOTUgMzMuMzEgMTAyLjU3Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNzEuOSAxMDMuNTUgOTMuNjcgOTAuNTQgOTMuOSAxMDMuMjcgODIuOSAxMDkuOTEgNzEuOSAxMDMuNTUiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI5Mi4zOCA2OC44MiAxMTQuMTQgNTUuODEgMTE0LjM3IDY4LjU1IDEwMy4zNyA3NS4xOSA5Mi4zOCA2OC44MiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy03IiBwb2ludHM9IjY3LjMgMzcuMzIgNjcuNTYgMTguNzIgODMuNTggOS4xOSA5OS4zNSAxOC4yNyA5OS4wOSAzNi44OCA4My4wNyA0Ni40IDY3LjMgMzcuMzIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMyIgcG9pbnRzPSI3Mi4zMyAzNS4wNiA5NC4xIDIyLjA1IDk0LjMyIDM0Ljc5IDgzLjMzIDQxLjQzIDcyLjMzIDM1LjA2Ii8+CiAgPC9nPgogIDxyZWN0IGNsYXNzPSJjbHMtNCIgeD0iMCIgd2lkdGg9IjEyNy4xMyIgaGVpZ2h0PSIxMjMuNjYiLz4KPC9zdmc+" alt="">
+      <span class="wordmark">haloe</span>
+    </a>
+    <div class="header-actions">
+      <a href="https://wa.me/447474833643" class="icon-btn" target="_blank" rel="noopener" aria-label="Message haloe on WhatsApp">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 9 18.6z"/><path d="M8.5 9.7c0 3.8 2.5 6.3 6 6.3"/></svg>
+      </a>
+      <a href="book.html" class="btn-pill btn-gold">Book now</a>
+    </div>
+  </div>
+</header>
 
 <div class="nav-overlay" id="navOverlay">
-  <button class="nav-overlay-close" aria-label="Close menu" onclick="toggleNavOverlay()">&times;</button>
+  <div class="nav-overlay-top">
+    <button class="nav-overlay-close" aria-label="Close menu" onclick="toggleNavOverlay()">&times;</button>
+  </div>
   <ul class="nav-overlay-links">
     <li><a href="#about" onclick="toggleNavOverlay()">About</a></li>
     <li><a href="#conditions" onclick="toggleNavOverlay()">Conditions</a></li>
@@ -831,391 +535,330 @@
     <li><a href="#process" onclick="toggleNavOverlay()">What to Expect</a></li>
     <li><a href="hijama-manchester.html">Hijama in Manchester</a></li>
   </ul>
-  <a href="book.html" class="btn btn-gold nav-overlay-cta">Book Now</a>
+  <a href="book.html" class="btn-pill btn-gold nav-overlay-cta">Book Now</a>
 </div>
 
-<!-- CONDITIONS -->
-<section id="conditions">
-  <div class="reveal">
-    <div class="section-tag">Who It Helps</div>
-    <h2>Conditions <em>we treat</em></h2>
+<main>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero">
+  <div class="container">
+    <div class="illustration-placeholder reveal" aria-hidden="true">Illustration coming soon</div>
+    <div class="badge-pill reveal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+      Women &amp; men welcome
+    </div>
+    <h1 class="hero-title reveal">Ancient healing.<br><em>Modern standards.</em></h1>
+    <p class="hero-sub reveal">Massage, dry cupping and hijama across Manchester — unhurried sessions rooted in the prophetic tradition, held to modern professional standards.</p>
+    <div class="offer-box reveal">
+      <span class="offer-label">First session</span>
+      <span class="offer-value">[YOUR OFFER]</span>
+    </div>
+    <p class="hero-talk reveal">Rather talk? <a href="https://wa.me/447474833643" class="link-gold" target="_blank" rel="noopener">Message us on WhatsApp →</a></p>
   </div>
-  <div class="flower-section">
-    <p class="conditions-hint">Tap any condition to book your session →</p>
-    <div class="flower-wrap" id="flower-wrap" style="width:660px;height:790px;">
+</section>
 
-      <!-- TOP ROW: 2 — matches logo (top-left, top-right) -->
-      <div class="flower-petal" data-index="0" data-cond="hormonal" style="left:126px;top:56px;">
-        <svg class="petal-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="100,9 182,54 182,146 100,191 18,146 18,54" fill="#1e1a14" fill-opacity="0.97" stroke="#c9a040" stroke-opacity="0.45" stroke-width="1.5"/>
-          <text x="100" y="92" text-anchor="middle" font-size="36" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">🌸</text>
-          <text x="100" y="122" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">HORMONAL</text>
-          <text x="100" y="136" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">&amp; MENSTRUAL</text>
-        </svg>
+<!-- ============================================================
+     ACTION CARDS
+     ============================================================ -->
+<section>
+  <div class="container action-cards">
+    <a href="book.html" class="action-card action-card--dark card card--dark reveal">
+      <span class="action-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 14.5l2 2 4-4"/></svg>
+      </span>
+      <span class="action-text">Book your session — pay in full, no deposit, 2 minutes</span>
+      <span class="action-arrow">→</span>
+    </a>
+    <a href="#clinic-day" class="action-card card reveal">
+      <span class="action-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-7h6v7"/></svg>
+      </span>
+      <span class="action-text">Tuesday clinic day, Deansgate</span>
+      <span class="action-arrow">→</span>
+    </a>
+    <a href="book.html?location=mobile" class="action-card card reveal">
+      <span class="action-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5L12 4l9 7.5"/><path d="M5 10v10h14V10"/></svg>
+      </span>
+      <span class="action-text">Home visits across Manchester</span>
+      <span class="action-arrow">→</span>
+    </a>
+  </div>
+</section>
+
+<!-- ============================================================
+     TRUST STRIP
+     ============================================================ -->
+<section>
+  <div class="container trust-strip">
+    <span class="trust-pill reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/></svg>Fully insured</span>
+    <span class="trust-pill reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M8.5 12.5L7 21l5-3 5 3-1.5-8.5"/></svg>CMA &amp; IPHM accredited</span>
+    <span class="trust-pill reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 8v7l9 5 9-5V8"/></svg>L5 Diploma</span>
+    <span class="trust-pill reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>Single-use equipment</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     ABOUT (kept — index.html#about is linked from hijama-manchester.html,
+     intake.html and before-your-session.html)
+     ============================================================ -->
+<section id="about">
+  <div class="container">
+    <div class="about-card card reveal">
+      <div class="about-copy">
+        <span class="section-eyebrow">About haloe</span>
+        <h2>Healing rooted in the Sunnah</h2>
+        <p>Hijama — wet cupping — is one of the oldest traditions in natural wellbeing, practised for thousands of years and encouraged by the Prophet Muhammad ﷺ. It uses gentle suction and a few small, superficial incisions; most clients describe feeling lighter and more settled afterwards.</p>
+        <p>haloe offers three kinds of session — <strong>massage</strong> to ease everyday tension, <strong>dry cupping</strong> (suction only, skin unbroken), and <strong>wet cupping</strong> — hijama itself. Run by Halima Yasmin, a CMA and IPHM accredited therapist who graduated with an 88% distinction from The Suuk Academy's L5 Diploma in Health and Cupping Therapy.</p>
+        <div class="about-cert-row">
+          <span class="trust-pill">L5 Diploma</span>
+          <span class="trust-pill">CMA Accredited</span>
+          <span class="trust-pill">IPHM Accredited</span>
+          <span class="trust-pill">Fully Insured</span>
+        </div>
+        <div style="margin-top:20px;"><a href="book.html" class="btn-pill btn-gold">Book a consultation</a></div>
       </div>
-
-      <div class="flower-petal" data-index="1" data-cond="spiritual" style="left:327px;top:56px;">
-        <svg class="petal-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="100,9 182,54 182,146 100,191 18,146 18,54" fill="#1e1a0a" fill-opacity="0.97" stroke="#c9a040" stroke-opacity="0.9" stroke-width="2"/>
-          <text x="100" y="92" text-anchor="middle" font-size="36" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">🌙</text>
-          <text x="100" y="122" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#c9a040">SPIRITUAL</text>
-          <text x="100" y="136" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#c9a040">WELLBEING</text>
-        </svg>
+      <div class="about-figure">
+        <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsgZmlsbDogIzhhNmEyYzsgfQogICAgICAuY2xzLTIgeyBmaWxsOiBub25lOyB9CiAgICAgIC5jbHMtMyB7IGZpbGw6ICNjZjhhMmE7IH0KICAgICAgLmNscy00IHsgb3BhY2l0eTogMDsgfQogICAgICAuY2xzLTUgeyBjbGlwLXBhdGg6IHVybCgjY2xpcHBhdGgpOyB9CiAgICAgIC5jbHMtNiB7IGZpbGw6ICNkOWNiYjA7IH0KICAgICAgLmNscy03IHsgZmlsbDogI2ZiYjcxNjsgfQogICAgPC9zdHlsZT4KICAgIDxjbGlwUGF0aCBpZD0iY2xpcHBhdGgiPjxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPjwvY2xpcFBhdGg+CiAgPC9kZWZzPgogIDxnIGNsYXNzPSJjbHMtNSI+CiAgICA8cG9seWdvbiBwb2ludHM9IjIwLjAzIDExMC4zMSAyMC40MSA4Mi43OSA0NC4xMSA2OC43IDY3LjQzIDgyLjE0IDY3LjA1IDEwOS42NiA0My4zNSAxMjMuNzUgMjAuMDMgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ii40MiA3NS42NyAuOCA0OC4xNCAyNC41IDM0LjA1IDQ3LjgyIDQ3LjQ5IDQ3LjQ0IDc1LjAyIDIzLjc0IDg5LjEgLjQyIDc1LjY3Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjQwLjQ2IDc1LjY3IDQwLjg0IDQ4LjE0IDY0LjU0IDM0LjA1IDg3Ljg2IDQ3LjQ5IDg3LjQ4IDc1LjAyIDYzLjc4IDg5LjEgNDAuNDYgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuNjIgMTEwLjMxIDYwIDgyLjc5IDgzLjcxIDY4LjcgMTA3LjAzIDgyLjE0IDEwNi42NSAxMDkuNjYgODIuOTUgMTIzLjc1IDU5LjYyIDExMC4zMSIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI3OS42NyA3NS42NyA4MC4wNSA0OC4xNCAxMDMuNzUgMzQuMDUgMTI3LjA4IDQ3LjQ5IDEyNi43IDc1LjAyIDEwMi45OSA4OS4xIDc5LjY3IDc1LjY3Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjU5LjIgNDEuNjEgNTkuNTggMTQuMDkgODMuMjggMCAxMDYuNiAxMy40NCAxMDYuMjIgNDAuOTYgODIuNTIgNTUuMDUgNTkuMiA0MS42MSIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxOS40OSA0MS42MSAxOS44NyAxNC4wOSA0My41NyAwIDY2Ljg5IDEzLjQ0IDY2LjUxIDQwLjk2IDQyLjgxIDU1LjA1IDE5LjQ5IDQxLjYxIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMzcuMzIgMjcuOSAxOC43MiA0My45MiA5LjE5IDU5LjY5IDE4LjI3IDU5LjQzIDM2Ljg4IDQzLjQxIDQ2LjQgMjcuNjQgMzcuMzIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI0Ny43NCA3MS43OSA0OCA1My4xOCA2NC4wMiA0My42NSA3OS43OSA1Mi43MyA3OS41MyA3MS4zNCA2My41MSA4MC44NyA0Ny43NCA3MS43OSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjcuNyA3MS43OSA3Ljk2IDUzLjE4IDIzLjk4IDQzLjY1IDM5Ljc1IDUyLjczIDM5LjQ5IDcxLjM0IDIzLjQ3IDgwLjg3IDcuNyA3MS43OSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjUzLjQ0IDY4LjgyIDc1LjIxIDU1LjgxIDc1LjQ0IDY4LjU1IDY0LjQzIDc1LjE5IDUzLjQ0IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzIuNjcgMzUuMDYgNTQuNDMgMjIuMDUgNTQuNjYgMzQuNzkgNDMuNjcgNDEuNDMgMzIuNjcgMzUuMDYiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIxMi43MyA2OC44MiAzNC40OSA1NS44MSAzNC43MiA2OC41NSAyMy43MyA3NS4xOSAxMi43MyA2OC44MiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjI3LjY0IDEwNS44OCAyNy45IDg3LjI3IDQzLjkyIDc3Ljc1IDU5LjY5IDg2LjgzIDU5LjQzIDEwNS40NCA0My40MSAxMTQuOTYgMjcuNjQgMTA1Ljg4Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNjYuODggMTA1Ljg4IDY3LjEzIDg3LjI3IDgzLjE2IDc3Ljc1IDk4LjkyIDg2LjgzIDk4LjY3IDEwNS40NCA4Mi42NCAxMTQuOTYgNjYuODggMTA1Ljg4Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iODYuNiA3MS43OSA4Ni44NiA1My4xOCAxMDIuODggNDMuNjUgMTE4LjY0IDUyLjczIDExOC4zOSA3MS4zNCAxMDIuMzYgODAuODcgODYuNiA3MS43OSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjMzLjMxIDEwMi41NyA1NS4wOCA4OS41NyA1NS4zMSAxMDIuMyA0NC4zMSAxMDguOTUgMzMuMzEgMTAyLjU3Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNzEuOSAxMDMuNTUgOTMuNjcgOTAuNTQgOTMuOSAxMDMuMjcgODIuOSAxMDkuOTEgNzEuOSAxMDMuNTUiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI5Mi4zOCA2OC44MiAxMTQuMTQgNTUuODEgMTE0LjM3IDY4LjU1IDEwMy4zNyA3NS4xOSA5Mi4zOCA2OC44MiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy03IiBwb2ludHM9IjY3LjMgMzcuMzIgNjcuNTYgMTguNzIgODMuNTggOS4xOSA5OS4zNSAxOC4yNyA5OS4wOSAzNi44OCA4My4wNyA0Ni40IDY3LjMgMzcuMzIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMyIgcG9pbnRzPSI3Mi4zMyAzNS4wNiA5NC4xIDIyLjA1IDk0LjMyIDM0Ljc5IDgzLjMzIDQxLjQzIDcyLjMzIDM1LjA2Ii8+CiAgPC9nPgogIDxyZWN0IGNsYXNzPSJjbHMtNCIgeD0iMCIgd2lkdGg9IjEyNy4xMyIgaGVpZ2h0PSIxMjMuNjYiLz4KPC9zdmc+" alt="haloe honeycomb mark">
       </div>
-
-      <!-- MIDDLE ROW: 3 — matches logo (mid-left, mid-centre, mid-right) -->
-      <div class="flower-petal" data-index="2" data-cond="stress" style="left:29px;top:229px;">
-        <svg class="petal-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="100,9 182,54 182,146 100,191 18,146 18,54" fill="#1e1a14" fill-opacity="0.97" stroke="#c9a040" stroke-opacity="0.45" stroke-width="1.5"/>
-          <text x="100" y="92" text-anchor="middle" font-size="36" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">🧘</text>
-          <text x="100" y="122" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">STRESS</text>
-          <text x="100" y="136" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">&amp; ANXIETY</text>
-        </svg>
-      </div>
-
-      <div class="flower-petal" data-index="3" data-cond="detox" style="left:232px;top:229px;">
-        <svg class="petal-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="100,9 182,54 182,146 100,191 18,146 18,54" fill="#1e1a14" fill-opacity="0.97" stroke="#c9a040" stroke-opacity="0.45" stroke-width="1.5"/>
-          <text x="100" y="92" text-anchor="middle" font-size="36" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">🍃</text>
-          <text x="100" y="122" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">DETOX</text>
-          <text x="100" y="136" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">&amp; CLEANSING</text>
-        </svg>
-      </div>
-
-      <div class="flower-petal" data-index="4" data-cond="pain" style="left:431px;top:229px;">
-        <svg class="petal-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="100,9 182,54 182,146 100,191 18,146 18,54" fill="#1e1a14" fill-opacity="0.97" stroke="#c9a040" stroke-opacity="0.45" stroke-width="1.5"/>
-          <text x="100" y="92" text-anchor="middle" font-size="36" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">⚡</text>
-          <text x="100" y="122" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">CHRONIC PAIN</text>
-          <text x="100" y="136" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">&amp; TENSION</text>
-        </svg>
-      </div>
-
-      <!-- BOTTOM ROW: 2 — matches logo (bot-left, bot-right) -->
-      <div class="flower-petal" data-index="5" data-cond="skin" style="left:129px;top:405px;">
-        <svg class="petal-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="100,9 182,54 182,146 100,191 18,146 18,54" fill="#1e1a14" fill-opacity="0.97" stroke="#c9a040" stroke-opacity="0.45" stroke-width="1.5"/>
-          <text x="100" y="92" text-anchor="middle" font-size="36" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">🌿</text>
-          <text x="100" y="122" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">SKIN</text>
-          <text x="100" y="136" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">&amp; BEAUTY</text>
-        </svg>
-      </div>
-
-      <div class="flower-petal" data-index="6" data-cond="fatigue" style="left:329px;top:405px;">
-        <svg class="petal-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="100,9 182,54 182,146 100,191 18,146 18,54" fill="#1e1a14" fill-opacity="0.97" stroke="#c9a040" stroke-opacity="0.45" stroke-width="1.5"/>
-          <text x="100" y="92" text-anchor="middle" font-size="36" font-family="Apple Color Emoji,Segoe UI Emoji,sans-serif">✨</text>
-          <text x="100" y="122" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">FATIGUE &amp;</text>
-          <text x="100" y="136" text-anchor="middle" font-family="Poppins,sans-serif" font-size="11" font-weight="700" letter-spacing="1.8" fill="#F5F0E8">LOW ENERGY</text>
-        </svg>
-      </div>
-
-      <!-- CAPSTONE: closing CTA, centred beneath the bottom row — same hex
-           shape/size as the conditions, gold-filled instead of dark, no
-           data-cond so it's never picked up by the condition-modal click
-           handler. Deliberately a plain <a> (not JS-driven) so it works even
-           if the honeycomb's other scripts ever fail to load. -->
-      <a href="book.html" class="flower-petal flower-capstone" data-index="7" style="left:232px;top:581px;">
-        <svg class="petal-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="capstoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#DFC38E"/>
-              <stop offset="100%" stop-color="#C8A96E"/>
-            </linearGradient>
-          </defs>
-          <polygon points="100,9 182,54 182,146 100,191 18,146 18,54" fill="url(#capstoneGrad)" stroke="#DFC38E" stroke-opacity="0.9" stroke-width="1.5"/>
-          <text x="100" y="94" text-anchor="middle" font-family="Poppins,sans-serif" font-size="12" font-weight="700" letter-spacing="1.4" fill="#0D0D0D">VIEW ALL</text>
-          <text x="100" y="110" text-anchor="middle" font-family="Poppins,sans-serif" font-size="12" font-weight="700" letter-spacing="1.4" fill="#0D0D0D">TREATMENTS</text>
-          <text x="100" y="140" text-anchor="middle" font-family="Poppins,sans-serif" font-size="18" fill="#0D0D0D">→</text>
-        </svg>
-      </a>
-
     </div>
   </div>
 </section>
-<script>
-(function(){
-  var petals = document.querySelectorAll('.flower-petal');
-  var wrap   = document.getElementById('flower-wrap');
-  var fired  = false;
 
-  // Spiral clockwise: top-left → top-right → mid-right → bot-right → bot-left → mid-left → mid-centre,
-  // capstone CTA blooms in last so it reads as the deliberate close of the sequence.
-  var order = [0, 1, 4, 6, 5, 2, 3, 7];
+<!-- ============================================================
+     CONDITIONS
+     ============================================================ -->
+<section id="conditions">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow">Who it helps</span>
+      <h2>Conditions we support</h2>
+      <p>Tap any condition to see how haloe can help, and book straight into the right treatment.</p>
+    </div>
+    <div class="cond-grid" id="condGrid">
+      <button class="cond-card card reveal" type="button" data-cond="hormonal">
+        <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><path d="M12 2c1.8 2 1.8 4-0 6M12 2c-1.8 2-1.8 4 0 6M22 12c-2 1.8-4 1.8-6 0M22 12c-2-1.8-4-1.8-6 0M12 22c1.8-2 1.8-4 0-6M12 22c-1.8-2-1.8-4 0-6M2 12c2-1.8 4-1.8 6 0M2 12c2 1.8 4 1.8 6 0"/></svg></span>
+        <h3>Hormonal &amp; Menstrual</h3>
+      </button>
+      <button class="cond-card card reveal" type="button" data-cond="spiritual">
+        <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></span>
+        <h3>Spiritual Wellbeing</h3>
+      </button>
+      <button class="cond-card card reveal" type="button" data-cond="stress">
+        <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 6.5a5.5 5.5 0 0 1 0 11M12 3a9 9 0 0 1 0 18"/></svg></span>
+        <h3>Stress &amp; Anxiety</h3>
+      </button>
+      <button class="cond-card card reveal" type="button" data-cond="detox">
+        <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 6 8 6 11.5A6 6 0 0 1 6 14.5C6 11 9 7 12 3z"/></svg></span>
+        <h3>Detox &amp; Cleansing</h3>
+      </button>
+      <button class="cond-card card reveal" type="button" data-cond="pain">
+        <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
+        <h3>Chronic Pain &amp; Tension</h3>
+      </button>
+      <button class="cond-card card reveal" type="button" data-cond="skin">
+        <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 6 5 10 5 13.5a7 7 0 0 0 14 0C19 10 17 6 12 3z"/><path d="M12 8v11"/></svg></span>
+        <h3>Skin &amp; Beauty</h3>
+      </button>
+      <button class="cond-card card reveal" type="button" data-cond="fatigue">
+        <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6z"/></svg></span>
+        <h3>Fatigue &amp; Low Energy</h3>
+      </button>
+      <a href="book.html" class="cond-card card reveal">
+        <span class="cond-icon" style="background:var(--gold);border-color:var(--gold);color:var(--ink);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        <h3>View all treatments</h3>
+      </a>
+    </div>
+  </div>
+</section>
 
-  function bloomFlower(){
-    if(fired) return;
-    fired = true;
-    order.forEach(function(idx, seq){
-      setTimeout(function(){ petals[idx].classList.add('bloom'); }, seq*180);
-    });
-  }
-
-  var observer = new IntersectionObserver(function(entries){
-    if(entries[0].isIntersecting) bloomFlower();
-  }, {threshold:0.15});
-  observer.observe(wrap);
-
-  // Mobile scaling — only in the narrow 681-699px gap above the ≤680px
-  // breakpoint, where the CSS below switches .flower-wrap to a static
-  // 2-column grid (real reflow, not a shrunk copy of the radial layout).
-  // Scaling AND the grid rule must never both be live on the same element:
-  // this old whole-group transform:scale() was fighting the grid's own
-  // width/position, compounding into petals rendered far smaller than
-  // either approach intended on its own.
-  function reposition(){
-    // documentElement.clientWidth is the true CSS layout viewport; vw units
-    // and window.innerWidth both resolve unreliably in at least one
-    // environment this site is tested in, so the grid-mode width below is
-    // pinned via JS off this instead of trusted to CSS alone.
-    var cw = document.documentElement.clientWidth;
-    var vw = window.innerWidth;
-    if(vw < 700 && vw > 680){
-      var s = (vw - 32) / 660;
-      wrap.style.transform = 'scale(' + s + ')';
-      wrap.style.transformOrigin = 'top center';
-      wrap.style.marginBottom = -(790*(1-s)*0.9)+'px';
-    } else {
-      wrap.style.transform = '';
-      wrap.style.marginBottom = '';
-    }
-    if (cw <= 680) {
-      // Set the width directly (inline style always wins the cascade,
-      // sidestepping whatever was making % / vw-based widths resolve
-      // wider than the actual viewport for this grid in some environments).
-      wrap.style.width = Math.min(380, cw - 48) + 'px';
-    } else {
-      wrap.style.width = '';
-    }
-  }
-  window.addEventListener('resize', reposition);
-  reposition();
-}());
-</script>
-
-<!-- CONDITION MODAL -->
+<!-- Condition modal (restyled light; same data/behaviour as before) -->
 <div class="cond-overlay" id="condOverlay">
-  <div class="cond-modal" id="condModal">
-    <button class="cond-modal-close" id="condClose">&#x2715;</button>
-    <span class="cond-modal-emoji" id="condEmoji"></span>
-    <div class="cond-modal-title" id="condTitle"></div>
-    <h3 id="condHeading"></h3>
+  <div class="cond-modal">
+    <div class="cond-modal-top">
+      <span class="cond-modal-icon" id="condIcon"></span>
+      <button class="cond-modal-close" id="condClose" aria-label="Close">&times;</button>
+    </div>
+    <h3 id="condTitle"></h3>
+    <h4 id="condHeading"></h4>
     <p id="condBody"></p>
     <div class="cond-modal-tags" id="condTags"></div>
-    <a href="book.html" class="cond-modal-cta" id="condCta">Book This Treatment</a>
+    <a href="book.html" id="condCta" class="btn-pill btn-gold cond-modal-cta">Book This Treatment</a>
   </div>
 </div>
 
-<script>
-(function(){
-  var data = {
-    hormonal: {
-      emoji: '🌸',
-      title: 'Hormonal & Menstrual Health',
-      heading: 'Cycle comfort & hormonal balance',
-      body: "Hijama has long been used to support women's hormonal wellness — helping ease the discomfort of irregular cycles, period pain, and hormonal fluctuations. The Women's Hormonal Balance package (8 sessions over 16 weeks) and Cycle Comfort — Period Relief package (4 sessions over ~3 cycles) are designed specifically for this.",
-      tags: ["Women's Hormonal Balance", 'Cycle Comfort Package', '8–16 weeks', 'Wet & dry cupping'],
-      cta: { cat: 'packages', svc: "Women's Hormonal Balance" }
-    },
-    spiritual: {
-      emoji: '🌙',
-      title: 'Spiritual Wellbeing',
-      heading: 'Prophetic medicine. Modern care.',
-      body: "Al-Hijama is a Sunnah — a practice of the Prophet ﷺ. For many Muslim clients, receiving hijama in a private space with a modest practitioner who understands their faith is itself part of the healing. haloe exists precisely for this. Every session is delivered with care, dignity, and full respect for your values.",
-      tags: ['Private space', 'Sunnah practice', 'Modest environment'],
-      // Not tied to one package — open the hijama list and let her choose.
-      cta: { cat: 'wet' }
-    },
-    stress: {
-      emoji: '🧘',
-      title: 'Stress & Anxiety',
-      heading: 'Rest, release, restore',
-      body: "Cupping works deeply on the nervous system — many clients describe a profound calm that settles in during and after treatment. The Stress & Sleep package (6 sessions over 24 weeks) offers a sustained, structured course of care, pairing wet and dry cupping with follow-up consultations and a herbal oil kit to support your wellbeing between sessions.",
-      tags: ['Stress & Sleep Package', '6 sessions', '24 weeks', 'Herbal oil kit included'],
-      cta: { cat: 'packages', svc: 'Stress & Sleep' }
-    },
-    detox: {
-      emoji: '🍃',
-      title: 'Detox & Cleansing',
-      heading: 'Support your body\'s natural rhythm',
-      body: "Wet cupping draws blood to the surface, supporting your body's natural cleansing processes. The Digestion & Detox package (6 sessions over 24 weeks) is built around this — combining wet and dry cupping with a symptom-tracking guide so you can see real progress over time.",
-      tags: ['Digestion & Detox Package', '6 sessions', '24 weeks', 'Symptom tracking guide'],
-      cta: { cat: 'packages', svc: 'Digestion & Detox' }
-    },
-    pain: {
-      emoji: '⚡',
-      title: 'Chronic Pain & Tension',
-      heading: 'Targeted relief for persistent pain',
-      body: "The Pain & Mobility package was built for clients carrying chronic tension — back pain, shoulder tightness, sports injuries, recurring aches. Four sessions over 8–12 weeks, combining wet and dry cupping with unlimited cups and a follow-up consultation to track what's shifting. Targeted area and full-back options also available as single treatments.",
-      tags: ['Pain & Mobility Package', '4 sessions', 'Headache & Tension Package', 'Unlimited cups'],
-      cta: { cat: 'packages', svc: 'Pain & Mobility' }
-    },
-    skin: {
-      emoji: '🌿',
-      title: 'Skin & Beauty',
-      heading: 'Glow from the inside out',
-      body: "Face and head cupping uses gentle suction to lift the skin, stimulate circulation, and encourage your complexion to feel refreshed and vital. Every client also leaves with a take-home black seed oil bottle — used for centuries for its skin-nourishing properties and included as part of your aftercare at every session.",
-      tags: ['Face cupping', 'Head cupping', 'Black seed oil aftercare', 'Dry cupping only'],
-      // The only condition with no package — it is a single dry-cupping treatment.
-      cta: { cat: 'dry', svc: 'Face Cupping' }
-    },
-    fatigue: {
-      emoji: '✨',
-      title: 'Fatigue & Low Energy',
-      heading: 'Reclaim your vitality',
-      body: "The Circulation & Energy package (8 sessions over 18 weeks) is haloe's most comprehensive energy-focused course. By supporting circulation and encouraging the body to function more freely, clients often notice a meaningful shift in their energy levels and general vitality. Includes unlimited cups, herbal oil kit, and priority booking.",
-      tags: ['Circulation & Energy Package', '8 sessions', '18 weeks', 'Priority booking'],
-      cta: { cat: 'packages', svc: 'Circulation & Energy' }
-    }
-  };
-
-  var overlay = document.getElementById('condOverlay');
-  var modal   = document.getElementById('condModal');
-
-  function openModal(key) {
-    var d = data[key];
-    if (!d) return;
-    document.getElementById('condEmoji').textContent   = d.emoji;
-    document.getElementById('condTitle').textContent   = d.title;
-    document.getElementById('condHeading').textContent = d.heading;
-    document.getElementById('condBody').textContent    = d.body;
-    var tags = document.getElementById('condTags');
-    tags.innerHTML = '';
-    d.tags.forEach(function(t){
-      var span = document.createElement('span');
-      span.className = 'cond-modal-tag';
-      span.textContent = t;
-      tags.appendChild(span);
-    });
-    // Point "Book This Treatment" at the treatment she actually tapped.
-    // Without this every condition opened the wizard on Massage.
-    var cta = document.getElementById('condCta');
-    if (cta) {
-      var q = 'book.html';
-      if (d.cta && d.cta.cat) {
-        q += '?cat=' + encodeURIComponent(d.cta.cat);
-        if (d.cta.svc) q += '&svc=' + encodeURIComponent(d.cta.svc);
-      }
-      cta.href = q;
-      cta.textContent = d.cta && d.cta.svc ? 'Book ' + d.cta.svc : 'Book This Treatment';
-    }
-
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeModal() {
-    overlay.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  // Petal click handlers
-  document.querySelectorAll('.flower-petal[data-cond]').forEach(function(el){
-    el.addEventListener('click', function(){ openModal(el.dataset.cond); });
-  });
-
-  document.getElementById('condClose').addEventListener('click', closeModal);
-  overlay.addEventListener('click', function(e){ if (e.target === overlay) closeModal(); });
-  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
-}());
-</script>
-
-<!-- HERO -->
-<section id="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-left">
-  <div class="hero-rays" aria-hidden="true">
-    <div class="light-rays"
-         data-origin="top-center"
-         data-color="#e0b862"
-         data-speed="0.4"
-         data-spread="0.65"
-         data-length="1.6"
-         data-follow="false"
-         data-mouse="0"
-         data-noise="0.08"
-         data-distortion="0.15"
-         data-pulsating="false"
-         data-fade="1"
-         data-saturation="1"></div>
-  </div>
-  <div class="hero-content">
-    <div class="hero-eyebrow">Women &amp; Men · Mobile across Manchester · Tuesdays at Deansgate</div>
-    <h1>Ancient healing.<br><em>Modern standards.</em></h1>
-    <p class="hero-sub">Massage, dry cupping and hijama for women and men across Manchester — unhurried sessions in the comfort of your own home, rooted in the prophetic tradition and held to modern professional standards&hellip;or visit our weekly clinic day at Milton Hall, Deansgate.</p>
-    <div class="hero-btns">
-      <a href="book.html" class="btn btn-gold">Book Your Session</a>
+<!-- ============================================================
+     PRICING — read live from services-data.js, never hardcoded
+     ============================================================ -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow">Pricing</span>
+      <h2>Simple, flat pricing</h2>
+      <p>Every price includes unlimited cups and take-home black seed oil aftercare. See the full list and book in the wizard.</p>
     </div>
-  </div>
-  </div>
-  <div class="hero-right">
-    <img src="hero.jpg" alt="Halima Yasmin performing hijama therapy">
+    <div class="price-grid" id="priceGrid"></div>
+    <p class="price-note reveal">Prices shown are the current promotional rate. See <a href="hijama-manchester.html" class="link-gold">the full price list</a> for every treatment.</p>
   </div>
 </section>
 
-<!-- ABOUT -->
-<section id="about">
-  <div class="about-text reveal">
-    <div class="section-tag">About haloe</div>
-    <h2>Healing rooted in <em>the Sunnah</em></h2>
-    <p>Hijama — wet cupping — is one of the oldest traditions in natural wellbeing. Practised for thousands of years and encouraged by the Prophet Muhammad ﷺ, it uses gentle suction and a few small, superficial incisions. Most clients describe feeling lighter and more settled afterwards.</p>
-    <p>haloe offers three kinds of session. <strong>Massage</strong> to ease everyday tension and help you unwind. <strong>Dry cupping</strong>, which uses suction alone and leaves the skin unbroken. And <strong>wet cupping</strong> — hijama itself. Each can be booked on its own, or as a package of sessions spread over several weeks.</p>
-    <p>It is a practice for women and men based in Manchester, run by Halima Yasmin — a CMA and IPHM accredited therapist who graduated with an 88% distinction from The Suuk Academy's L5 Diploma in Health and Cupping Therapy.</p>
-    <p>Every session is private, dignified, and designed entirely around your comfort — I come to you, so you can rest in your own space afterwards. Flat pricing, unlimited cups, and take-home black seed oil aftercare every time.</p>
-    <br>
-    <a href="book.html" class="btn btn-gold">Book a Consultation</a>
-    <div class="cert-strip">
-      <div class="cert-tag">L5 Diploma</div>
-      <div class="cert-tag">CMA Accredited</div>
-      <div class="cert-tag">IPHM Accredited</div>
-      <div class="cert-tag">Fully Insured</div>
-    </div>
-  </div>
-  <div class="about-img reveal" style="display:none;">
-    <div class="logo-hero-wrap">
-      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6IG5vbmU7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogI2NmOGEyYTsKICAgICAgfQoKICAgICAgLmNscy00IHsKICAgICAgICBvcGFjaXR5OiAwOwogICAgICB9CgogICAgICAuY2xzLTUgewogICAgICAgIGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7CiAgICAgIH0KCiAgICAgIC5jbHMtNiB7CiAgICAgICAgZmlsbDogI2U2ZTdlODsKICAgICAgfQoKICAgICAgLmNscy03IHsKICAgICAgICBmaWxsOiAjZmJiNzE2OwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+CiAgICAgIDxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
-    </div>
-  </div>
-</section>
-
-<!-- ABOUT → PROCESS DIVIDER: soft dithered wave texture. Originally sat
-     between About and Conditions before Conditions moved to the top of the
-     page (Sep 2026) -- it's a generic transition visual, not tied to either
-     section's content, so it just kept its position after About. -->
-<div class="about-divider" id="aboutDither" aria-hidden="true"></div>
-
-
-<!-- PROCESS -->
+<!-- ============================================================
+     PROCESS ("What to expect" — index.html#process is linked from
+     before-your-session.html)
+     ============================================================ -->
 <section id="process">
-  <div class="reveal" style="text-align:center; max-width:480px; margin:0 auto;">
-    <div class="section-tag" style="justify-content:center;">Your Journey</div>
-    <h2>What to <em>expect</em></h2>
-  </div>
-  <div class="process-grid">
-    <div class="p-step reveal">
-      <div class="p-num">01</div>
-      <h4>Book & Intake</h4>
-      <p>Fill in the booking form. A health intake form is sent before every session — your safety is non-negotiable.</p>
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow">Your journey</span>
+      <h2>What to expect</h2>
     </div>
-    <div class="p-step reveal">
-      <div class="p-num">02</div>
-      <h4>Your Session</h4>
-      <p>Private, clean, dignified. Cups placed and a sterile blade used for wet cupping. You are guided through every step.</p>
-    </div>
-    <div class="p-step reveal">
-      <div class="p-num">03</div>
-      <h4>Aftercare</h4>
-      <p>Rest, hydrate, avoid cold water for 24 hours. Marks may last up to 10 days — this is normal and expected.</p>
-    </div>
-    <div class="p-step reveal">
-      <div class="p-num">04</div>
-      <h4>Your Plan</h4>
-      <p>Most clients benefit from regular sessions. We'll build a personalised schedule around your health goals.</p>
+    <div class="process-grid">
+      <div class="process-card card reveal">
+        <div class="process-num">01</div>
+        <h4>Book &amp; Intake</h4>
+        <p>Fill in the booking form. A health intake form is sent before every session — your safety is non-negotiable.</p>
+      </div>
+      <div class="process-card card reveal">
+        <div class="process-num">02</div>
+        <h4>Your Session</h4>
+        <p>Private, clean, dignified. Cups placed and a single-use blade used for wet cupping. You're guided through every step.</p>
+      </div>
+      <div class="process-card card reveal">
+        <div class="process-num">03</div>
+        <h4>Aftercare</h4>
+        <p>Rest, hydrate, avoid cold water for 24 hours. Marks may last up to 10 days — this is normal and expected.</p>
+      </div>
+      <div class="process-card card reveal">
+        <div class="process-num">04</div>
+        <h4>Your Plan</h4>
+        <p>Most clients benefit from regular sessions. We'll build a personalised schedule around your goals.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- BOOK -->
+<!-- ============================================================
+     REVIEWS — placeholders until real reviews are supplied
+     ============================================================ -->
+<section id="reviews">
+  <div class="container">
+    <div class="reviews-head reveal">
+      <div>
+        <span class="section-eyebrow">Reviews</span>
+        <h2 style="font-size:clamp(1.5rem,3.5vw,2rem);">Rated [X.X] from [Y] Google reviews</h2>
+      </div>
+      <span class="google-badge">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6 6.6.6-5 4.4 1.5 6.5L12 16l-5.9 3.5L7.5 13l-5-4.4 6.6-.6z"/></svg>
+        Google Reviews
+      </span>
+    </div>
+    <div class="review-grid">
+      <div class="review-card card reveal">
+        <div class="review-stars">★★★★★</div>
+        <p>"Placeholder review text — swap in a real client review here."</p>
+        <div class="review-name">— Placeholder Name</div>
+      </div>
+      <div class="review-card card reveal">
+        <div class="review-stars">★★★★★</div>
+        <p>"Placeholder review text — swap in a real client review here."</p>
+        <div class="review-name">— Placeholder Name</div>
+      </div>
+      <div class="review-card card reveal">
+        <div class="review-stars">★★★★★</div>
+        <p>"Placeholder review text — swap in a real client review here."</p>
+        <div class="review-name">— Placeholder Name</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FAQ
+     ============================================================ -->
+<section class="faq-section">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="section-eyebrow">FAQ</span>
+      <h2>Questions, answered</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <button class="faq-q" aria-expanded="false">Does hijama hurt?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Most clients feel mild discomfort at most. Cups create a gentle suction, and only wet cupping uses a few small, superficial incisions. Sessions are unhurried and you're guided through every step.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q" aria-expanded="false">What should I do before and after?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Eat lightly beforehand and stay hydrated. Afterwards, rest, keep drinking water, and avoid cold water on the treated area for 24 hours. Marks can last up to 10 days — that's completely normal.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q" aria-expanded="false">Are you insured?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Yes — Halima is fully insured, CMA and IPHM accredited, and holds an L5 Diploma in Health and Cupping Therapy.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q" aria-expanded="false">Where is the clinic?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Every Tuesday at Milton Hall, 244 Deansgate, Manchester M3 4BQ. Outside of that, Halima visits you at home anywhere across Greater Manchester.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q" aria-expanded="false">How quickly can I book?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Booking takes about two minutes online, with real-time availability for both home visits and the Tuesday clinic day. You'll get a confirmation and a health form to complete before your session.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CLINIC DAY
+     ============================================================ -->
+<section id="clinic-day">
+  <div class="container">
+    <div class="clinic-card card reveal">
+      <div class="clinic-copy">
+        <span class="section-eyebrow">Weekly Clinic Day</span>
+        <h2>Tuesdays at Milton Hall</h2>
+        <p>Every Tuesday, Halima holds a full day of appointments at Milton Hall on Deansgate — a private treatment room, not a shared space. A receptionist greets you and the room itself is behind a key-coded door, so your session stays just as private as a home visit.</p>
+        <p style="margin-top:12px;">The building has lift and stair access throughout. Sessions are paid in full at the time of booking — no address to arrange, no travel fee to work out.</p>
+        <div class="clinic-facts">
+          <span class="trust-pill">Private treatment room</span>
+          <span class="trust-pill">Key-coded door</span>
+          <span class="trust-pill">Lift &amp; stairs</span>
+          <span class="trust-pill">Full payment at booking</span>
+        </div>
+        <p class="clinic-address">Milton Hall, 244 Deansgate, Manchester, M3 4BQ</p>
+      </div>
+      <div class="clinic-cta">
+        <a href="book.html?location=clinic" class="btn-pill btn-gold">Book a Tuesday</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     BIG CTA
+     ============================================================ -->
+<section>
+  <div class="container">
+    <div class="cta-card reveal">
+      <h2>Ready to feel lighter?</h2>
+      <p>Massage, dry cupping and hijama — mobile across Manchester or every Tuesday at Deansgate.</p>
+      <div class="cta-benefits">
+        <span class="cta-benefit">Unlimited cups</span>
+        <span class="cta-benefit">Black seed oil aftercare</span>
+        <span class="cta-benefit">Paid in full, no deposit</span>
+      </div>
+      <a href="book.html" class="btn-pill" style="background:var(--ink);color:var(--cream);">Book your session</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     BOOK (hidden booking widget — kept exactly as-is, display:none,
+     see CLAUDE.md. Not part of the visual redesign.)
+     ============================================================ -->
 <section id="book" style="display:none;" style="padding:0;background:var(--bg);">
 <div class="hb-book-wrap" style="max-width:900px;margin:0 auto;">
 
@@ -1866,848 +1509,58 @@ hbInit();
 </div>
 </section>
 
-<!-- CLINIC DAY -->
-<section id="clinic-day">
-  <div class="about-text reveal" style="max-width:640px;">
-    <div class="section-tag">Weekly Clinic Day</div>
-    <h2>Tuesdays at <em>Milton Hall</em></h2>
-    <p>Every Tuesday, Halima holds a full day of appointments at Milton Hall on Deansgate — a private treatment room, not a shared space. A receptionist greets you and the room itself is behind a key-coded door, so your session stays just as private as a home visit.</p>
-    <p>The building has lift access throughout. Sessions are paid in full at the time of booking, and there's no address to arrange or travel fee to work out — just turn up at your appointment time.</p>
-    <div class="cert-strip">
-      <div class="cert-tag">Private treatment room</div>
-      <div class="cert-tag">Receptionist &amp; key-coded door</div>
-      <div class="cert-tag">Lift access</div>
-      <div class="cert-tag">Full payment at booking</div>
-    </div>
-    <p style="margin-top:28px;color:var(--dim);">Milton Hall, 244 Deansgate, Manchester, M3 4BQ</p>
-    <br>
-    <a href="book.html?location=clinic" class="btn btn-gold">Book a Tuesday Slot</a>
-  </div>
-</section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-left">
-    <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsKICAgICAgICBmaWxsOiAjZmZmOwogICAgICB9CgogICAgICAuY2xzLTIgewogICAgICAgIGZpbGw6IG5vbmU7CiAgICAgIH0KCiAgICAgIC5jbHMtMyB7CiAgICAgICAgZmlsbDogI2NmOGEyYTsKICAgICAgfQoKICAgICAgLmNscy00IHsKICAgICAgICBvcGFjaXR5OiAwOwogICAgICB9CgogICAgICAuY2xzLTUgewogICAgICAgIGNsaXAtcGF0aDogdXJsKCNjbGlwcGF0aCk7CiAgICAgIH0KCiAgICAgIC5jbHMtNiB7CiAgICAgICAgZmlsbDogI2U2ZTdlODsKICAgICAgfQoKICAgICAgLmNscy03IHsKICAgICAgICBmaWxsOiAjZmJiNzE2OwogICAgICB9CiAgICA8L3N0eWxlPgogICAgPGNsaXBQYXRoIGlkPSJjbGlwcGF0aCI+CiAgICAgIDxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPgogICAgPC9jbGlwUGF0aD4KICA8L2RlZnM+CiAgPGcgY2xhc3M9ImNscy01Ij4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjAuMDMgMTEwLjMxIDIwLjQxIDgyLjc5IDQ0LjExIDY4LjcgNjcuNDMgODIuMTQgNjcuMDUgMTA5LjY2IDQzLjM1IDEyMy43NSAyMC4wMyAxMTAuMzEiLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iLjQyIDc1LjY3IC44IDQ4LjE0IDI0LjUgMzQuMDUgNDcuODIgNDcuNDkgNDcuNDQgNzUuMDIgMjMuNzQgODkuMSAuNDIgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNDAuNDYgNzUuNjcgNDAuODQgNDguMTQgNjQuNTQgMzQuMDUgODcuODYgNDcuNDkgODcuNDggNzUuMDIgNjMuNzggODkuMSA0MC40NiA3NS42NyIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI1OS42MiAxMTAuMzEgNjAgODIuNzkgODMuNzEgNjguNyAxMDcuMDMgODIuMTQgMTA2LjY1IDEwOS42NiA4Mi45NSAxMjMuNzUgNTkuNjIgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ijc5LjY3IDc1LjY3IDgwLjA1IDQ4LjE0IDEwMy43NSAzNC4wNSAxMjcuMDggNDcuNDkgMTI2LjcgNzUuMDIgMTAyLjk5IDg5LjEgNzkuNjcgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuMiA0MS42MSA1OS41OCAxNC4wOSA4My4yOCAwIDEwNi42IDEzLjQ0IDEwNi4yMiA0MC45NiA4Mi41MiA1NS4wNSA1OS4yIDQxLjYxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9IjE5LjQ5IDQxLjYxIDE5Ljg3IDE0LjA5IDQzLjU3IDAgNjYuODkgMTMuNDQgNjYuNTEgNDAuOTYgNDIuODEgNTUuMDUgMTkuNDkgNDEuNjEiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSIyNy42NCAzNy4zMiAyNy45IDE4LjcyIDQzLjkyIDkuMTkgNTkuNjkgMTguMjcgNTkuNDMgMzYuODggNDMuNDEgNDYuNCAyNy42NCAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjQ3Ljc0IDcxLjc5IDQ4IDUzLjE4IDY0LjAyIDQzLjY1IDc5Ljc5IDUyLjczIDc5LjUzIDcxLjM0IDYzLjUxIDgwLjg3IDQ3Ljc0IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNy43IDcxLjc5IDcuOTYgNTMuMTggMjMuOTggNDMuNjUgMzkuNzUgNTIuNzMgMzkuNDkgNzEuMzQgMjMuNDcgODAuODcgNy43IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNTMuNDQgNjguODIgNzUuMjEgNTUuODEgNzUuNDQgNjguNTUgNjQuNDMgNzUuMTkgNTMuNDQgNjguODIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIzMi42NyAzNS4wNiA1NC40MyAyMi4wNSA1NC42NiAzNC43OSA0My42NyA0MS40MyAzMi42NyAzNS4wNiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjEyLjczIDY4LjgyIDM0LjQ5IDU1LjgxIDM0LjcyIDY4LjU1IDIzLjczIDc1LjE5IDEyLjczIDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMTA1Ljg4IDI3LjkgODcuMjcgNDMuOTIgNzcuNzUgNTkuNjkgODYuODMgNTkuNDMgMTA1LjQ0IDQzLjQxIDExNC45NiAyNy42NCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI2Ni44OCAxMDUuODggNjcuMTMgODcuMjcgODMuMTYgNzcuNzUgOTguOTIgODYuODMgOTguNjcgMTA1LjQ0IDgyLjY0IDExNC45NiA2Ni44OCAxMDUuODgiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI4Ni42IDcxLjc5IDg2Ljg2IDUzLjE4IDEwMi44OCA0My42NSAxMTguNjQgNTIuNzMgMTE4LjM5IDcxLjM0IDEwMi4zNiA4MC44NyA4Ni42IDcxLjc5Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzMuMzEgMTAyLjU3IDU1LjA4IDg5LjU3IDU1LjMxIDEwMi4zIDQ0LjMxIDEwOC45NSAzMy4zMSAxMDIuNTciLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI3MS45IDEwMy41NSA5My42NyA5MC41NCA5My45IDEwMy4yNyA4Mi45IDEwOS45MSA3MS45IDEwMy41NSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjkyLjM4IDY4LjgyIDExNC4xNCA1NS44MSAxMTQuMzcgNjguNTUgMTAzLjM3IDc1LjE5IDkyLjM4IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTciIHBvaW50cz0iNjcuMyAzNy4zMiA2Ny41NiAxOC43MiA4My41OCA5LjE5IDk5LjM1IDE4LjI3IDk5LjA5IDM2Ljg4IDgzLjA3IDQ2LjQgNjcuMyAzNy4zMiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0zIiBwb2ludHM9IjcyLjMzIDM1LjA2IDk0LjEgMjIuMDUgOTQuMzIgMzQuNzkgODMuMzMgNDEuNDMgNzIuMzMgMzUuMDYiLz4KICA8L2c+CiAgPHJlY3QgY2xhc3M9ImNscy00IiB4PSIwIiB3aWR0aD0iMTI3LjEzIiBoZWlnaHQ9IjEyMy42NiIvPgo8L3N2Zz4=" alt="haloe">
-    <span>haloe</span>
-  </div>
-  <div class="footer-links">
-    <a href="#about">About</a>
-    <a href="#conditions">Conditions</a>
-    <a href="#clinic-day">Clinic Day</a>
-    <a href="#process">What to Expect</a>
-    <a href="hijama-manchester.html">Hijama in Manchester</a>
-    <a href="book.html">Book</a>
-    <a href="https://instagram.com/haloe.health" target="_blank">Instagram</a>
-  </div>
-  <div class="footer-right">
-    © 2026 haloe · Halima Yasmin<br>
-    CMA & IPHM Accredited · Fully Insured · Manchester
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2aWV3Qm94PSIwIDAgMTI3LjUgMTIzLjc1Ij4KICA8ZGVmcz4KICAgIDxzdHlsZT4KICAgICAgLmNscy0xIHsgZmlsbDogIzhhNmEyYzsgfQogICAgICAuY2xzLTIgeyBmaWxsOiBub25lOyB9CiAgICAgIC5jbHMtMyB7IGZpbGw6ICNjZjhhMmE7IH0KICAgICAgLmNscy00IHsgb3BhY2l0eTogMDsgfQogICAgICAuY2xzLTUgeyBjbGlwLXBhdGg6IHVybCgjY2xpcHBhdGgpOyB9CiAgICAgIC5jbHMtNiB7IGZpbGw6ICNkOWNiYjA7IH0KICAgICAgLmNscy03IHsgZmlsbDogI2ZiYjcxNjsgfQogICAgPC9zdHlsZT4KICAgIDxjbGlwUGF0aCBpZD0iY2xpcHBhdGgiPjxyZWN0IGNsYXNzPSJjbHMtMiIgeT0iMCIgd2lkdGg9IjEyNy41IiBoZWlnaHQ9IjEyMy43NSIvPjwvY2xpcFBhdGg+CiAgPC9kZWZzPgogIDxnIGNsYXNzPSJjbHMtNSI+CiAgICA8cG9seWdvbiBwb2ludHM9IjIwLjAzIDExMC4zMSAyMC40MSA4Mi43OSA0NC4xMSA2OC43IDY3LjQzIDgyLjE0IDY3LjA1IDEwOS42NiA0My4zNSAxMjMuNzUgMjAuMDMgMTEwLjMxIi8+CiAgICA8cG9seWdvbiBwb2ludHM9Ii40MiA3NS42NyAuOCA0OC4xNCAyNC41IDM0LjA1IDQ3LjgyIDQ3LjQ5IDQ3LjQ0IDc1LjAyIDIzLjc0IDg5LjEgLjQyIDc1LjY3Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjQwLjQ2IDc1LjY3IDQwLjg0IDQ4LjE0IDY0LjU0IDM0LjA1IDg3Ljg2IDQ3LjQ5IDg3LjQ4IDc1LjAyIDYzLjc4IDg5LjEgNDAuNDYgNzUuNjciLz4KICAgIDxwb2x5Z29uIHBvaW50cz0iNTkuNjIgMTEwLjMxIDYwIDgyLjc5IDgzLjcxIDY4LjcgMTA3LjAzIDgyLjE0IDEwNi42NSAxMDkuNjYgODIuOTUgMTIzLjc1IDU5LjYyIDExMC4zMSIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI3OS42NyA3NS42NyA4MC4wNSA0OC4xNCAxMDMuNzUgMzQuMDUgMTI3LjA4IDQ3LjQ5IDEyNi43IDc1LjAyIDEwMi45OSA4OS4xIDc5LjY3IDc1LjY3Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjU5LjIgNDEuNjEgNTkuNTggMTQuMDkgODMuMjggMCAxMDYuNiAxMy40NCAxMDYuMjIgNDAuOTYgODIuNTIgNTUuMDUgNTkuMiA0MS42MSIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxOS40OSA0MS42MSAxOS44NyAxNC4wOSA0My41NyAwIDY2Ljg5IDEzLjQ0IDY2LjUxIDQwLjk2IDQyLjgxIDU1LjA1IDE5LjQ5IDQxLjYxIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iMjcuNjQgMzcuMzIgMjcuOSAxOC43MiA0My45MiA5LjE5IDU5LjY5IDE4LjI3IDU5LjQzIDM2Ljg4IDQzLjQxIDQ2LjQgMjcuNjQgMzcuMzIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMSIgcG9pbnRzPSI0Ny43NCA3MS43OSA0OCA1My4xOCA2NC4wMiA0My42NSA3OS43OSA1Mi43MyA3OS41MyA3MS4zNCA2My41MSA4MC44NyA0Ny43NCA3MS43OSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjcuNyA3MS43OSA3Ljk2IDUzLjE4IDIzLjk4IDQzLjY1IDM5Ljc1IDUyLjczIDM5LjQ5IDcxLjM0IDIzLjQ3IDgwLjg3IDcuNyA3MS43OSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjUzLjQ0IDY4LjgyIDc1LjIxIDU1LjgxIDc1LjQ0IDY4LjU1IDY0LjQzIDc1LjE5IDUzLjQ0IDY4LjgyIi8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iMzIuNjcgMzUuMDYgNTQuNDMgMjIuMDUgNTQuNjYgMzQuNzkgNDMuNjcgNDEuNDMgMzIuNjcgMzUuMDYiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSIxMi43MyA2OC44MiAzNC40OSA1NS44MSAzNC43MiA2OC41NSAyMy43MyA3NS4xOSAxMi43MyA2OC44MiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy0xIiBwb2ludHM9IjI3LjY0IDEwNS44OCAyNy45IDg3LjI3IDQzLjkyIDc3Ljc1IDU5LjY5IDg2LjgzIDU5LjQzIDEwNS40NCA0My40MSAxMTQuOTYgMjcuNjQgMTA1Ljg4Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iNjYuODggMTA1Ljg4IDY3LjEzIDg3LjI3IDgzLjE2IDc3Ljc1IDk4LjkyIDg2LjgzIDk4LjY3IDEwNS40NCA4Mi42NCAxMTQuOTYgNjYuODggMTA1Ljg4Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTEiIHBvaW50cz0iODYuNiA3MS43OSA4Ni44NiA1My4xOCAxMDIuODggNDMuNjUgMTE4LjY0IDUyLjczIDExOC4zOSA3MS4zNCAxMDIuMzYgODAuODcgODYuNiA3MS43OSIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy02IiBwb2ludHM9IjMzLjMxIDEwMi41NyA1NS4wOCA4OS41NyA1NS4zMSAxMDIuMyA0NC4zMSAxMDguOTUgMzMuMzEgMTAyLjU3Ii8+CiAgICA8cG9seWdvbiBjbGFzcz0iY2xzLTYiIHBvaW50cz0iNzEuOSAxMDMuNTUgOTMuNjcgOTAuNTQgOTMuOSAxMDMuMjcgODIuOSAxMDkuOTEgNzEuOSAxMDMuNTUiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtNiIgcG9pbnRzPSI5Mi4zOCA2OC44MiAxMTQuMTQgNTUuODEgMTE0LjM3IDY4LjU1IDEwMy4zNyA3NS4xOSA5Mi4zOCA2OC44MiIvPgogICAgPHBvbHlnb24gY2xhc3M9ImNscy03IiBwb2ludHM9IjY3LjMgMzcuMzIgNjcuNTYgMTguNzIgODMuNTggOS4xOSA5OS4zNSAxOC4yNyA5OS4wOSAzNi44OCA4My4wNyA0Ni40IDY3LjMgMzcuMzIiLz4KICAgIDxwb2x5Z29uIGNsYXNzPSJjbHMtMyIgcG9pbnRzPSI3Mi4zMyAzNS4wNiA5NC4xIDIyLjA1IDk0LjMyIDM0Ljc5IDgzLjMzIDQxLjQzIDcyLjMzIDM1LjA2Ii8+CiAgPC9nPgogIDxyZWN0IGNsYXNzPSJjbHMtNCIgeD0iMCIgd2lkdGg9IjEyNy4xMyIgaGVpZ2h0PSIxMjMuNjYiLz4KPC9zdmc+" alt="">
+        <span>haloe</span>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h5>Contact</h5>
+          <a href="https://wa.me/447474833643" target="_blank" rel="noopener">WhatsApp</a>
+          <a href="https://instagram.com/haloe.health" target="_blank" rel="noopener">Instagram</a>
+        </div>
+        <div class="footer-col">
+          <h5>Hours</h5>
+          <p>Clinic Day: Tuesdays, 9:30am–7pm</p>
+          <p>Home visits: Mon–Sat, 10am–8pm</p>
+        </div>
+        <div class="footer-col">
+          <h5>Explore</h5>
+          <a href="#about">About</a>
+          <a href="#conditions">Conditions</a>
+          <a href="#clinic-day">Clinic Day</a>
+          <a href="#process">What to Expect</a>
+          <a href="hijama-manchester.html">Hijama in Manchester</a>
+          <a href="book.html">Book</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2026 haloe · Halima Yasmin · CMA &amp; IPHM Accredited · Fully Insured · Manchester
+    </div>
   </div>
 </footer>
 
+<!-- ============================================================
+     STICKY MOBILE BOTTOM BAR
+     ============================================================ -->
+<div class="mobile-bar">
+  <a href="book.html" class="btn-pill btn-gold">Book your session</a>
+  <a href="https://wa.me/447474833643" class="btn-pill btn-outline" target="_blank" rel="noopener">WhatsApp</a>
+</div>
+
+<script src="services-data.js"></script>
 <script>
-  const reveals = document.querySelectorAll('.reveal');
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
-    });
-  }, {threshold:0.08, rootMargin:'0px 0px -30px 0px'});
-  reveals.forEach((el,i) => {
-    el.style.transitionDelay = (i % 4) * 0.07 + 's';
-    obs.observe(el);
-  });
-</script>
-
-<!-- Hero intro reveal: growing-image + word-stagger, adapted from the "Willem" GSAP
-     loader pattern. Pure vanilla + GSAP (no build step). Fails safe: if GSAP doesn't
-     load, or the user prefers reduced motion, the hero just renders in its normal
-     static state (no broken/hidden content). -->
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-<script>
-(function () {
-  if (typeof gsap === 'undefined') return; // CDN failed — leave hero as plain CSS fadeUp
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  var heroImg = document.querySelector('#hero .hero-right img');
-  var h1 = document.querySelector('#hero h1');
-  if (!heroImg || !h1) return;
-
-  if (reduceMotion) return; // keep the existing instant/fadeUp presentation
-
-  // --- Split the h1 into word-masks, preserving the <br> and <em> structure ---
-  function wrapWords(node) {
-    var frag = document.createDocumentFragment();
-    var words = node.textContent.split(/(\s+)/); // keep whitespace tokens
-    words.forEach(function (chunk) {
-      if (chunk.trim() === '') {
-        frag.appendChild(document.createTextNode(chunk));
-        return;
-      }
-      var mask = document.createElement('span');
-      mask.className = 'hw-mask';
-      var word = document.createElement('span');
-      word.className = 'hw-word';
-      word.textContent = chunk;
-      mask.appendChild(word);
-      frag.appendChild(mask);
-    });
-    node.parentNode.replaceChild(frag, node);
-  }
-
-  // Walk the h1's existing child nodes (text node + <br> + <em>) and split any
-  // text-bearing node into word-masks, without disturbing <br>/<em> themselves.
-  Array.prototype.slice.call(h1.childNodes).forEach(function (child) {
-    if (child.nodeType === 3 && child.textContent.trim()) {
-      wrapWords(child);
-    } else if (child.nodeType === 1 && child.tagName === 'EM') {
-      Array.prototype.slice.call(child.childNodes).forEach(function (grandchild) {
-        if (grandchild.nodeType === 3 && grandchild.textContent.trim()) {
-          wrapWords(grandchild);
-        }
-      });
-    }
-  });
-
-  var words = h1.querySelectorAll('.hw-word');
-  h1.classList.add('hw-ready'); // turn off the CSS fadeUp now that JS owns the reveal
-
-  gsap.set(words, { yPercent: 110, opacity: 0 });
-
-  // --- Growing-image reveal on the hero photo ---
-  // A slow opacity+scale settle rather than a hard clip-path wipe — reads as
-  // calm and deliberate instead of a "garage door" reveal line.
-  gsap.set(heroImg, { opacity: 0, scale: 1.15, transformOrigin: '50% 50%' });
-
-  var tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-  tl.to(heroImg, {
-      opacity: 1,
-      scale: 1,
-      duration: 3.2,
-      ease: 'power2.out'
-    }, 0.1)
-    .to(words, {
-      yPercent: 0,
-      opacity: 1,
-      duration: 0.9,
-      stagger: 0.05
-    }, 0.5);
-})();
-</script>
-
-<!-- Conditions honeycomb: hover echo ripple, adapted from "RepetitionHoverEffect".
-     Purely additive — does not touch the existing bloom-in or click/modal script
-     blocks above. Falls back to the plain CSS hover (scale+shadow on the svg,
-     defined above) if GSAP isn't available. -->
-<script>
-(function () {
-  if (typeof gsap === 'undefined') return;
-
-  var petals = document.querySelectorAll('.flower-petal');
-
-  petals.forEach(function (petal) {
-    // Two stacked echo hexagons, appended before the svg so they paint behind it.
-    var echoes = [];
-    for (var i = 0; i < 2; i++) {
-      var echo = document.createElement('span');
-      echo.className = 'petal-echo';
-      petal.insertBefore(echo, petal.firstChild);
-      echoes.push(echo);
-    }
-
-    var tl = null;
-
-    petal.addEventListener('mouseenter', function () {
-      if (tl) tl.kill();
-      gsap.set(echoes, { scale: 0.85, opacity: 0.6 });
-      tl = gsap.timeline()
-        .to(echoes, {
-          scale: 1.45,
-          opacity: 0,
-          duration: 0.9,
-          ease: 'power2.out',
-          stagger: 0.15
-        });
-    });
-
-    petal.addEventListener('mouseleave', function () {
-      if (tl) tl.kill();
-      gsap.set(echoes, { opacity: 0 });
-    });
-  });
-}());
-</script>
-
-<!-- Soft light rays behind the hero headline (WebGL), adapted from the
-     components "Light Rays" background pack. Pure vanilla JS, no
-     dependencies. Respects prefers-reduced-motion: skips WebGL init
-     entirely, leaving the plain hero background. -->
-<script>
-(function () {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  var hexToRgb = function (hex) {
-    var m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return m
-      ? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255]
-      : [1, 1, 1];
-  };
-
-  var getAnchorAndDir = function (origin, w, h) {
-    var outside = 0.2;
-    switch (origin) {
-      case 'top-left': return { anchor: [0, -outside * h], dir: [0, 1] };
-      case 'top-right': return { anchor: [w, -outside * h], dir: [0, 1] };
-      case 'left': return { anchor: [-outside * w, 0.5 * h], dir: [1, 0] };
-      case 'right': return { anchor: [(1 + outside) * w, 0.5 * h], dir: [-1, 0] };
-      case 'bottom-left': return { anchor: [0, (1 + outside) * h], dir: [0, -1] };
-      case 'bottom-center': return { anchor: [0.5 * w, (1 + outside) * h], dir: [0, -1] };
-      case 'bottom-right': return { anchor: [w, (1 + outside) * h], dir: [0, -1] };
-      default: return { anchor: [0.5 * w, -outside * h], dir: [0, 1] };
-    }
-  };
-
-  var boolAttr = function (v, fallback) {
-    if (fallback === void 0) fallback = false;
-    return v == null ? fallback : String(v) !== 'false';
-  };
-
-  var vert = `
-attribute vec2 position;
-varying vec2 vUv;
-void main(){
-  vUv = position * 0.5 + 0.5;
-  gl_Position = vec4(position, 0.0, 1.0);
-}`;
-
-  var frag = `precision highp float;
-
-uniform float iTime;
-uniform vec2  iResolution;
-
-uniform vec2  rayPos;
-uniform vec2  rayDir;
-uniform vec3  raysColor;
-uniform float raysSpeed;
-uniform float lightSpread;
-uniform float rayLength;
-uniform float pulsating;
-uniform float fadeDistance;
-uniform float saturation;
-uniform vec2  mousePos;
-uniform float mouseInfluence;
-uniform float noiseAmount;
-uniform float distortion;
-
-varying vec2 vUv;
-
-float noise(vec2 st){
-  return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
-}
-
-float rayStrength(vec2 raySource, vec2 rayRefDirection, vec2 coord,
-                  float seedA, float seedB, float speed){
-  vec2 sourceToCoord = coord - raySource;
-  vec2 dirNorm = normalize(sourceToCoord);
-  float cosAngle = dot(dirNorm, rayRefDirection);
-
-  float distortedAngle = cosAngle + distortion * sin(iTime * 2.0 + length(sourceToCoord) * 0.01) * 0.2;
-
-  float spreadFactor = pow(max(distortedAngle, 0.0), 1.0 / max(lightSpread, 0.001));
-
-  float distance = length(sourceToCoord);
-  float maxDistance = iResolution.x * rayLength;
-  float lengthFalloff = clamp((maxDistance - distance) / maxDistance, 0.0, 1.0);
-
-  float fadeFalloff = clamp((iResolution.x * fadeDistance - distance) / (iResolution.x * fadeDistance), 0.5, 1.0);
-  float pulse = pulsating > 0.5 ? (0.8 + 0.2 * sin(iTime * speed * 3.0)) : 1.0;
-
-  float baseStrength = clamp(
-    (0.45 + 0.15 * sin(distortedAngle * seedA + iTime * speed)) +
-    (0.3 + 0.2 * cos(-distortedAngle * seedB + iTime * speed)),
-    0.0, 1.0
-  );
-
-  return baseStrength * lengthFalloff * fadeFalloff * spreadFactor * pulse;
-}
-
-void mainImage(out vec4 fragColor, in vec2 fragCoord){
-  vec2 coord = vec2(fragCoord.x, iResolution.y - fragCoord.y);
-
-  vec2 finalRayDir = rayDir;
-  if (mouseInfluence > 0.0){
-    vec2 mouseScreenPos = mousePos * iResolution.xy;
-    vec2 mouseDirection = normalize(mouseScreenPos - rayPos);
-    finalRayDir = normalize(mix(rayDir, mouseDirection, mouseInfluence));
-  }
-
-  vec4 rays1 = vec4(1.0) *
-               rayStrength(rayPos, finalRayDir, coord, 36.2214, 21.11349, 1.5 * raysSpeed);
-  vec4 rays2 = vec4(1.0) *
-               rayStrength(rayPos, finalRayDir, coord, 22.3991, 18.0234, 1.1 * raysSpeed);
-
-  fragColor = rays1 * 1.3 + rays2 * 1.0;
-
-  if (noiseAmount > 0.0){
-    float n = noise(coord * 0.01 + iTime * 0.1);
-    fragColor.rgb *= (1.0 - noiseAmount + noiseAmount * n);
-  }
-
-  float brightness = 1.0 - (coord.y / iResolution.y);
-  fragColor.x *= 0.1 + brightness * 0.8;
-  fragColor.y *= 0.3 + brightness * 0.6;
-  fragColor.z *= 0.5 + brightness * 0.5;
-
-  if (saturation != 1.0){
-    float gray = dot(fragColor.rgb, vec3(0.299, 0.587, 0.114));
-    fragColor.rgb = mix(vec3(gray), fragColor.rgb, saturation);
-  }
-
-  fragColor.rgb *= raysColor;
-}
-
-void main(){
-  vec4 color;
-  mainImage(color, gl_FragCoord.xy);
-  gl_FragColor = color;
-}`;
-
-  document.querySelectorAll('.hero-rays .light-rays').forEach(function (container) {
-    var origin = container.dataset.origin || 'top-center';
-    var raysColor = container.dataset.color || '#ffffff';
-    var raysSpeed = parseFloat(container.dataset.speed || '1');
-    var lightSpread = parseFloat(container.dataset.spread || '1');
-    var rayLength = parseFloat(container.dataset.length || '2');
-    var pulsating = boolAttr(container.dataset.pulsating, false);
-    var fadeDistance = parseFloat(container.dataset.fade || '1');
-    var saturation = parseFloat(container.dataset.saturation || '1');
-    var followMouse = boolAttr(container.dataset.follow, true);
-    var mouseInfluence = parseFloat(container.dataset.mouse || '0.1');
-    var noiseAmount = parseFloat(container.dataset.noise || '0');
-    var distortion = parseFloat(container.dataset.distortion || '0');
-
-    var canvas = document.createElement('canvas');
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.display = 'block';
-    container.appendChild(canvas);
-
-    var gl = canvas.getContext('webgl', { alpha: true, antialias: true, premultipliedAlpha: false, preserveDrawingBuffer: true })
-      || canvas.getContext('experimental-webgl', { alpha: true, antialias: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
-    if (!gl) return;
-
-    gl.clearColor(0, 0, 0, 0);
-    gl.disable(gl.DEPTH_TEST);
-    gl.disable(gl.CULL_FACE);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-
-    var compile = function (type, src) {
-      var sh = gl.createShader(type);
-      gl.shaderSource(sh, src);
-      gl.compileShader(sh);
-      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) return null;
-      return sh;
-    };
-    var link = function (vs, fs) {
-      var p = gl.createProgram();
-      gl.attachShader(p, vs);
-      gl.attachShader(p, fs);
-      gl.linkProgram(p);
-      if (!gl.getProgramParameter(p, gl.LINK_STATUS)) return null;
-      return p;
-    };
-
-    var vs = compile(gl.VERTEX_SHADER, vert);
-    var fs = compile(gl.FRAGMENT_SHADER, frag);
-    if (!vs || !fs) return;
-    var program = link(vs, fs);
-    if (!program) return;
-    gl.useProgram(program);
-
-    var posLoc = gl.getAttribLocation(program, 'position');
-    var uTimeLoc = gl.getUniformLocation(program, 'iTime');
-    var uResLoc = gl.getUniformLocation(program, 'iResolution');
-    var uRayPosLoc = gl.getUniformLocation(program, 'rayPos');
-    var uRayDirLoc = gl.getUniformLocation(program, 'rayDir');
-    var uRaysColorLoc = gl.getUniformLocation(program, 'raysColor');
-    var uRaysSpeedLoc = gl.getUniformLocation(program, 'raysSpeed');
-    var uLightSpreadLoc = gl.getUniformLocation(program, 'lightSpread');
-    var uRayLengthLoc = gl.getUniformLocation(program, 'rayLength');
-    var uPulsatingLoc = gl.getUniformLocation(program, 'pulsating');
-    var uFadeDistanceLoc = gl.getUniformLocation(program, 'fadeDistance');
-    var uSaturationLoc = gl.getUniformLocation(program, 'saturation');
-    var uMousePosLoc = gl.getUniformLocation(program, 'mousePos');
-    var uMouseInfluenceLoc = gl.getUniformLocation(program, 'mouseInfluence');
-    var uNoiseAmountLoc = gl.getUniformLocation(program, 'noiseAmount');
-    var uDistortionLoc = gl.getUniformLocation(program, 'distortion');
-
-    var quad = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(posLoc);
-    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-    var uniforms = {
-      iTime: 0, iResolution: [1, 1], rayPos: [0, 0], rayDir: [0, 1],
-      raysColor: hexToRgb(raysColor), raysSpeed: raysSpeed, lightSpread: lightSpread,
-      rayLength: rayLength, pulsating: pulsating ? 1.0 : 0.0, fadeDistance: fadeDistance,
-      saturation: saturation, mousePos: [0.5, 0.5], mouseInfluence: mouseInfluence,
-      noiseAmount: noiseAmount, distortion: distortion,
-    };
-
-    var mouse = { x: 0.5, y: 0.5 };
-    var smooth = { x: 0.5, y: 0.5 };
-
-    var setMouse = function (clientX, clientY) {
-      var rect = container.getBoundingClientRect();
-      mouse.x = (clientX - rect.left) / rect.width;
-      mouse.y = (clientY - rect.top) / rect.height;
-    };
-    var onMouse = function (e) { setMouse(e.clientX, e.clientY); };
-    var onTouch = function (e) {
-      var t = e.touches[0];
-      if (!t) return;
-      setMouse(t.clientX, t.clientY);
-    };
-
-    var updatePlacement = function () {
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var wCSS = container.clientWidth, hCSS = container.clientHeight;
-      var w = Math.max(1, Math.floor(wCSS * dpr));
-      var h = Math.max(1, Math.floor(hCSS * dpr));
-      canvas.width = w;
-      canvas.height = h;
-      gl.viewport(0, 0, w, h);
-      uniforms.iResolution = [w, h];
-      var ad = getAnchorAndDir(origin, w, h);
-      uniforms.rayPos = ad.anchor;
-      uniforms.rayDir = ad.dir;
-    };
-    updatePlacement();
-
-    var onResize = function () { updatePlacement(); };
-    window.addEventListener('resize', onResize);
-    if (followMouse) {
-      window.addEventListener('mousemove', onMouse);
-      window.addEventListener('touchmove', onTouch, { passive: true });
-    }
-
-    gl.uniform3fv(uRaysColorLoc, new Float32Array(uniforms.raysColor));
-    gl.uniform1f(uRaysSpeedLoc, uniforms.raysSpeed);
-    gl.uniform1f(uLightSpreadLoc, uniforms.lightSpread);
-    gl.uniform1f(uRayLengthLoc, uniforms.rayLength);
-    gl.uniform1f(uPulsatingLoc, uniforms.pulsating);
-    gl.uniform1f(uFadeDistanceLoc, uniforms.fadeDistance);
-    gl.uniform1f(uSaturationLoc, uniforms.saturation);
-    gl.uniform1f(uMouseInfluenceLoc, uniforms.mouseInfluence);
-    gl.uniform1f(uNoiseAmountLoc, uniforms.noiseAmount);
-    gl.uniform1f(uDistortionLoc, uniforms.distortion);
-
-    var loop = function (t) {
-      uniforms.iTime = t * 0.001;
-      if (followMouse && uniforms.mouseInfluence > 0) {
-        var s = 0.92;
-        smooth.x = smooth.x * s + mouse.x * (1 - s);
-        smooth.y = smooth.y * s + mouse.y * (1 - s);
-        uniforms.mousePos = [smooth.x, smooth.y];
-      }
-      gl.uniform1f(uTimeLoc, uniforms.iTime);
-      gl.uniform2fv(uResLoc, new Float32Array(uniforms.iResolution));
-      gl.uniform2fv(uRayPosLoc, new Float32Array(uniforms.rayPos));
-      gl.uniform2fv(uRayDirLoc, new Float32Array(uniforms.rayDir));
-      gl.uniform2fv(uMousePosLoc, new Float32Array(uniforms.mousePos));
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
-  });
-}());
-</script>
-
-<!-- Nav active-link indicator: toggles .nav-active on the section link
-     currently scrolled into view. Purely presentational — doesn't touch
-     navigation/click behaviour, just adds/removes a class. -->
-<script>
-(function () {
-  var navLinks = Array.prototype.slice.call(document.querySelectorAll('nav ul a:not(.nav-cta)'));
-  var sections = navLinks
-    .map(function (a) {
-      var id = a.getAttribute('href').replace('#', '');
-      var el = document.getElementById(id);
-      return el ? { link: a, section: el } : null;
-    })
-    .filter(Boolean);
-  if (!sections.length) return;
-
-  var observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      var match = sections.find(function (s) { return s.section === entry.target; });
-      if (!match) return;
-      if (entry.isIntersecting) {
-        navLinks.forEach(function (a) { a.classList.remove('nav-active'); });
-        match.link.classList.add('nav-active');
-      }
-    });
-  }, { rootMargin: '-45% 0px -50% 0px' }); // fires when a section crosses the vertical middle of the viewport
-
-  sections.forEach(function (s) { observer.observe(s.section); });
-}());
-</script>
-
-<!-- About → Process divider (was About → Conditions before Conditions moved
-     to the top of the page, Sep 2026): soft dithered wave texture (WebGL),
-     adapted from the components "Dither" background pack. Pure vanilla JS,
-     no dependencies. Mouse interaction disabled and tuned for a slow, quiet
-     effect — an accent strip, not something meant to draw the eye. -->
-<script>
-(function () {
-  var container = document.getElementById('aboutDither');
-  if (!container) return;
-
-  var opts = {
-    waveColor: [0.784, 0.663, 0.431], // muted gold (#C8A96E)
-    enableMouseInteraction: false,
-    // The Bayer dither quantizes each RGB channel independently — at a low
-    // colorNum (the pack default, tuned for near-grey input) a saturated
-    // colour like gold fringes into visible red/green noise, since each
-    // channel lands on a different quantized step. A much higher colorNum
-    // keeps the intended grain texture while eliminating the colour fringing.
-    colorNum: 32,
-    waveAmplitude: 0.22,
-    waveFrequency: 2,
-    waveSpeed: 0.03,
-    pixelSize: 3,
-  };
-
-  var canvas = document.createElement('canvas');
-  canvas.style.width = '100%';
-  canvas.style.height = '100%';
-  canvas.style.display = 'block';
-  container.appendChild(canvas);
-
-  var gl = canvas.getContext('webgl', { alpha: true, antialias: true, premultipliedAlpha: false })
-    || canvas.getContext('experimental-webgl', { alpha: true, antialias: true, premultipliedAlpha: false });
-  if (!gl) return;
-
-  gl.disable(gl.DEPTH_TEST);
-  gl.disable(gl.CULL_FACE);
-  gl.clearColor(0, 0, 0, 0);
-
-  var vertexSrc = `
-attribute vec2 position;
-varying vec2 vUv;
-void main() {
-  vUv = position * 0.5 + 0.5;
-  gl_Position = vec4(position, 0.0, 1.0);
-}
-`;
-
-  var fragmentSrc = `precision highp float;
-
-uniform vec2 uResolution;
-uniform float uTime;
-
-uniform float uWaveSpeed;
-uniform float uWaveFrequency;
-uniform float uWaveAmplitude;
-uniform vec3 uWaveColor;
-
-uniform float uColorNum;
-uniform float uPixelSize;
-
-varying vec2 vUv;
-
-vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
-vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
-vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-vec2 fade(vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
-
-float cnoise(vec2 P) {
-  vec4 Pi = floor(P.xyxy) + vec4(0.0,0.0,1.0,1.0);
-  vec4 Pf = fract(P.xyxy) - vec4(0.0,0.0,1.0,1.0);
-  Pi = mod289(Pi);
-  vec4 ix = Pi.xzxz;
-  vec4 iy = Pi.yyww;
-  vec4 fx = Pf.xzxz;
-  vec4 fy = Pf.yyww;
-  vec4 i = permute(permute(ix) + iy);
-  vec4 gx = fract(i * (1.0/41.0)) * 2.0 - 1.0;
-  vec4 gy = abs(gx) - 0.5;
-  vec4 tx = floor(gx + 0.5);
-  gx = gx - tx;
-  vec2 g00 = vec2(gx.x, gy.x);
-  vec2 g10 = vec2(gx.y, gy.y);
-  vec2 g01 = vec2(gx.z, gy.z);
-  vec2 g11 = vec2(gx.w, gy.w);
-  vec4 norm = taylorInvSqrt(vec4(dot(g00,g00), dot(g01,g01), dot(g10,g10), dot(g11,g11)));
-  g00 *= norm.x; g01 *= norm.y; g10 *= norm.z; g11 *= norm.w;
-  float n00 = dot(g00, vec2(fx.x, fy.x));
-  float n10 = dot(g10, vec2(fx.y, fy.y));
-  float n01 = dot(g01, vec2(fx.z, fy.z));
-  float n11 = dot(g11, vec2(fx.w, fy.w));
-  vec2 fade_xy = fade(Pf.xy);
-  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-  return 2.3 * mix(n_x.x, n_x.y, fade_xy.y);
-}
-
-float fbm(vec2 p) {
-  float value = 0.0;
-  float amp = 1.0;
-  float freq = uWaveFrequency;
-  for (int i = 0; i < 4; i++) {
-    value += amp * abs(cnoise(p));
-    p *= freq;
-    amp *= uWaveAmplitude;
-  }
-  return value;
-}
-
-float pattern(vec2 p) {
-  vec2 p2 = p - uTime * uWaveSpeed;
-  return fbm(p + fbm(p2));
-}
-
-float bayer8x8(int x, int y) {
-  int i = y * 8 + x;
-  if (i == 0) return 0.0/64.0;
-  if (i == 1) return 48.0/64.0;
-  if (i == 2) return 12.0/64.0;
-  if (i == 3) return 60.0/64.0;
-  if (i == 4) return 3.0/64.0;
-  if (i == 5) return 51.0/64.0;
-  if (i == 6) return 15.0/64.0;
-  if (i == 7) return 63.0/64.0;
-  if (i == 8) return 32.0/64.0;
-  if (i == 9) return 16.0/64.0;
-  if (i == 10) return 44.0/64.0;
-  if (i == 11) return 28.0/64.0;
-  if (i == 12) return 35.0/64.0;
-  if (i == 13) return 19.0/64.0;
-  if (i == 14) return 47.0/64.0;
-  if (i == 15) return 31.0/64.0;
-  if (i == 16) return 8.0/64.0;
-  if (i == 17) return 56.0/64.0;
-  if (i == 18) return 4.0/64.0;
-  if (i == 19) return 52.0/64.0;
-  if (i == 20) return 11.0/64.0;
-  if (i == 21) return 59.0/64.0;
-  if (i == 22) return 7.0/64.0;
-  if (i == 23) return 55.0/64.0;
-  if (i == 24) return 40.0/64.0;
-  if (i == 25) return 24.0/64.0;
-  if (i == 26) return 36.0/64.0;
-  if (i == 27) return 20.0/64.0;
-  if (i == 28) return 43.0/64.0;
-  if (i == 29) return 27.0/64.0;
-  if (i == 30) return 39.0/64.0;
-  if (i == 31) return 23.0/64.0;
-  if (i == 32) return 2.0/64.0;
-  if (i == 33) return 50.0/64.0;
-  if (i == 34) return 14.0/64.0;
-  if (i == 35) return 62.0/64.0;
-  if (i == 36) return 1.0/64.0;
-  if (i == 37) return 49.0/64.0;
-  if (i == 38) return 13.0/64.0;
-  if (i == 39) return 61.0/64.0;
-  if (i == 40) return 34.0/64.0;
-  if (i == 41) return 18.0/64.0;
-  if (i == 42) return 46.0/64.0;
-  if (i == 43) return 30.0/64.0;
-  if (i == 44) return 33.0/64.0;
-  if (i == 45) return 17.0/64.0;
-  if (i == 46) return 45.0/64.0;
-  if (i == 47) return 29.0/64.0;
-  if (i == 48) return 10.0/64.0;
-  if (i == 49) return 58.0/64.0;
-  if (i == 50) return 6.0/64.0;
-  if (i == 51) return 54.0/64.0;
-  if (i == 52) return 9.0/64.0;
-  if (i == 53) return 57.0/64.0;
-  if (i == 54) return 5.0/64.0;
-  if (i == 55) return 53.0/64.0;
-  if (i == 56) return 42.0/64.0;
-  if (i == 57) return 26.0/64.0;
-  if (i == 58) return 38.0/64.0;
-  if (i == 59) return 22.0/64.0;
-  if (i == 60) return 41.0/64.0;
-  if (i == 61) return 25.0/64.0;
-  if (i == 62) return 37.0/64.0;
-  return 21.0/64.0;
-}
-
-vec3 dither(vec2 fragCoord, vec3 color) {
-  vec2 scaled = floor(fragCoord / max(uPixelSize, 1.0));
-  int x = int(mod(scaled.x, 8.0));
-  int y = int(mod(scaled.y, 8.0));
-  float threshold = bayer8x8(x, y) - 0.25;
-  float stepv = 1.0 / max(uColorNum - 1.0, 1.0);
-  color += threshold * stepv;
-  float bias = 0.2;
-  color = clamp(color - bias, 0.0, 1.0);
-  return floor(color * (uColorNum - 1.0) + 0.5) / max(uColorNum - 1.0, 1.0);
-}
-
-void main() {
-  vec2 frag = gl_FragCoord.xy;
-  vec2 px = vec2(max(uPixelSize, 1.0));
-  vec2 fragP = px * floor(frag / px) + 0.5 * px;
-  vec2 uv = fragP / uResolution;
-  vec2 p = uv - 0.5;
-  p.x *= uResolution.x / uResolution.y;
-
-  float f = pattern(p);
-  vec3 col = mix(vec3(0.0), uWaveColor, f);
-  col = dither(frag, col);
-  gl_FragColor = vec4(col, 1.0);
-}
-`;
-
-  function compile(type, src) {
-    var sh = gl.createShader(type);
-    gl.shaderSource(sh, src);
-    gl.compileShader(sh);
-    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) return null;
-    return sh;
-  }
-  function link(vs2, fs2) {
-    var p = gl.createProgram();
-    gl.attachShader(p, vs2);
-    gl.attachShader(p, fs2);
-    gl.linkProgram(p);
-    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) return null;
-    return p;
-  }
-  var vs = compile(gl.VERTEX_SHADER, vertexSrc);
-  var fs = compile(gl.FRAGMENT_SHADER, fragmentSrc);
-  if (!vs || !fs) return;
-  var program = link(vs, fs);
-  if (!program) return;
-  gl.useProgram(program);
-
-  var posLoc = gl.getAttribLocation(program, 'position');
-  var uResolutionLoc = gl.getUniformLocation(program, 'uResolution');
-  var uTimeLoc = gl.getUniformLocation(program, 'uTime');
-  var uWaveSpeedLoc = gl.getUniformLocation(program, 'uWaveSpeed');
-  var uWaveFrequencyLoc = gl.getUniformLocation(program, 'uWaveFrequency');
-  var uWaveAmplitudeLoc = gl.getUniformLocation(program, 'uWaveAmplitude');
-  var uWaveColorLoc = gl.getUniformLocation(program, 'uWaveColor');
-  var uColorNumLoc = gl.getUniformLocation(program, 'uColorNum');
-  var uPixelSizeLoc = gl.getUniformLocation(program, 'uPixelSize');
-
-  var posBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-  gl.enableVertexAttribArray(posLoc);
-  gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-  function setStaticUniforms() {
-    gl.uniform1f(uWaveSpeedLoc, opts.waveSpeed);
-    gl.uniform1f(uWaveFrequencyLoc, opts.waveFrequency);
-    gl.uniform1f(uWaveAmplitudeLoc, opts.waveAmplitude);
-    gl.uniform3fv(uWaveColorLoc, new Float32Array(opts.waveColor));
-    gl.uniform1f(uColorNumLoc, opts.colorNum);
-    gl.uniform1f(uPixelSizeLoc, opts.pixelSize);
-  }
-  function resize() {
-    var rect = container.getBoundingClientRect();
-    var dpr = Math.min(1.25, window.devicePixelRatio || 1);
-    var w = Math.max(1, Math.floor(rect.width * dpr));
-    var h = Math.max(1, Math.floor(rect.height * dpr));
-    canvas.width = w;
-    canvas.height = h;
-    gl.viewport(0, 0, w, h);
-    gl.uniform2fv(uResolutionLoc, new Float32Array([w, h]));
-  }
-  window.addEventListener('resize', resize, false);
-  resize();
-  setStaticUniforms();
-
-  var lastT = 0;
-  function loop(t) {
-    requestAnimationFrame(loop);
-    if (t - lastT < 33) return;
-    lastT = t;
-    gl.uniform1f(uTimeLoc, t * 1e-3);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
-  }
-  requestAnimationFrame(loop);
-}());
-</script>
-
-<!-- Scroll-triggered reveals for About + What to Expect, adapted from the
-     components "gsap-pinned-image-mask-reveal-on-scroll" technique: real
-     scroll-scrubbed motion (tied to scroll position via ScrollTrigger's
-     `scrub`) instead of the site's default one-shot fade-up. Lenis supplies
-     the smooth-scroll feel the reference demo pairs it with.
-
-     Safety: this ONLY detaches these elements from the existing
-     IntersectionObserver .reveal system (see the very first script in
-     <body>) once GSAP + ScrollTrigger + Lenis have ALL loaded successfully.
-     If any CDN fails, nothing here runs and the original fade-up fallback
-     still drives these same elements untouched — they can never end up
-     stuck invisible. -->
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
-<script>
-(function () {
-  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined' || typeof Lenis === 'undefined') return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  gsap.registerPlugin(ScrollTrigger);
-
-  // --- Lenis smooth scroll, wired into GSAP's ticker so ScrollTrigger stays in sync ---
-  var lenis = new Lenis({ duration: 1.1, smoothWheel: true });
-  lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
-  gsap.ticker.lagSmoothing(0);
-
-  // --- About: was a single one-shot .reveal fade on the whole block; now each
-  // child scrubs in individually as the section scrolls through view. ---
-  var aboutText = document.querySelector('.about-text');
-  if (aboutText) {
-    var aboutChildren = Array.prototype.slice.call(aboutText.children);
-    aboutText.classList.remove('reveal', 'visible'); // hand off from the old observer-driven system
-    gsap.set(aboutChildren, { opacity: 0, y: 40 });
-    gsap.to(aboutChildren, {
-      opacity: 1,
-      y: 0,
-      stagger: 0.12,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: aboutText,
-        start: 'top 85%',
-        end: 'top 30%',
-        scrub: 0.6,
-      },
-    });
-  }
-
-  // --- What to Expect: was 4 separate one-shot .reveal fades; now the whole
-  // row scrubs in together, staggered, tied to scroll through the section. ---
-  var steps = document.querySelectorAll('#process .p-step');
-  if (steps.length) {
-    steps.forEach(function (el) { el.classList.remove('reveal', 'visible'); });
-    gsap.set(steps, { opacity: 0, y: 50 });
-    gsap.to(steps, {
-      opacity: 1,
-      y: 0,
-      stagger: 0.15,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.process-grid',
-        start: 'top 80%',
-        end: 'top 25%',
-        scrub: 0.6,
-      },
-    });
-  }
-}());
-</script>
-
-<script>
-// Mobile hamburger nav: full-screen overlay toggle. Purely presentational —
-// no booking/site logic involved.
+// ------------------------------------------------------------------
+// Mobile hamburger nav overlay — same pattern as the rest of the site.
+// ------------------------------------------------------------------
 function toggleNavOverlay() {
   const overlay = document.getElementById('navOverlay');
   const btn = document.getElementById('navHamburger');
@@ -2721,6 +1574,203 @@ document.addEventListener('keydown', function (e) {
     toggleNavOverlay();
   }
 });
+
+// ------------------------------------------------------------------
+// Reveal-on-scroll: fade + rise, staggered 60ms per section, 350ms
+// ease-out. Skipped entirely under prefers-reduced-motion (the .reveal
+// CSS rule already shows everything at full opacity in that case, so
+// this observer just never needs to run).
+// ------------------------------------------------------------------
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var groups = {}; // batch elements that become visible in the same tick so the stagger reads as one wave per section, not per element
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      var el = entry.target;
+      obs.unobserve(el);
+      var siblings = Array.prototype.slice.call(el.parentElement.querySelectorAll('.reveal'));
+      var i = siblings.indexOf(el);
+      el.style.transitionDelay = (Math.max(i, 0) % 6) * 60 + 'ms';
+      requestAnimationFrame(function () { el.classList.add('in-view'); });
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(function (el) { obs.observe(el); });
+})();
+
+// ------------------------------------------------------------------
+// Condition cards → modal, same data + deep-link contract as before:
+// cta.href becomes book.html?cat=<category>&svc=<exact treatment name>,
+// matched by applyDeepLink() in book.html.
+// ------------------------------------------------------------------
+(function () {
+  var ICONS = {
+    hormonal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><path d="M12 2c1.8 2 1.8 4-0 6M12 2c-1.8 2-1.8 4 0 6M22 12c-2 1.8-4 1.8-6 0M22 12c-2-1.8-4-1.8-6 0M12 22c1.8-2 1.8-4 0-6M12 22c-1.8-2-1.8-4 0-6M2 12c2-1.8 4-1.8 6 0M2 12c2 1.8 4 1.8 6 0"/></svg>',
+    spiritual: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>',
+    stress: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 6.5a5.5 5.5 0 0 1 0 11M12 3a9 9 0 0 1 0 18"/></svg>',
+    detox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 6 8 6 11.5A6 6 0 0 1 6 14.5C6 11 9 7 12 3z"/></svg>',
+    pain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>',
+    skin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 6 5 10 5 13.5a7 7 0 0 0 14 0C19 10 17 6 12 3z"/><path d="M12 8v11"/></svg>',
+    fatigue: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6z"/></svg>'
+  };
+  var data = {
+    hormonal: {
+      title: 'Hormonal & Menstrual Health',
+      heading: 'Cycle comfort & hormonal balance',
+      body: "Hijama has long been used to support women's hormonal wellness — helping ease the discomfort of irregular cycles, period pain, and hormonal fluctuations. The Women's Hormonal Balance package (8 sessions over 16 weeks) and Cycle Comfort — Period Relief package (4 sessions over ~3 cycles) are designed specifically for this.",
+      tags: ["Women's Hormonal Balance", 'Cycle Comfort Package', '8–16 weeks', 'Wet & dry cupping'],
+      cta: { cat: 'packages', svc: "Women's Hormonal Balance" }
+    },
+    spiritual: {
+      title: 'Spiritual Wellbeing',
+      heading: 'Prophetic medicine. Modern care.',
+      body: "Al-Hijama is a Sunnah — a practice of the Prophet ﷺ. For many Muslim clients, receiving hijama in a private space with a modest practitioner who understands their faith is itself part of the healing. haloe exists precisely for this. Every session is delivered with care, dignity, and full respect for your values.",
+      tags: ['Private space', 'Sunnah practice', 'Modest environment'],
+      cta: { cat: 'wet' }
+    },
+    stress: {
+      title: 'Stress & Anxiety',
+      heading: 'Rest, release, restore',
+      body: "Cupping works deeply on the nervous system — many clients describe a profound calm that settles in during and after treatment. The Stress & Sleep package (6 sessions over 24 weeks) offers a sustained, structured course of care, pairing wet and dry cupping with follow-up consultations and a herbal oil kit to support your wellbeing between sessions.",
+      tags: ['Stress & Sleep Package', '6 sessions', '24 weeks', 'Herbal oil kit included'],
+      cta: { cat: 'packages', svc: 'Stress & Sleep' }
+    },
+    detox: {
+      title: 'Detox & Cleansing',
+      heading: "Support your body's natural rhythm",
+      body: "Wet cupping draws blood to the surface, supporting your body's natural cleansing processes. The Digestion & Detox package (6 sessions over 24 weeks) is built around this — combining wet and dry cupping with a symptom-tracking guide so you can see real progress over time.",
+      tags: ['Digestion & Detox Package', '6 sessions', '24 weeks', 'Symptom tracking guide'],
+      cta: { cat: 'packages', svc: 'Digestion & Detox' }
+    },
+    pain: {
+      title: 'Chronic Pain & Tension',
+      heading: 'Targeted relief for persistent pain',
+      body: "The Pain & Mobility package was built for clients carrying chronic tension — back pain, shoulder tightness, sports injuries, recurring aches. Four sessions over 8–12 weeks, combining wet and dry cupping with unlimited cups and a follow-up consultation to track what's shifting.",
+      tags: ['Pain & Mobility Package', '4 sessions', 'Headache & Tension Package', 'Unlimited cups'],
+      cta: { cat: 'packages', svc: 'Pain & Mobility' }
+    },
+    skin: {
+      title: 'Skin & Beauty',
+      heading: 'Glow from the inside out',
+      body: "Face and head cupping uses gentle suction to lift the skin, stimulate circulation, and encourage your complexion to feel refreshed and vital. Every client also leaves with a take-home black seed oil bottle, included as part of your aftercare at every session.",
+      tags: ['Face cupping', 'Head cupping', 'Black seed oil aftercare', 'Dry cupping only'],
+      cta: { cat: 'dry', svc: 'Face Cupping' }
+    },
+    fatigue: {
+      title: 'Fatigue & Low Energy',
+      heading: 'Reclaim your vitality',
+      body: "The Circulation & Energy package (8 sessions over 18 weeks) is haloe's most comprehensive energy-focused course. By supporting circulation and encouraging the body to function more freely, clients often notice a meaningful shift in their energy levels and general vitality.",
+      tags: ['Circulation & Energy Package', '8 sessions', '18 weeks', 'Priority booking'],
+      cta: { cat: 'packages', svc: 'Circulation & Energy' }
+    }
+  };
+
+  var overlay = document.getElementById('condOverlay');
+
+  function openModal(key) {
+    var d = data[key];
+    if (!d) return;
+    document.getElementById('condIcon').innerHTML = ICONS[key] || '';
+    document.getElementById('condTitle').textContent = d.title;
+    document.getElementById('condHeading').textContent = d.heading;
+    document.getElementById('condBody').textContent = d.body;
+    var tags = document.getElementById('condTags');
+    tags.innerHTML = '';
+    d.tags.forEach(function (t) {
+      var span = document.createElement('span');
+      span.className = 'cond-modal-tag';
+      span.textContent = t;
+      tags.appendChild(span);
+    });
+    var cta = document.getElementById('condCta');
+    var q = 'book.html';
+    if (d.cta && d.cta.cat) {
+      q += '?cat=' + encodeURIComponent(d.cta.cat);
+      if (d.cta.svc) q += '&svc=' + encodeURIComponent(d.cta.svc);
+    }
+    cta.href = q;
+    cta.textContent = d.cta && d.cta.svc ? 'Book ' + d.cta.svc : 'Book This Treatment';
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.cond-card[data-cond]').forEach(function (el) {
+    el.addEventListener('click', function () { openModal(el.dataset.cond); });
+  });
+  document.getElementById('condClose').addEventListener('click', closeModal);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+})();
+
+// ------------------------------------------------------------------
+// Pricing cards — "from £X" per category, computed live from
+// services-data.js (SERVICES/netPrice()). Never hardcode a price here:
+// it would silently drift from book.html.
+// ------------------------------------------------------------------
+(function () {
+  var CATS = [
+    { key: 'massage', label: 'Massage', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13c0-4 3-8 8-8s8 4 8 8"/><path d="M4 13a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4"/><path d="M9 13v3M15 13v3"/></svg>' },
+    { key: 'dry', label: 'Dry cupping', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8" rx="6" ry="4"/><path d="M6 8v5a6 4 0 0 0 12 0V8"/></svg>' },
+    { key: 'wet', label: 'Wet cupping', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4.5 7 9 7 12.5a7 7 0 0 1-14 0C5 12 8.5 7.5 12 3z"/></svg>' },
+    { key: 'packages', label: 'Packages', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M4 12h16M12 8v12M8 8a4 4 0 0 1 8 0"/></svg>' }
+  ];
+  var grid = document.getElementById('priceGrid');
+  if (!grid || typeof SERVICES === 'undefined') return;
+  grid.innerHTML = CATS.map(function (c) {
+    var items = SERVICES[c.key] || [];
+    if (!items.length) return '';
+    var min = Math.min.apply(null, items.map(netPrice));
+    return '<a href="book.html?cat=' + c.key + '" class="price-card card reveal">' +
+      '<span class="price-icon">' + c.icon + '</span>' +
+      '<h3>' + c.label + '</h3>' +
+      '<p class="price-from">from <strong>£' + min + '</strong></p>' +
+      '<span class="price-arrow">→</span></a>';
+  }).join('');
+  // Newly-injected .reveal cards need their own observer, since the page-load
+  // one above already finished querying the DOM before this ran.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var obs2 = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry, i) {
+        if (!entry.isIntersecting) return;
+        obs2.unobserve(entry.target);
+        entry.target.style.transitionDelay = (i % 6) * 60 + 'ms';
+        requestAnimationFrame(function () { entry.target.classList.add('in-view'); });
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    grid.querySelectorAll('.reveal').forEach(function (el) { obs2.observe(el); });
+  } else {
+    grid.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in-view'); });
+  }
+})();
+
+// ------------------------------------------------------------------
+// FAQ accordion — animates open via max-height, one open at a time.
+// ------------------------------------------------------------------
+(function () {
+  document.querySelectorAll('.faq-item').forEach(function (item) {
+    var btn = item.querySelector('.faq-q');
+    var panel = item.querySelector('.faq-a');
+    btn.addEventListener('click', function () {
+      var isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function (other) {
+        if (other !== item) {
+          other.classList.remove('open');
+          other.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+          other.querySelector('.faq-a').style.maxHeight = null;
+        }
+      });
+      item.classList.toggle('open', !isOpen);
+      btn.setAttribute('aria-expanded', String(!isOpen));
+      panel.style.maxHeight = !isOpen ? panel.scrollHeight + 'px' : null;
+    });
+  });
+})();
 </script>
+
 </body>
 </html>
