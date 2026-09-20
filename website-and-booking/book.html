@@ -2358,13 +2358,11 @@ function renderServices() {
     const priceEl = `<span class="svc-price">${priceHtml(s)}</span>`;
     let body;
     if (isPackages) {
-      const sessions = packageSessionCount(s.time);
-      const metaLine = s.time || '';
-      const durTag = sessions ? `<span class="svc-dur-tag">${sessions} sessions</span>` : '';
+      const durTag = s.pkgDur ? `<span class="svc-dur-tag">${s.pkgDur}</span>` : '';
       body = `
         <span class="svc-main">
           <span class="svc-name">${s.name}</span>
-          ${metaLine ? `<span class="svc-meta-line">${metaLine}</span>` : ''}
+          ${s.pkgMeta ? `<span class="svc-meta-line">${s.pkgMeta}</span>` : ''}
           <details class="svc-included" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()">
             <summary>What's included</summary>
             <p class="svc-included-missing">Session-by-session details aren't listed here yet — message Halima on WhatsApp before booking to confirm exactly what each session covers.</p>
