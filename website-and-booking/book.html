@@ -1340,9 +1340,9 @@
     display: inline-flex; align-items: center; gap: 0.4rem;
     background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); border: none;
     font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 0.95rem;
-    padding: 0.72rem 1.8rem; border-radius: var(--radius-full); cursor: pointer;
+    padding: 0.6rem 1.65rem; border-radius: var(--radius-full); cursor: pointer;
     transition: filter 0.2s;
-    min-height: 56px; flex: none;
+    min-height: 48px; flex: none;
   }
   .foot-cta svg { width: 16px; height: 16px; flex: none; }
   .foot-cta:hover:not(:disabled) { filter: brightness(1.08); }
@@ -1454,7 +1454,7 @@
     .ios-row input, .ios-row select, .ios-row textarea { font-size: 16px; }
     .ios-row select { min-height: 44px; }
     .back-link, .back-link:link, .back-link:visited { min-height: 44px; }
-    .foot-cta { min-height: 56px; }
+    .foot-cta { min-height: 48px; }
     /* Real body copy (instructions, descriptions, legal/consent text, error
        messages) gets a 15px floor. Short UI-control labels (chips, kickers,
        step dots, the 4-across category tabs) are left at their compact,
@@ -2245,6 +2245,8 @@ function updateRail() {
   if (ft) ft.innerHTML = svc && currentStep !== 2 ? priceHtml(svc) : '';
   const fh = document.getElementById('foot-helper');
   if (fh) fh.classList.toggle('hidden', !(currentStep === 1 && !state.location));
+  const sc = document.querySelector('.foot-summary-col');
+  if (sc) sc.style.display = currentStep === 1 ? 'none' : '';
   syncFooter();
 }
 
