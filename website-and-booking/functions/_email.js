@@ -32,21 +32,27 @@ export const FONT = "'Poppins', 'Helvetica Neue', Arial, sans-serif";
 export const FONT_HEADING = FONT;
 
 // The flower logo + "haloe" wordmark, pre-rendered together as a single PNG
-// (2x, 598x240) because email clients don't render SVG reliably and won't
+// (2x, 340x160) because email clients don't render SVG reliably and won't
 // load the self-hosted Tan Ashford font for the wordmark. The cream rounded
 // pill background is baked into the raster image itself (not the
 // surrounding HTML) — Gmail/Apple Mail dark mode can still invert the page's
 // CSS background despite the color-scheme meta tags, and an image with a
 // transparent background would then show the near-black wordmark sitting on
 // an inverted-dark page background, unreadable. An opaque background baked
-// into the pixels can't be touched by that inversion. Regenerate by
-// compositing haloe-logo-flower.svg + the Tan Ashford wordmark onto a cream
-// rounded-pill canvas at 2x (~48px/24px-at-1x padding) and re-exporting if
-// either source changes.
+// into the pixels can't be touched by that inversion.
+//
+// Regenerate by measuring the real site header's .brand img/.wordmark
+// boxes (getBoundingClientRect + computed font-size) as ground truth, then
+// composite haloe-logo-flower.svg + the Tan Ashford wordmark onto a cream
+// rounded-pill canvas scaled uniformly from those same proportions — fix a
+// display HEIGHT and derive width from the content, never force both
+// dimensions to arbitrary values, or the composition drifts from the site's
+// actual logo-to-wordmark ratio even before any email client touches it.
+// Always screenshot the result next to the live header at the same height
+// before saving — see the auto-generated 170x80 (340x160 file) numbers
+// below, which came from that comparison, not a guess.
 export const LOGO_URL = 'https://haloe.health/images/email-logo@2x.png';
-// The file is 598x240 (ratio 2.492) — keep display dimensions on that same
-// ratio or the pill stretches. 200x80 (ratio 2.5) is the closest clean pair.
-export const LOGO_WIDTH = 200;
+export const LOGO_WIDTH = 170;
 export const LOGO_HEIGHT = 80;
 
 // POST an email through the Resend REST API. Throws on a non-2xx response.
@@ -85,11 +91,20 @@ export function emailButton(href, label) {
 
 // The haloe header row: the flower + wordmark PNG, centred, on the cream
 // background — no card, matching the site's plain header-on-cream look.
+// width is fixed (attribute + inline style + max-width, three separate
+// ways of saying the same thing) and height is left to `auto` rather than
+// also pinned — Gmail injects its own `img { max-width:100% }`-style reset
+// that can shrink the rendered width below LOGO_WIDTH depending on the
+// client width; a fixed height alongside a client-shrunk width is exactly
+// what stretches/squashes the image, whereas height:auto keeps it on the
+// file's real ratio no matter what width Gmail ends up applying. The
+// explicit width=""/height="" attributes are still there for Outlook,
+// which does not reliably honour height:auto.
 export function emailHeader() {
   return `<!-- Header -->
               <tr>
                 <td align="center" bgcolor="${CREAM}" style="padding:6px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
-                  <img src="${LOGO_URL}" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="haloe" style="display:block;width:${LOGO_WIDTH}px;height:${LOGO_HEIGHT}px;border:0;outline:none;">
+                  <img src="${LOGO_URL}" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="haloe" style="display:block;width:${LOGO_WIDTH}px;height:auto;max-width:${LOGO_WIDTH}px;border:0;outline:none;">
                   <div style="font-family:${FONT};font-size:11px;letter-spacing:3px;color:${GOLD_DEEP};text-transform:uppercase;margin-top:10px;">Hijama &middot; Wellness &middot; Manchester</div>
                 </td>
               </tr>`;
