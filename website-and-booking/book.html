@@ -583,27 +583,6 @@
     line-height: 1.45;
     margin: 0.6rem 0.25rem 0.9rem;
   }
-  .svc-included {
-    margin-top: 0.6rem;
-  }
-  .svc-included summary {
-    font-size: 0.98rem;
-    font-weight: 500;
-    color: var(--gold-deep);
-    cursor: pointer;
-    padding: 0.4rem 0;
-    min-height: 28px;
-    list-style: none;
-  }
-  .svc-included summary::-webkit-details-marker { display: none; }
-  .svc-included summary::before { content: '+ '; }
-  .svc-included[open] summary::before { content: '– '; }
-  .svc-included-missing {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    line-height: 1.45;
-    margin: 0.2rem 0 0.4rem;
-  }
   .service-name {
     font-family: 'Poppins', sans-serif;
     font-size: 1.1rem;
@@ -1715,7 +1694,7 @@
         <button class="tab-btn seg-option" data-cat="packages" role="tab" aria-selected="false" tabindex="-1">Packages</button>
       </div>
     </div>
-    <p class="packages-policy-line hidden" id="packages-policy-line">Packages are paid in full. Free reschedule or full refund up to 48 hours before a session; inside 48 hours, sessions are non-refundable but can be moved once.</p>
+    <p class="packages-policy-line hidden" id="packages-policy-line">Packages are paid in full. Free reschedule or full refund up to 48 hours before a session; inside 48 hours, sessions are non-refundable but can be moved once. For more information contact Halima on WhatsApp: <a href="https://wa.me/447474833643" style="color:#a8873a;text-decoration:none;">07474 833643</a></p>
 
     <div class="service-grid" id="service-grid" role="radiogroup" aria-label="Treatment"></div>
 
@@ -2365,10 +2344,6 @@ function renderServices() {
         <span class="svc-main">
           <span class="svc-name">${s.name}</span>
           ${s.pkgMeta ? `<span class="svc-meta-line">${s.pkgMeta}</span>` : ''}
-          <details class="svc-included" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()">
-            <summary>What's included</summary>
-            <p class="svc-included-missing">Session-by-session details aren't listed here yet — message Halima on WhatsApp before booking to confirm exactly what each session covers.</p>
-          </details>
         </span>
         <span class="svc-right-col">${priceEl}${durTag}</span>`;
     } else {
