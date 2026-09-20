@@ -19,12 +19,17 @@ export const BODY_TEXT = '#5a5247';
 export const GOLD = '#C8A96E';
 export const GOLD_DEEP = '#8a6a2c';
 export const HAIRLINE = 'rgba(13,13,13,0.08)';
-// Poppins where the client supports web fonts, Arial/Helvetica everywhere
-// else (most email clients strip @font-face entirely).
-export const FONT = "'Poppins', Arial, Helvetica, sans-serif";
-// Headings fall back to Georgia — the closest web-safe match to the site's
-// Playfair Display serif — since custom fonts don't load in most clients.
-export const FONT_HEADING = "Georgia, 'Times New Roman', serif";
+// Poppins where the client supports web fonts (a <link> to the Google Fonts
+// CSS in emailShell's <head> covers Apple Mail and some Gmail apps), with a
+// web-safe sans fallback everywhere else — most clients strip @font-face and
+// external stylesheets entirely.
+export const FONT = "'Poppins', 'Helvetica Neue', Arial, sans-serif";
+// Headings use the same Poppins stack at weight 600 (set inline per h1),
+// not a serif fallback — the site's heading font is Playfair Display via a
+// self-hosted web font, which email clients can't load any more reliably
+// than Poppins, so falling back to Georgia/Times just swaps one unreliable
+// font for a different, unrelated-looking one instead of degrading cleanly.
+export const FONT_HEADING = FONT;
 
 // The flower logo + "haloe" wordmark, pre-rendered together as a single PNG
 // (2x, 598x240) because email clients don't render SVG reliably and won't
@@ -39,8 +44,10 @@ export const FONT_HEADING = "Georgia, 'Times New Roman', serif";
 // rounded-pill canvas at 2x (~48px/24px-at-1x padding) and re-exporting if
 // either source changes.
 export const LOGO_URL = 'https://haloe.health/images/email-logo@2x.png';
-export const LOGO_WIDTH = 210;
-export const LOGO_HEIGHT = 84;
+// The file is 598x240 (ratio 2.492) — keep display dimensions on that same
+// ratio or the pill stretches. 200x80 (ratio 2.5) is the closest clean pair.
+export const LOGO_WIDTH = 200;
+export const LOGO_HEIGHT = 80;
 
 // POST an email through the Resend REST API. Throws on a non-2xx response.
 export async function sendEmail(apiKey, payload) {
@@ -154,6 +161,7 @@ export function emailShell(innerRows) {
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light">
     <meta name="supported-color-schemes" content="light">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
       body, table, td, div, p, a, span, h1 { font-family: ${FONT}; }
