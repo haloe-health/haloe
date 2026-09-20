@@ -4,8 +4,9 @@
     {
       "name": "haloe",
       "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "cd website-and-booking && npx wrangler pages dev . --port 8788"],
-      "port": 8788
+      "runtimeArgs": ["/c", "cd website-and-booking && npx wrangler pages dev ."],
+      "port": 8788,
+      "autoPort": true
     }
   ]
 }

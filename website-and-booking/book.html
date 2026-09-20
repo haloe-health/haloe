@@ -122,7 +122,8 @@
     --radius-full: 9999px;
 
     /* Tan Ashford is the heading font site-wide again (Sep 2026) — .panel-title
-       and .where-title (the only non-h1-h4 "headings" on this page) use it. */
+       is the only non-h1-h4 "heading" on this page that uses it. .where-title
+       is a card label and uses Poppins 600 instead. */
     --font-heading: 'Tan Ashford', Georgia, serif;
   }
 
@@ -695,13 +696,14 @@
   .where-icon-tile svg { width: 22px; height: 22px; display: block; }
   .where-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.16rem; }
   .where-title {
-    font-family: var(--font-heading);
+    /* Card label, not a heading — Poppins 600 to match all other card/
+       treatment labels on the page. .panel-title keeps Tan Ashford. */
+    font-family: Poppins, sans-serif;
     font-size: 22px;
     color: var(--cream);
-    font-weight: normal;
-    font-synthesis: none;
-    letter-spacing: -0.025em;
-    line-height: 1.15;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
   }
   .where-subtitle {
     display: flex;
@@ -1668,7 +1670,6 @@
         <textarea id="address" placeholder="House number, street, postcode" oninput="checkStep3()"></textarea>
       </div>
       <p class="field-error" id="address-error"></p>
-      <p class="loc-line" id="clinic-venue-note" style="display:none;"></p>
     </div>
 
     <div class="ios-group">
@@ -1688,6 +1689,11 @@
         <label for="notes">Notes</label>
         <textarea id="notes" placeholder="Anything Halima should know"></textarea>
       </div>
+    </div>
+
+    <div id="clinic-venue-block" style="display:none;">
+      <p class="ios-group-label">Your appointment location</p>
+      <p class="clinic-venue-note-text loc-line" id="clinic-venue-note" style="margin-top:0;margin-bottom:1rem;"></p>
     </div>
 
     <p class="ios-group-label">Consent</p>
@@ -2596,14 +2602,15 @@ function checkStep3() {
   document.getElementById('address-row').style.display = isClinic() ? 'none' : '';
   const addressError = document.getElementById('address-error');
   const venueNote = document.getElementById('clinic-venue-note');
+  const venueBlock = document.getElementById('clinic-venue-block');
   if (isClinic()) {
     if (addressError) addressError.classList.remove('visible');
     if (venueNote) {
       venueNote.textContent = `${CLINIC_VENUE_NAME} — ${CLINIC_VENUE_ADDRESS}. Check in at reception on arrival.`;
-      venueNote.style.display = '';
     }
-  } else if (venueNote) {
-    venueNote.style.display = 'none';
+    if (venueBlock) venueBlock.style.display = '';
+  } else {
+    if (venueBlock) venueBlock.style.display = 'none';
   }
 
   const nameOk = document.getElementById('fullname').value.trim().length > 0;
