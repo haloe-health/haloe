@@ -403,7 +403,12 @@
     background: var(--black);
     transition: box-shadow 0.2s ease;
     margin-bottom: 1.2rem;
-    padding: 0 16px;
+    /* Break out of .book-shell's horizontal padding so the sticky bar
+       reaches the screen edges, then restore 16px gutters for the pills. */
+    margin-left: calc(-1 * clamp(1rem, 4vw, 1.5rem));
+    margin-right: calc(-1 * clamp(1rem, 4vw, 1.5rem));
+    padding-left: 16px;
+    padding-right: 16px;
   }
   .category-tabs-wrap.is-stuck { box-shadow: 0 1px 0 var(--hairline), 0 4px 12px rgba(13,13,13,0.06); }
   .category-tabs {
