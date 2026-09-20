@@ -16,41 +16,61 @@ const FROM = 'haloe <halima@haloe.health>';
 const PREVIEW_TO = 'iamhalimayasmin@gmail.com';
 const GUIDE_URL = 'https://haloe.health/before-your-session';
 
+function formatPenceGBP(pence) {
+  const pounds = pence / 100;
+  return '£' + (Number.isInteger(pounds) ? String(pounds) : pounds.toFixed(2));
+}
+
 export async function onRequestGet(context) {
   const apiKey = context.env.RESEND_API_KEY;
   if (!apiKey) {
     return new Response('RESEND_API_KEY is not configured.', { status: 500 });
   }
 
-  const clientSample = {
-    name: 'Aisha Rahman',
-    phone: '07123 456789',
-    email: PREVIEW_TO,
-    treatment: 'Full Back',
-    date: 'Tuesday, 6 October 2026',
-    time: '2:00 pm',
+  // Self-consistent sample figures — Total paid is always derived from these
+  // same three numbers (price - discount + travel), exactly like
+  // create-checkout.js/stripe-webhook.js do from the real metadata.
+  const treatmentPence = 9000;   // £90
+  const discountPence = 1800;    // HALOE20, 20% off £90
+  const clinicTravelPence = 0;   // no travel fee on Clinic Day
+  const mobileTravelPence = 1500; // Zone A
+
+  function buildSample(overrides) {
+    const travelPence = overrides.travelPence || 0;
+    const totalPence = treatmentPence - discountPence + travelPence;
+    return {
+      name: 'Aisha Rahman',
+      phone: '07123 456789',
+      email: PREVIEW_TO,
+      treatment: 'Full Back',
+      date: 'Tuesday, 6 October 2026',
+      time: '2:00 pm',
+      venue: 'Milton Hall',
+      address: '',
+      notes: 'First session, a little nervous.',
+      originalAmountLabel: formatPenceGBP(treatmentPence),
+      discountRowLabel: 'HALOE20 discount',
+      discountLabel: '−' + formatPenceGBP(discountPence),
+      amount: formatPenceGBP(totalPence),
+      ...overrides,
+    };
+  }
+
+  const clientSample = buildSample({
     location: 'clinic',
-    venue: 'Milton Hall',
-    address: '',
-    amount: '£90.00',
-    notes: 'First session, a little nervous.',
-    originalAmountLabel: '£90',
-    discountRowLabel: 'HALOE20 discount',
-    discountLabel: '−£18.00',
     travelLabel: '',
     travelZone: '',
-    travelPence: 0,
-  };
+    travelPence: clinicTravelPence,
+  });
 
-  const halimaSample = {
-    ...clientSample,
+  const halimaSample = buildSample({
     location: 'mobile',
     venue: '',
     address: '12 Ashfield Road, Oldham, OL9 7QE',
-    travelLabel: '£15.00',
+    travelLabel: formatPenceGBP(mobileTravelPence),
     travelZone: 'A',
-    travelPence: 1500,
-  };
+    travelPence: mobileTravelPence,
+  });
 
 function formatGBP(pence) {
   const pounds = (Number(pence) || 0) / 100;
@@ -70,7 +90,8 @@ function locationLabel(d) {
 // COMPLIANCE: wellness/symptom language only — no claims to treat/cure/manage conditions.
 function clientEmailHtml(d) {
   const clinicNote = d.location === 'clinic'
-    ? `<p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Your session is at ${esc(d.venue)}: ${esc(CLINIC_VENUE_ADDRESS)}. Check in at reception on the ground floor — they'll direct you to the room. Lift access is available.</p>`
+    ? `<p style="color:${INK};font-size:14px;font-weight:600;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Getting there</p>
+       <p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Milton Hall is at 244 Deansgate. When you arrive, Musa at the concierge desk will be expecting you — just give your name and he'll point you to Room 4 on the 3rd floor. Take the lift, or if you'd rather, the wide baroque staircase is worth the climb. Please arrive five minutes early. The room sits behind a key-coded door, so if it's closed, take a seat and Halima will come and collect you.</p>`
     : '';
   const cancellationNote = `<p style="color:${BODY_TEXT};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>`;
 

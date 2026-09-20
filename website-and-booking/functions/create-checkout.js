@@ -170,6 +170,11 @@ export async function onRequestPost(context) {
       params.append('metadata[travelZone]', travelZone);
       params.append('metadata[travelPence]', String(travelPence));
     }
+    // The same figure Stripe is being charged (treatmentAmount + travelPence)
+    // — a fallback for the webhook's "Total paid" if session.amount_total is
+    // ever missing, so that fallback can't silently diverge from what the
+    // customer actually paid.
+    params.append('metadata[totalAmountPence]', String(totalAmount));
     // Expire the Checkout Session in step with the slot hold, so an abandoned
     // payment and its reservation lapse together.
     params.append('expires_at', String(now + HOLD_SECONDS));

@@ -100,10 +100,16 @@ export async function onRequestPost(context) {
     const address = upperPostcode(md.customerAddress || '');
     const notes = md.notes || '';
 
+    // session.amount_total is the authoritative figure — exactly what Stripe
+    // charged. The fallback reads metadata[totalAmountPence], the same
+    // treatmentAmount + travelPence figure create-checkout.js computed and
+    // sent to Stripe as line items, so "Total paid" can never diverge from
+    // the Treatment/Discount/Travel rows below, which are built from that
+    // same metadata.
     const amountPence =
       typeof session.amount_total === 'number'
         ? session.amount_total
-        : parseInt(md.amount || '0', 10);
+        : parseInt(md.totalAmountPence || '0', 10);
     const amount = formatGBP(amountPence);
     const paymentLabel = `${amount} — paid in full`;
     // Every booking is paid in full — there is no deposit path.
@@ -339,7 +345,8 @@ function locationLabel(d) {
 // COMPLIANCE: wellness/symptom language only — no claims to treat/cure/manage conditions.
 function clientEmailHtml(d) {
   const clinicNote = d.location === 'clinic'
-    ? `<p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Your session is at ${esc(d.venue)}: ${esc(CLINIC_VENUE_ADDRESS)}. Check in at reception on the ground floor — they'll direct you to the room. Lift access is available.</p>`
+    ? `<p style="color:${INK};font-size:14px;font-weight:600;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Getting there</p>
+       <p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Milton Hall is at 244 Deansgate. When you arrive, Musa at the concierge desk will be expecting you — just give your name and he'll point you to Room 4 on the 3rd floor. Take the lift, or if you'd rather, the wide baroque staircase is worth the climb. Please arrive five minutes early. The room sits behind a key-coded door, so if it's closed, take a seat and Halima will come and collect you.</p>`
     : '';
   const cancellationNote = `<p style="color:${BODY_TEXT};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>`;
 

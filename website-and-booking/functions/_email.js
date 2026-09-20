@@ -27,11 +27,20 @@ export const FONT = "'Poppins', Arial, Helvetica, sans-serif";
 export const FONT_HEADING = "Georgia, 'Times New Roman', serif";
 
 // The flower logo + "haloe" wordmark, pre-rendered together as a single PNG
-// (2x, transparent background) because email clients don't render SVG
-// reliably and won't load the self-hosted Tan Ashford font for the wordmark.
-// Regenerate by compositing haloe-logo-flower.svg + the Tan Ashford wordmark
-// on a canvas at 2x and re-exporting if either changes.
+// (2x, 598x240) because email clients don't render SVG reliably and won't
+// load the self-hosted Tan Ashford font for the wordmark. The cream rounded
+// pill background is baked into the raster image itself (not the
+// surrounding HTML) — Gmail/Apple Mail dark mode can still invert the page's
+// CSS background despite the color-scheme meta tags, and an image with a
+// transparent background would then show the near-black wordmark sitting on
+// an inverted-dark page background, unreadable. An opaque background baked
+// into the pixels can't be touched by that inversion. Regenerate by
+// compositing haloe-logo-flower.svg + the Tan Ashford wordmark onto a cream
+// rounded-pill canvas at 2x (~48px/24px-at-1x padding) and re-exporting if
+// either source changes.
 export const LOGO_URL = 'https://haloe.health/images/email-logo@2x.png';
+export const LOGO_WIDTH = 210;
+export const LOGO_HEIGHT = 84;
 
 // POST an email through the Resend REST API. Throws on a non-2xx response.
 export async function sendEmail(apiKey, payload) {
@@ -73,7 +82,7 @@ export function emailHeader() {
   return `<!-- Header -->
               <tr>
                 <td align="center" bgcolor="${CREAM}" style="padding:6px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
-                  <img src="${LOGO_URL}" width="190" height="65" alt="haloe" style="display:block;width:190px;height:65px;border:0;outline:none;">
+                  <img src="${LOGO_URL}" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="haloe" style="display:block;width:${LOGO_WIDTH}px;height:${LOGO_HEIGHT}px;border:0;outline:none;">
                   <div style="font-family:${FONT};font-size:11px;letter-spacing:3px;color:${GOLD_DEEP};text-transform:uppercase;margin-top:10px;">Hijama &middot; Wellness &middot; Manchester</div>
                 </td>
               </tr>`;
