@@ -2118,11 +2118,6 @@ const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
    Without this the wizard always opened on Massage, so someone who tapped
    "Stress & Anxiety" landed on face massages instead of their package.
    The category alone is enough; svc is optional and matched by exact name. */
-// Show the "Test booking" treatment only when ?test=1 is in the URL.
-// Remove this flag (and the TEST ONLY entries in services-data.js,
-// functions/_services.js and HB_SERVICES in index.html) before sustained
-// live traffic. One line to change: set TEST_MODE = false here.
-const TEST_MODE = new URLSearchParams(location.search).has('test');
 
 function applyDeepLink() {
   const params = new URLSearchParams(location.search);
@@ -2349,10 +2344,7 @@ function renderServices() {
     return;
   }
 
-  // Hide test-only treatments unless ?test=1 is in the URL. The data entry
-  // in services-data.js is the single source of truth; this filter is the
-  // only place that controls visibility.
-  const visibleServices = TEST_MODE ? services : services.filter(s => s.name !== 'Test booking');
+  const visibleServices = services;
   const ordered = isPackages ? orderedPackages(visibleServices) : orderedTreatments(visibleServices);
 
   grid.innerHTML = ordered.map(({ s, i }) => {

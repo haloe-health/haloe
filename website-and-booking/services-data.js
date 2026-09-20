@@ -13,9 +13,7 @@
 // own quirks (badges, no desc on non-package items), so it wasn't folded in.
 const SERVICES = {
   massage: [
-    // TEST ONLY — remove before sustained live traffic
-    { name: 'Test booking', time: '45 min', price: 0.50, desc: 'Internal test booking — not visible on normal visits.' },
-    { name: 'Face Massage', time: '45 min', price: 40, desc: 'Gentle facial massage to relax and refresh.' },
+{ name: 'Face Massage', time: '45 min', price: 40, desc: 'Gentle facial massage to relax and refresh.' },
     { name: 'Head Massage', time: '45 min', price: 40, desc: 'Soothing scalp and head massage to help you unwind.' },
     { name: 'Face & Head Massage', time: '1 hour', price: 70, desc: 'Face and scalp together, for deeper calm.' },
     { name: 'Head & Foot Massage', time: '1 hour', price: 60, desc: 'Head and feet, for head-to-toe ease.' },

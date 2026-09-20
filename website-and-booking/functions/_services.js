@@ -12,9 +12,7 @@
 // client-supplied duration.
 export const SERVICES = {
   massage: [
-    // TEST ONLY — remove before sustained live traffic
-    { name: 'Test booking', price: 0.50, min: 45 },
-    { name: 'Face Massage', price: 40, min: 45 },
+{ name: 'Face Massage', price: 40, min: 45 },
     { name: 'Head Massage', price: 40, min: 45 },
     { name: 'Face & Head Massage', price: 70, min: 60 },
     { name: 'Head & Foot Massage', price: 60, min: 60 },
