@@ -405,37 +405,22 @@
     margin-bottom: 1.2rem;
   }
   .category-tabs-wrap.is-stuck { box-shadow: 0 1px 0 var(--hairline), 0 4px 12px rgba(13,13,13,0.06); }
-  .category-tabs-wrap::after {
-    content: '';
-    position: absolute;
-    right: 0; top: 0; bottom: 0;
-    width: 40px;
-    background: linear-gradient(to right, transparent, var(--tab-fade-to, var(--black)));
-    pointer-events: none;
-    z-index: 1;
-  }
   .category-tabs {
     display: flex;
     flex-wrap: nowrap;
     gap: 8px;
-    padding: 6px 40px 6px 16px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    padding: 6px 16px;
     background: transparent;
     border-radius: 0;
     margin-bottom: 0;
   }
-  .category-tabs::-webkit-scrollbar { display: none; }
   .category-tabs .seg-option {
-    flex: none;
-    scroll-snap-align: start;
+    flex: 1;
     border-radius: 999px;
     border: none;
-    padding: 10px 14px;
+    padding: 8px 12px;
     font-family: 'Poppins', sans-serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     line-height: 1;
     min-height: 0;
@@ -444,6 +429,7 @@
     background: #ede8df;
     color: #5a5040;
     transition: background 0.18s, color 0.18s;
+    text-align: center;
   }
   .category-tabs .seg-option.active {
     background: #a8873a;
@@ -465,7 +451,7 @@
   @media (max-width: 560px) {
     .category-tabs {
       gap: 8px;
-      padding: 6px 40px 6px 16px;
+      padding: 6px 16px;
     }
     .footbar .foot-cta {
       font-size: 1.1rem;
@@ -524,7 +510,8 @@
      second line (long treatment names) without ever pushing the price down
      onto its own line: name is flex:1 or truncation, price is
      flex-shrink:0. */
-  .svc-top-row { display: flex; align-items: baseline; gap: 0.8rem; }
+  .svc-top-row { display: flex; align-items: baseline; gap: 0; }
+  .svc-dur-inline { flex: none; color: #888; font-weight: 400; white-space: nowrap; font-size: 1.362rem; }
   .svc-name {
     flex: 1; min-width: 0;
     font-size: 1.362rem; /* 17px */
@@ -535,6 +522,8 @@
   }
   .svc-price {
     flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 0.8rem;
     font-size: 1.362rem; /* 17px */
     font-weight: 500;
     font-variant-numeric: tabular-nums;
@@ -2380,12 +2369,11 @@ function renderServices() {
           </details>
         </span>`;
     } else {
-      const metaLine = [s.time ? `<span class="svc-duration">${s.time}</span>` : '', s.desc || '']
-        .filter(Boolean).join(' · ');
+      const durSpan = s.time ? `<span class="svc-dur-inline"> · ${s.time}</span>` : '';
       body = `
         <span class="svc-main">
-          <span class="svc-top-row"><span class="svc-name">${s.name}</span>${priceEl}</span>
-          ${metaLine ? `<span class="svc-meta-line">${metaLine}</span>` : ''}
+          <span class="svc-top-row"><span class="svc-name">${s.name}</span>${durSpan}${priceEl}</span>
+          ${s.desc ? `<span class="svc-meta-line">${s.desc}</span>` : ''}
         </span>`;
     }
     return `<div class="service-card${selected ? ' selected' : ''}" role="radio" aria-checked="${selected}" tabindex="${selected || (state.serviceIndex === null && ordered[0].i === i) ? '0' : '-1'}" onclick="selectService(${i})" onkeydown="serviceCardKeydown(event, ${i})">${ring}${body}</div>`;
