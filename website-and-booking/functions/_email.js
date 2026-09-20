@@ -104,7 +104,7 @@ export function emailButton(href, label) {
 export function emailHeader() {
   return `<!-- Header -->
               <tr>
-                <td align="center" bgcolor="${CREAM}" style="padding:6px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
+                <td align="center" bgcolor="${CREAM}" style="padding:3px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
                   <img src="${LOGO_URL}" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="haloe" style="display:block;width:${LOGO_WIDTH}px;height:auto;max-width:${LOGO_WIDTH}px;border:0;outline:none;">
                   <div style="font-family:${FONT};font-size:11px;letter-spacing:3px;color:${GOLD_DEEP};text-transform:uppercase;margin-top:10px;">Hijama &middot; Wellness &middot; Manchester</div>
                 </td>
@@ -187,7 +187,7 @@ export function emailShell(innerRows) {
   <body style="margin:0;padding:0;background:${CREAM};font-family:${FONT};">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${CREAM}" style="border-collapse:collapse;background:${CREAM};">
       <tr>
-        <td align="center" bgcolor="${CREAM}" style="padding:32px 16px;background:${CREAM};">
+        <td align="center" bgcolor="${CREAM}" style="padding:16px 16px 32px;background:${CREAM};">
           <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:480px;max-width:100%;border-collapse:collapse;">
             ${innerRows}
           </table>
