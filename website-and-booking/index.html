@@ -352,13 +352,19 @@
      stops the browser from faking a bold/oblique variant it doesn't have).
      font-weight:normal to match how this font is used everywhere else
      (the "haloe" wordmark is always weight:normal — there's no bold cut).
-     clamp() floor re-measured for Tan Ashford specifically (its letterforms
-     run noticeably wider than Playfair's) via canvas measureText against
-     the real hero container width, not eyeballed: 1.4375rem/23px is the
-     largest size "Modern standards." (the longer of the two lines) still
-     renders on one line at a 375px viewport, with the explicit <br> in the
-     markup (not this rule) doing the actual two-line split between phrases. */
-  .hero-title { font-family:var(--font-hero-serif); font-weight:normal; font-synthesis:none; font-size:clamp(1.4375rem,6vw,3.6rem); margin-top:20px; }
+     Considered letting "Modern standards." wrap naturally at a bigger
+     clamp(2rem,8vw,2.75rem) instead of holding each phrase to one line —
+     tried it, rejected it: at 32px (the 375px floor) even "Ancient
+     healing." itself wraps, splitting into "Ancient" / "healing." /
+     "Modern" / "standards." across four short lines, which reads like a
+     layout accident, not a deliberate two-clause break. -0.025em
+     letter-spacing plus a re-measured floor (canvas measureText against
+     the real hero container width, not eyeballed) gets both phrases back
+     to one line each at 1.5rem/24px — smaller than the old Playfair
+     version, but legible and intentional-looking beats larger and broken.
+     The explicit <br> in the markup (not this rule) does the two-line
+     split between phrases. */
+  .hero-title { font-family:var(--font-hero-serif); font-weight:normal; font-synthesis:none; font-size:clamp(1.5rem,6vw,3.6rem); letter-spacing:-0.025em; margin-top:20px; }
   .hero-title em { font-style:normal; color:var(--gold-deep); }
   .hero-sub { margin-top:14px; max-width:52ch; font-size:1.02rem; }
   /* Promo card: dashed border -> a slightly deeper cream fill, same 24px
