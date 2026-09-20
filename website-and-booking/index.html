@@ -194,9 +194,18 @@
   .menu-btn[aria-expanded="true"] span:nth-child(2) { opacity:0; }
   .menu-btn[aria-expanded="true"] span:nth-child(3) { transform:translateY(-6px) rotate(-45deg); }
 
-  .brand { display:flex; align-items:center; gap:10px; text-decoration:none; flex:1; justify-content:center; }
-  .brand img { height:38px; width:auto; display:block; }
-  .brand .wordmark { font-family:var(--font-wordmark); font-style:normal; font-weight:normal; font-size:1.5rem; color:var(--ink); letter-spacing:0.02em; }
+  /* Lock-up alignment (Sep 2026): font-size lives on .brand itself, not the
+     wordmark, so the icon's em-based height/offset below resolves against
+     the SAME reference the wordmark uses — em on the icon would otherwise
+     inherit font-size from .brand's own ancestor instead of the wordmark's,
+     silently breaking the scaling this whole lock-up depends on.
+     1.17em/-0.2918em aren't round numbers — they come from measuring Tan
+     Ashford's actual rendered glyphs (canvas TextMetrics on "haloe": the
+     font's ascenders overshoot its own em-box, so naive flex centering
+     undershoots the optical centre). See COMPONENTS.md before touching. */
+  .brand { display:flex; align-items:center; gap:calc(1.17em * 0.35); text-decoration:none; flex:1; justify-content:center; font-size:1.5rem; }
+  .brand img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
+  .brand .wordmark { font-family:var(--font-wordmark); font-style:normal; font-weight:normal; font-size:1em; line-height:1; color:var(--ink); letter-spacing:0.02em; }
 
   .header-actions { display:flex; align-items:center; gap:10px; flex:none; }
   .icon-btn {
@@ -471,9 +480,11 @@
   .site-footer { background:var(--ink); color:var(--cream); padding:56px 0 28px; }
   .footer-top { display:flex; flex-direction:column; gap:32px; }
   @media (min-width:768px) { .footer-top { flex-direction:row; justify-content:space-between; } }
-  .footer-brand { display:flex; align-items:center; gap:10px; }
-  .footer-brand img { height:30px; }
-  .footer-brand span { font-family:var(--font-wordmark); font-style:normal; font-size:1.4rem; }
+  /* Same lock-up fix as .brand above (see its comment) — font-size on the
+     container, icon sized/offset in em against that same reference. */
+  .footer-brand { display:flex; align-items:center; gap:calc(1.17em * 0.35); font-size:1.4rem; }
+  .footer-brand img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
+  .footer-brand span { font-family:var(--font-wordmark); font-style:normal; font-size:1em; line-height:1; }
   .footer-col h5 { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
   .footer-col a, .footer-col p { display:block; color:#C8C2B7; text-decoration:none; font-size:0.9rem; margin-bottom:8px; }
   .footer-col a:hover { color:var(--gold); }

@@ -276,3 +276,73 @@ class is what keeps them safe; adding a new conditional box is opt-in.
 Hiding is CSS-only, so a hidden `<textarea>` keeps any text already typed and
 still submits it. Answer Yes, type, then switch to No, and the note is stored
 alongside the "No". Clear the field on change if that matters for the record.
+
+---
+
+## Logo lock-up (flower + wordmark)
+
+The honeycomb flower mark next to the "haloe" wordmark, in Tan Ashford.
+Appears as `.brand`/`.footer-brand` (`index.html`), `.nav-logo`/`.footer-left`
+(`before-your-session.html`, `intake.html`), and as a baked PNG for email
+(`images/email-logo@2x.png`, via `functions/_email.js`).
+
+**The icon is vertically centred on the wordmark's cap-height, not
+baseline-sitting.** Cap-height here means the span from the top of the "l"/"h"
+ascender down to the baseline — measured from Tan Ashford's *actual rendered
+glyphs*, not the font's nominal em-box: canvas `TextMetrics` on the string
+"haloe" gives `actualBoundingBoxAscent` ≈ **1.17×** the font-size (this font's
+ascenders overshoot its own em-box — confirmed against Arial/Playfair Display
+controls, which measure ~0.72–0.79×, so it's a real font trait, not a
+fallback-font artifact) and `actualBoundingBoxDescent` ≈ 0 (no descenders in
+"haloe"). Gap between icon and wordmark is **0.35× the icon's width**.
+
+### CSS (site)
+
+```css
+.brand { display:flex; align-items:center; gap:calc(1.17em * 0.35); font-size:1.5rem; }
+.brand img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
+.brand .wordmark { font-family:var(--font-wordmark); font-size:1em; line-height:1; letter-spacing:0.02em; }
+```
+
+Font-size lives on the **container**, not the wordmark span — the icon's `em`
+values must resolve against that same reference. Setting `font-size` only on
+the wordmark (the old code) means the icon's `em` inherits from *its own*
+ancestor instead, silently breaking the scaling this whole lock-up depends on.
+
+`-0.2918em` is not a rounded/guessed number. Plain `align-items:center` +
+`line-height:1` centres the icon on the wordmark's *line box* (the font's
+design ascent+descent, 0.8em+0.2em here), which sits measurably lower than
+the box the real ink actually occupies (1.17em+0em) once a font's ascenders
+overshoot its own em-box this much — the two only coincide for "normal"
+fonts. The `-0.2918em` translateY is the measured correction for Tan Ashford
+specifically; re-derive it (see below) if the wordmark font ever changes.
+
+### Re-deriving the numbers (if the font changes)
+
+```js
+await document.fonts.load("100px '<font>'");
+const m = document.createElement('canvas').getContext('2d');
+m.font = "normal 100px '<font>'";
+const t = m.measureText('haloe');
+const ascentRatio = t.actualBoundingBoxAscent / 100;   // -> icon height/width, in em
+// Then empirically find the translateY correction: apply align-items:center
+// + line-height:1 + icon height/width:${ascentRatio}em, measure the icon's
+// actual centre vs. the text's true ink centre (baseline - (ascent-descent)/2
+// above the baseline) via getBoundingClientRect, and translateY the icon by
+// the difference. See the git history of index.html's .brand rule for the
+// exact measurement script used for Tan Ashford.
+```
+
+### Email PNG
+
+`images/email-logo@2x.png` bakes the same lock-up into a raster image (email
+clients can't load the self-hosted font or reliably render SVG) on an opaque
+cream rounded-pill background (see the `LOGO_URL` comment in
+`functions/_email.js` for why the background must be baked in, not
+transparent). Regenerate by drawing the icon at `height = 1.17 ×
+<wordmark font-size>` with its **bottom edge at the text baseline** (so it
+spans exactly ascender-top to baseline — equivalent to the site's
+translateY correction, but simpler to express directly against a canvas
+baseline instead of a flex line-box), gap = `0.35 ×` the icon's width, then
+compare a screenshot of the result against a live `.brand` clone at the same
+font-size before saving.

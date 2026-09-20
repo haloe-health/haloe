@@ -70,11 +70,17 @@
     -webkit-backdrop-filter:blur(20px);
     border-bottom:1px solid var(--border);
   }
-  .nav-logo { display:flex; align-items:center; gap:14px; text-decoration:none; }
-  .nav-logo img { height:38px; width:auto; display:block; }
+  /* Lock-up alignment (Sep 2026): font-size lives on .nav-logo itself, not
+     the wordmark span, so the icon's em-based height/offset resolves
+     against the SAME reference the wordmark uses. 1.17em/-0.2918em come
+     from measuring Tan Ashford's actual rendered glyphs (canvas TextMetrics
+     on "haloe") — its ascenders overshoot its own em-box, so naive flex
+     centering undershoots the optical centre. See COMPONENTS.md. */
+  .nav-logo { display:flex; align-items:center; gap:calc(1.17em * 0.35); text-decoration:none; font-size:1.5rem; }
+  .nav-logo img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
   .nav-logo span {
     font-family:var(--font-wordmark);
-    font-size:1.5rem; color:var(--gold-deep);
+    font-size:1em; line-height:1; color:var(--gold-deep);
     letter-spacing:0.02em; font-weight:normal;
     text-transform:none;
   }
@@ -336,11 +342,12 @@
     border-top:1px solid var(--border);
     display:flex; justify-content:space-between; align-items:center;
   }
-  .footer-left { display:flex; align-items:center; gap:14px; }
-  .footer-left img { height:24px; }
+  /* Same lock-up fix as .nav-logo above (see its comment). */
+  .footer-left { display:flex; align-items:center; gap:calc(1.17em * 0.35); font-size:1.3rem; }
+  .footer-left img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
   .footer-left span {
     font-family:var(--font-wordmark);
-    font-size:1.3rem; color:var(--gold);
+    font-size:1em; line-height:1; color:var(--gold);
     letter-spacing:0.02em; font-weight:normal;
   }
   .footer-links { display:flex; gap:32px; }

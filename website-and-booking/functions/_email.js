@@ -32,7 +32,7 @@ export const FONT = "'Poppins', 'Helvetica Neue', Arial, sans-serif";
 export const FONT_HEADING = FONT;
 
 // The flower logo + "haloe" wordmark, pre-rendered together as a single PNG
-// (2x, 340x160) because email clients don't render SVG reliably and won't
+// (2x, 545x190) because email clients don't render SVG reliably and won't
 // load the self-hosted Tan Ashford font for the wordmark. The cream rounded
 // pill background is baked into the raster image itself (not the
 // surrounding HTML) — Gmail/Apple Mail dark mode can still invert the page's
@@ -41,19 +41,20 @@ export const FONT_HEADING = FONT;
 // an inverted-dark page background, unreadable. An opaque background baked
 // into the pixels can't be touched by that inversion.
 //
-// Regenerate by measuring the real site header's .brand img/.wordmark
-// boxes (getBoundingClientRect + computed font-size) as ground truth, then
-// composite haloe-logo-flower.svg + the Tan Ashford wordmark onto a cream
-// rounded-pill canvas scaled uniformly from those same proportions — fix a
-// display HEIGHT and derive width from the content, never force both
-// dimensions to arbitrary values, or the composition drifts from the site's
-// actual logo-to-wordmark ratio even before any email client touches it.
-// Always screenshot the result next to the live header at the same height
-// before saving — see the auto-generated 170x80 (340x160 file) numbers
-// below, which came from that comparison, not a guess.
+// Lock-up (Sep 2026): the icon is NOT baseline-sitting — it's centred on the
+// wordmark's cap-height span (top of the "l"/"h" ascender to the baseline),
+// same alignment as .brand/.footer-brand/.nav-logo/.footer-left on the
+// live site (see index.html's .brand comment for where 1.17/0.35 come
+// from — Tan Ashford's real rendered ascent, measured via canvas
+// TextMetrics, not a guess). Regenerate by drawing the icon at
+// height = 1.17 × the wordmark's font-size, with its bottom edge at the
+// text baseline (so it spans exactly the ascender-to-baseline range), gap
+// = 0.35 × the icon's width, then compare a screenshot of the result
+// against a live-site .brand clone at the same font-size before saving —
+// the 272x95 (545x190 file) numbers below came from that comparison.
 export const LOGO_URL = 'https://haloe.health/images/email-logo@2x.png';
-export const LOGO_WIDTH = 170;
-export const LOGO_HEIGHT = 80;
+export const LOGO_WIDTH = 272;
+export const LOGO_HEIGHT = 95;
 
 // POST an email through the Resend REST API. Throws on a non-2xx response.
 export async function sendEmail(apiKey, payload) {
