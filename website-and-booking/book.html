@@ -1465,6 +1465,113 @@
       font-size: 15px;
     }
   }
+
+  /* ---- Step 4: label-above full-width fields ---- */
+  .field-block { margin-bottom: 1.15rem; position: relative; }
+  .field-label {
+    display: block;
+    font-size: 0.825rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 0.42rem;
+    letter-spacing: 0.01em;
+  }
+  .field-optional { font-weight: 400; opacity: 0.65; }
+  .field-input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    height: 3.5rem; /* ~56px at 78% base */
+    padding: 0 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem; /* real 16px — avoids Safari zoom */
+    font-weight: 400;
+    color: var(--cream);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--hairline-border);
+    border-radius: 1rem;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+  .field-input:focus {
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 0 3px rgba(200,169,110,0.18);
+  }
+  .field-input.invalid {
+    border-color: #E5736A;
+    box-shadow: 0 0 0 3px rgba(229,115,106,0.12);
+  }
+  .field-input::placeholder { color: #9C9486; }
+  .field-textarea {
+    height: auto;
+    min-height: 5.5rem;
+    padding: 0.88rem 1rem;
+    resize: none;
+    line-height: 1.5;
+  }
+  .field-select-wrap { position: relative; }
+  .field-select { padding-right: 2.6rem; cursor: pointer; }
+  .field-select option { background: var(--obsidian-elevated); color: var(--cream); }
+  .field-chevron {
+    position: absolute; right: 1rem; top: 50%;
+    transform: translateY(-50%) scaleY(0.85);
+    color: var(--text-muted); font-size: 1.3rem;
+    pointer-events: none; line-height: 1;
+  }
+  .field-helper {
+    font-size: 0.78rem; color: var(--text-muted);
+    margin-top: 0.38rem; line-height: 1.5;
+  }
+  /* field-error reused — already declared above; add block-level display */
+  .field-block .field-error { display: none; margin-top: 0.38rem; }
+  .field-block .field-error.visible { display: block; }
+  /* Autofill override for new fields */
+  .field-input:-webkit-autofill,
+  .field-input:-webkit-autofill:hover,
+  .field-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--cream);
+    box-shadow: inset 0 0 0 1000px rgba(28,28,30,0.98), 0 0 0 0px transparent;
+    transition: background-color 100000s;
+  }
+  .field-input.invalid:-webkit-autofill,
+  .field-input.invalid:-webkit-autofill:focus {
+    -webkit-text-fill-color: #E5736A;
+  }
+
+  /* ---- Consent checkboxes (replaces ios-toggle on step 4) ---- */
+  .consent-block { margin-bottom: 1.6rem; }
+  .consent-row {
+    display: flex; align-items: flex-start; gap: 0.85rem;
+    padding: 0.88rem 0; cursor: pointer;
+    border-bottom: 1px solid var(--hairline-border);
+  }
+  .consent-block .consent-row:last-child { border-bottom: none; }
+  .consent-check {
+    flex: none; width: 24px; height: 24px; margin-top: 0.07rem;
+    border: 1.5px solid rgba(255,255,255,0.22);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.06);
+    -webkit-appearance: none; appearance: none;
+    cursor: pointer; position: relative;
+    transition: border-color 0.18s, background 0.18s;
+  }
+  .consent-check:checked {
+    background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary));
+    border-color: transparent;
+  }
+  .consent-check:checked::after {
+    content: '';
+    position: absolute; left: 7px; top: 3px;
+    width: 6px; height: 11px;
+    border: 2px solid var(--obsidian-base);
+    border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+  .consent-check:focus-visible { box-shadow: 0 0 0 3px var(--active-border); }
+  .consent-text { font-size: 0.875rem; color: var(--cream); line-height: 1.55; }
+
 </style>
 </head>
 <body>
@@ -1650,32 +1757,46 @@
     <p class="panel-title">Your details.</p>
     <p class="panel-sub">All information is held in confidence.</p>
 
-    <div class="ios-group">
-      <div class="ios-row">
-        <label for="fullname">Name</label>
-        <input type="text" id="fullname" placeholder="Your full name" oninput="checkStep3()">
-      </div>
-      <div class="ios-row">
-        <label for="phone">Mobile</label>
-        <input type="tel" id="phone" placeholder="07700 000000" oninput="checkStep3()">
-      </div>
+    <div class="field-block">
+      <label class="field-label" for="fullname">Name</label>
+      <input class="field-input" type="text" id="fullname"
+             placeholder="Your full name"
+             autocomplete="name" enterkeyhint="next"
+             oninput="checkStep3()" onblur="markTouched('fullname')">
+      <p class="field-error" id="fullname-error"></p>
+    </div>
+
+    <div class="field-block">
+      <label class="field-label" for="phone">Mobile</label>
+      <input class="field-input" type="tel" id="phone"
+             placeholder="07700 000000"
+             inputmode="tel" autocomplete="tel" enterkeyhint="next"
+             oninput="checkStep3()" onblur="markTouched('phone')">
       <p class="field-error" id="phone-error"></p>
-      <div class="ios-row">
-        <label for="email">Email</label>
-        <input type="email" id="email" placeholder="your@email.com" oninput="checkStep3()">
-      </div>
+    </div>
+
+    <div class="field-block">
+      <label class="field-label" for="email">Email</label>
+      <input class="field-input" type="email" id="email"
+             placeholder="your@email.com"
+             inputmode="email" autocomplete="email" enterkeyhint="next"
+             oninput="checkStep3()" onblur="markTouched('email')">
       <p class="field-error" id="email-error"></p>
-      <div class="ios-row" id="address-row">
-        <label for="address">Address</label>
-        <textarea id="address" placeholder="House number, street, postcode" oninput="checkStep3()"></textarea>
-      </div>
+    </div>
+
+    <div class="field-block" id="address-row">
+      <label class="field-label" for="address">Address</label>
+      <textarea class="field-input field-textarea" id="address" rows="3"
+                placeholder="House number, street, postcode"
+                autocomplete="street-address"
+                oninput="checkStep3()" onblur="markTouched('address')"></textarea>
       <p class="field-error" id="address-error"></p>
     </div>
 
-    <div class="ios-group">
-      <div class="ios-row">
-        <label for="referral">Heard via</label>
-        <select id="referral">
+    <div class="field-block">
+      <label class="field-label" for="referral">How did you hear about us?</label>
+      <div class="field-select-wrap">
+        <select class="field-input field-select" id="referral">
           <option value="">Please select</option>
           <option>Instagram</option>
           <option>TikTok</option>
@@ -1684,11 +1805,15 @@
           <option>Word of mouth</option>
           <option>Other</option>
         </select>
+        <span class="field-chevron" aria-hidden="true">&#8964;</span>
       </div>
-      <div class="ios-row">
-        <label for="notes">Notes</label>
-        <textarea id="notes" placeholder="Anything Halima should know"></textarea>
-      </div>
+    </div>
+
+    <div class="field-block">
+      <label class="field-label" for="notes">Anything I should know? <span class="field-optional">(optional)</span></label>
+      <textarea class="field-input field-textarea" id="notes" rows="3"
+                placeholder="Tell Halima here"></textarea>
+      <p class="field-helper">Medications, pregnancy, recent surgery, or anything that affects your session.</p>
     </div>
 
     <div id="clinic-venue-block" style="display:none;">
@@ -1697,20 +1822,18 @@
     </div>
 
     <p class="ios-group-label">Consent</p>
-    <div class="ios-group">
-      <label class="ios-toggle">
-        <span>I confirm I am 18 or over, or booking for a family member with their consent.</span>
-        <input type="checkbox" id="consent1" onchange="checkStep3()">
-        <span class="switch"></span>
+    <div class="consent-block">
+      <label class="consent-row">
+        <input type="checkbox" class="consent-check" id="consent1" onchange="checkStep3()">
+        <span class="consent-text">I confirm I am 18 or over, or booking for a family member with their consent.</span>
       </label>
-      <label class="ios-toggle">
-        <span>I understand haloe offers complementary wellness therapy, not a substitute for medical diagnosis or treatment.</span>
-        <input type="checkbox" id="consent2" onchange="checkStep3()">
-        <span class="switch"></span>
+      <label class="consent-row">
+        <input type="checkbox" class="consent-check" id="consent2" onchange="checkStep3()">
+        <span class="consent-text">I understand haloe offers complementary wellness therapy, not a substitute for medical diagnosis or treatment.</span>
       </label>
     </div>
 
-    <button class="btn-primary" id="btn-step4" onclick="goToStep(5)" disabled>Review Booking</button>
+    <button class="btn-primary" id="btn-step4" onclick="goToStep(5)" disabled>Review booking</button>
   </div>
 
   <!-- STEP 5: Confirm -->
@@ -2598,6 +2721,9 @@ function isClinic() {
   return state.location === 'clinic';
 }
 
+const touchedFields = new Set();
+function markTouched(id) { touchedFields.add(id); checkStep3(); }
+
 function checkStep3() {
   document.getElementById('address-row').style.display = isClinic() ? 'none' : '';
   const addressError = document.getElementById('address-error');
@@ -2606,20 +2732,32 @@ function checkStep3() {
   if (isClinic()) {
     if (addressError) addressError.classList.remove('visible');
     if (venueNote) {
-      venueNote.textContent = `${CLINIC_VENUE_NAME} — ${CLINIC_VENUE_ADDRESS}. Check in at reception on arrival.`;
+      venueNote.textContent = `${CLINIC_VENUE_ADDRESS} · Check in at reception on arrival.`;
     }
     if (venueBlock) venueBlock.style.display = '';
   } else {
     if (venueBlock) venueBlock.style.display = 'none';
   }
 
-  const nameOk = document.getElementById('fullname').value.trim().length > 0;
-  const emailOk = validateField('email', 'email-error', isValidEmail,
-    'Please enter a valid email address so we can send your intake form.');
-  const phoneOk = validateField('phone', 'phone-error', isValidPhone,
-    'Please enter a valid UK mobile number (e.g. 07700 900900 or +44 7700 900900).');
-  const addressOk = isClinic() || validateField('address', 'address-error', isValidAddress,
-    'Please include your full address and postcode so Halima knows where to travel to.');
+  const fullnameEl = document.getElementById('fullname');
+  const nameOk = fullnameEl.value.trim().length > 0;
+  if (touchedFields.has('fullname')) {
+    fullnameEl.classList.toggle('invalid', !nameOk);
+    const err = document.getElementById('fullname-error');
+    if (err) { err.textContent = nameOk ? '' : 'Please enter your name.'; err.classList.toggle('visible', !nameOk); }
+  }
+  const emailOk = touchedFields.has('email')
+    ? validateField('email', 'email-error', isValidEmail,
+        'Please enter a valid email address.')
+    : isValidEmail(document.getElementById('email').value.trim());
+  const phoneOk = touchedFields.has('phone')
+    ? validateField('phone', 'phone-error', isValidPhone,
+        'Please enter a valid UK mobile number (e.g. 07700 900900).')
+    : isValidPhone(document.getElementById('phone').value.trim());
+  const addressOk = isClinic() || (touchedFields.has('address')
+    ? validateField('address', 'address-error', isValidAddress,
+        'Please include your full address and postcode.')
+    : isValidAddress(document.getElementById('address').value.trim()));
   const consentsOk =
     document.getElementById('consent1').checked &&
     document.getElementById('consent2').checked;
@@ -2940,6 +3078,9 @@ function notifyWhatsApp(paymentType) {
 }
 
 function goToStep(n) {
+  // Reset touched tracking whenever the customer navigates away from step 4
+  // so errors don't carry over on Back+Forward.
+  if (n !== 4) touchedFields.clear();
   if (n === 5 && state.serviceIndex === null) { alert("Please select a treatment first."); return; }
   currentStep = n;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
