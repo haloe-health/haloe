@@ -208,7 +208,7 @@ function guideEmailHtml(fullName) {
               <!-- Intro -->
               <tr>
                 <td style="padding:30px 4px 4px;">
-                  <h1 style="color:${INK};font-size:22px;font-weight:600;margin:0 0 18px;font-family:${FONT_HEADING};">Your form is in — thank you</h1>
+                  <h1 style="color:${INK};font-size:24px;font-weight:normal;margin:0 0 18px;font-family:${FONT_HEADING};">Your form is in — thank you</h1>
                   <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">${greeting}</p>
                   <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">Thank you for completing your intake form — that's everything I need, and you're all set for your session.</p>
                   <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0 0 22px;font-family:${FONT};">Before you come, please take a couple of minutes to read your short pre-session guide. It walks you through exactly what to expect on the day and how to prepare so you feel completely at ease.</p>

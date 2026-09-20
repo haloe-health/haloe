@@ -37,7 +37,8 @@
     --dim: #5a5247;
     --border: rgba(13,13,13,0.1);
     --radius: 0px;
-    --font-wordmark: 'Tan Ashford', 'Playfair Display', Georgia, serif;
+    --font-heading: 'Tan Ashford', Georgia, serif;
+    --font-wordmark: 'Tan Ashford', Georgia, serif;
   }
   @font-face {
     font-family: 'Tan Ashford';
@@ -145,20 +146,20 @@
   .section-tag.center { justify-content:center; }
   .section-tag::before { content:''; width:24px; height:1px; background:var(--gold); opacity:0.6; }
 
-  /* Headings — Poppins 600, no italic gold second line (Sep 2026, was
-     weight 300 with a "h1/h2 em" gold-italic treatment; the em rules and
-     every <em> that used them were removed). */
+  /* Headings — Tan Ashford again (Sep 2026, reverts the brief Poppins
+     pass). Normal weight/font-synthesis:none (no bold or italic cut to
+     fake), -0.025em tracking, no italic gold second line either way. */
   h1 {
-    font-family:'Poppins',sans-serif;
-    font-size:1.875rem;
-    font-weight:600; line-height:1.18;
-    margin-bottom:24px; letter-spacing:-0.01em;
+    font-family:var(--font-heading);
+    font-size:clamp(1.75rem,7vw,2.75rem);
+    font-weight:normal; font-synthesis:none; line-height:1.05;
+    margin-bottom:24px; letter-spacing:-0.025em;
   }
   h2 {
-    font-family:'Poppins',sans-serif;
-    font-size:1.5rem;
-    font-weight:600; line-height:1.2; margin-bottom:20px;
-    letter-spacing:-0.01em;
+    font-family:var(--font-heading);
+    font-size:clamp(1.5rem,5.5vw,2rem);
+    font-weight:normal; font-synthesis:none; line-height:1.05; margin-bottom:20px;
+    letter-spacing:-0.025em;
   }
   .cert-tag {
     font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase;

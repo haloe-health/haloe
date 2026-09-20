@@ -7,6 +7,7 @@
 <meta name="description" content="Book your hijama or cupping session in Manchester with haloe. Secure online booking.">
 <link rel="canonical" href="https://haloe.health/book.html">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="haloe">
@@ -28,12 +29,22 @@
      actual woff2 from a per-request, UA-subsetted URL that isn't known
      until their CSS response comes back, so a direct <link rel="preload">
      to a specific font file (as intake.html does for the self-hosted Tan
-     Ashford) isn't available here. 300/400/500/600 are the weights
-     actually used across this page (checked via grep, not guessed). -->
+     Ashford, which now IS preloaded above — Tan Ashford is back as the
+     site's heading font, Sep 2026) isn't available here. 300/400/500/600
+     are the weights actually used across this page (checked via grep, not
+     guessed). -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+  @font-face {
+    font-family: 'Tan Ashford';
+    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
+         url('fonts/TAN-ASHFORD.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
   /* ── Branded loading screen (presentation only) ──
      Minimal on purpose (Sep 2026, replaced a bigger icon + shimmer-bar
      version): just the flower, static but for a gentle opacity pulse — no
@@ -109,6 +120,10 @@
     --radius-lg: 2rem;
     --radius-xl: 3rem;
     --radius-full: 9999px;
+
+    /* Tan Ashford is the heading font site-wide again (Sep 2026) — .panel-title
+       and .where-title (the only non-h1-h4 "headings" on this page) use it. */
+    --font-heading: 'Tan Ashford', Georgia, serif;
   }
 
   /* Dark mode (Sep 2026): a defined dark palette, not auto-inversion.
@@ -315,19 +330,20 @@
     color: var(--text-sand);
     margin-bottom: 0.5rem;
   }
-  /* Booking flow uses Poppins only (Sep 2026) — no serif display font, no
-     italic gold second line. 2.163rem = 27px, mid-range of the requested
-     26-28px, at weight 600 (the same Poppins 600 the page already loads,
-     no new weight needed). Scoped to this page's own :root/inline styles,
-     same as the removed --font-heading var was — index.html defines its
-     own separate --font-heading and is untouched by this. */
+  /* Step titles: Tan Ashford again (Sep 2026, reverts the brief Poppins
+     experiment) — same treatment as the site's other headings: normal
+     weight (no bold cut), font-synthesis:none (no italic face either),
+     -0.025em tracking. clamp(1.5rem,6vw,1.75rem) per spec; line-height
+     1.15 since these read as a smaller/secondary heading tier than a
+     page h1. Never italic, no gold second line. */
   .panel-title {
-    font-family: 'Poppins', sans-serif;
-    font-size: 2.163rem;
-    font-weight: 600;
+    font-family: var(--font-heading);
+    font-size: clamp(1.5rem, 6vw, 1.75rem);
+    font-weight: normal;
+    font-synthesis: none;
     color: var(--cream);
     margin-bottom: 0.5rem;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.025em;
     line-height: 1.15;
   }
   .panel-sub {
@@ -679,11 +695,13 @@
   .where-icon-tile svg { width: 22px; height: 22px; display: block; }
   .where-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.16rem; }
   .where-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-heading);
     font-size: 22px;
     color: var(--cream);
-    font-weight: 600;
-    line-height: 1.2;
+    font-weight: normal;
+    font-synthesis: none;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
   }
   .where-subtitle {
     display: flex;

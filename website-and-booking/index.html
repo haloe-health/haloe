@@ -78,17 +78,12 @@
     --card-shadow: 0 8px 24px rgba(13,13,13,0.06);
     --dark-card-bg: #0D0D0D;
     --container: 1180px;
-    /* Sep 2026: Poppins is the site-wide heading font now (see the h1-h4
-       rule below) — this var is scoped to exactly one element, the hero
-       headline (.hero-title), the single non-Poppins heading on the whole
-       site. Renamed from --font-heading, which implied it drove every
-       heading, to make that narrow scope explicit. Was Playfair Display,
-       now Tan Ashford — the same self-hosted wordmark font as the "haloe"
-       logo lock-up, already @font-face'd and preloaded below/in <head>, so
-       this doesn't add a new font request. Georgia is the fallback if Tan
-       Ashford fails to load, not Playfair, which the site no longer loads
-       at all. */
-    --font-hero-serif: 'Tan Ashford', Georgia, serif;
+    /* Sep 2026: Tan Ashford is the site-wide heading font again (h1-h4 rule
+       below) — the Poppins-headings experiment from the previous few
+       commits is reverted. Same self-hosted font as the "haloe" wordmark
+       lock-up, already @font-face'd and preloaded in <head>, so this adds
+       no new font request. Georgia is the fallback if it fails to load. */
+    --font-heading: 'Tan Ashford', Georgia, serif;
     --font-body: 'Poppins', sans-serif;
     --font-wordmark: 'Tan Ashford', Georgia, serif;
 
@@ -164,13 +159,21 @@
   @media (prefers-color-scheme: dark) { body::before { opacity:0.05; } }
   #siteHeader, main, footer.site-footer { position:relative; z-index:1; }
 
-  /* Poppins 600 is the default for every heading site-wide (Sep 2026) —
-     h1 ~30px, h2 24px, h3 20px, h4 18px, overridden per-section below
-     where a heading needs its own size. The one exception, .hero-title,
-     sets its own font-family back to --font-hero-serif (Tan Ashford). */
-  h1, h2, h3, h4 { font-family:'Poppins', sans-serif; font-weight:600; color:var(--text); line-height:1.15; }
-  h1 { font-size:1.875rem; }
-  h2 { font-size:1.5rem; }
+  /* Tan Ashford is the default for every heading site-wide again (Sep
+     2026 — reverts the Poppins-headings pass). No italic (the font has no
+     italic face), font-synthesis:none so browsers don't fake one, -0.025em
+     tracking to match the hero. Tan Ashford runs wide — sized to allow
+     wrapping rather than shrunk to force one line; where a heading wraps
+     awkwardly mid-phrase, prefer an explicit <br> at the natural phrase
+     break (see .hero-title) over a smaller size. */
+  h1, h2, h3, h4 {
+    font-family:var(--font-heading); font-weight:normal; font-synthesis:none;
+    letter-spacing:-0.025em; color:var(--text);
+  }
+  h1, h2 { line-height:1.05; }
+  h3, h4 { line-height:1.15; }
+  h1 { font-size:clamp(1.75rem,7vw,2.75rem); }
+  h2 { font-size:clamp(1.5rem,5.5vw,2rem); }
   h3 { font-size:1.25rem; }
   h4 { font-size:1.125rem; }
   a { color:inherit; }
@@ -190,7 +193,6 @@
     color:var(--gold-deep); margin-bottom:10px; display:block;
   }
   .section-head { max-width:640px; margin:0 0 32px; }
-  .section-head h2 { font-size:1.5rem; }
   .section-head p { margin-top:10px; color:var(--text-muted); font-size:1rem; }
 
   /* ---- Cards ---- */
@@ -346,12 +348,9 @@
     box-shadow:var(--card-shadow); font-size:0.85rem; font-weight:600; color:var(--text);
   }
   .badge-pill svg { width:16px; height:16px; flex:none; color:var(--gold-deep); }
-  /* The one non-Poppins heading on the site (Tan Ashford, Sep 2026 — was
-     Playfair Display italic; Tan Ashford has no italic face at all, so the
-     gold half of the headline stays upright, and font-synthesis:none stops
-     the browser faking a bold/oblique variant it doesn't have).
-     font-weight:normal to match how this font is used everywhere else (the
-     "haloe" wordmark is always weight:normal — there's no bold cut).
+  /* The hero headline — an h1, so font-family/weight/synthesis/tracking/
+     line-height all come from the global h1,h2 rule above now; only its
+     own oversized font-size and top margin are set here.
      A deliberate four-line stack — "Ancient"/"healing."/"Modern"/
      "standards.", each its own .ht-line, forced via display:block rather
      than left to wrap naturally. Two earlier attempts at keeping this to
@@ -366,7 +365,7 @@
      canvas measureText against the real hero container at 375/430px
      (not eyeballed) confirm every word — "standards." is the widest —
      stays well inside it at both. */
-  .hero-title { font-family:var(--font-hero-serif); font-weight:normal; font-synthesis:none; font-size:clamp(2.25rem,10.5vw,3.25rem); line-height:1.05; letter-spacing:-0.025em; margin-top:20px; }
+  .hero-title { font-size:clamp(2.25rem,10.5vw,3.25rem); margin-top:20px; }
   .hero-title .ht-line { display:block; }
   .hero-title .ht-gold { color:var(--gold-deep); }
   .hero-sub { margin-top:14px; max-width:52ch; font-size:1.02rem; }
@@ -580,7 +579,6 @@
     background:var(--gold); border-radius:var(--card-radius);
     padding:40px 24px; text-align:center;
   }
-  .cta-card h2 { font-size:1.5rem; }
   .cta-card p { margin-top:10px; color:var(--ink); opacity:0.75; }
   .cta-benefits { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:22px; }
   .cta-benefit { background:var(--ink); color:var(--cream); border-radius:999px; padding:8px 16px; font-size:0.8rem; font-weight:600; }

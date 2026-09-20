@@ -99,7 +99,7 @@ function clientEmailHtml(d) {
               <!-- Intro -->
               <tr>
                 <td style="padding:28px 4px 18px;">
-                  <h1 style="color:${INK};font-size:22px;font-weight:600;margin:0 0 16px;font-family:${FONT_HEADING};">Your booking is confirmed</h1>
+                  <h1 style="color:${INK};font-size:24px;font-weight:normal;margin:0 0 16px;font-family:${FONT_HEADING};">Your booking is confirmed</h1>
                   <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 14px;font-family:${FONT};">Dear ${esc(d.name)},</p>
                   <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0;font-family:${FONT};">Thank you for booking with haloe. Your payment has been received and your appointment is reserved. We look forward to welcoming you for a calm, restorative session.</p>
                 </td>
@@ -138,7 +138,7 @@ function halimaEmailHtml(d) {
   const inner = `<tr>
                 <td style="padding:0 0 16px;">
                   <div style="color:${GOLD_DEEP};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:${FONT};font-weight:600;">New booking &middot; payment received</div>
-                  <h1 style="color:${INK};font-size:20px;font-weight:600;margin:8px 0 0;font-family:${FONT_HEADING};">${esc(d.name)}</h1>
+                  <h1 style="color:${INK};font-size:22px;font-weight:normal;margin:8px 0 0;font-family:${FONT_HEADING};">${esc(d.name)}</h1>
                 </td>
               </tr>
               ${heroRow(d.date, d.time, locationLabel(d))}
@@ -173,7 +173,7 @@ function guideEmailHtml(fullName) {
               <!-- Intro -->
               <tr>
                 <td style="padding:30px 4px 4px;">
-                  <h1 style="color:${INK};font-size:22px;font-weight:600;margin:0 0 18px;font-family:${FONT_HEADING};">Your form is in — thank you</h1>
+                  <h1 style="color:${INK};font-size:24px;font-weight:normal;margin:0 0 18px;font-family:${FONT_HEADING};">Your form is in — thank you</h1>
                   <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">${greeting}</p>
                   <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">Thank you for completing your intake form — that's everything I need, and you're all set for your session.</p>
                   <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0 0 22px;font-family:${FONT};">Before you come, please take a couple of minutes to read your short pre-session guide. It walks you through exactly what to expect on the day and how to prepare so you feel completely at ease.</p>

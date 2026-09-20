@@ -24,12 +24,20 @@ export const HAIRLINE = 'rgba(13,13,13,0.08)';
 // web-safe sans fallback everywhere else — most clients strip @font-face and
 // external stylesheets entirely.
 export const FONT = "'Poppins', 'Helvetica Neue', Arial, sans-serif";
-// Headings use the same Poppins stack at weight 600 (set inline per h1),
-// not a serif fallback — the site's heading font is Playfair Display via a
-// self-hosted web font, which email clients can't load any more reliably
-// than Poppins, so falling back to Georgia/Times just swaps one unreliable
-// font for a different, unrelated-looking one instead of degrading cleanly.
-export const FONT_HEADING = FONT;
+// Headings (Sep 2026): Tan Ashford, matching the site's heading font again,
+// via an @font-face in emailShell()'s <style> pointing at the hosted woff2
+// on haloe.health — Apple Mail (and some other clients that honour
+// @font-face/embedded fonts) will actually load and render it; everything
+// else silently falls through to Georgia, a real serif rather than a
+// same-family swap, since most clients strip @font-face entirely and never
+// fetch it. Body text stays Poppins -> Arial (FONT), unaffected either way.
+// Never relied on for layout — no size/line-height math assumes Tan Ashford
+// specifically loaded, since most recipients won't get it.
+export const FONT_HEADING = "'Tan Ashford', Georgia, 'Times New Roman', serif";
+// Absolute, publicly-reachable URL — email clients fetch fonts (when they
+// fetch them at all) with no notion of a relative path, same reasoning as
+// LOGO_URL below.
+export const FONT_HEADING_URL = 'https://haloe.health/fonts/TAN-ASHFORD.woff2';
 
 // The flower logo + "haloe" wordmark, pre-rendered together as a single PNG
 // (2x, 1068x286) because email clients don't render SVG reliably and won't
@@ -141,7 +149,7 @@ export function heroRow(eyebrow, big, sub) {
                     <tr>
                       <td align="center" style="padding:22px 16px;font-family:${FONT};">
                         <div style="color:${GOLD_DEEP};font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;">${esc(eyebrow)}</div>
-                        <div style="color:${INK};font-size:30px;font-weight:600;letter-spacing:-0.5px;margin-top:3px;">${esc(big)}</div>
+                        <div style="color:${INK};font-family:${FONT_HEADING};font-size:32px;font-weight:normal;letter-spacing:-0.5px;margin-top:3px;">${esc(big)}</div>
                         ${sub ? `<div style="color:${BODY_TEXT};font-size:13px;margin-top:6px;">${esc(sub)}</div>` : ''}
                       </td>
                     </tr>
@@ -189,7 +197,18 @@ export function emailShell(innerRows) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-      body, table, td, div, p, a, span, h1 { font-family: ${FONT}; }
+      /* Apple Mail (and any other client that honours @font-face in HTML
+         email, which most don't) loads the real heading font from here;
+         every h1 below sets font-family inline to FONT_HEADING, which
+         falls through to Georgia/Times New Roman for everyone else. Never
+         relied on for layout — no spacing/sizing assumes this loaded. */
+      @font-face {
+        font-family: 'Tan Ashford';
+        src: url('${FONT_HEADING_URL}') format('woff2');
+        font-weight: normal;
+        font-style: normal;
+      }
+      body, table, td, div, p, a, span { font-family: ${FONT}; }
       :root { color-scheme: light; supported-color-schemes: light; }
     </style>
   </head>

@@ -6,9 +6,18 @@
 <title>Booking Confirmed · haloe</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  @font-face {
+    font-family: 'Tan Ashford';
+    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
+         url('fonts/TAN-ASHFORD.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
   :root {
     /* Light theme (Sep 2026) — was true-black/dark-surface. */
     --gold: #C8A96E;
@@ -21,7 +30,10 @@
     --s3: #F0EAE0;
     --sep: rgba(13,13,13,0.08);
     --sep2: rgba(13,13,13,0.14);
+    --font-heading: 'Tan Ashford', Georgia, serif;
   }
+  /* Root scaled to 78% (16px -> 12.5px) — every rem size below, including
+     h1's, is sized relative to THAT, not 16px. */
   html { font-size: 78%; }
   body {
     background: var(--page-bg);
@@ -47,9 +59,13 @@
     stroke: var(--gold); fill: none;
     stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
   }
+  /* Tan Ashford (Sep 2026, was Poppins 500) — 78%-root compensated so this
+     actually renders at the spec's 28-44px: 1.75rem/2.75rem -> 2.244rem/
+     3.526rem (vw is viewport-relative, unaffected by root scaling). */
   h1 {
-    font-size: 1.85rem; font-weight: 500;
-    letter-spacing: -0.03em; line-height: 1.12;
+    font-family: var(--font-heading); font-synthesis: none;
+    font-size: clamp(2.244rem, 7vw, 3.526rem); font-weight: normal;
+    letter-spacing: -0.025em; line-height: 1.05;
     text-align: center;
   }
   .sub {
