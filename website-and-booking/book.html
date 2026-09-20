@@ -2367,11 +2367,7 @@ function renderServices() {
     let body;
     if (isPackages) {
       const sessions = packageSessionCount(s.time);
-      const windowText = (s.time || '').replace(/^\d+\s*sessions?\s*·\s*/i, '');
-      const perSession = sessions ? Math.round(netPrice(s) / sessions) : null;
-      const metaLine = sessions && perSession
-        ? `£${perSession} each${windowText ? ' · over ' + windowText : ''}`
-        : (s.time || '');
+      const metaLine = s.time || '';
       const durTag = sessions ? `<span class="svc-dur-tag">${sessions} sessions</span>` : '';
       body = `
         <span class="svc-main">
