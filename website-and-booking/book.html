@@ -1524,13 +1524,16 @@
   /* field-error reused — already declared above; add block-level display */
   .field-block .field-error { display: none; margin-top: 0.38rem; }
   .field-block .field-error.visible { display: block; }
-  /* Autofill override for new fields */
+  /* Autofill override for step 4 fields — force white fill, dark text.
+     Scoped to .field-input so it doesn't override the dark .ios-row fill on step 3. */
   .field-input:-webkit-autofill,
   .field-input:-webkit-autofill:hover,
-  .field-input:-webkit-autofill:focus {
-    -webkit-text-fill-color: var(--cream);
-    box-shadow: inset 0 0 0 1000px rgba(28,28,30,0.98), 0 0 0 0px transparent;
-    transition: background-color 100000s;
+  .field-input:-webkit-autofill:focus,
+  .field-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 60px #ffffff inset !important;
+    -webkit-text-fill-color: #1a1208 !important;
+    box-shadow: 0 0 0 60px #ffffff inset !important;
+    caret-color: #1a1208;
   }
   .field-input.invalid:-webkit-autofill,
   .field-input.invalid:-webkit-autofill:focus {
