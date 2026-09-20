@@ -31,13 +31,13 @@ export const SERVICES = {
   ],
   packages: [
     { name: 'Pain & Mobility', price: 340 },
-    { name: 'Breathe & Immunity', price: 340 },
+    { name: 'Breathe & Reset', price: 340 },
     { name: 'Cycle Comfort', price: 340 },
     { name: 'Stress & Sleep', price: 480 },
     { name: 'Headache & Tension', price: 480 },
-    { name: 'Digestion & Detox', price: 480 },
+    { name: 'Digestion & Comfort', price: 480 },
     { name: 'Circulation & Energy', price: 600 },
-    { name: "Women's Hormonal Balance", price: 600 },
+    { name: "Women's Cycle Care", price: 600 },
   ],
 };
 

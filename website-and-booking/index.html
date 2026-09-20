@@ -744,7 +744,7 @@
   <div class="container">
     <div class="section-head reveal">
       <span class="section-eyebrow">Who it helps</span>
-      <h2>Conditions we support</h2>
+      <h2>What people come for</h2>
       <p>Tap any condition to see how haloe can help, and book straight into the right treatment. Curious about hijama specifically? Read more about <a href="hijama-manchester.html" class="link-gold">hijama in Manchester</a>.</p>
     </div>
     <div class="cond-grid" id="condGrid">
@@ -762,7 +762,7 @@
       </button>
       <button class="cond-card card reveal" type="button" data-cond="detox">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 6 8 6 11.5A6 6 0 0 1 6 14.5C6 11 9 7 12 3z"/></svg></span>
-        <h3>Detox &amp; Cleansing</h3>
+        <h3>Reset &amp; Renewal</h3>
       </button>
       <button class="cond-card card reveal" type="button" data-cond="pain">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
@@ -1372,14 +1372,14 @@ const HB_SERVICES = {
     {name:'Head, Scalp & Full Body',time:'1 hr 45 min',price:150},
   ],
   packages:[
-    {name:'Pain & Mobility',time:'4 sessions · 8–12 wks',price:340,desc:'Targeted cupping to support ease of movement and tension relief.'},
-    {name:'Breathe & Immunity',time:'4 sessions · 16 wks',price:340,desc:'Supports respiratory wellness and immune resilience.'},
-    {name:'Cycle Comfort',time:'4 sessions · ~3 cycles',price:340,desc:'Focused on menstrual comfort and hormonal balance.'},
-    {name:'Stress & Sleep',time:'6 sessions · 24 wks',price:480,desc:'Designed to ease tension and support restful sleep patterns.'},
-    {name:'Headache & Tension',time:'6 sessions · 14 wks',price:480,desc:'Head, neck and shoulder focus for tension headache relief.'},
-    {name:'Digestion & Detox',time:'6 sessions · 24 wks',price:480,desc:'Supporting digestive comfort and overall wellbeing.'},
-    {name:'Circulation & Energy',time:'8 sessions · 18 wks',price:600,desc:'Full circulation support for vitality and energy levels.'},
-    {name:"Women's Hormonal Balance",time:'8 sessions · 16 wks',price:600,desc:'Comprehensive hormonal wellness support across the cycle.'},
+    {name:'Pain & Mobility',time:'4 sessions · 8–12 wks',price:340,desc:'Targeted cupping on areas of tension and restricted movement, over four sessions.'},
+    {name:'Breathe & Reset',time:'4 sessions · 16 wks',price:340,desc:'Four sessions on the chest, upper back and shoulders, spaced over the season.'},
+    {name:'Cycle Comfort',time:'4 sessions · ~3 cycles',price:340,desc:'Four sessions timed around your cycle — one per month, roughly three cycles.'},
+    {name:'Stress & Sleep',time:'6 sessions · 24 wks',price:480,desc:'Six evening-friendly sessions focused on the neck, shoulders and upper back.'},
+    {name:'Headache & Tension',time:'6 sessions · 14 wks',price:480,desc:'Six sessions across the head, neck and shoulders.'},
+    {name:'Digestion & Comfort',time:'6 sessions · 24 wks',price:480,desc:'Six sessions focused on the abdomen and lower back.'},
+    {name:'Circulation & Energy',time:'8 sessions · 18 wks',price:600,desc:'Eight full-body sessions over eighteen weeks.'},
+    {name:"Women's Cycle Care",time:'8 sessions · 16 wks',price:600,desc:"Eight sessions across the cycle — our most complete women's course."},
   ]
 };
 /* Promotional discount — ended Sep 2026, kept in step with PROMO_DISCOUNT
@@ -1729,9 +1729,9 @@ document.addEventListener('keydown', function (e) {
     hormonal: {
       title: 'Hormonal & Menstrual Health',
       heading: 'Cycle comfort & hormonal balance',
-      body: "Hijama has long been used to support women's hormonal wellness — helping ease the discomfort of irregular cycles, period pain, and hormonal fluctuations. The Women's Hormonal Balance package (8 sessions over 16 weeks) and Cycle Comfort — Period Relief package (4 sessions over ~3 cycles) are designed specifically for this.",
-      tags: ["Women's Hormonal Balance", 'Cycle Comfort Package', '8–16 weeks', 'Wet & dry cupping'],
-      cta: { cat: 'packages', svc: "Women's Hormonal Balance" }
+      body: "Hijama has long been used to support women's hormonal wellness — helping ease the discomfort of irregular cycles, period pain, and hormonal fluctuations. The Women's Cycle Care package (8 sessions over 16 weeks) and Cycle Comfort — Period Relief package (4 sessions over ~3 cycles) are designed specifically for this.",
+      tags: ["Women's Cycle Care", 'Cycle Comfort Package', '8–16 weeks', 'Wet & dry cupping'],
+      cta: { cat: 'packages', svc: "Women's Cycle Care" }
     },
     spiritual: {
       title: 'Spiritual Wellbeing',
@@ -1743,16 +1743,16 @@ document.addEventListener('keydown', function (e) {
     stress: {
       title: 'Stress & Anxiety',
       heading: 'Rest, release, restore',
-      body: "Cupping works deeply on the nervous system — many clients describe a profound calm that settles in during and after treatment. The Stress & Sleep package (6 sessions over 24 weeks) offers a sustained, structured course of care, pairing wet and dry cupping with follow-up consultations and a herbal oil kit to support your wellbeing between sessions.",
+      body: "Many clients describe a profound calm that settles in during and after a cupping session. The Stress & Sleep package (6 sessions over 24 weeks) offers a sustained, structured course of care, pairing wet and dry cupping with follow-up consultations and a herbal oil kit to support your wellbeing between sessions.",
       tags: ['Stress & Sleep Package', '6 sessions', '24 weeks', 'Herbal oil kit included'],
       cta: { cat: 'packages', svc: 'Stress & Sleep' }
     },
     detox: {
-      title: 'Detox & Cleansing',
-      heading: "Support your body's natural rhythm",
-      body: "Wet cupping draws blood to the surface, supporting your body's natural cleansing processes. The Digestion & Detox package (6 sessions over 24 weeks) is built around this — combining wet and dry cupping with a symptom-tracking guide so you can see real progress over time.",
-      tags: ['Digestion & Detox Package', '6 sessions', '24 weeks', 'Symptom tracking guide'],
-      cta: { cat: 'packages', svc: 'Digestion & Detox' }
+      title: 'Reset & Renewal',
+      heading: "A rhythm to reset by",
+      body: "Many clients build wet cupping into a regular rhythm as part of looking after themselves day to day. The Digestion & Comfort package (6 sessions over 24 weeks) pairs wet and dry cupping with a simple wellbeing journal, so you can see how you're getting on over time.",
+      tags: ['Digestion & Comfort Package', '6 sessions', '24 weeks', 'Wellbeing journal'],
+      cta: { cat: 'packages', svc: 'Digestion & Comfort' }
     },
     pain: {
       title: 'Chronic Pain & Tension',
