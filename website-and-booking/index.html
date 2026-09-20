@@ -615,12 +615,7 @@
     padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));
     display:flex; flex-direction:column; gap:6px;
   }
-  .mobile-bar-helper {
-    font-size:0.8125rem; /* 13px */
-    color:var(--text-muted);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    padding:0 2px;
-  }
+
   .mobile-bar-row { display:flex; align-items:center; gap:10px; }
   .mobile-bar-row .btn-pill { flex:1; height:56px; min-height:56px; font-size:1rem; }
   .mobile-bar-row .icon-btn {
@@ -1664,7 +1659,7 @@ hbInit();
      STICKY MOBILE BOTTOM BAR
      ============================================================ -->
 <div class="mobile-bar">
-  <span class="mobile-bar-helper">Pay in full online · no deposit · takes 2 minutes</span>
+
   <div class="mobile-bar-row">
     <a href="book.html" class="btn-pill btn-gold">Book a session</a>
     <a href="https://wa.me/447474833643" class="icon-btn" target="_blank" rel="noopener" aria-label="Message on WhatsApp">
