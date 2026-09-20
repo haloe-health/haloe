@@ -2247,6 +2247,8 @@ function updateRail() {
   if (fh) fh.classList.toggle('hidden', !(currentStep === 1 && !state.location));
   const sc = document.querySelector('.foot-summary-col');
   if (sc) sc.style.display = currentStep === 1 ? 'none' : '';
+  const fi = document.querySelector('.footbar-inner');
+  if (fi) fi.style.justifyContent = currentStep === 1 ? 'flex-end' : '';
   syncFooter();
 }
 
