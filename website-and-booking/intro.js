@@ -10,16 +10,36 @@
 //             centred on screen, using the exact same alignment as the
 //             site header's .brand lock-up (see COMPONENTS.md).
 //   0.6-0.9s  hold.
-//   0.9-1.6s  the whole lock-up scales up around the flower's yellow
-//             hexagon until that hexagon fills the viewport, cross-fading
-//             its fill from gold to cream as it grows.
-//   1.6-1.8s  the (by-now solid cream) overlay fades out onto the page
+//   0.9-1.6s  the flower icon scales up around its own yellow hexagon
+//             until that hexagon fills the viewport (the wordmark fades
+//             out as this starts — see "Why the icon is detached" below),
+//             cross-fading the hexagon's fill from gold to cream as it
+//             grows.
+//   1.6-1.8s  the (by-now solid cream) overlay fades onto the page
 //             underneath, which has been rendering the whole time.
 //
 // Plays once per browser session (sessionStorage "haloeIntroSeen"), respects
 // prefers-reduced-motion (static lock-up for 400ms, then fade), is
 // skippable (tap/click/Escape, or the Skip link), never blocks the page
 // underneath, and hard-caps itself at 3s.
+//
+// Font: the wordmark is real text in the self-hosted Tan Ashford font
+// (index.html preloads it), not baked into an image — ensureFontReady()
+// below additionally waits on document.fonts.ready (capped, so a slow/
+// failed font fetch can't hang the intro) before anything is revealed, so
+// the lock-up never flashes a fallback font.
+//
+// Why the icon is detached from the lock-up for the zoom: a naive
+// `transform: scale()` on the small, already-laid-out icon (or its flex
+// parent) gets promoted to its own compositor layer, which is rasterised
+// ONCE at that small on-screen size — the 60-100x scale this zoom needs
+// then stretches that small bitmap, which is what caused the reported
+// pixelation. runZoom() instead gives the icon its full FINAL pixel size
+// up front (so the SVG rasterises crisp at target resolution immediately),
+// visually shrinks it back down to the current on-screen size with an
+// initial `transform: scale(1/zoomFactor)`, then animates that transform
+// up to `scale(1)` — the layer is always at-or-above native resolution,
+// never stretched beyond it.
 (function () {
   'use strict';
 
@@ -50,7 +70,6 @@
     '#haloeIntroLockup{display:flex;align-items:center;gap:calc(1.17em * .35);font-size:clamp(2.75rem,9vw,5.5rem);',
       'opacity:0;transform:scale(.94);transition:opacity .6s ease,transform .6s ease;will-change:transform,opacity;}',
     '#haloeIntroLockup.in{opacity:1;transform:scale(1);}',
-    '#haloeIntroLockup.zooming{transition:transform .7s cubic-bezier(.45,0,.55,1);}',
     '#haloeIntroIcon{height:1.17em;width:1.17em;display:block;transform:translateY(-.2918em);overflow:visible;}',
     '#haloeIntroIcon svg{display:block;height:100%;width:100%;}',
     '#haloeIntroWordmark{font-family:"Tan Ashford","Playfair Display",Georgia,serif;font-style:normal;',
@@ -82,6 +101,7 @@
 
   var lockup = document.getElementById('haloeIntroLockup');
   var iconSlot = document.getElementById('haloeIntroIcon');
+  var wordmark = document.getElementById('haloeIntroWordmark');
   var skipBtn = document.getElementById('haloeIntroSkip');
 
   // ------------------------------------------------------------------ //
@@ -138,12 +158,27 @@
 
   overlay.focus();
 
+  // index.html already <link rel="preload">s the font, which starts the
+  // fetch as early as possible; this additionally waits (capped, so a
+  // slow/broken font fetch can't hang the intro) for it to actually be
+  // ready, so the lock-up is never revealed mid-swap from a fallback font.
+  function ensureFontReady() {
+    try {
+      return Promise.race([
+        document.fonts.load("1em 'Tan Ashford'").then(function () { return document.fonts.ready; }),
+        new Promise(function (res) { window.setTimeout(res, 1200); }),
+      ]);
+    } catch (e) {
+      return Promise.resolve();
+    }
+  }
+
   // ------------------------------------------------------------------ //
   // Reduced motion: skip the zoom choreography entirely.
   // ------------------------------------------------------------------ //
   if (reduced) {
     overlay.className = 'reduced';
-    fetchAndMountIcon().then(function () {
+    Promise.all([fetchAndMountIcon(), ensureFontReady()]).then(function () {
       timers.push(window.setTimeout(finishNow, 400));
     }).catch(finishNow);
     return;
@@ -152,8 +187,9 @@
   // ------------------------------------------------------------------ //
   // Full animation
   // ------------------------------------------------------------------ //
-  fetchAndMountIcon().then(function (svgEl) {
+  Promise.all([fetchAndMountIcon(), ensureFontReady()]).then(function (results) {
     if (finished) return;
+    var svgEl = results[0];
 
     // Phase 1 (0-0.6s): fade + scale in. Two rAFs so the initial
     // opacity:0/scale(.94) state has actually painted before the
@@ -199,43 +235,67 @@
       });
   }
 
-  // Computes the yellow hexagon's centre and size from the SVG's own
-  // coordinates (getBBox() — live geometry, not a hand-measured guess, so
-  // this stays correct if the mark or its lock-up sizing ever changes),
-  // sets the lock-up's transform-origin to that exact point, then scales
-  // the lock-up up until the hexagon covers the viewport, cross-fading the
-  // hexagon's fill to cream over the same 0.7s.
+  // Zooms the icon into its own yellow hexagon until that hexagon covers
+  // the viewport, cross-fading the hexagon's fill to cream over the same
+  // 0.7s. See the file-header comment for why the icon is detached to
+  // position:fixed and given its full final pixel size up front, instead
+  // of just scaling the small, already-laid-out element (which is what
+  // produced the pixelation this replaces).
   function runZoom(svgEl) {
     var yellow = svgEl.querySelector('path[fill="#fbb716"]');
     if (!yellow) { finishNow(); return; } // artwork changed unexpectedly — bail safely rather than zoom nowhere
 
-    var hexBox = yellow.getBBox(); // SVG user-space (== the file's own 0-375ish viewBox coordinates)
-    var svgRect = svgEl.getBoundingClientRect();
+    // The hexagon's centre and size, as fractions (0-1) of the icon's own
+    // box — computed from the SVG's own coordinates (getBBox()/viewBox),
+    // not a hand-measured guess, so this stays correct at any lock-up size.
+    var hexBox = yellow.getBBox();
     var vbox = svgEl.viewBox.baseVal;
-    var scaleToPx = svgRect.width / vbox.width; // svg is uniformly scaled (square viewBox, square box)
+    var fracX = (hexBox.x + hexBox.width / 2 - vbox.x) / vbox.width;
+    var fracY = (hexBox.y + hexBox.height / 2 - vbox.y) / vbox.height;
+    var hexDiameterFrac = Math.max(hexBox.width, hexBox.height) / vbox.width;
 
-    var hexCenterPx = {
-      x: svgRect.left + (hexBox.x + hexBox.width / 2 - vbox.x) * scaleToPx,
-      y: svgRect.top + (hexBox.y + hexBox.height / 2 - vbox.y) * scaleToPx,
-    };
-    var hexDiameterPx = Math.max(hexBox.width, hexBox.height) * scaleToPx;
-
-    var lockupRect = lockup.getBoundingClientRect();
-    var originXPct = ((hexCenterPx.x - lockupRect.left) / lockupRect.width) * 100;
-    var originYPct = ((hexCenterPx.y - lockupRect.top) / lockupRect.height) * 100;
-    lockup.style.transformOrigin = originXPct + '% ' + originYPct + '%';
+    // Where the hexagon's centre actually sits on screen right now (post
+    // phase-1, at the icon's small, laid-out size) — this point must not
+    // move for the rest of the animation.
+    var iconRect = iconSlot.getBoundingClientRect();
+    var hexScreenX = iconRect.left + fracX * iconRect.width;
+    var hexScreenY = iconRect.top + fracY * iconRect.height;
+    var hexDiameterPxNow = hexDiameterFrac * iconRect.width;
 
     // Scale until the hexagon's diameter covers the viewport diagonal (plus
     // a safety margin, since the hexagon isn't a perfect circle).
     var viewportDiagonal = Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight);
-    var scale = (viewportDiagonal * 1.15) / hexDiameterPx;
+    var zoomFactor = (viewportDiagonal * 1.15) / hexDiameterPxNow;
+    var finalSize = iconRect.width * zoomFactor; // the icon's native, full-resolution pixel size
 
-    lockup.classList.add('zooming');
-    // Force a reflow so the new (longer, eased) transition on .zooming is
-    // committed before the transform target changes in the same tick.
+    // The wordmark isn't part of the zoomed element any more — fade it out
+    // rather than let it sit static while the icon grows past it.
+    wordmark.style.transition = 'opacity .3s ease';
+    wordmark.style.opacity = '0';
+
+    // Detach from the flex flow and give it its FULL final size immediately
+    // (the SVG rasterises crisp at that size right away), positioned so the
+    // hexagon's centre lands exactly on hexScreenX/Y — then an initial
+    // transform shrinks the whole thing back down to look identical to the
+    // small, pre-zoom icon.
+    iconSlot.style.position = 'fixed';
+    iconSlot.style.margin = '0';
+    iconSlot.style.width = finalSize + 'px';
+    iconSlot.style.height = finalSize + 'px';
+    iconSlot.style.left = (hexScreenX - fracX * finalSize) + 'px';
+    iconSlot.style.top = (hexScreenY - fracY * finalSize) + 'px';
+    iconSlot.style.transformOrigin = (fracX * 100) + '% ' + (fracY * 100) + '%';
+    iconSlot.style.willChange = 'transform';
+    iconSlot.style.transform = 'scale(' + (1 / zoomFactor) + ')';
+
+    // Force a reflow so the browser commits the large-box / small-transform
+    // state above (rasterising the layer at finalSize) before the
+    // transition below starts.
     // eslint-disable-next-line no-unused-expressions
-    lockup.offsetHeight;
-    lockup.style.transform = 'scale(' + scale + ')';
+    iconSlot.offsetHeight;
+
+    iconSlot.style.transition = 'transform .7s cubic-bezier(.45,0,.55,1)';
+    iconSlot.style.transform = 'scale(1)';
 
     yellow.style.transition = 'fill .7s cubic-bezier(.45,0,.55,1)';
     yellow.style.fill = '#F5F0E8';
