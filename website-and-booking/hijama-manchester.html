@@ -56,7 +56,10 @@
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
+<!-- Poppins only (Sep 2026) — this page has no serif exception (that's
+     scoped to index.html's hero alone), so Playfair Display was dropped
+     from this request entirely. -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
     /* Light theme (Sep 2026) — was true-black; --white/--dim are still the
@@ -69,7 +72,6 @@
     --white: #0D0D0D;
     --dim: #5a5247;
     --border: rgba(13,13,13,0.1);
-    --font-heading: 'Playfair Display', 'Poppins', serif;
     --font-body: 'Poppins', sans-serif;
     --font-wordmark: 'Tan Ashford', 'Playfair Display', Georgia, serif;
   }
@@ -163,7 +165,7 @@
   .nav-overlay-links { list-style:none; text-align:center; display:flex; flex-direction:column; gap:28px; }
   .nav-overlay-links a {
     color:var(--white); text-decoration:none;
-    font-family:var(--font-heading); font-size:1.5rem; letter-spacing:0.01em;
+    font-family:'Poppins', sans-serif; font-weight:600; font-size:1.5rem; letter-spacing:0.01em;
     padding:8px 0; display:inline-block; min-height:44px;
   }
   .nav-overlay-links a:hover { color:var(--gold-deep); }
@@ -179,8 +181,8 @@
   }
   .eyebrow::before, .eyebrow::after { content:''; width:32px; height:1px; background:var(--gold); opacity:0.6; }
   h1 {
-    font-family:var(--font-heading); font-weight:500;
-    font-size:clamp(1.8rem,4vw,2.6rem); line-height:1.18;
+    font-family:'Poppins', sans-serif; font-weight:600;
+    font-size:1.875rem; line-height:1.18;
     letter-spacing:-0.01em; margin-bottom:20px;
   }
   .page-sub { color:var(--dim); font-size:1rem; max-width:560px; margin:0 auto; line-height:1.9; }
@@ -193,11 +195,10 @@
   }
   .section-tag::before { content:''; width:22px; height:1px; background:var(--gold); opacity:0.6; }
   h2 {
-    font-family:var(--font-heading); font-weight:500;
-    font-size:clamp(1.5rem,3vw,2rem); line-height:1.2; margin-bottom:22px;
+    font-family:'Poppins', sans-serif; font-weight:600;
+    font-size:1.5rem; line-height:1.2; margin-bottom:22px;
     letter-spacing:-0.01em;
   }
-  h2 em { font-style:italic; color:var(--gold-deep); }
   p { color:var(--dim); line-height:1.9; margin-bottom:18px; font-size:0.97rem; }
   p:last-child { margin-bottom:0; }
   strong { color:var(--white); font-weight:500; }
@@ -256,7 +257,7 @@
   .faq-item { padding:22px 0; border-bottom:1px solid var(--border); }
   .faq-item:last-child { border-bottom:none; }
   .faq-item summary {
-    cursor:pointer; font-family:var(--font-heading); font-size:1.05rem;
+    cursor:pointer; font-family:'Poppins', sans-serif; font-weight:600; font-size:1.05rem;
     color:var(--white); font-weight:500; list-style:none;
     display:flex; justify-content:space-between; align-items:center; gap:16px;
     min-height:44px;
@@ -363,45 +364,45 @@
 
   <section>
     <div class="section-tag">What Hijama Is</div>
-    <h2>What is <em>hijama?</em></h2>
+    <h2>What is hijama?</h2>
     <p>Hijama — wet cupping — is one of the oldest traditions in natural wellbeing, practised for thousands of years and encouraged by the Prophet Muhammad ﷺ. Cups are placed on the skin to create gentle suction, and a small number of light, superficial incisions are made before a second, shorter round of suction. Clients most often describe the sensation as a firm pulling tug, and the incisions themselves as a quick, light scratch. Sessions are generally found relaxing, and many people feel lighter and more settled afterwards. haloe also offers dry cupping — suction only, with no incisions — and massage, for anyone who'd rather ease in gently or prefers not to have their skin broken.</p>
     <p style="font-size:0.85rem;">haloe offers complementary wellness therapy to support relaxation, circulation and general wellbeing. It is not a substitute for medical advice, diagnosis or treatment.</p>
   </section>
 
   <section>
     <div class="section-tag">Safety &amp; Hygiene</div>
-    <h2>Is hijama <em>safe?</em></h2>
+    <h2>Is hijama safe?</h2>
     <p>Yes — every session follows strict hygiene practice, with single-use, sterile equipment for each client. Halima is CMA and IPHM accredited and fully insured, and every booking includes a short health and consent form beforehand so any medical considerations are known in advance. Circular marks are common after cupping and usually fade within 3 to 10 days — this is a normal, expected response, not a sign that anything has gone wrong. As with any wellness therapy, hijama isn't right for everyone; the health form helps identify anything that needs a closer look before your appointment.</p>
   </section>
 
   <section>
     <div class="section-tag">Wellbeing</div>
-    <h2>What does hijama <em>help with?</em></h2>
+    <h2>What does hijama help with?</h2>
     <p>haloe's cupping and massage sessions are complementary wellness therapy, offered to support relaxation, ease everyday tension and aches, and support general circulation and wellbeing. Many clients book hijama, dry cupping or massage as part of a regular self-care routine, or to unwind after a demanding week. These sessions are not a substitute for medical advice, diagnosis or treatment, and haloe does not claim to treat, cure or manage any specific medical condition. If you have a health concern, please see a qualified medical professional — haloe is glad to work alongside your own healthcare, not in place of it.</p>
   </section>
 
   <section>
     <div class="section-tag">Women</div>
-    <h2>Hijama for <em>women</em></h2>
+    <h2>Hijama for women</h2>
     <p>haloe welcomes women for hijama, dry cupping and massage across Manchester, whether at the Tuesday clinic on Deansgate or a home visit anywhere in Greater Manchester. Every session is private and unhurried, conducted with full respect for your comfort and modesty — just you and Halima, with the door closed and the pace entirely yours. Halima is a CMA and IPHM accredited therapist with a Level 5 Diploma, and many women choose a home visit for the added privacy of their own space, particularly for a first session. Whether you're new to cupping or have had it before, you're welcome to ask questions at any point.</p>
   </section>
 
   <section>
     <div class="section-tag">Men</div>
-    <h2>Hijama for <em>men</em></h2>
+    <h2>Hijama for men</h2>
     <p>Hijama, dry cupping and massage at haloe are open to men as well as women, with the same private, professional standard throughout. Sessions run at the Tuesday clinic at Milton Hall, Deansgate, or as a home visit anywhere across Greater Manchester — whichever suits you best. Halima is CMA and IPHM accredited, fully insured, and every appointment starts with a short health and consent form so the session can be tailored to you. Many men book hijama for the Sunnah days specifically (see below), while others prefer to fit a session around their week as a form of regular self-care.</p>
   </section>
 
   <section>
     <div class="section-tag">Timing</div>
-    <h2>Hijama on <em>sunnah days</em></h2>
+    <h2>Hijama on sunnah days</h2>
     <p>Hijama is traditionally sought on the 17th, 19th or 21st of the Islamic lunar month, and Mondays, Tuesdays or Thursdays are also commonly preferred. Where it's possible to align your appointment with one of these days, Halima is glad to help you plan around it — though availability on the day still comes first, so it's worth asking early. The Tuesday clinic at Milton Hall, Deansgate naturally falls on one of the preferred weekdays every week, which is part of why it's structured that way. Mobile visits can be booked on Sunnah dates too, subject to availability across Halima's diary that week.</p>
     <p>The majority scholarly view is that hijama does not break a fast, though opinions differ — sessions can be scheduled around Ramadan and your energy levels.</p>
   </section>
 
   <section>
     <div class="section-tag">Pricing</div>
-    <h2><em>Prices</em></h2>
+    <h2>Prices</h2>
     <p>Every price below is the full session price — the same list drives the booking wizard, so what you see here is what you'll pay at checkout. Have a discount code? It's applied at checkout, on top of these prices.</p>
     <div class="price-tabs" id="price-tabs">
       <button class="price-tab active" data-cat="massage">Massage</button>
@@ -415,7 +416,7 @@
 
   <section id="clinic-day-block">
     <div class="section-tag">Location &amp; Coverage</div>
-    <h2>Where to <em>find us</em></h2>
+    <h2>Where to find us</h2>
     <p>Every Tuesday, Halima holds a full day of appointments at Milton Hall, 244 Deansgate, Manchester, M3 4BQ — a private treatment room, not a shared space, with a receptionist on arrival, a key-coded door, and lift access throughout. Outside clinic days, haloe comes to you: home visits cover Manchester, Oldham, Salford, Rochdale, Stockport, Ashton-under-Lyne, Bury and Bolton, with a small travel fee depending on your postcode (free for the Tuesday clinic). If you've searched for hijama or cupping therapy near me, in Oldham, or anywhere across Greater Manchester, haloe is set up to reach you — book a clinic slot or a home visit at a time that works.</p>
     <div class="tag-strip">
       <div class="tag">Private treatment room</div>
@@ -427,13 +428,13 @@
 
   <section>
     <div class="section-tag">Changing Plans</div>
-    <h2>Cancellation <em>policy</em></h2>
+    <h2>Cancellation policy</h2>
     <p>Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>
   </section>
 
   <section>
     <div class="section-tag">FAQ</div>
-    <h2>A few quick <em>answers</em></h2>
+    <h2>A few quick answers</h2>
     <details class="faq-item">
       <summary>What is hijama?</summary>
       <p>Hijama is traditional wet cupping: gentle suction cups followed by a few light, superficial incisions, encouraged by the Prophet Muhammad ﷺ and practised for thousands of years.</p>
@@ -457,7 +458,7 @@
   </section>
 
   <div class="cta-final">
-    <h2>Ready when <em>you are</em></h2>
+    <h2>Ready when you are</h2>
     <p>Choose a Tuesday at Milton Hall, or a mobile visit anywhere across Greater Manchester.</p>
     <a href="book.html?cat=wet" class="btn btn-gold">Book Your Session</a>
   </div>

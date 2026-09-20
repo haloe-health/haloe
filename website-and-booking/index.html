@@ -48,7 +48,12 @@
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
+<!-- Playfair Display is now scoped to exactly one element on the whole
+     site — the hero headline's ".hero-title"/".hero-title em" (see the
+     --font-hero-serif comment below) — so only the two weight/style
+     combinations it actually uses (600 upright, 600 italic) are
+     requested, not the broad set every other heading used to pull in. -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
 <style>
   /* ============================================================
      DESIGN TOKENS — light, card-based redesign (Sep 2026).
@@ -74,7 +79,12 @@
     --card-shadow: 0 8px 24px rgba(13,13,13,0.06);
     --dark-card-bg: #0D0D0D;
     --container: 1180px;
-    --font-heading: 'Playfair Display', 'Poppins', serif;
+    /* Sep 2026: Poppins is the site-wide heading font now (see the h1-h4
+       rule below) — this var is scoped to exactly one element, the hero
+       headline (.hero-title), the single serif exception on the whole
+       site. Renamed from --font-heading, which implied it drove every
+       heading, to make that narrow scope explicit. */
+    --font-hero-serif: 'Playfair Display', 'Poppins', serif;
     --font-body: 'Poppins', sans-serif;
     --font-wordmark: 'Tan Ashford', 'Playfair Display', Georgia, serif;
 
@@ -150,7 +160,16 @@
   @media (prefers-color-scheme: dark) { body::before { opacity:0.05; } }
   #siteHeader, main, footer.site-footer { position:relative; z-index:1; }
 
-  h1, h2, h3, h4 { font-family:var(--font-heading); font-weight:600; color:var(--text); line-height:1.15; }
+  /* Poppins 600 is the default for every heading site-wide (Sep 2026) —
+     h1 ~30px, h2 24px, h3 20px, h4 18px, overridden per-section below
+     where a heading needs its own size. The one exception, .hero-title,
+     sets its own font-family back to --font-hero-serif (Playfair
+     Display) and keeps its existing clamp()-based size untouched. */
+  h1, h2, h3, h4 { font-family:'Poppins', sans-serif; font-weight:600; color:var(--text); line-height:1.15; }
+  h1 { font-size:1.875rem; }
+  h2 { font-size:1.5rem; }
+  h3 { font-size:1.25rem; }
+  h4 { font-size:1.125rem; }
   a { color:inherit; }
   img { max-width:100%; display:block; }
   button { font-family:inherit; }
@@ -168,7 +187,7 @@
     color:var(--gold-deep); margin-bottom:10px; display:block;
   }
   .section-head { max-width:640px; margin:0 0 32px; }
-  .section-head h2 { font-size:clamp(1.7rem,4vw,2.4rem); }
+  .section-head h2 { font-size:1.5rem; }
   .section-head p { margin-top:10px; color:var(--text-muted); font-size:1rem; }
 
   /* ---- Cards ---- */
@@ -308,7 +327,7 @@
   }
   .nav-overlay-links { list-style:none; margin:40px 0; display:flex; flex-direction:column; gap:6px; }
   .nav-overlay-links a {
-    display:block; padding:16px 4px; font-family:var(--font-heading); font-size:1.6rem; font-weight:500;
+    display:block; padding:16px 4px; font-family:'Poppins', sans-serif; font-size:1.6rem; font-weight:500;
     text-decoration:none; color:var(--text); border-bottom:1px solid var(--hairline);
   }
   .nav-overlay-cta { margin-top:auto; width:100%; }
@@ -330,7 +349,10 @@
      no wrap at 375-430px (measured via getBoundingClientRect, not eyeballed)
      and scales the same way at the desktop end of the clamp since ch is
      relative to font-size. */
-  .hero-title { font-size:clamp(2.2rem,7vw,3.6rem); margin-top:20px; max-width:14.5ch; }
+  /* The one serif exception on the site — every other heading is Poppins
+     (see the h1-h4 rule above). Own font-family since it no longer
+     inherits serif from that rule; size/weight/spacing all unchanged. */
+  .hero-title { font-family:var(--font-hero-serif); font-size:clamp(2.2rem,7vw,3.6rem); margin-top:20px; max-width:14.5ch; }
   .hero-title em { font-style:italic; color:var(--gold-deep); }
   .hero-sub { margin-top:14px; max-width:52ch; font-size:1.02rem; }
   /* Promo card: dashed border -> a slightly deeper cream fill, same 24px
@@ -343,7 +365,7 @@
   }
   .offer-box:hover { transform:translateY(-2px); box-shadow:var(--card-shadow); }
   .offer-box .offer-label { font-size:0.72rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold-deep); }
-  .offer-box .offer-value { font-family:var(--font-heading); font-size:1.3rem; color:var(--text); }
+  .offer-box .offer-value { font-family:'Poppins', sans-serif; font-weight:600; font-size:1.3rem; color:var(--text); }
   .offer-box .offer-detail { font-size:0.78rem; color:var(--text-muted); margin-top:2px; }
 
   /* ============================================================
@@ -472,7 +494,7 @@
   .price-icon svg { width:22px; height:22px; }
   .price-card h3 { font-size:1.05rem; }
   .price-from { color:var(--text-muted); font-size:0.92rem; }
-  .price-from strong { color:var(--text); font-size:1.3rem; font-family:var(--font-heading); }
+  .price-from strong { color:var(--text); font-size:1.3rem; font-family:'Poppins', sans-serif; font-weight:600; }
   .price-arrow { margin-top:auto; align-self:flex-end; color:var(--gold-deep); font-size:1.2rem; }
   .price-note { margin-top:20px; font-size:0.82rem; color:var(--text-muted); }
 
@@ -483,7 +505,7 @@
   @media (min-width:768px) { .process-grid { grid-template-columns:repeat(2,1fr); } }
   @media (min-width:1024px) { .process-grid { grid-template-columns:repeat(4,1fr); } }
   .process-card { padding:24px 22px; }
-  .process-num { font-family:var(--font-heading); font-size:1.6rem; color:var(--gold); margin-bottom:8px; }
+  .process-num { font-family:'Poppins', sans-serif; font-weight:600; font-size:1.6rem; color:var(--gold); margin-bottom:8px; }
   .process-card h4 { font-size:1rem; }
   .process-card p { margin-top:8px; font-size:0.9rem; }
 
@@ -543,7 +565,7 @@
     background:var(--gold); border-radius:var(--card-radius);
     padding:40px 24px; text-align:center;
   }
-  .cta-card h2 { font-size:clamp(1.8rem,5vw,2.6rem); }
+  .cta-card h2 { font-size:1.5rem; }
   .cta-card p { margin-top:10px; color:var(--ink); opacity:0.75; }
   .cta-benefits { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:22px; }
   .cta-benefit { background:var(--ink); color:var(--cream); border-radius:999px; padding:8px 16px; font-size:0.8rem; font-weight:600; }
@@ -881,7 +903,7 @@
     <div class="reviews-head reveal">
       <div>
         <span class="section-eyebrow">Reviews</span>
-        <h2 style="font-size:clamp(1.5rem,3.5vw,2rem);">Rated [X.X] from [Y] Google reviews</h2>
+        <h2>Rated [X.X] from [Y] Google reviews</h2>
       </div>
       <span class="google-badge">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6 6.6.6-5 4.4 1.5 6.5L12 16l-5.9 3.5L7.5 13l-5-4.4 6.6-.6z"/></svg>
@@ -1024,8 +1046,7 @@
 /* Panel header */
 .hb-kicker { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-sand); }
 #haloe-booking .hb-kicker { margin-bottom:0.5rem; }
-.hb-title { font-size:2rem; font-weight:500; color:#F5F0E8; margin-bottom:1rem; letter-spacing:-0.02em; }
-.hb-title em { font-style:italic; color:var(--gold-highlight); }
+.hb-title { font-size:2rem; font-weight:600; color:#F5F0E8; margin-bottom:1rem; letter-spacing:-0.02em; }
 @media(max-width:480px){ #hb-panel-1 .hb-title { font-size:1.6rem; } }
 .hb-sub { font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(201,160,64,0.5); margin-bottom:3.5rem; }
 .hb-where-helper { font-size:0.82rem; color:var(--text-sand); }
@@ -1188,7 +1209,7 @@
 .hb-where-radio-ring::after { content:''; width:9px; height:9px; border-radius:999px; background:transparent; transition:background 0.2s; }
 .hb-where-card.selected .hb-where-radio-ring { border-color:var(--gold-primary); background:rgba(200,169,110,0.12); }
 .hb-where-card.selected .hb-where-radio-ring::after { background:var(--gold-primary); }
-.hb-where-name { display:block; font-family:var(--font-heading,'Playfair Display',serif); font-size:22px; color:#F5F0E8; font-weight:500; line-height:1.2; }
+.hb-where-name { display:block; font-family:'Poppins', sans-serif; font-size:22px; color:#F5F0E8; font-weight:600; line-height:1.2; }
 #haloe-booking .hb-where-name { margin-bottom:0.35rem; }
 .hb-where-venue { display:flex; align-items:center; gap:0.4rem; font-size:14px; color:var(--gold-highlight); }
 .hb-where-venue svg { width:14px; height:14px; flex:none; }
@@ -1215,7 +1236,7 @@
   <!-- Step 1 -->
   <div class="hb-panel active" id="hb-panel-1">
     <p class="hb-kicker">Consultation preference</p>
-    <p class="hb-title">Where would you like<br><em>your session?</em></p>
+    <p class="hb-title">Where would you like your session?</p>
     <p class="hb-sub">Choose a clinic day appointment or a home visit</p>
     <div class="hb-where-grid" id="hb-where-grid">
       <label class="hb-where-card" id="hb-where-clinic" for="hb-where-clinic-radio">
