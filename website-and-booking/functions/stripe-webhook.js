@@ -10,7 +10,7 @@
 //   RESEND_API_KEY         — Resend API key for sending email
 
 import {
-  WHITE, INK, BODY_TEXT, GOLD_DEEP, HAIRLINE, FONT,
+  WHITE, INK, BODY_TEXT, GOLD_DEEP, HAIRLINE, FONT, FONT_HEADING,
   sendEmail, esc, emailHeader, emailFooter, emailShell, heroRow, infoCard,
 } from './_email.js';
 import { confirmBooking } from './_bookings.js';
