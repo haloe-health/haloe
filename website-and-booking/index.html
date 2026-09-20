@@ -347,25 +347,28 @@
   }
   .badge-pill svg { width:16px; height:16px; flex:none; color:var(--gold-deep); }
   /* The one non-Poppins heading on the site (Tan Ashford, Sep 2026 — was
-     Playfair Display italic; Tan Ashford has no italic face at all, so
-     "Modern standards." stays gold but upright, and font-synthesis:none
-     stops the browser from faking a bold/oblique variant it doesn't have).
-     font-weight:normal to match how this font is used everywhere else
-     (the "haloe" wordmark is always weight:normal — there's no bold cut).
-     Considered letting "Modern standards." wrap naturally at a bigger
-     clamp(2rem,8vw,2.75rem) instead of holding each phrase to one line —
-     tried it, rejected it: at 32px (the 375px floor) even "Ancient
-     healing." itself wraps, splitting into "Ancient" / "healing." /
-     "Modern" / "standards." across four short lines, which reads like a
-     layout accident, not a deliberate two-clause break. -0.025em
-     letter-spacing plus a re-measured floor (canvas measureText against
-     the real hero container width, not eyeballed) gets both phrases back
-     to one line each at 1.5rem/24px — smaller than the old Playfair
-     version, but legible and intentional-looking beats larger and broken.
-     The explicit <br> in the markup (not this rule) does the two-line
-     split between phrases. */
-  .hero-title { font-family:var(--font-hero-serif); font-weight:normal; font-synthesis:none; font-size:clamp(1.5rem,6vw,3.6rem); letter-spacing:-0.025em; margin-top:20px; }
-  .hero-title em { font-style:normal; color:var(--gold-deep); }
+     Playfair Display italic; Tan Ashford has no italic face at all, so the
+     gold half of the headline stays upright, and font-synthesis:none stops
+     the browser faking a bold/oblique variant it doesn't have).
+     font-weight:normal to match how this font is used everywhere else (the
+     "haloe" wordmark is always weight:normal — there's no bold cut).
+     A deliberate four-line stack — "Ancient"/"healing."/"Modern"/
+     "standards.", each its own .ht-line, forced via display:block rather
+     than left to wrap naturally. Two earlier attempts at keeping this to
+     two lines were tried and rejected: a plain clamp(2rem,8vw,2.75rem)
+     let "Ancient healing." itself wrap unpredictably at the 375px floor
+     (four ragged lines by accident, not by design), and a tighter
+     -0.025em + re-measured single-line fit only reached 24px before
+     "Modern standards." stopped fitting — too small for a hero headline.
+     This stack sizes each word large (clamp(2.25rem,10.5vw,3.25rem)) with
+     line-height:1.05 (1.0 let the "g" descender in "healing." clash with
+     "Modern" below it) and -0.025em tracking; widths re-measured via
+     canvas measureText against the real hero container at 375/430px
+     (not eyeballed) confirm every word — "standards." is the widest —
+     stays well inside it at both. */
+  .hero-title { font-family:var(--font-hero-serif); font-weight:normal; font-synthesis:none; font-size:clamp(2.25rem,10.5vw,3.25rem); line-height:1.05; letter-spacing:-0.025em; margin-top:20px; }
+  .hero-title .ht-line { display:block; }
+  .hero-title .ht-gold { color:var(--gold-deep); }
   .hero-sub { margin-top:14px; max-width:52ch; font-size:1.02rem; }
   /* Promo card: dashed border -> a slightly deeper cream fill, same 24px
      radius as every other card (no separate "sm" look). */
@@ -717,7 +720,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
       Women &amp; men welcome
     </div>
-    <h1 class="hero-title reveal">Ancient healing.<br><em>Modern standards.</em></h1>
+    <h1 class="hero-title reveal"><span class="ht-line">Ancient</span><span class="ht-line">healing.</span><span class="ht-line ht-gold">Modern</span><span class="ht-line ht-gold">standards.</span></h1>
     <p class="hero-sub reveal">Massage, dry cupping and hijama across Manchester — unhurried sessions rooted in the prophetic tradition, held to modern professional standards.</p>
     <a href="book.html?code=HALOE20" class="offer-box reveal">
       <span class="offer-label">First session</span>
