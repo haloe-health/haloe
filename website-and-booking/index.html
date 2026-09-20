@@ -106,7 +106,7 @@
        that reads as invisible. A cream disc behind it (same trick as the
        cream pill baked into the email logo PNG) keeps it legible without
        touching haloe-logo-flower.svg itself. */
-    .brand img { background:var(--cream); border-radius:50%; }
+    .brand-icon { background:var(--cream); border-radius:50%; }
   }
   @font-face {
     font-family: 'Tan Ashford';
@@ -254,15 +254,34 @@
      1.17em/-0.2918em aren't round numbers — they come from measuring Tan
      Ashford's actual rendered glyphs (canvas TextMetrics on "haloe": the
      font's ascenders overshoot its own em-box, so naive flex centering
-     undershoots the optical centre) — this already makes the icon match
-     the wordmark's cap-height, vertically centred, gap = 0.35x the icon's
-     width (~the width of the wordmark's "a"). See COMPONENTS.md before
-     touching. The wordmark's own font-size (1.5rem = 24px) is what's on
-     the 8pt grid; the icon's derived 1.17em is a measured consequence of
+     undershoots the optical centre) — this already makes the icon's BOX
+     match the wordmark's cap-height, vertically centred, gap = 0.35x the
+     icon's width (~the width of the wordmark's "a"). See COMPONENTS.md
+     before touching. The wordmark's own font-size (1.5rem = 24px) is what's
+     on the 8pt grid; the icon's derived 1.17em is a measured consequence of
      that, not a free value — snapping it to a round px figure instead
-     would reintroduce the exact baseline-sitting misalignment this fixed. */
+     would reintroduce the exact baseline-sitting misalignment this fixed.
+     Crop fix (Sep 2026): the box was already correctly sized/positioned to
+     span the wordmark's cap-height, but haloe-logo-flower.svg's own artwork
+     only fills ~71% of its square viewBox (measured from the path data —
+     the honeycomb sits inboard of a ~14% margin on every side), so the
+     VISIBLE flower was only ever rendering at roughly 0.83em despite living
+     in a correctly-sized 1.17em box, which is what actually made it read as
+     "far too small" next to the wordmark. .brand-icon is a new wrapper
+     around the <img> (was directly the <img> before) so the crop can be
+     done in CSS alone, without touching the SVG file: the wrapper keeps
+     the box's existing size/position (1.17em, translateY -0.2918em)
+     unchanged, and the <img> inside is scaled to 140.85% (1 / 0.71) and
+     flex-centred, so the honeycomb's own ink now fills the box edge to
+     edge instead of floating in the middle of unused padding. */
   .brand { display:flex; align-items:center; gap:calc(1.17em * 0.35); text-decoration:none; flex:1; justify-content:center; font-size:1.5rem; }
-  .brand img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
+  .brand-icon {
+    height:1.17em; width:1.17em; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    transform:translateY(-0.2918em);
+  }
+  .brand-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
   .brand .wordmark { font-family:var(--font-wordmark); font-style:normal; font-weight:normal; font-size:1em; line-height:1; color:var(--text); letter-spacing:0.02em; }
 
   /* Invisible spacer balancing .menu-btn's width so .brand's flex:1 +
@@ -336,23 +355,15 @@
     padding:20px 22px; text-decoration:none; color:var(--text);
     transition:transform 0.15s ease, box-shadow 0.15s ease;
   }
-  /* .action-card--dark still needs var(--cream) text on its always-dark
-     background, regardless of page theme — restated here (same
-     specificity as .action-card above, but later in source) since it'd
-     otherwise lose to the color:var(--text) rule just added above it. */
-  .action-card--dark { color:var(--cream); }
   .action-card:hover, .action-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
-  .action-card--dark:hover { box-shadow:0 12px 28px rgba(13,13,13,0.28); }
   .action-icon {
     width:48px; height:48px; border-radius:50%; flex:none;
     display:flex; align-items:center; justify-content:center;
     background:var(--gold-soft); color:var(--gold-deep);
   }
-  .action-card--dark .action-icon { background:rgba(200,169,110,0.18); color:var(--gold); }
   .action-icon svg { width:22px; height:22px; }
   .action-text { flex:1; font-weight:600; font-size:1rem; }
   .action-arrow { flex:none; font-size:1.3rem; color:var(--gold-deep); }
-  .action-card--dark .action-arrow { color:var(--gold); }
 
   @media (min-width:768px) {
     .action-cards { flex-direction:row; align-items:stretch; }
@@ -544,10 +555,17 @@
   .site-footer { background:var(--ink); color:var(--cream); padding:56px 0 28px; }
   .footer-top { display:flex; flex-direction:column; gap:32px; }
   @media (min-width:768px) { .footer-top { flex-direction:row; justify-content:space-between; } }
-  /* Same lock-up fix as .brand above (see its comment) — font-size on the
-     container, icon sized/offset in em against that same reference. */
+  /* Same lock-up fix as .brand above (see its comment, including the
+     Sep 2026 crop fix) — font-size on the container, icon sized/offset in
+     em against that same reference. */
   .footer-brand { display:flex; align-items:center; gap:calc(1.17em * 0.35); font-size:1.4rem; }
-  .footer-brand img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
+  .footer-brand-icon {
+    height:1.17em; width:1.17em; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    transform:translateY(-0.2918em);
+  }
+  .footer-brand-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
   .footer-brand span { font-family:var(--font-wordmark); font-style:normal; font-size:1em; line-height:1; }
   .footer-col h5 { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
   /* Was #C8C2B7 / #8E887F — greys outside the gold/ink/cream palette;
@@ -564,33 +582,50 @@
      ============================================================ */
   /* One primary action (56px-tall full-width gold pill) plus WhatsApp as a
      56x56 icon-only outline circle — not a second full-text button, so
-     there's a clear single primary action per screen.
+     there's a clear single primary action per screen. A one-line muted
+     helper ("Pay in full online...") sits above the button row — this used
+     to be its own black full-width banner card at the top of the page
+     (directly above this same sticky bar once scrolled to it, since the
+     bar is fixed), a duplicate "book now" CTA stacked on top of this one;
+     folding its message into a helper line here keeps the information
+     without the repeated call to action. See the (now two-card) action-cards
+     section above for the cards that remain — those point at different
+     destinations (the Tuesday clinic, home visits), not this same booking
+     action, so they're not duplicates of this bar.
      padding-bottom uses env(safe-area-inset-bottom) so the bar itself
      never sits under a phone's home-indicator gesture area; BAR_H below
-     (56px pill + 20px top/bottom padding) is the fixed part or the body's
+     (56px pill + helper line + padding/gap) is the fixed part the body's
      reserved space and the scroll-padding both need to match. */
   .mobile-bar {
     position:fixed; bottom:0; left:0; right:0; z-index:90;
     background:var(--header-bg); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
     border-top:1px solid var(--hairline);
-    padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
-    display:flex; align-items:center; gap:10px;
+    padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));
+    display:flex; flex-direction:column; gap:6px;
   }
-  .mobile-bar .btn-pill { flex:1; height:56px; min-height:56px; font-size:1rem; }
-  .mobile-bar .icon-btn {
+  .mobile-bar-helper {
+    font-size:0.8125rem; /* 13px */
+    color:var(--text-muted);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    padding:0 2px;
+  }
+  .mobile-bar-row { display:flex; align-items:center; gap:10px; }
+  .mobile-bar-row .btn-pill { flex:1; height:56px; min-height:56px; font-size:1rem; }
+  .mobile-bar-row .icon-btn {
     width:56px; height:56px; flex:none; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
     background:transparent; border:1.5px solid var(--text); color:var(--text);
     transition:transform 0.15s ease, background 0.15s ease;
   }
-  .mobile-bar .icon-btn:hover { background:var(--hairline); transform:translateY(-2px); }
-  .mobile-bar .icon-btn svg { width:24px; height:24px; }
+  .mobile-bar-row .icon-btn:hover { background:var(--hairline); transform:translateY(-2px); }
+  .mobile-bar-row .icon-btn svg { width:24px; height:24px; }
   @media (min-width:768px) { .mobile-bar { display:none; } }
-  /* 56px pill + 16px top/bottom padding = 88px, plus the safe-area inset —
-     both the reserved body space AND the scroll target need the same
-     figure, or content (e.g. a page's last line of text) can still end up
-     hidden behind the fixed bar on a short screen. */
-  body { padding-bottom:calc(88px + env(safe-area-inset-bottom,0px)); scroll-padding-bottom:calc(88px + env(safe-area-inset-bottom,0px)); }
+  /* 56px pill + helper line + 6px gap + 10px/16px top/bottom padding —
+     measured at ~110px rendered, 112px reserved for a small buffer. Both
+     the reserved body space AND the scroll target need the same figure, or
+     content (e.g. a page's last line of text) can still end up hidden
+     behind the fixed bar on a short screen. */
+  body { padding-bottom:calc(112px + env(safe-area-inset-bottom,0px)); scroll-padding-bottom:calc(112px + env(safe-area-inset-bottom,0px)); }
   @media (min-width:768px) { body { padding-bottom:0; scroll-padding-bottom:0; } }
 
   /* ============================================================
@@ -618,7 +653,7 @@
       <span></span><span></span><span></span>
     </button>
     <a href="#" class="brand" aria-label="haloe home">
-      <img src="haloe-logo-flower.svg" alt="">
+      <span class="brand-icon"><img src="haloe-logo-flower.svg" alt=""></span>
       <span class="wordmark">haloe</span>
     </a>
     <!-- Balances .menu-btn's width so .brand stays visually centred — the
@@ -670,13 +705,6 @@
      ============================================================ -->
 <section>
   <div class="container action-cards">
-    <a href="book.html" class="action-card action-card--dark card card--dark reveal">
-      <span class="action-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8.5 14.5l2 2 4-4"/></svg>
-      </span>
-      <span class="action-text">Book your session — pay in full, no deposit, 2 minutes</span>
-      <span class="action-arrow">→</span>
-    </a>
     <a href="#clinic-day" class="action-card card reveal">
       <span class="action-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V9l8-5 8 5v12"/><path d="M9 21v-7h6v7"/></svg>
@@ -1627,7 +1655,7 @@ hbInit();
   <div class="container">
     <div class="footer-top">
       <div class="footer-brand">
-        <img src="haloe-logo-flower.svg" alt="">
+        <span class="footer-brand-icon"><img src="haloe-logo-flower.svg" alt=""></span>
         <span>haloe</span>
       </div>
       <div class="footer-cols">
@@ -1662,10 +1690,13 @@ hbInit();
      STICKY MOBILE BOTTOM BAR
      ============================================================ -->
 <div class="mobile-bar">
-  <a href="book.html" class="btn-pill btn-gold">Book a session</a>
-  <a href="https://wa.me/447474833643" class="icon-btn" target="_blank" rel="noopener" aria-label="Message on WhatsApp">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 9 18.6z"/><path d="M8.5 9.7c0 3.8 2.5 6.3 6 6.3"/></svg>
-  </a>
+  <span class="mobile-bar-helper">Pay in full online · no deposit · takes 2 minutes</span>
+  <div class="mobile-bar-row">
+    <a href="book.html" class="btn-pill btn-gold">Book a session</a>
+    <a href="https://wa.me/447474833643" class="icon-btn" target="_blank" rel="noopener" aria-label="Message on WhatsApp">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 9 18.6z"/><path d="M8.5 9.7c0 3.8 2.5 6.3 6 6.3"/></svg>
+    </a>
+  </div>
 </div>
 
 <script src="services-data.js"></script>

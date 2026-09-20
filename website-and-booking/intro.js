@@ -70,8 +70,17 @@
     '#haloeIntroLockup{display:flex;align-items:center;gap:calc(1.17em * .35);font-size:clamp(2.75rem,9vw,5.5rem);',
       'opacity:0;transform:scale(.94);transition:opacity .6s ease,transform .6s ease;will-change:transform,opacity;}',
     '#haloeIntroLockup.in{opacity:1;transform:scale(1);}',
-    '#haloeIntroIcon{height:1.17em;width:1.17em;display:block;transform:translateY(-.2918em);overflow:visible;}',
-    '#haloeIntroIcon svg{display:block;height:100%;width:100%;}',
+    // Resting lock-up: cropped to the flower's own ink (see fetchAndMountIcon
+    // below) — height:1.17em/-0.2918em/overflow:hidden here match the site
+    // header's .brand-icon fix exactly (same measured cap-height box, now
+    // actually filled by the honeycomb instead of mostly padding). Reset to
+    // overflow:visible + the svg back at 100%/100% happens at the top of
+    // runZoom(), before any of its geometry math runs, so the zoom animation
+    // itself (which reads this element's rect) is completely unaffected —
+    // the crop is purely a phase-1/2 resting-state visual, never present
+    // during the zoom.
+    '#haloeIntroIcon{height:1.17em;width:1.17em;display:flex;align-items:center;justify-content:center;overflow:hidden;transform:translateY(-.2918em);}',
+    '#haloeIntroIcon svg{display:block;height:140.85%;width:140.85%;flex:none;}',
     '#haloeIntroWordmark{font-family:"Tan Ashford","Playfair Display",Georgia,serif;font-style:normal;',
       'font-weight:normal;font-size:1em;line-height:1;letter-spacing:.02em;color:#0D0D0D;}',
     '#haloeIntro.reduced #haloeIntroLockup{opacity:1;transform:scale(1);transition:none;}',
@@ -218,9 +227,11 @@
 
   // Fetches the real logo SVG (unedited on disk) and mounts a live, inline
   // copy into the icon slot so its yellow-hexagon <path> can be selected
-  // and cross-faded, and its geometry read via getBBox(). Sized to fill the
-  // 1.17em slot via width/height=100% (presentation only — the file's own
-  // viewBox, and everything else about it, is untouched).
+  // and cross-faded, and its geometry read via getBBox(). Left at the
+  // 140.85%/flex-centred crop from the #haloeIntroIcon svg{} rule above
+  // (presentation only, via width/height removal so nothing fights that CSS
+  // — the file's own viewBox, and everything else about it, is untouched);
+  // runZoom() resets this to a plain 100% fill before it does anything else.
   function fetchAndMountIcon() {
     return fetch('/haloe-logo-flower.svg')
       .then(function (res) { if (!res.ok) throw new Error('logo fetch failed'); return res.text(); })
@@ -229,8 +240,6 @@
         var svgEl = iconSlot.querySelector('svg');
         svgEl.removeAttribute('width');
         svgEl.removeAttribute('height');
-        svgEl.style.height = '100%';
-        svgEl.style.width = '100%';
         return svgEl;
       });
   }
@@ -244,6 +253,18 @@
   function runZoom(svgEl) {
     var yellow = svgEl.querySelector('path[fill="#fbb716"]');
     if (!yellow) { finishNow(); return; } // artwork changed unexpectedly — bail safely rather than zoom nowhere
+
+    // Undo the resting-state crop (see fetchAndMountIcon/the #haloeIntroIcon
+    // CSS above) before any geometry is read below — everything from here on
+    // was written and tested against a plain 100%-fill icon, and re-deriving
+    // it for a cropped/oversized svg isn't worth the risk to logic that's
+    // already been debugged once for pixelation. This reset and the
+    // transform:scale(1/zoomFactor) jump below both happen before the single
+    // forced reflow a few lines down, so nothing paints in between — no
+    // visible pop.
+    iconSlot.style.overflow = 'visible';
+    svgEl.style.height = '100%';
+    svgEl.style.width = '100%';
 
     // The hexagon's centre and size, as fractions (0-1) of the icon's own
     // box — computed from the SVG's own coordinates (getBBox()/viewBox),
