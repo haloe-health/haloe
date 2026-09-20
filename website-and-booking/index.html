@@ -48,12 +48,11 @@
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<!-- Playfair Display is now scoped to exactly one element on the whole
-     site — the hero headline's ".hero-title"/".hero-title em" (see the
-     --font-hero-serif comment below) — so only the two weight/style
-     combinations it actually uses (600 upright, 600 italic) are
-     requested, not the broad set every other heading used to pull in. -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+<!-- Playfair Display is gone from the site entirely (Sep 2026) — the hero
+     headline (the one heading that isn't Poppins) uses the self-hosted Tan
+     Ashford wordmark font instead, via the @font-face + preload already on
+     this page for the "haloe" logo lock-up. Nothing left needs Playfair. -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
   /* ============================================================
      DESIGN TOKENS — light, card-based redesign (Sep 2026).
@@ -81,12 +80,17 @@
     --container: 1180px;
     /* Sep 2026: Poppins is the site-wide heading font now (see the h1-h4
        rule below) — this var is scoped to exactly one element, the hero
-       headline (.hero-title), the single serif exception on the whole
+       headline (.hero-title), the single non-Poppins heading on the whole
        site. Renamed from --font-heading, which implied it drove every
-       heading, to make that narrow scope explicit. */
-    --font-hero-serif: 'Playfair Display', 'Poppins', serif;
+       heading, to make that narrow scope explicit. Was Playfair Display,
+       now Tan Ashford — the same self-hosted wordmark font as the "haloe"
+       logo lock-up, already @font-face'd and preloaded below/in <head>, so
+       this doesn't add a new font request. Georgia is the fallback if Tan
+       Ashford fails to load, not Playfair, which the site no longer loads
+       at all. */
+    --font-hero-serif: 'Tan Ashford', Georgia, serif;
     --font-body: 'Poppins', sans-serif;
-    --font-wordmark: 'Tan Ashford', 'Playfair Display', Georgia, serif;
+    --font-wordmark: 'Tan Ashford', Georgia, serif;
 
     /* Semantic tokens for the things that actually need to flip in dark
        mode. Deliberately separate from --cream/--ink/--white/--body
@@ -163,8 +167,7 @@
   /* Poppins 600 is the default for every heading site-wide (Sep 2026) —
      h1 ~30px, h2 24px, h3 20px, h4 18px, overridden per-section below
      where a heading needs its own size. The one exception, .hero-title,
-     sets its own font-family back to --font-hero-serif (Playfair
-     Display) and keeps its existing clamp()-based size untouched. */
+     sets its own font-family back to --font-hero-serif (Tan Ashford). */
   h1, h2, h3, h4 { font-family:'Poppins', sans-serif; font-weight:600; color:var(--text); line-height:1.15; }
   h1 { font-size:1.875rem; }
   h2 { font-size:1.5rem; }
@@ -343,17 +346,20 @@
     box-shadow:var(--card-shadow); font-size:0.85rem; font-weight:600; color:var(--text);
   }
   .badge-pill svg { width:16px; height:16px; flex:none; color:var(--gold-deep); }
-  /* max-width was 12ch — too tight for "Modern standards." at the mobile
-     floor of this clamp (35.2px/2.2rem): the italic wrapped to a second
-     line, giving three visual lines instead of two. 14.5ch verified with
-     no wrap at 375-430px (measured via getBoundingClientRect, not eyeballed)
-     and scales the same way at the desktop end of the clamp since ch is
-     relative to font-size. */
-  /* The one serif exception on the site — every other heading is Poppins
-     (see the h1-h4 rule above). Own font-family since it no longer
-     inherits serif from that rule; size/weight/spacing all unchanged. */
-  .hero-title { font-family:var(--font-hero-serif); font-size:clamp(2.2rem,7vw,3.6rem); margin-top:20px; max-width:14.5ch; }
-  .hero-title em { font-style:italic; color:var(--gold-deep); }
+  /* The one non-Poppins heading on the site (Tan Ashford, Sep 2026 — was
+     Playfair Display italic; Tan Ashford has no italic face at all, so
+     "Modern standards." stays gold but upright, and font-synthesis:none
+     stops the browser from faking a bold/oblique variant it doesn't have).
+     font-weight:normal to match how this font is used everywhere else
+     (the "haloe" wordmark is always weight:normal — there's no bold cut).
+     clamp() floor re-measured for Tan Ashford specifically (its letterforms
+     run noticeably wider than Playfair's) via canvas measureText against
+     the real hero container width, not eyeballed: 1.4375rem/23px is the
+     largest size "Modern standards." (the longer of the two lines) still
+     renders on one line at a 375px viewport, with the explicit <br> in the
+     markup (not this rule) doing the actual two-line split between phrases. */
+  .hero-title { font-family:var(--font-hero-serif); font-weight:normal; font-synthesis:none; font-size:clamp(1.4375rem,6vw,3.6rem); margin-top:20px; }
+  .hero-title em { font-style:normal; color:var(--gold-deep); }
   .hero-sub { margin-top:14px; max-width:52ch; font-size:1.02rem; }
   /* Promo card: dashed border -> a slightly deeper cream fill, same 24px
      radius as every other card (no separate "sm" look). */

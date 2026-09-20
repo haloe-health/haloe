@@ -181,10 +181,14 @@
     padding:8px 20px; border-radius:50px; margin-bottom:32px;
   }
   .article-hero h1 { margin-bottom:8px; }
+  /* Poppins regular, gold, upright (Sep 2026 — was italic, the same
+     gold-italic-subline pattern removed from every heading's <em> across
+     the site; this one's a standalone div rather than an em, but it's the
+     same visual pattern so it gets the same fix). */
   .article-hero .hero-sub {
-    font-family:'Poppins',sans-serif; font-style:italic;
+    font-family:'Poppins',sans-serif; font-style:normal;
     font-size:clamp(1.1rem,2.4vw,1.5rem); color:var(--gold-deep);
-    font-weight:300; margin-bottom:32px;
+    font-weight:400; margin-bottom:32px;
   }
   .article-hero .creds {
     font-size:0.8rem; color:var(--dim); line-height:1.8;
