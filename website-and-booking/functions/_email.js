@@ -51,10 +51,14 @@ export const FONT_HEADING = FONT;
 // text baseline (so it spans exactly the ascender-to-baseline range), gap
 // = 0.35 × the icon's width, then compare a screenshot of the result
 // against a live-site .brand clone at the same font-size before saving —
-// the 272x95 (545x190 file) numbers below came from that comparison.
+// the original 272x95 display numbers (545x190 file) came from that
+// comparison. Bumped to 344x120 (Sep 2026) — same file, same aspect ratio
+// (2.868, vs 2.867 at these rounded values — a ~0.06% difference that's
+// invisible in practice), just rendered larger so the mark reads with more
+// visual weight next to the "haloe" wordmark baked into the same image.
 export const LOGO_URL = 'https://haloe.health/images/email-logo@2x.png';
-export const LOGO_WIDTH = 272;
-export const LOGO_HEIGHT = 95;
+export const LOGO_WIDTH = 344;
+export const LOGO_HEIGHT = 120;
 
 // POST an email through the Resend REST API. Throws on a non-2xx response.
 export async function sendEmail(apiKey, payload) {
@@ -92,20 +96,24 @@ export function emailButton(href, label) {
 
 // The haloe header row: the flower + wordmark PNG, centred, on the cream
 // background — no card, matching the site's plain header-on-cream look.
-// width is fixed (attribute + inline style + max-width, three separate
-// ways of saying the same thing) and height is left to `auto` rather than
-// also pinned — Gmail injects its own `img { max-width:100% }`-style reset
-// that can shrink the rendered width below LOGO_WIDTH depending on the
-// client width; a fixed height alongside a client-shrunk width is exactly
-// what stretches/squashes the image, whereas height:auto keeps it on the
-// file's real ratio no matter what width Gmail ends up applying. The
-// explicit width=""/height="" attributes are still there for Outlook,
-// which does not reliably honour height:auto.
+// width is fixed via the attribute + inline style, and height is left to
+// `auto` rather than also pinned — some clients (Gmail among them) inject
+// their own `img { max-width:100% }`-style reset that can shrink the
+// rendered width below LOGO_WIDTH depending on the client width; a fixed
+// height alongside a shrunk width is exactly what stretches/squashes the
+// image, whereas height:auto keeps it on the file's real ratio no matter
+// what width ends up applied. The explicit width=""/height="" attributes
+// are still there for Outlook, which does not reliably honour height:auto.
+// max-width is a genuine `100%` (not `${LOGO_WIDTH}px`, which was a no-op
+// cap equal to width itself) — LOGO_WIDTH at 344 is wide enough to overflow
+// a narrow phone's content column in clients that DON'T inject their own
+// shrink reset, so this is what actually keeps it from forcing horizontal
+// scroll on mobile there.
 export function emailHeader() {
   return `<!-- Header -->
               <tr>
                 <td align="center" bgcolor="${CREAM}" style="padding:3px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
-                  <img src="${LOGO_URL}" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="haloe" style="display:block;width:${LOGO_WIDTH}px;height:auto;max-width:${LOGO_WIDTH}px;border:0;outline:none;">
+                  <img src="${LOGO_URL}" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="haloe" style="display:block;width:${LOGO_WIDTH}px;height:auto;max-width:100%;border:0;outline:none;">
                   <div style="font-family:${FONT};font-size:11px;letter-spacing:3px;color:${GOLD_DEEP};text-transform:uppercase;margin-top:10px;">Hijama &middot; Wellness &middot; Manchester</div>
                 </td>
               </tr>`;
