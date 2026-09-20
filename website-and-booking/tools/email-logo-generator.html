@@ -59,6 +59,16 @@ const SCALE = 2;
 const PAD = 24; // logical px, 1x
 const PILL_BG = '#F5F0E8';
 const WORDMARK_COLOR = '#0D0D0D';
+// haloe-logo-flower.svg's own honeycomb artwork only fills ~71% of its
+// square viewBox (~14.5% padding on every side, measured from the path
+// data) — drawing the whole image into the icon box (the old behaviour)
+// meant the visible flower only ever rendered at ~0.71x the intended
+// ascent-matched height, same bug as the site's .brand-icon crop fix
+// (Sep 2026). Cropping the source draw region to this central fraction
+// before compositing makes the flower's actual ink — not its padded
+// viewBox — span the ascender-top-to-baseline box, matching the site fix.
+// Square source, square crop, square destination: no aspect distortion.
+const ICON_INK_FRACTION = 0.71;
 
 async function run() {
   const status = document.getElementById('status');
@@ -136,7 +146,16 @@ async function run() {
 
     // Icon: top at the ascender-top, bottom at the baseline — i.e. vertically
     // centred on the wordmark's own cap-height span by construction.
-    ctx.drawImage(img, pad, baselineY - iconPx, iconPx, iconPx);
+    // Source rect is cropped to ICON_INK_FRACTION of the loaded image (see
+    // its comment) so the flower's own ink fills the destination box,
+    // instead of the image's padded viewBox.
+    const srcInset = (1 - ICON_INK_FRACTION) / 2;
+    const srcSize = img.naturalWidth * ICON_INK_FRACTION; // naturalWidth === naturalHeight (square viewBox)
+    ctx.drawImage(
+      img,
+      img.naturalWidth * srcInset, img.naturalHeight * srcInset, srcSize, srcSize,
+      pad, baselineY - iconPx, iconPx, iconPx
+    );
 
     ctx.fillStyle = WORDMARK_COLOR;
     ctx.font = `normal ${fontPx}px "Tan Ashford"`;

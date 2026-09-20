@@ -74,9 +74,22 @@
      against the SAME reference the wordmark uses. 1.17em/-0.2918em come
      from measuring Tan Ashford's actual rendered glyphs (canvas TextMetrics
      on "haloe") — its ascenders overshoot its own em-box, so naive flex
-     centering undershoots the optical centre. See COMPONENTS.md. */
+     centering undershoots the optical centre. See COMPONENTS.md.
+     Crop fix (Sep 2026): haloe-logo-flower.svg's own artwork only fills
+     ~71% of its square viewBox (~14% padding per side), so the visible
+     flower was rendering at ~0.83em despite the correctly-sized 1.17em box
+     — same bug/fix as index.html's .brand-icon. .nav-logo-icon is a new
+     wrapper around the <img> that keeps the box's existing size/position
+     unchanged and clips an oversized (140.85% = 1/0.71) copy of the image,
+     so the ink fills the box edge to edge. Don't touch the SVG file. */
   .nav-logo { display:flex; align-items:center; gap:calc(1.17em * 0.35); text-decoration:none; font-size:1.5rem; }
-  .nav-logo img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
+  .nav-logo-icon {
+    height:1.17em; width:1.17em; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    transform:translateY(-0.2918em);
+  }
+  .nav-logo-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
   .nav-logo span { font-family:var(--font-wordmark); font-size:1em; line-height:1; color:var(--gold-deep); letter-spacing:0.02em; font-weight:normal; text-transform:none; }
   nav ul { list-style:none; display:flex; gap:48px; align-items:center; }
   nav ul a { color:var(--dim); text-decoration:none; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; transition:color 0.4s; font-weight:400; }
@@ -188,9 +201,16 @@
 
   /* Footer */
   footer { position:relative; z-index:1; background:#040403; padding:64px 80px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
-  /* Same lock-up fix as .nav-logo above (see its comment). */
+  /* Same lock-up fix as .nav-logo above (see its comment, including the
+     Sep 2026 crop fix). */
   .footer-left { display:flex; align-items:center; gap:calc(1.17em * 0.35); font-size:1.3rem; }
-  .footer-left img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
+  .footer-left-icon {
+    height:1.17em; width:1.17em; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    transform:translateY(-0.2918em);
+  }
+  .footer-left-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
   .footer-left span { font-family:var(--font-wordmark); font-size:1em; line-height:1; color:var(--gold); letter-spacing:0.02em; font-weight:normal; }
   .footer-links { display:flex; gap:32px; }
   .footer-links a { color:#f7f2ea; text-decoration:none; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; transition:color 0.4s; opacity:0.6; }
@@ -737,7 +757,7 @@
 <!-- NAV -->
 <nav>
   <a href="index.html" class="nav-logo">
-    <img src="haloe-logo-flower.svg" alt="">
+    <span class="nav-logo-icon"><img src="haloe-logo-flower.svg" alt=""></span>
     <span>haloe</span>
   </a>
   <ul>
@@ -1213,7 +1233,7 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-left">
-    <img src="haloe-logo-flower.svg" alt="">
+    <span class="footer-left-icon"><img src="haloe-logo-flower.svg" alt=""></span>
     <span>haloe</span>
   </div>
   <div class="footer-links">
