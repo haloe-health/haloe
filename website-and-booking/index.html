@@ -96,7 +96,6 @@
     --surface: var(--white);
     --text: var(--ink);
     --text-muted: var(--body);
-    --header-bg: rgba(245,240,232,0.92);
     --hairline: rgba(13,13,13,0.08);
   }
   @media (prefers-color-scheme: dark) {
@@ -105,17 +104,11 @@
       --surface: #262119;
       --text: #F5F0E8;
       --text-muted: #C9C0B2;
-      --header-bg: rgba(26,23,18,0.92);
       --hairline: rgba(245,240,232,0.12);
       --card-shadow: 0 8px 24px rgba(0,0,0,0.28);
       --gold-soft: rgba(200,169,110,0.22);
       --cream-deep: #302A20;
     }
-    /* The flower mark's outline is drawn in near-black — on a dark page
-       that reads as invisible. A cream disc behind it (same trick as the
-       cream pill baked into the email logo PNG) keeps it legible without
-       touching haloe-logo-flower.svg itself. */
-    .brand-icon { background:var(--cream); border-radius:50%; }
   }
   @font-face {
     font-family: 'Tan Ashford';
@@ -157,7 +150,7 @@
     pointer-events:none;
   }
   @media (prefers-color-scheme: dark) { body::before { opacity:0.05; } }
-  #siteHeader, main, footer.site-footer { position:relative; z-index:1; }
+  main, footer.site-footer { position:relative; z-index:1; }
 
   /* Tan Ashford is the default for every heading site-wide again (Sep
      2026 — reverts the Poppins-headings pass). No italic (the font has no
@@ -238,116 +231,12 @@
     outline:2px solid var(--gold-deep); outline-offset:2px; border-radius:4px;
   }
 
-  /* ============================================================
-     HEADER
-     ============================================================ */
-  /* Header height, hamburger circle and (see .brand below) logo sizing all
-     sit on the 8pt grid: 48px hamburger (>=44px minimum tap target and a
-     clean 8pt multiple — 44 itself isn't), 16px vertical header padding
-     -> 80px total header height on mobile. */
-  #siteHeader {
-    position:sticky; top:0; z-index:100;
-    background:var(--header-bg);
-    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--hairline);
-  }
-  .header-inner {
-    max-width:var(--container); margin:0 auto; padding:16px 20px;
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-  }
-  @media (min-width:768px) { .header-inner { padding:16px 40px; } }
-  @media (min-width:1280px) { .header-inner { padding:16px 80px; } }
-
-  .menu-btn {
-    width:48px; height:48px; border-radius:50%; border:1px solid var(--hairline);
-    background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
-    cursor:pointer; flex:none;
-    transition:transform 0.15s ease;
-  }
-  .menu-btn span { display:block; width:18px; height:2px; background:var(--text); border-radius:1px; transition:transform 0.25s ease, opacity 0.25s ease; }
-  .menu-btn:hover { transform:translateY(-2px); }
-  .menu-btn[aria-expanded="true"] span:nth-child(1) { transform:translateY(6px) rotate(45deg); }
-  .menu-btn[aria-expanded="true"] span:nth-child(2) { opacity:0; }
-  .menu-btn[aria-expanded="true"] span:nth-child(3) { transform:translateY(-6px) rotate(-45deg); }
-
-  /* Lock-up alignment (Sep 2026): font-size lives on .brand itself, not the
-     wordmark, so the icon's em-based height/offset below resolves against
-     the SAME reference the wordmark uses — em on the icon would otherwise
-     inherit font-size from its own ancestor instead of the wordmark's,
-     silently breaking the scaling this whole lock-up depends on.
-     1.17em/-0.2918em aren't round numbers — they come from measuring Tan
-     Ashford's actual rendered glyphs (canvas TextMetrics on "haloe": the
-     font's ascenders overshoot its own em-box, so naive flex centering
-     undershoots the optical centre) — this already makes the icon's BOX
-     match the wordmark's cap-height, vertically centred, gap = 0.35x the
-     icon's width (~the width of the wordmark's "a"). See COMPONENTS.md
-     before touching. The wordmark's own font-size (1.5rem = 24px) is what's
-     on the 8pt grid; the icon's derived 1.17em is a measured consequence of
-     that, not a free value — snapping it to a round px figure instead
-     would reintroduce the exact baseline-sitting misalignment this fixed.
-     Crop fix (Sep 2026): the box was already correctly sized/positioned to
-     span the wordmark's cap-height, but haloe-logo-flower.svg's own artwork
-     only fills ~71% of its square viewBox (measured from the path data —
-     the honeycomb sits inboard of a ~14% margin on every side), so the
-     VISIBLE flower was only ever rendering at roughly 0.83em despite living
-     in a correctly-sized 1.17em box, which is what actually made it read as
-     "far too small" next to the wordmark. .brand-icon is a new wrapper
-     around the <img> (was directly the <img> before) so the crop can be
-     done in CSS alone, without touching the SVG file: the wrapper keeps
-     the box's existing size/position (1.17em, translateY -0.2918em)
-     unchanged, and the <img> inside is scaled to 140.85% (1 / 0.71) and
-     flex-centred, so the honeycomb's own ink now fills the box edge to
-     edge instead of floating in the middle of unused padding. */
-  .brand { display:flex; align-items:center; gap:calc(1.17em * 0.35); text-decoration:none; flex:1; justify-content:center; font-size:1.5rem; }
-  .brand-icon {
-    height:1.17em; width:1.17em; flex:none;
-    display:flex; align-items:center; justify-content:center;
-    overflow:hidden;
-    transform:translateY(-0.2918em);
-  }
-  .brand-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
-  .brand .wordmark { font-family:var(--font-wordmark); font-style:normal; font-weight:normal; font-size:1em; line-height:1; color:var(--text); letter-spacing:0.02em; }
-
-  /* Invisible spacer balancing .menu-btn's width so .brand's flex:1 +
-     justify-content:center lands on the header's true visual centre, not
-     just the centre of the leftover space. The gold WhatsApp bubble that
-     used to sit here is gone — the sticky bottom bar already has WhatsApp. */
-  .header-spacer { width:48px; height:48px; flex:none; }
-
-  /* Mobile nav overlay */
-  .nav-overlay {
-    position:fixed; inset:0; z-index:200;
-    background:var(--bg);
-    display:flex; flex-direction:column;
-    padding:20px;
-    opacity:0; visibility:hidden; transform:translateY(-8px);
-    transition:opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
-  }
-  .nav-overlay.open { opacity:1; visibility:visible; transform:translateY(0); }
-  @media (prefers-reduced-motion: reduce) { .nav-overlay { transition:none; } }
-  .nav-overlay-top { display:flex; justify-content:flex-end; }
-  .nav-overlay-close {
-    width:48px; height:48px; border-radius:50%; border:1px solid var(--hairline);
-    background:var(--surface); font-size:1.4rem; line-height:1; cursor:pointer; color:var(--text);
-  }
-  .nav-overlay-links { list-style:none; margin:40px 0; display:flex; flex-direction:column; gap:6px; }
-  .nav-overlay-links a {
-    display:block; padding:16px 4px; font-family:'Poppins', sans-serif; font-size:1.6rem; font-weight:500;
-    text-decoration:none; color:var(--text); border-bottom:1px solid var(--hairline);
-  }
-  .nav-overlay-cta { margin-top:auto; width:100%; }
-  body.nav-open { overflow:hidden; }
 
   /* ============================================================
      HERO
      ============================================================ */
   .hero { padding-top:28px; }
-  .badge-pill {
-    display:inline-flex; align-items:center; gap:8px;
-    background:var(--surface); border-radius:999px; padding:10px 18px;
-    box-shadow:var(--card-shadow); font-size:0.85rem; font-weight:600; color:var(--text);
-  }
-  .badge-pill svg { width:16px; height:16px; flex:none; color:var(--gold-deep); }
+
   /* The hero headline — an h1, so font-family/weight/synthesis/tracking
      come from the global h1,h2 rule above; font-size and line-height are
      overridden here. Back to two lines (Sep 2026 — the four-line "Ancient
@@ -650,35 +539,6 @@
 <!-- ============================================================
      HEADER
      ============================================================ -->
-<header id="siteHeader">
-  <div class="header-inner">
-    <button class="menu-btn" id="navHamburger" aria-label="Menu" aria-expanded="false" aria-controls="navOverlay" onclick="toggleNavOverlay()">
-      <span></span><span></span><span></span>
-    </button>
-    <a href="#" class="brand" aria-label="haloe home">
-      <span class="brand-icon"><img src="haloe-logo-flower.svg" alt=""></span>
-      <span class="wordmark">haloe</span>
-    </a>
-    <!-- Balances .menu-btn's width so .brand stays visually centred — the
-         header's WhatsApp bubble is gone; the sticky bottom bar covers it. -->
-    <span class="header-spacer" aria-hidden="true"></span>
-  </div>
-</header>
-
-<div class="nav-overlay" id="navOverlay">
-  <div class="nav-overlay-top">
-    <button class="nav-overlay-close" aria-label="Close menu" onclick="toggleNavOverlay()">&times;</button>
-  </div>
-  <ul class="nav-overlay-links">
-    <li><a href="#about" onclick="toggleNavOverlay()">About</a></li>
-    <li><a href="#conditions" onclick="toggleNavOverlay()">Conditions</a></li>
-    <li><a href="#clinic-day" onclick="toggleNavOverlay()">Clinic Day</a></li>
-    <li><a href="#process" onclick="toggleNavOverlay()">What to Expect</a></li>
-    <li><a href="hijama-manchester.html">Hijama in Manchester</a></li>
-  </ul>
-  <a href="book.html" class="btn-pill btn-gold nav-overlay-cta">Book Now</a>
-</div>
-
 <main>
 
 <!-- ============================================================
@@ -686,10 +546,6 @@
      ============================================================ -->
 <section class="hero">
   <div class="container">
-    <div class="badge-pill reveal">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
-      Women &amp; men welcome
-    </div>
     <h1 class="hero-title reveal">Ancient healing.<br><em>Modern standards.</em></h1>
     <p class="hero-sub reveal"><span style="font-weight:600;">Massage, dry cupping and hijama across Manchester.</span><br>Rooted in the prophetic tradition. Practised to modern professional standards.</p>
     <a href="book.html?code=HALOE20" class="offer-box reveal">
@@ -1670,23 +1526,6 @@ hbInit();
 
 <script src="services-data.js"></script>
 <script>
-// ------------------------------------------------------------------
-// Mobile hamburger nav overlay — same pattern as the rest of the site.
-// ------------------------------------------------------------------
-function toggleNavOverlay() {
-  const overlay = document.getElementById('navOverlay');
-  const btn = document.getElementById('navHamburger');
-  const willOpen = !overlay.classList.contains('open');
-  overlay.classList.toggle('open', willOpen);
-  btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-  document.body.classList.toggle('nav-open', willOpen);
-}
-document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape' && document.getElementById('navOverlay').classList.contains('open')) {
-    toggleNavOverlay();
-  }
-});
-
 // ------------------------------------------------------------------
 // Reveal-on-scroll: fade + rise, staggered 60ms per section, 350ms
 // ease-out. Skipped entirely under prefers-reduced-motion (the .reveal
