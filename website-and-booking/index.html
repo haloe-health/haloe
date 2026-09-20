@@ -255,18 +255,16 @@
   .hero-title { font-size:clamp(1.5rem,6vw,3.6rem); line-height:1.12; margin-top:20px; }
   .hero-title em { font-style:normal; color:var(--gold-deep); }
   .hero-sub { margin-top:14px; max-width:52ch; font-size:1.02rem; color:#1a1208; }
-  /* Promo card: dashed border -> a slightly deeper cream fill, same 24px
-     radius as every other card (no separate "sm" look). */
-  .offer-box {
-    margin-top:24px; border-radius:var(--card-radius);
-    padding:20px; display:inline-flex; flex-direction:column; gap:2px;
-    background:var(--cream-deep); text-decoration:none;
-    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  .promo-badge {
+    position:fixed; top:16px; right:16px; z-index:500;
+    width:72px; height:72px; border-radius:50%;
+    background:#a8873a;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:1px; transform:rotate(12deg);
+    pointer-events:none;
   }
-  .offer-box:hover { transform:translateY(-2px); box-shadow:var(--card-shadow); }
-  .offer-box .offer-label { font-size:0.72rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold-deep); }
-  .offer-box .offer-value { font-family:'Poppins', sans-serif; font-weight:600; font-size:1.3rem; color:var(--text); }
-  .offer-box .offer-detail { font-size:0.78rem; color:var(--text-muted); margin-top:2px; }
+  .promo-badge-pct { font-size:20px; font-weight:700; color:#fff; line-height:1; }
+  .promo-badge-off { font-size:12px; font-weight:500; color:#fff; line-height:1; }
 
   /* ============================================================
      ACTION CARDS
@@ -539,6 +537,11 @@
 <!-- ============================================================
      HEADER
      ============================================================ -->
+<div class="promo-badge" aria-hidden="true">
+  <span class="promo-badge-pct">20%</span>
+  <span class="promo-badge-off">off</span>
+</div>
+
 <main>
 
 <!-- ============================================================
@@ -548,11 +551,6 @@
   <div class="container">
     <h1 class="hero-title reveal">Ancient healing.<br><em>Modern standards.</em></h1>
     <p class="hero-sub reveal"><span style="font-weight:600;">Massage, dry cupping and hijama across Manchester.</span><br>Rooted in the prophetic tradition. Practised to modern professional standards.</p>
-    <a href="book.html?code=HALOE20" class="offer-box reveal">
-      <span class="offer-label">First session</span>
-      <span class="offer-value">HALOE20</span>
-      <span class="offer-detail">20% off your first booking · online only · ends 31 Oct</span>
-    </a>
     <!-- The "Rather talk?" WhatsApp line was removed (Sep 2026) — the
          sticky bottom bar already gives every mobile visitor a WhatsApp
          entry point, so this was a third path to the same place. -->
