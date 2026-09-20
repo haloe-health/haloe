@@ -4,6 +4,10 @@
 // this site has no build step or module system; it defines SERVICES,
 // PROMO_DISCOUNT and netPrice() as plain globals.
 //
+// `sessionMin` on a package is the length of ONE session (the first, which
+// is what the calendar books). Single treatments get theirs parsed from
+// `time`. functions/_services.js mirrors both as `min` — keep in step.
+//
 // index.html's booking widget keeps its own separate HB_SERVICES /
 // HB_PROMO_DISCOUNT copy (see CLAUDE.md) — it predates this file and has its
 // own quirks (badges, no desc on non-package items), so it wasn't folded in.
@@ -33,14 +37,14 @@ const SERVICES = {
     { name: 'Head, Scalp & Full Body', time: '1 hr 45 min', price: 150, desc: 'The complete hijama (wet cupping) session, head to toe.' },
   ],
   packages: [
-    { name: 'Pain & Mobility', time: '4 sessions · 8–12 wks', price: 340, desc: 'Targeted cupping on areas of tension and restricted movement, over four sessions.' },
-    { name: 'Breathe & Reset', time: '4 sessions · 16 wks', price: 340, desc: 'Four sessions on the chest, upper back and shoulders, spaced over the season.' },
-    { name: 'Cycle Comfort', time: '4 sessions · ~3 cycles', price: 340, desc: 'Four sessions timed around your cycle — one per month, roughly three cycles.' },
-    { name: 'Stress & Sleep', time: '6 sessions · 24 wks', price: 480, desc: 'Six evening-friendly sessions focused on the neck, shoulders and upper back.' },
-    { name: 'Headache & Tension', time: '6 sessions · 14 wks', price: 480, desc: 'Six sessions across the head, neck and shoulders.' },
-    { name: 'Digestion & Comfort', time: '6 sessions · 24 wks', price: 480, desc: 'Six sessions focused on the abdomen and lower back.' },
-    { name: 'Circulation & Energy', time: '8 sessions · 18 wks', price: 600, desc: 'Eight full-body sessions over eighteen weeks.' },
-    { name: "Women's Cycle Care", time: '8 sessions · 16 wks', price: 600, desc: "Eight sessions across the cycle — our most complete women's course." },
+    { name: 'Pain & Mobility', time: '4 sessions · 8–12 wks', price: 340, sessionMin: 60, desc: 'Targeted cupping on areas of tension and restricted movement, over four sessions.' },
+    { name: 'Breathe & Reset', time: '4 sessions · 16 wks', price: 340, sessionMin: 60, desc: 'Four sessions on the chest, upper back and shoulders, spaced over the season.' },
+    { name: 'Cycle Comfort', time: '4 sessions · ~3 cycles', price: 340, sessionMin: 60, desc: 'Four sessions timed around your cycle — one per month, roughly three cycles.' },
+    { name: 'Stress & Sleep', time: '6 sessions · 24 wks', price: 480, sessionMin: 60, desc: 'Six evening-friendly sessions focused on the neck, shoulders and upper back.' },
+    { name: 'Headache & Tension', time: '6 sessions · 14 wks', price: 480, sessionMin: 60, desc: 'Six sessions across the head, neck and shoulders.' },
+    { name: 'Digestion & Comfort', time: '6 sessions · 24 wks', price: 480, sessionMin: 60, desc: 'Six sessions focused on the abdomen and lower back.' },
+    { name: 'Circulation & Energy', time: '8 sessions · 18 wks', price: 600, sessionMin: 60, desc: 'Eight full-body sessions over eighteen weeks.' },
+    { name: "Women's Cycle Care", time: '8 sessions · 16 wks', price: 600, sessionMin: 60, desc: "Eight sessions across the cycle — our most complete women's course." },
   ],
 };
 

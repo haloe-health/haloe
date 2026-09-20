@@ -118,6 +118,9 @@ const HTML = `<!DOCTYPE html>
   .badge.loc-clinic { color: var(--gold-deep); border-color: var(--gold); background: var(--gold-soft); }
   .badge.status-confirmed { background: var(--green-soft); color: var(--green); border-color: transparent; font-weight: 600; }
   .badge.status-pending { background: var(--gold-soft); color: var(--gold-deep); border-color: transparent; font-weight: 600; }
+  .badge.status-cancelled { background: var(--red-soft); color: var(--red); border-color: transparent; font-weight: 600; }
+  .card.cancelled { opacity: 0.55; }
+  .card.cancelled .card-time, .card.cancelled .card-name { text-decoration: line-through; }
   .badge.discount { color: var(--gold-deep); border-color: var(--gold); }
   .badge.warn { color: var(--red); border-color: var(--red); background: transparent; font-weight: 600; }
   .card-address { color: var(--body); font-size: 0.8rem; margin-top: 0.5rem; }
@@ -127,6 +130,12 @@ const HTML = `<!DOCTYPE html>
     border-radius: 999px; padding: 0.32rem 0.8rem; font-size: 0.78rem; background: var(--cream);
   }
   .card-actions a:hover { border-color: var(--gold); color: var(--gold-deep); }
+  .card-actions button {
+    font: inherit; cursor: pointer; color: var(--red); border: 1px solid var(--hairline);
+    border-radius: 999px; padding: 0.32rem 0.8rem; font-size: 0.78rem; background: var(--cream);
+    margin-left: auto;
+  }
+  .card-actions button:hover { border-color: var(--red); background: var(--red-soft); }
   .empty { color: var(--body); padding: 2rem 0; text-align: center; }
   .toast {
     position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
@@ -258,7 +267,8 @@ function render() {
     return true;
   });
 
-  const conflictIds = flagConflicts(bookings.filter(b => whenFilter === 'all' ? true : (whenFilter === 'upcoming' ? !isPast(b) : isPast(b))));
+  // Cancelled rows no longer block the time, so they can't clash with anything.
+  const conflictIds = flagConflicts(bookings.filter(b => b.status !== 'cancelled' && (whenFilter === 'all' ? true : (whenFilter === 'upcoming' ? !isPast(b) : isPast(b)))));
 
   const listEl = document.getElementById('list');
   if (filtered.length === 0) {
@@ -286,8 +296,9 @@ function render() {
             b.travel_zone === 'C' ? 'Zone C · travel TBC' : 'Mobile'
           ) + '</span>';
 
+      const cancelled = b.status === 'cancelled';
       const statusBadge = '<span class="badge status-' + escapeHtml(b.status) + '">' +
-        (b.status === 'confirmed' ? 'Paid' : 'Pending payment') + '</span>';
+        (b.status === 'confirmed' ? 'Paid' : cancelled ? 'Cancelled' : 'Pending payment') + '</span>';
 
       const discountBadge = b.discount_code
         ? '<span class="badge discount">' + escapeHtml(b.discount_code) + '</span>'
@@ -298,11 +309,15 @@ function render() {
 
       const address = !isClinic && b.address ? '<p class="card-address">' + escapeHtml(b.address) + '</p>' : '';
 
-      const actions = phone
-        ? '<div class="card-actions"><a href="tel:+' + phone + '">Call</a><a href="https://wa.me/' + phone + '" target="_blank" rel="noopener">WhatsApp</a></div>'
+      const contact = phone
+        ? '<a href="tel:+' + phone + '">Call</a><a href="https://wa.me/' + phone + '" target="_blank" rel="noopener">WhatsApp</a>'
         : '';
+      // Cancelling frees the slot straight away (status → cancelled). Refunds
+      // are done in the Stripe dashboard — this button doesn't touch money.
+      const cancelBtn = cancelled ? '' : '<button type="button" onclick="cancelBooking(' + b.id + ')">Cancel booking</button>';
+      const actions = (contact || cancelBtn) ? '<div class="card-actions">' + contact + cancelBtn + '</div>' : '';
 
-      return '<div class="card' + (conflict ? ' conflict' : '') + '">' +
+      return '<div class="card' + (conflict ? ' conflict' : '') + (cancelled ? ' cancelled' : '') + '">' +
         '<div class="card-top">' +
           '<span class="card-time">' + minutesToLabel(b.start_min) + '</span>' +
           '<span class="card-amount">' + money(b.amount_pence) + '</span>' +
@@ -335,6 +350,27 @@ function copyTodaysClinicList() {
   }).catch(() => {
     showToast('Could not copy — clipboard access blocked');
   });
+}
+
+async function cancelBooking(id) {
+  const b = bookings.find(x => x.id === id);
+  const who = b ? (b.customer_name || 'this booking') + ' at ' + minutesToLabel(b.start_min) + ' on ' + dateLabel(b.booking_date) : 'this booking';
+  if (!confirm('Cancel ' + who + '?
+
+The time becomes bookable again immediately. Any refund is done separately in Stripe.')) return;
+  try {
+    const res = await fetch('/admin/cancel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    });
+    if (!res.ok) throw new Error('Request failed: ' + res.status);
+    if (b) b.status = 'cancelled';
+    render();
+    showToast('Booking cancelled — time is free again');
+  } catch (err) {
+    showToast('Could not cancel: ' + (err.message || err));
+  }
 }
 
 let toastTimer = null;

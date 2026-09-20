@@ -2,42 +2,48 @@
 // truth for book.html and hijama-manchester.html. Cloudflare Pages Functions
 // run as ES modules and can't import a classic global-scope <script> file, so
 // this catalogue is kept in step by hand — same pattern as _clinic.js for the
-// Weekly Clinic Day constants. Change a price or treatment name? Update
-// services-data.js AND this file together.
+// Weekly Clinic Day constants. Change a price, treatment name or duration?
+// Update services-data.js AND this file together.
+//
+// `min` is the session length in minutes — what a booking blocks in the
+// calendar (parsed from services-data.js's `time`; for a package it is the
+// length of ONE session — the first one, which is what gets booked). Since
+// Sep 2026 create-checkout.js uses THIS figure for the slot hold, never a
+// client-supplied duration.
 export const SERVICES = {
   massage: [
-    { name: 'Face Massage', price: 40 },
-    { name: 'Head Massage', price: 40 },
-    { name: 'Face & Head Massage', price: 70 },
-    { name: 'Head & Foot Massage', price: 60 },
-    { name: 'Back, Neck & Shoulders', price: 75 },
-    { name: 'Full Body Massage', price: 90 },
+    { name: 'Face Massage', price: 40, min: 45 },
+    { name: 'Head Massage', price: 40, min: 45 },
+    { name: 'Face & Head Massage', price: 70, min: 60 },
+    { name: 'Head & Foot Massage', price: 60, min: 60 },
+    { name: 'Back, Neck & Shoulders', price: 75, min: 60 },
+    { name: 'Full Body Massage', price: 90, min: 75 },
   ],
   dry: [
-    { name: 'Face Cupping', price: 50 },
-    { name: 'Head Cupping', price: 50 },
-    { name: 'Face & Head Cupping', price: 85 },
-    { name: 'Targeted Area / Sports Injury', price: 60 },
-    { name: 'Full Back', price: 80 },
-    { name: 'Full Body', price: 100 },
-    { name: 'Head, Scalp & Full Body', price: 115 },
+    { name: 'Face Cupping', price: 50, min: 45 },
+    { name: 'Head Cupping', price: 50, min: 45 },
+    { name: 'Face & Head Cupping', price: 85, min: 60 },
+    { name: 'Targeted Area / Sports Injury', price: 60, min: 60 },
+    { name: 'Full Back', price: 80, min: 60 },
+    { name: 'Full Body', price: 100, min: 60 },
+    { name: 'Head, Scalp & Full Body', price: 115, min: 75 },
   ],
   wet: [
-    { name: 'Head & Scalp', price: 70 },
-    { name: 'Targeted Area / Sports Injury', price: 80 },
-    { name: 'Full Back', price: 90 },
-    { name: 'Full Body', price: 120 },
-    { name: 'Head, Scalp & Full Body', price: 150 },
+    { name: 'Head & Scalp', price: 70, min: 60 },
+    { name: 'Targeted Area / Sports Injury', price: 80, min: 60 },
+    { name: 'Full Back', price: 90, min: 60 },
+    { name: 'Full Body', price: 120, min: 90 },
+    { name: 'Head, Scalp & Full Body', price: 150, min: 105 },
   ],
   packages: [
-    { name: 'Pain & Mobility', price: 340 },
-    { name: 'Breathe & Reset', price: 340 },
-    { name: 'Cycle Comfort', price: 340 },
-    { name: 'Stress & Sleep', price: 480 },
-    { name: 'Headache & Tension', price: 480 },
-    { name: 'Digestion & Comfort', price: 480 },
-    { name: 'Circulation & Energy', price: 600 },
-    { name: "Women's Cycle Care", price: 600 },
+    { name: 'Pain & Mobility', price: 340, min: 60 },
+    { name: 'Breathe & Reset', price: 340, min: 60 },
+    { name: 'Cycle Comfort', price: 340, min: 60 },
+    { name: 'Stress & Sleep', price: 480, min: 60 },
+    { name: 'Headache & Tension', price: 480, min: 60 },
+    { name: 'Digestion & Comfort', price: 480, min: 60 },
+    { name: 'Circulation & Energy', price: 600, min: 60 },
+    { name: "Women's Cycle Care", price: 600, min: 60 },
   ],
 };
 

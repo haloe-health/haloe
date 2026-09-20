@@ -140,16 +140,24 @@ export async function onRequestPost(context) {
     // Confirm the held slot so it converts from a temporary hold into a firm
     // booking that keeps blocking the time. Best-effort: if the row lapsed or
     // Supabase isn't configured, the notifications below must still go out.
+    //
+    // The slot hold is only 10 minutes but Stripe keeps the Checkout Session
+    // open for 30, so a customer who paid late may have had their time
+    // re-booked by someone else in between. confirmBooking() reports that as
+    // `conflict`; the booking is still confirmed (they've paid) and Halima's
+    // email is flagged so she can sort it out with the two clients.
     const bookingId = md.bookingId;
+    let slotConflict = false;
     if (bookingId && context.env.SUPABASE_URL && context.env.SUPABASE_SERVICE_ROLE_KEY) {
       try {
-        await confirmBooking(context.env, Number(bookingId));
+        const result = await confirmBooking(context.env, Number(bookingId));
+        slotConflict = Boolean(result && result.conflict);
       } catch (err) {
         console.error('Failed to confirm booking slot:', err);
       }
     }
 
-    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel, discountLabel, travelLabel, travelZone, travelPence };
+    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel, discountLabel, travelLabel, travelZone, travelPence, slotConflict };
 
     // WhatsApp notification to Halima. Sent before the email block and wrapped in
     // its own try/catch so it still fires if Resend is unconfigured or failing —
@@ -190,7 +198,7 @@ export async function onRequestPost(context) {
         from: FROM,
         to: [HALIMA_EMAIL],
         reply_to: email || HALIMA_EMAIL,
-        subject: `New booking — ${name}`,
+        subject: `${slotConflict ? "⚠ TIME CLASH — " : ""}New booking — ${name}`,
         html: halimaEmailHtml(detail),
       });
     } catch (err) {
@@ -412,6 +420,7 @@ function halimaEmailHtml(d) {
                 { label: 'Email', value: d.email },
                 { label: 'Notes', value: d.notes },
                 { label: 'Travel note', value: d.travelZone === 'C' ? '⚠ Confirm travel cost with the client before the session' : '' },
+                { label: 'Time clash', value: d.slotConflict ? '⚠ This time overlaps another booking — the payment landed after the 10-minute hold lapsed. Check /admin and reschedule one of them.' : '' },
               ])}
               <tr>
                 <td style="padding:6px 2px 0;">

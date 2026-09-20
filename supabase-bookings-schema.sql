@@ -22,7 +22,7 @@ create table if not exists public.bookings (
   location        text,                              -- 'clinic' | 'mobile'
   address         text,
   amount_pence    integer,
-  status          text not null default 'pending',    -- 'pending' | 'confirmed'
+  status          text not null default 'pending',    -- 'pending' | 'confirmed' | 'cancelled' (set from /admin; frees the time)
   hold_expires_at bigint,                              -- unix seconds
   created_at      bigint not null,
   discount_code   text,                                -- e.g. 'HALOE20'; null if none applied

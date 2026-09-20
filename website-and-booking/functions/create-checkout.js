@@ -1,4 +1,5 @@
-import { reserveSlot, releaseBooking, slotToMinutes, HOLD_SECONDS } from './_bookings.js';
+import { reserveSlot, releaseBooking, slotToMinutes, STRIPE_SESSION_SECONDS } from './_bookings.js';
+import { isOfferableStart } from './_slots.js';
 import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
 import { findService, netPrice } from './_services.js';
 import { validateDiscountCode, applyDiscount } from './_discounts.js';
@@ -6,7 +7,7 @@ import { travelZoneFor, travelFeeFor } from './_travel.js';
 
 export async function onRequestPost(context) {
   try {
-    const { treatmentName, treatmentCategory, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, durationMin, discountCode, travelPostcode } = await context.request.json();
+    const { treatmentName, treatmentCategory, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, discountCode, travelPostcode } = await context.request.json();
     // location is 'clinic' | 'mobile'. Every booking is paid in full — there is
     // no deposit path.
     const venue = location === 'clinic' ? CLINIC_VENUE_NAME : '';
@@ -79,15 +80,29 @@ export async function onRequestPost(context) {
     const secretKey = context.env.STRIPE_SECRET_KEY;
     const origin = new URL(context.request.url).origin;
 
-    // --- Reserve the slot before taking payment (prevents double-booking) ---
-    // Held as 'pending' for HOLD_SECONDS; the webhook confirms it on payment, and
-    // an abandoned checkout's hold simply lapses. If Supabase isn't configured,
-    // or the time can't be parsed, we fail OPEN and let the booking proceed
-    // unreserved — never block a paying customer over an availability bug.
-    const hasSupabase = Boolean(context.env.SUPABASE_URL && context.env.SUPABASE_SERVICE_ROLE_KEY);
+    // --- Validate the start time against the opening hours (_slots.js) ---
+    // The wizard generates its slots from the same table, so a start that
+    // isn't on the grid (or is inside the same-day minimum notice) can only
+    // come from a tampered or stale request. Rejected outright — this is
+    // static config, so there's nothing to fail open over.
     const now = Math.floor(Date.now() / 1000);
     const startMin = slotToMinutes(time);
-    const duration = Number(durationMin) > 0 ? Number(durationMin) : 60;
+    if (startMin === null || !isOfferableStart({ location: location === 'clinic' ? 'clinic' : 'mobile', dateISO: bookingDate, startMin })) {
+      return new Response(JSON.stringify({ error: 'slot_invalid' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // --- Reserve the slot before taking payment (prevents double-booking) ---
+    // Held as 'pending' for HOLD_SECONDS (10 min); the webhook confirms it on
+    // payment, and an abandoned checkout's hold simply lapses. The duration
+    // comes from the server-side catalogue (`min` in _services.js), never
+    // from the client. If Supabase isn't configured we fail OPEN and let the
+    // booking proceed unreserved — never block a paying customer over an
+    // availability bug.
+    const hasSupabase = Boolean(context.env.SUPABASE_URL && context.env.SUPABASE_SERVICE_ROLE_KEY);
+    const duration = Number(svc.min) > 0 ? Number(svc.min) : 60;
     let bookingId = null;
 
     if (hasSupabase && bookingDate && startMin !== null) {
@@ -175,9 +190,11 @@ export async function onRequestPost(context) {
     // ever missing, so that fallback can't silently diverge from what the
     // customer actually paid.
     params.append('metadata[totalAmountPence]', String(totalAmount));
-    // Expire the Checkout Session in step with the slot hold, so an abandoned
-    // payment and its reservation lapse together.
-    params.append('expires_at', String(now + HOLD_SECONDS));
+    // Stripe's minimum Checkout Session lifetime is 30 minutes — longer than
+    // our 10-minute slot hold, unavoidably. A payment that lands after the
+    // hold lapsed is still confirmed; the webhook flags any clash to Halima
+    // (see confirmBooking in _bookings.js).
+    params.append('expires_at', String(now + STRIPE_SESSION_SECONDS));
     const successParams = new URLSearchParams({
       name: customerName || '',
       treatment: treatmentName || '',

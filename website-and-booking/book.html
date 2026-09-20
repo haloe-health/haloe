@@ -860,9 +860,15 @@
   .cal-day.empty { cursor: default; }
 
   /* ---- Time Slots ---- */
+  .time-count { font-size: 0.92rem; color: var(--text-muted); margin: -0.2rem 0 0.8rem; }
+  .time-group { margin-bottom: 1rem; }
+  .time-group:last-child { margin-bottom: 0; }
+  .time-group-label { font-size: 0.82rem; color: var(--text-muted); margin: 0 0 0.45rem; letter-spacing: 0.02em; }
+  .time-empty { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+  .time-empty a { color: var(--gold-deep); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
   .time-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.5rem;
   }
   .time-slot {
@@ -1435,13 +1441,6 @@
   /* Mobile */
   @media (max-width: 500px) {
     .form-row { grid-template-columns: 1fr; }
-    .time-grid { grid-template-columns: repeat(3, 1fr); }
-  }
-  /* Narrower phones (iPhone SE/mini-class, ~375px): 3 columns squeezes each
-     slot to ~90px, tight against the "booked" tag. Drop to 2 below 430px;
-     430px+ keeps the 3-column rule above. */
-  @media (max-width: 429px) {
-    .time-grid { grid-template-columns: repeat(2, 1fr); }
   }
   /* Mobile touch targets + iOS zoom fix: Safari auto-zooms the page on focus
      of any text input under 16px — the step-3 fields were 1.05rem (~13px at
@@ -1459,7 +1458,7 @@
        step dots, the 4-across category tabs) are left at their compact,
        deliberately-designed size — bumping those risks wrapping the tab row. */
     .panel-sub, .foot-label, .svc-desc, .loc-line, #loc-notice, .pay-note,
-    .ios-toggle span, .field-error, .time-hint, .section-label,
+    .ios-toggle span, .field-error, .time-hint, .time-count, .time-group-label, .time-empty, .section-label,
     .ios-group-label, .confirm-sub, .confirm-intake {
       font-size: 15px;
     }
@@ -1634,7 +1633,8 @@
 
       <div class="date-section" id="time-section">
         <p class="section-label">Select a time</p>
-        <div class="time-grid" id="time-grid"></div>
+        <p class="time-count" id="time-count" hidden></p>
+        <div id="time-groups"></div>
         <p class="time-hint" id="time-hint">Choose a date to see available times.</p>
       </div>
     </div>
@@ -1770,22 +1770,49 @@
 const CLINIC_VENUE_NAME = 'Milton Hall, Deansgate';
 const CLINIC_VENUE_ADDRESS = 'Milton Hall, 244 Deansgate, Manchester, M3 4BQ';
 const CLINIC_WEEKDAY = 2; // 0=Sunday ... 6=Saturday. 2 = Tuesday.
-const CLINIC_SLOT_TEMPLATE = ['09:30', '11:15', '13:00', '14:45', '16:30', '18:15'];
 // First bookable clinic day, confirmed by Halima after her venue viewing.
 const CLINIC_START_DATE = '2026-10-06';
 
 document.getElementById('where-clinic-venue').textContent = CLINIC_VENUE_NAME;
 
-// The existing slot system (TIME_SLOTS, slotToMinutes, renderTimes) expects
-// '6:00 pm' style strings — convert the 24-hour clinic template once so
-// everything downstream works unmodified for clinic slots too.
-function to12h(t) {
+/* ---- Opening hours / dynamic start times ----
+   Mirrors functions/_slots.js — the server is the source of truth (it
+   generates the slot list /availability returns and rejects any start that
+   isn't on this grid); this copy only exists so the wizard can render a
+   sensible list if /availability is unreachable. Edit BOTH together.
+   Per venue, per weekday (0 = Sunday … 6 = Saturday). null = closed. */
+const HOURS = {
+  clinic: {
+    0: null, 1: null,
+    2: { first: '09:30', last: '19:30' }, // Tuesday — Milton Hall, Deansgate
+    3: null, 4: null, 5: null, 6: null,
+  },
+  mobile: {
+    0: null,                              // Sunday — closed
+    1: { first: '10:00', last: '20:00' },
+    2: { first: '10:00', last: '20:00' },
+    3: { first: '10:00', last: '20:00' },
+    4: { first: '10:00', last: '20:00' },
+    5: { first: '10:00', last: '20:00' },
+    6: { first: '10:00', last: '20:00' },
+  },
+};
+const SLOT_STEP_MIN = 30;
+const MIN_NOTICE_MIN = 120; // same-day bookings need 2 h notice
+
+function hhmmToMinutes(t) {
   const [h, m] = t.split(':').map(Number);
-  const period = h >= 12 ? 'pm' : 'am';
-  let h12 = h % 12; if (h12 === 0) h12 = 12;
-  return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+  return h * 60 + m;
 }
-const CLINIC_TIME_SLOTS = CLINIC_SLOT_TEMPLATE.map(to12h);
+// 570 -> '9:30 am' — the display format the rest of the flow (state.time,
+// the summary pass, Stripe metadata, the emails) expects.
+function minutesToLabel(min) {
+  const h24 = Math.floor(min / 60);
+  const mm = String(min % 60).padStart(2, '0');
+  const period = h24 >= 12 ? 'pm' : 'am';
+  let h12 = h24 % 12; if (h12 === 0) h12 = 12;
+  return `${h12}:${mm} ${period}`;
+}
 
 /* ---- Travel fee (home visits only) ----
    Mirrors functions/_travel.js — browser JS can't import that module, same
@@ -2329,11 +2356,16 @@ function changeMonth(dir) {
   renderCalendar();
 }
 
-// Busy intervals [{s,e}] for the selected date, from /availability. Slots that
-// would overlap one of these (given the chosen treatment's length) are disabled.
-let busyIntervals = [];
-
-const TIME_SLOTS = ['10:00 am','10:30 am','11:00 am','11:30 am','12:00 pm','12:30 pm','1:00 pm','1:30 pm','2:00 pm','2:30 pm','3:00 pm','3:30 pm','4:00 pm','4:30 pm','5:00 pm','5:30 pm','6:00 pm','6:30 pm','7:00 pm','7:30 pm','8:00 pm'];
+// The start times (minutes from midnight) currently on offer for
+// state.date — the server's answer from /availability, or a local fallback
+// generated from HOURS if that call fails. Only these are ever rendered;
+// booked times are simply absent rather than shown greyed out.
+let availableSlots = [];
+// Next ISO date with at least one free start (from /availability), for the
+// empty state's "next available" link.
+let nextAvailableISO = null;
+// True while /availability is in flight for the selected date.
+let slotsLoading = false;
 
 function slotToMinutes(t) {
   const m = /^(\d{1,2}):(\d{2})\s*(am|pm)$/i.exec(t);
@@ -2344,9 +2376,14 @@ function slotToMinutes(t) {
   return h * 60 + min;
 }
 
+// Minutes a booking blocks. Parsed from the treatment's `time`; a package
+// carries an explicit `sessionMin` (the length of its first session, which
+// is what gets booked). The server recomputes this from functions/_services.js
+// and never trusts a client figure — this drives the slot list only.
 function selectedDurationMin() {
   const svc = SERVICES[state.category] && SERVICES[state.category][state.serviceIndex];
   if (!svc) return 60;
+  if (Number(svc.sessionMin) > 0) return Number(svc.sessionMin);
   const s = svc.time || '';
   const hr = /(\d+)\s*(?:hours?|hrs?|hr)\b/i.exec(s);
   const mn = /(\d+)\s*min/i.exec(s);
@@ -2358,69 +2395,143 @@ function toISODate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-function slotIsTaken(t) {
+// Is this '9:30 am'-style time one of the starts currently on offer?
+function slotIsOffered(t) {
   const start = slotToMinutes(t);
-  if (start === null) return false;
-  const end = start + selectedDurationMin();
-  return busyIntervals.some((b) => start < b.e && end > b.s);
+  return start !== null && availableSlots.includes(start);
 }
 
-// A slot is in the past only when the chosen day is today and its start time
-// has already passed. Keeps clients from booking a time earlier than now.
-function slotIsPast(t) {
-  if (!state.date) return false;
+// Local fallback: the full grid from HOURS for state.date, minus anything
+// inside the same-day minimum notice. No busy data — used only when
+// /availability can't be reached, so the customer can still book (the
+// server's reserve_slot still prevents an actual double-booking).
+function localSlotsFor(date) {
+  const table = HOURS[state.location === 'clinic' ? 'clinic' : 'mobile'];
+  const h = table && table[date.getDay()];
+  if (!h) return [];
+  const first = hhmmToMinutes(h.first), last = hhmmToMinutes(h.last);
   const now = new Date();
-  if (state.date.toDateString() !== now.toDateString()) return false;
-  const start = slotToMinutes(t);
-  if (start === null) return false;
-  return start <= now.getHours() * 60 + now.getMinutes();
+  const isToday = date.toDateString() === now.toDateString();
+  const cutoff = now.getHours() * 60 + now.getMinutes() + MIN_NOTICE_MIN;
+  const out = [];
+  for (let t = first; t <= last; t += SLOT_STEP_MIN) {
+    if (isToday && t < cutoff) continue;
+    out.push(t);
+  }
+  return out;
 }
 
-async function selectDate(y, m, d) {
+let availabilityRequest = 0;
+
+// Fetch the offered starts for state.date from /availability (which applies
+// the opening hours, existing bookings, the selected treatment's duration
+// and the minimum notice), then render. Also called when the treatment or
+// venue changes while a date is already picked, since the answer depends on
+// the duration.
+async function loadSlots() {
+  if (!state.date) return;
+  const reqId = ++availabilityRequest;
+  const iso = toISODate(state.date);
+  slotsLoading = true;
+  availableSlots = [];
+  nextAvailableISO = null;
+  renderTimes();
+  try {
+    const params = new URLSearchParams({
+      date: iso,
+      location: state.location === 'clinic' ? 'clinic' : 'mobile',
+      duration: String(selectedDurationMin()),
+    });
+    const res = await fetch(`/availability?${params}`);
+    if (reqId !== availabilityRequest) return; // a newer request superseded this one
+    if (!res.ok) throw new Error('availability ' + res.status);
+    const data = await res.json();
+    availableSlots = Array.isArray(data.slots) ? data.slots.filter(Number.isFinite) : [];
+    nextAvailableISO = typeof data.next === 'string' ? data.next : null;
+  } catch (e) {
+    if (reqId !== availabilityRequest) return;
+    // Fail open: render the plain grid so a lookup fault never blocks booking.
+    availableSlots = localSlotsFor(state.date);
+    nextAvailableISO = null;
+  }
+  slotsLoading = false;
+  // A previously chosen time may no longer be on offer (treatment got longer,
+  // or someone booked it meanwhile).
+  if (state.time && !slotIsOffered(state.time)) {
+    state.time = null;
+    document.getElementById('btn-step3').disabled = true;
+    updateRail();
+  }
+  renderTimes();
+}
+
+function selectDate(y, m, d) {
   state.date = new Date(y, m, d);
   state.time = null;
-  busyIntervals = [];
   renderCalendar();
-  renderTimes();
   const hint = document.getElementById('time-hint');
   if (hint) hint.style.display = 'none';
   document.getElementById('btn-step3').disabled = true;
   updateRail();
-
-  // Pull real availability, then re-render so taken slots grey out. Fail open —
-  // a fetch error just leaves every slot enabled rather than blocking booking.
-  try {
-    const res = await fetch(`/availability?date=${toISODate(state.date)}`);
-    if (res.ok) {
-      const data = await res.json();
-      // Ignore a stale response if the user has since picked another date.
-      if (state.date && toISODate(state.date) === toISODate(new Date(y, m, d))) {
-        busyIntervals = Array.isArray(data.busy) ? data.busy : [];
-        renderTimes();
-      }
-    }
-  } catch (e) { /* fail open */ }
+  loadSlots();
 }
 
-function activeTimeSlots() {
-  return state.location === 'clinic' ? CLINIC_TIME_SLOTS : TIME_SLOTS;
+// Jump to an ISO date (the empty state's "next available" link) — moves the
+// calendar to that month, then selects it.
+function selectDateISO(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  state.calYear = y; state.calMonth = m - 1;
+  selectDate(y, m - 1, d);
 }
 
+function friendlyDate(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  return `${DAYS[dt.getDay()]} ${d} ${MONTHS[m - 1]}`;
+}
+
+// Renders the offered starts grouped Morning / Afternoon / Evening, with an
+// "X times available" line above. Booked times aren't shown at all.
 function renderTimes() {
-  const grid = document.getElementById('time-grid');
-  grid.innerHTML = activeTimeSlots().map(t => {
-    const past = slotIsPast(t);
-    const booked = !past && slotIsTaken(t);
-    const disabled = past || booked;
-    const cls = disabled ? 'taken' : (state.time === t ? 'selected' : '');
-    const click = disabled ? '' : `onclick="selectTime('${t}')"`;
-    const label = booked ? `${t}<span class="slot-tag">booked</span>` : t;
-    return `<div class="time-slot ${cls}" ${click}>${label}</div>`;
-  }).join('');
+  const wrap = document.getElementById('time-groups');
+  const count = document.getElementById('time-count');
+  if (!state.date) { wrap.innerHTML = ''; count.hidden = true; return; }
+
+  if (slotsLoading) {
+    count.hidden = true;
+    wrap.innerHTML = '<p class="time-empty">Checking availability…</p>';
+    return;
+  }
+
+  if (availableSlots.length === 0) {
+    count.hidden = true;
+    const next = nextAvailableISO
+      ? ` — next available: <a role="button" tabindex="0" onclick="selectDateISO('${nextAvailableISO}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDateISO('${nextAvailableISO}')}">${friendlyDate(nextAvailableISO)}</a>`
+      : '';
+    wrap.innerHTML = `<p class="time-empty">No times left on this day${next}</p>`;
+    return;
+  }
+
+  count.hidden = false;
+  count.textContent = `${availableSlots.length} time${availableSlots.length === 1 ? '' : 's'} available`;
+
+  const groups = [
+    ['Morning', availableSlots.filter(t => t < 12 * 60)],
+    ['Afternoon', availableSlots.filter(t => t >= 12 * 60 && t < 17 * 60)],
+    ['Evening', availableSlots.filter(t => t >= 17 * 60)],
+  ];
+  wrap.innerHTML = groups.filter(([, list]) => list.length).map(([label, list]) => `
+    <div class="time-group">
+      <p class="time-group-label">${label}</p>
+      <div class="time-grid">${list.map(min => {
+        const t = minutesToLabel(min);
+        return `<div class="time-slot${state.time === t ? ' selected' : ''}" onclick="selectTime('${t}')">${t}</div>`;
+      }).join('')}</div>
+    </div>`).join('');
 }
 
 function selectTime(t) {
-  if (slotIsPast(t) || slotIsTaken(t)) return;
+  if (!slotIsOffered(t)) return;
   state.time = t;
   renderTimes();
   document.getElementById('btn-step3').disabled = false;
@@ -2616,7 +2727,6 @@ async function handlePayment() {
         // Machine-readable fields for slot reservation (the strings above are
         // for display and the WhatsApp/email copy).
         bookingDate: state.date ? toISODate(state.date) : '',
-        durationMin: selectedDurationMin(),
         discountCode: state.discount ? state.discount.code : '',
         travelPostcode: isClinic() ? '' : state.travelPostcode,
       }),
@@ -2639,6 +2749,16 @@ async function handlePayment() {
     // the customer was shown as discounted.
     if (res.status === 400) {
       const errBody = await res.json().catch(() => ({}));
+      // The server generates slots from the same hours table, so this only
+      // happens if the list went stale (e.g. the same-day notice window
+      // moved past the chosen time while they filled in their details).
+      if (errBody.error === 'slot_invalid') {
+        alert('Sorry — that time is no longer available. Please choose another slot.');
+        state.time = null;
+        resetPayButtons();
+        goToStep(3);
+        return;
+      }
       if (errBody.error === 'discount_invalid' || errBody.error === 'discount_unavailable') {
         alert('Sorry — your discount code is no longer valid. It has been removed; please review your total and pay again.');
         removeDiscountCode();
@@ -2807,19 +2927,13 @@ function goToStep(n) {
     if (i + 1 < n) s.classList.add('done');
     else if (i + 1 === n) s.classList.add('active');
   });
-  // Re-validate the time when arriving at Date & Time: the treatment (and so
-  // its duration) may have changed since a slot was picked, turning a
-  // once-free slot into an overlapping one. Drop a now-invalid selection and
-  // re-render.
+  // Re-fetch the offered times when arriving at Date & Time: the treatment
+  // (and so its duration) or the venue may have changed since a slot was
+  // picked, and the slot list depends on both. loadSlots() drops a selection
+  // that's no longer offered.
   if (n === 3) {
     renderCalendar();
-    if (state.date) {
-      if (state.time && slotIsTaken(state.time)) {
-        state.time = null;
-        document.getElementById('btn-step3').disabled = true;
-      }
-      renderTimes();
-    }
+    if (state.date) loadSlots();
   }
   if (n === 4) {
     checkStep3();
