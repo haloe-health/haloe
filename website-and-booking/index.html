@@ -223,7 +223,8 @@
   /* ============================================================
      HERO
      ============================================================ */
-  .hero { padding-top:28px; }
+  .hero { padding-top:28px; padding-bottom:0; }
+  #about { padding-top:24px; }
 
   /* The hero headline — an h1, so font-family/weight/synthesis/tracking
      come from the global h1,h2 rule above; font-size and line-height are
@@ -271,6 +272,7 @@
      ============================================================ */
   .about-card { padding:32px 24px; display:flex; flex-direction:column; gap:16px; }
   .about-card p { font-size:0.98rem; }
+  .about-copy .section-eyebrow { margin-bottom:-8px; }
   .about-cert-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
   @media (min-width:1024px) {
     .about-card { padding:48px; flex-direction:row; align-items:center; gap:48px; }
@@ -543,7 +545,6 @@
   <div class="container">
     <div class="about-card card reveal">
       <div class="about-copy">
-        <span class="section-eyebrow">About haloe</span>
         <div class="about-figure">
           <picture>
             <source type="image/webp" srcset="images/halima-hero-640.webp 640w, images/halima-hero.webp 1408w" sizes="(min-width: 1024px) 360px, 280px">
@@ -551,6 +552,7 @@
             <img src="images/halima-hero.jpg" width="1408" height="1408" alt="Halima Yasmin, founder of haloe, seated with a cup of tea" loading="lazy">
           </picture>
         </div>
+        <span class="section-eyebrow">About haloe</span>
         <h2>Healing rooted in the Sunnah</h2>
         <p>Hijama — wet cupping — is one of the oldest traditions in natural wellbeing, practised for thousands of years and encouraged by the Prophet Muhammad ﷺ. It uses gentle suction and a few small, superficial incisions; most clients describe feeling lighter and more settled afterwards.</p>
         <p>haloe offers three kinds of session — <strong>massage</strong> to ease everyday tension, <strong>dry cupping</strong> (suction only, skin unbroken), and <strong>wet cupping</strong> — hijama itself.</p>
