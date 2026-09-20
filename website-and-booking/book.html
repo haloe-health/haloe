@@ -61,6 +61,10 @@
     --step-active: var(--gold);
     --step-done: var(--gold-dark);
     --step-idle: #C6BCA9;
+    /* Low-contrast NEUTRAL hairline (not gold-tinted, unlike --border) for
+       plain row/list separators — treatment rows, the sticky category-tab
+       boundary, etc. */
+    --hairline: rgba(13, 13, 13, 0.08);
 
     /* --- New design-system tokens (Stitch spec) — additive, existing
        tokens above are untouched and still drive most of the page. --- */
@@ -87,6 +91,34 @@
     --font-heading: 'Playfair Display', 'Poppins', serif;
   }
 
+  /* Dark mode (Sep 2026): a defined dark palette, not auto-inversion.
+     --black/--cream keep their (historically inverted-sounding, but
+     unchanged-elsewhere) names — --black is the page BACKGROUND, --cream is
+     the primary TEXT colour, same as light mode; only the actual values
+     flip here. --obsidian-base is deliberately NOT overridden: every one of
+     its uses is dark text painted on a gold-filled element (selected date/
+     time, primary buttons, the "done" step dot), which needs to stay dark
+     for contrast against gold regardless of page theme, the same reasoning
+     that kept --ink unflipped for gold-background text on the homepage. */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --black: #1A1712;
+      --cream: #F5F0E8;
+      --cream-mid: #211D16;
+      --white: #262119;
+      --surface: #262119;
+      --text-muted: #C9C0B2;
+      --obsidian-elevated: #262119;
+      --obsidian-floating: #2E2820;
+      --obsidian-inset: #2E2820;
+      --text-cream: #F5F0E8;
+      --text-cashmere: #C9C0B2;
+      --text-sand: #9C9484;
+      --step-idle: #4A4438;
+      --hairline: rgba(245, 240, 232, 0.12);
+    }
+  }
+
   /* Scales the whole booking page down in one place — every size below is in
      rem, so this shrinks type, padding and gaps together and keeps proportions.
      16px browser default -> 12.5px. */
@@ -99,7 +131,37 @@
     min-height: 100vh;
   }
 
-  /* ---- Header ---- */
+  /* ---- Sticky top nav: 56px tall, icon-only back button, dots centred,
+     "Step N of 5" right. The old text back-link/.logo rules below this
+     block are dead CSS (no <header> element exists in the page — the nav
+     bar has always been a plain <nav>) kept only for the step 1
+     .panel-title/.logo-sub markup that still references them elsewhere;
+     left alone rather than hunted down for a rename with no visual change. */
+  #bookNav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    background: var(--header-bg, rgba(245,240,232,0.92));
+    border-bottom: 1px solid var(--hairline-border);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  @media (prefers-color-scheme: dark) { #bookNav { --header-bg: rgba(26,23,18,0.92); } }
+  .nav-back-btn {
+    width: 44px; height: 44px; flex: none; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--cream); text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-back-btn:hover { background: rgba(201,160,64,0.08); }
+  .nav-back-btn svg { width: 22px; height: 22px; }
+  .nav-step-counter {
+    flex: none; font-size: 0.78rem; letter-spacing: 0.02em;
+    color: var(--text-muted); white-space: nowrap;
+  }
+
+  /* ---- Header (dead — see note above) ---- */
   header {
     text-align: center;
     padding: 1rem 1.5rem 1.1rem;
@@ -292,54 +354,71 @@
     color: var(--cream);
     font-weight: 500;
   }
-  /* Category tabs fill the width — four equal segments, one row. Rounder than
-     the base .segmented so the pill reads softer. Overrides .segmented's
-     inline-flex because it's declared later at equal specificity. */
+  /* Category tabs: horizontally-scrolling pill row, content-sized (not
+     squeezed to equal columns — "Hijama" and "Packages" would otherwise
+     clip or wrap). Sticky directly under the 56px nav; a scroll-snap stop
+     per pill, 16px leading padding, and a right-edge fade (mask-image, not
+     a solid overlay div, so it survives the row's own background changing
+     between light/dark) hint that the row scrolls. role="tablist" is set
+     on the element in markup; arrow-key navigation is wired in JS. */
   .category-tabs {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
+    flex-wrap: nowrap;
     width: 100%;
-    gap: 3px;
-    padding: 3px;
+    gap: 6px;
+    padding: 3px 32px 3px 16px;
     border-radius: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent 100%);
+            mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent 100%);
+    position: sticky;
+    top: 56px;
+    z-index: 50;
+    background: var(--black);
+    transition: box-shadow 0.2s ease;
   }
+  .category-tabs::-webkit-scrollbar { display: none; }
+  /* Boundary only appears once the page has actually scrolled under the
+     sticky row (toggled in JS) — at rest, the row sits flush with the page
+     background so there's nothing to separate. */
+  .category-tabs.is-stuck { box-shadow: 0 1px 0 var(--hairline), 0 4px 12px rgba(13,13,13,0.06); }
   .category-tabs .seg-option { border-radius: 13px; }
-  /* Each category is a tappable pill: the inactive tabs carry a faint fill so
-     they read as buttons (not disabled text), and the selected one fills with
-     brand gold. */
+  /* Each category is a tappable pill: the inactive tabs carry a solid
+     surface fill so they read as buttons (not disabled text), and the
+     selected one fills with brand gold. min-height 44px (was 26/34px) —
+     the (pointer:coarse) bump below is no longer needed since this is now
+     the baseline for every pointer type. */
   .category-tabs .seg-option {
-    background: rgba(13,13,13,0.06);
+    background: var(--white);
     color: var(--text-muted);
+    flex: none;
+    scroll-snap-align: start;
+    min-height: 44px;
+    padding: 0.5rem 1.15rem;
   }
   .category-tabs .seg-option.active {
     background: var(--gold);
-    color: #2A2013;
+    color: var(--obsidian-base);
   }
   .category-tabs .seg-option:hover:not(.active) {
-    background: rgba(13,13,13,0.10);
+    background: var(--obsidian-floating);
     color: var(--cream);
   }
-  /* Phones: keep the four categories on one row, but make each grey segment
-     more compact — slimmer height and tighter padding — with a label size
-     that still reads clearly and fits one line. */
+  /* Phones: same scrolling row, just a touch tighter so more of it previews
+     on-screen at once. min-height stays 44px (the shared baseline set
+     above) — this used to drop to 34px here, under the tap-target minimum. */
   @media (max-width: 560px) {
     .category-tabs {
-      gap: 2px;
-      padding: 2px;
+      gap: 4px;
+      padding: 3px 32px 3px 16px;
     }
     .category-tabs .seg-option {
-      font-size: 0.82rem;
-      min-height: 34px;
-      padding-left: 0.15rem;
-      padding-right: 0.15rem;
-    }
-    /* The 78% base scale leaves these small on a phone — size them up for
-       comfortable reading and tapping. */
-    .back-link,
-    .back-link:link,
-    .back-link:visited {
-      font-size: 1rem;
-      padding: 0.7rem 1.4rem;
+      font-size: 0.86rem;
+      padding-left: 0.85rem;
+      padding-right: 0.85rem;
     }
     .footbar .foot-cta {
       font-size: 1.1rem;
@@ -352,45 +431,82 @@
     .foot-loc-prefix { display: none; }
   }
 
-  /* ---- Service Cards ---- */
-  .service-grid { display: block; border-top: 1px solid rgba(245,240,232,0.10); }
+  /* ---- Treatment rows ----
+     Whole row is the tap target (role="radio" in a role="radiogroup",
+     keyboard-operable — see the JS keydown handler). No card borders; rows
+     are separated by a single low-contrast neutral hairline (was
+     rgba(245,240,232,0.10) — cream-on-cream, effectively invisible on this
+     light page; that value only ever made sense against a dark background,
+     looks like a leftover from before the light redesign). */
+  .service-grid { display: block; border-top: 1px solid var(--hairline); }
   .service-card {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
-    padding: 0.85rem 0.25rem;
+    gap: 0.962rem; /* 12px — gap between the selection circle and the text column */
+    padding: 1.282rem 0.25rem; /* 16px vertical */
     border: none;
-    border-bottom: 1px solid rgba(245,240,232,0.10);
+    border-bottom: 1px solid var(--hairline);
     border-radius: 0;
     background: none;
     cursor: pointer;
     transition: background 0.18s;
     position: relative;
   }
-  .service-card:hover { background: rgba(201,160,64,0.045); }
+  .service-card:hover { background: var(--obsidian-floating); }
+  .service-card:focus-visible { outline: 2px solid var(--gold-deep); outline-offset: -2px; }
+  .service-card.selected { background: var(--gold-soft, rgba(200,169,110,0.12)); }
+  .service-card.selected:hover { background: var(--gold-soft, rgba(200,169,110,0.16)); }
+  /* Selection indicator: left-aligned 24px circle, 12px gap to text (the
+     row's own `gap` above) — same treatment everywhere a list has a single
+     selectable row (also used on the Packages tab). Selected = gold fill +
+     check; unselected = a 1.5px neutral outline, no fill. */
   .svc-ring {
-    width: 19px; height: 19px; border-radius: 50%;
-    border: 1.5px solid #C4BBA8; flex: none;
-    transition: border-color 0.18s, border-width 0.18s;
+    width: 1.923rem; height: 1.923rem; /* 24px */
+    border-radius: 50%;
+    border: 1.5px solid var(--step-idle);
+    flex: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.18s, background 0.18s;
   }
+  .svc-ring svg { width: 62%; height: 62%; opacity: 0; transition: opacity 0.15s; color: var(--obsidian-base); }
   .service-card .svc-ring { margin-top: 2px; }
-  .service-card.selected .svc-ring { border-color: var(--gold); border-width: 6px; }
+  .service-card.selected .svc-ring { border-color: var(--gold); background: var(--gold); }
+  .service-card.selected .svc-ring svg { opacity: 1; }
   .svc-main { flex: 1; min-width: 0; }
-  .svc-name { display: block; font-size: 1rem; color: var(--cream); letter-spacing: -0.01em; }
-  /* Duration as a small gold chip on its own line (D4), freeing the right edge
-     for price alone. */
-  .svc-chip {
-    display: inline-block;
-    font-size: 0.62rem; letter-spacing: 0.02em;
-    color: var(--gold-deep);
-    border: 1px solid rgba(201,160,64,0.32);
-    border-radius: 99px;
-    padding: 1.5px 8px;
-    margin: 0.32rem 0 0.28rem;
+  /* Name + price share one baseline-aligned row — name can wrap onto a
+     second line (long treatment names) without ever pushing the price down
+     onto its own line: name is flex:1 or truncation, price is
+     flex-shrink:0. */
+  .svc-top-row { display: flex; align-items: baseline; gap: 0.8rem; }
+  .svc-name {
+    flex: 1; min-width: 0;
+    font-size: 1.362rem; /* 17px */
+    font-weight: 500;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  .svc-price {
+    flex-shrink: 0;
+    font-size: 1.362rem; /* 17px */
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--cream);
     white-space: nowrap;
   }
-  .svc-desc { display: block; font-size: 0.98rem; color: var(--text-muted); line-height: 1.5; }
-  .svc-price { font-size: 1.2rem; font-weight: 500; color: var(--cream); min-width: 64px; text-align: right; white-space: nowrap; margin-top: 1px; }
+  /* Duration + description on one line: "45 min · Gentle facial massage…".
+     Duration is set very slightly darker (full --cream, not --text-muted)
+     so it reads as the more load-bearing half of the line; try to keep
+     this to one visual line, never more than two. */
+  .svc-meta-line {
+    display: block;
+    font-size: 1.202rem; /* 15px */
+    font-weight: 400;
+    color: var(--text-muted);
+    line-height: 1.4;
+    margin-top: 0.2rem;
+  }
+  .svc-meta-line .svc-duration { color: var(--cream); }
   /* Pre-discount price, kept quiet so the payable amount stays dominant. */
   .was {
     color: var(--text-muted);
@@ -399,9 +515,58 @@
     margin-right: 0.34em;
     text-decoration-thickness: 1px;
   }
-  .service-card:hover { border-color: var(--border-strong); background: rgba(201,160,64,0.04); }
-  /* Selection is shown by the ring filling gold — no background box or check,
-     which read as a bordered cell against the neighbouring hairlines. */
+  /* Empty state (a category with no treatments — not expected with the
+     current catalogue, but the UI shouldn't go blank if it ever happens)
+     and the loading skeleton shown while SERVICES first renders. */
+  .service-empty {
+    padding: 2.5rem 0.25rem; text-align: center;
+    color: var(--text-muted); font-size: 1rem;
+  }
+  .service-skeleton-row {
+    display: flex; align-items: center; gap: 0.962rem;
+    padding: 1.282rem 0.25rem; border-bottom: 1px solid var(--hairline);
+  }
+  .skeleton-block {
+    background: var(--obsidian-floating); border-radius: 6px;
+    animation: skeletonPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes skeletonPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .skeleton-block { animation: none; opacity: 0.75; } }
+  /* Description line clamps at two lines max (never three) per spec —
+     applies to every category, packages included. */
+  .svc-meta-line {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .packages-policy-line {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin: 0.6rem 0.25rem 0.9rem;
+  }
+  .svc-included {
+    margin-top: 0.6rem;
+  }
+  .svc-included summary {
+    font-size: 0.98rem;
+    font-weight: 500;
+    color: var(--gold-deep);
+    cursor: pointer;
+    padding: 0.4rem 0;
+    min-height: 28px;
+    list-style: none;
+  }
+  .svc-included summary::-webkit-details-marker { display: none; }
+  .svc-included summary::before { content: '+ '; }
+  .svc-included[open] summary::before { content: '– '; }
+  .svc-included-missing {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin: 0.2rem 0 0.4rem;
+  }
   .service-name {
     font-family: 'Poppins', sans-serif;
     font-size: 1.1rem;
@@ -1124,17 +1289,17 @@
     font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 0.95rem;
     padding: 0.72rem 1.8rem; border-radius: var(--radius-full); cursor: pointer;
     transition: filter 0.2s;
-    min-height: 44px; flex: none;
+    min-height: 56px; flex: none;
   }
   .foot-cta svg { width: 16px; height: 16px; flex: none; }
   .foot-cta:hover:not(:disabled) { filter: brightness(1.08); }
   .foot-cta:disabled { background: var(--obsidian-floating); color: var(--text-muted); cursor: not-allowed; }
   .foot-cta.hidden { display: none; }
   .footbar.hidden { display: none; }
-  body { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+  body { padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
   /* So the last field on any step scrolls clear of the sticky footer rather
      than ending up hidden underneath it. */
-  html { scroll-padding-bottom: 96px; }
+  html { scroll-padding-bottom: 110px; }
 
   .btn-back { display: none; }
   .btn-back-unused {
@@ -1243,7 +1408,7 @@
     .ios-row input, .ios-row select, .ios-row textarea { font-size: 16px; }
     .ios-row select { min-height: 44px; }
     .back-link, .back-link:link, .back-link:visited { min-height: 44px; }
-    .foot-cta { min-height: 48px; }
+    .foot-cta { min-height: 56px; }
     /* Real body copy (instructions, descriptions, legal/consent text, error
        messages) gets a 15px floor. Short UI-control labels (chips, kickers,
        step dots, the 4-across category tabs) are left at their compact,
@@ -1280,8 +1445,10 @@
 })();
 </script>
 
-<nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:12px clamp(1rem,3vw,2.5rem);background:rgba(245,240,232,0.92);border-bottom:1px solid rgba(13,13,13,0.08);backdrop-filter:blur(12px);">
-  <a href="index.html" class="back-link" id="back-control" onclick="backControl(event)">← Back to site</a>
+<nav id="bookNav">
+  <a href="index.html" class="nav-back-btn" id="back-control" onclick="backControl(event)" aria-label="Back to site">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+  </a>
   <div class="steps" id="steps">
     <div class="step active" data-step="1">
       <div class="step-dot">1</div>
@@ -1304,9 +1471,9 @@
       <span class="step-label">Confirm</span>
     </div>
   </div>
-  <span class="foot-label" id="step-counter">Step 1 of 5</span>
+  <span class="nav-step-counter" id="step-counter">Step 1 of 5</span>
 </nav>
-<div style="height:52px;"></div>
+<div style="height:56px;"></div>
 <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Book a hijama or cupping session at haloe — Manchester</h1>
 <div class="book-shell">
 <div class="book-main">
@@ -1403,16 +1570,17 @@
   <div class="panel" id="panel-2">
     <button class="btn-back" onclick="goToStep(1)">← Back</button>
     <p class="panel-title">Choose your treatment.</p>
-    <p class="panel-sub">Women &amp; men. Fully accredited.</p>
+    <p class="panel-sub">Prices shown are treatment only — travel fee added for home visits.</p>
 
-    <div class="category-tabs segmented" id="category-tabs">
-      <button class="tab-btn seg-option active" data-cat="massage">Massage</button>
-      <button class="tab-btn seg-option" data-cat="dry">Dry Cupping</button>
-      <button class="tab-btn seg-option" data-cat="wet">Wet Cupping</button>
-      <button class="tab-btn seg-option" data-cat="packages">Packages</button>
+    <div class="category-tabs segmented" id="category-tabs" role="tablist" aria-label="Treatment category">
+      <button class="tab-btn seg-option active" data-cat="massage" role="tab" aria-selected="true" tabindex="0">Massage</button>
+      <button class="tab-btn seg-option" data-cat="dry" role="tab" aria-selected="false" tabindex="-1">Dry Cupping</button>
+      <button class="tab-btn seg-option" data-cat="wet" role="tab" aria-selected="false" tabindex="-1">Hijama</button>
+      <button class="tab-btn seg-option" data-cat="packages" role="tab" aria-selected="false" tabindex="-1">Packages</button>
     </div>
+    <p class="packages-policy-line hidden" id="packages-policy-line">Packages are paid in full. Free reschedule or full refund up to 48 hours before a session; inside 48 hours, sessions are non-refundable but can be moved once.</p>
 
-    <div class="service-grid" id="service-grid"></div>
+    <div class="service-grid" id="service-grid" role="radiogroup" aria-label="Treatment"></div>
 
     <button class="btn-primary" id="btn-step2" onclick="goToStep(3)" disabled>Continue — Choose Date & Time</button>
   </div>
@@ -1857,7 +2025,12 @@ function updateRail() {
         : state.location === 'mobile' ? 'Home visit · Greater Manchester'
         : "Choose where you'd like your session";
     } else if (!svc) {
-      fs.textContent = 'No treatment selected';
+      fs.textContent = 'Select a treatment';
+    } else if (currentStep === 2) {
+      // Step 2's bar is just "Select a treatment" / "Face Massage · £40" —
+      // date/time haven't been chosen yet at this point in the flow, and
+      // repeating them here (steps 3+) is handled by the branch below.
+      fs.textContent = `${svc.name} · £${netPrice(svc)}`;
     } else {
       const bits = [svc.name, svc.time];
       if (dateStr) bits.push(dateStr);
@@ -1868,7 +2041,9 @@ function updateRail() {
     }
   }
   const ft = document.getElementById('foot-total');
-  if (ft) ft.innerHTML = svc ? priceHtml(svc) : '—';
+  // Blank rather than a stray "—" placeholder when nothing's picked yet —
+  // the summary text alone ("Select a treatment") already says so.
+  if (ft) ft.innerHTML = svc && currentStep !== 2 ? priceHtml(svc) : '';
   const fh = document.getElementById('foot-helper');
   if (fh) fh.classList.toggle('hidden', !(currentStep === 1 && !state.location));
   syncFooter();
@@ -1880,8 +2055,10 @@ function syncFooter() {
   const counter = document.getElementById('step-counter');
   if (counter) counter.textContent = `Step ${currentStep} of 5`;
   // A single back control: leaves the site on step 1, steps back after that.
+  // aria-label only, never textContent — the button is icon-only and
+  // textContent would blow away its SVG child.
   const back = document.getElementById('back-control');
-  if (back) back.textContent = currentStep > 1 ? '← Back' : '← Back to site';
+  if (back) back.setAttribute('aria-label', currentStep > 1 ? 'Back' : 'Back to site');
   const cta = document.getElementById('foot-cta');
   if (!cta) return;
   // Step 5 carries its own total and pay button, so the bar would only repeat
@@ -1909,20 +2086,93 @@ function footerContinue() {
   if (src && !src.disabled) src.click();
 }
 
+// Consistent within-category ordering (Sep 2026): face -> head -> combined
+// (two areas together) -> targeted -> back -> full body, ties broken by
+// price ascending. Chosen over plain price-ascending because it mirrors how
+// someone actually browses a treatment menu (by body area), and — checked
+// against the real catalogue before picking it — it turns out to already
+// match every existing massage/dry/wet ordering exactly, so this function
+// is a guarantee going forward rather than a visible reshuffle today.
+// "Head & Scalp" is bucketed as HEAD, not COMBINED, despite the "&" —
+// scalp is part of the head, not a second distinct area.
+const TREATMENT_BUCKET = {
+  'Face Massage': 0, 'Face Cupping': 0,
+  'Head Massage': 1, 'Head Cupping': 1, 'Head & Scalp': 1,
+  'Face & Head Massage': 2, 'Head & Foot Massage': 2, 'Face & Head Cupping': 2,
+  'Targeted Area / Sports Injury': 3,
+  'Back, Neck & Shoulders': 4, 'Full Back': 4,
+  'Full Body Massage': 5, 'Full Body': 5, 'Head, Scalp & Full Body': 5,
+};
+function orderedTreatments(list) {
+  return list
+    .map((s, i) => ({ s, i, bucket: s.name in TREATMENT_BUCKET ? TREATMENT_BUCKET[s.name] : 99 }))
+    .sort((a, b) => a.bucket - b.bucket || a.s.price - b.s.price);
+}
+// Packages: total price ascending, ties by session count — also already the
+// data's existing order, implemented here so it's guaranteed rather than
+// incidental.
+function packageSessionCount(timeStr) {
+  const m = /^(\d+)\s*sessions?/i.exec(timeStr || '');
+  return m ? parseInt(m[1], 10) : 0;
+}
+function orderedPackages(list) {
+  return list
+    .map((s, i) => ({ s, i }))
+    .sort((a, b) => a.s.price - b.s.price || packageSessionCount(a.s.time) - packageSessionCount(b.s.time));
+}
+
+const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>';
+
+// None of the 8 packages in services-data.js define a session-by-session
+// breakdown (just name/time/price/desc for the package as a whole) — so the
+// "What's included" disclosure below is honest about that rather than
+// guessing what sessions 1-4 etc. would contain. See the summary handed
+// back after this task for the full list.
 function renderServices() {
   const grid = document.getElementById('service-grid');
   const services = SERVICES[state.category];
-  grid.innerHTML = services.map((s, i) => `
-    <div class="service-card ${state.serviceIndex === i ? 'selected' : ''}" onclick="selectService(${i})">
-      <span class="svc-ring"></span>
-      <span class="svc-main">
-        <span class="svc-name">${s.name}</span>
-        ${s.time ? `<span class="svc-chip">${s.time}</span>` : ''}
-        ${s.desc ? `<span class="svc-desc">${s.desc}</span>` : ''}
-      </span>
-      <span class="svc-price">${priceHtml(s)}</span>
-    </div>
-  `).join('');
+  const isPackages = state.category === 'packages';
+  document.getElementById('packages-policy-line').classList.toggle('hidden', !isPackages);
+
+  if (!services || services.length === 0) {
+    grid.innerHTML = '<p class="service-empty">Nothing here yet — try another category.</p>';
+    return;
+  }
+
+  const ordered = isPackages ? orderedPackages(services) : orderedTreatments(services);
+
+  grid.innerHTML = ordered.map(({ s, i }) => {
+    const selected = state.serviceIndex === i;
+    const ring = `<span class="svc-ring" aria-hidden="true">${CHECK_SVG}</span>`;
+    const priceEl = `<span class="svc-price">${priceHtml(s)}</span>`;
+    let body;
+    if (isPackages) {
+      const sessions = packageSessionCount(s.time);
+      const windowText = (s.time || '').replace(/^\d+\s*sessions?\s*·\s*/i, '');
+      const perSession = sessions ? Math.round(netPrice(s) / sessions) : null;
+      const metaLine = sessions && perSession
+        ? `<span class="svc-duration">${sessions} sessions</span> · £${perSession} each${windowText ? ' · over ' + windowText : ''}`
+        : (s.time || '');
+      body = `
+        <span class="svc-main">
+          <span class="svc-top-row"><span class="svc-name">${s.name}</span>${priceEl}</span>
+          <span class="svc-meta-line">${metaLine}</span>
+          <details class="svc-included" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()">
+            <summary>What's included</summary>
+            <p class="svc-included-missing">Session-by-session details aren't listed here yet — message Halima on WhatsApp before booking to confirm exactly what each session covers.</p>
+          </details>
+        </span>`;
+    } else {
+      const metaLine = [s.time ? `<span class="svc-duration">${s.time}</span>` : '', s.desc || '']
+        .filter(Boolean).join(' · ');
+      body = `
+        <span class="svc-main">
+          <span class="svc-top-row"><span class="svc-name">${s.name}</span>${priceEl}</span>
+          ${metaLine ? `<span class="svc-meta-line">${metaLine}</span>` : ''}
+        </span>`;
+    }
+    return `<div class="service-card${selected ? ' selected' : ''}" role="radio" aria-checked="${selected}" tabindex="${selected || (state.serviceIndex === null && ordered[0].i === i) ? '0' : '-1'}" onclick="selectService(${i})" onkeydown="serviceCardKeydown(event, ${i})">${ring}${body}</div>`;
+  }).join('');
 }
 
 function selectService(i) {
@@ -1930,19 +2180,75 @@ function selectService(i) {
   renderServices();
   document.getElementById('btn-step2').disabled = false;
   updateRail();
+  const row = document.querySelector(`.service-card[onclick="selectService(${i})"]`);
+  if (row) row.focus();
 }
 
-document.getElementById('category-tabs').addEventListener('click', e => {
-  const btn = e.target.closest('.tab-btn');
-  if (!btn) return;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+// Standard radiogroup keyboard pattern: arrow keys move focus AND selection
+// between rows (in the currently-rendered/ordered sequence, not raw array
+// index), Enter/Space select the focused row.
+function serviceCardKeydown(e, i) {
+  const cards = Array.from(document.querySelectorAll('#service-grid .service-card'));
+  const onclicks = cards.map(c => c.getAttribute('onclick'));
+  const currentPos = onclicks.indexOf(`selectService(${i})`);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+    e.preventDefault();
+    const next = cards[(currentPos + 1) % cards.length];
+    const m = /selectService\((\d+)\)/.exec(next.getAttribute('onclick'));
+    if (m) selectService(parseInt(m[1], 10));
+  } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    const prev = cards[(currentPos - 1 + cards.length) % cards.length];
+    const m = /selectService\((\d+)\)/.exec(prev.getAttribute('onclick'));
+    if (m) selectService(parseInt(m[1], 10));
+  } else if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    selectService(i);
+  }
+}
+
+// Category tabs: role="tablist"/"tab" semantics with aria-selected, plus
+// standard tablist arrow-key navigation (Left/Right move focus AND
+// activate the tab, matching the WAI-ARIA authoring practice for
+// automatic-activation tablists).
+const categoryTabsEl = document.getElementById('category-tabs');
+function activateCategoryTab(btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+    b.tabIndex = -1;
+  });
   btn.classList.add('active');
+  btn.setAttribute('aria-selected', 'true');
+  btn.tabIndex = 0;
   state.category = btn.dataset.cat;
   state.serviceIndex = null;
   document.getElementById('btn-step2').disabled = true;
   renderServices();
   updateRail();
+}
+categoryTabsEl.addEventListener('click', e => {
+  const btn = e.target.closest('.tab-btn');
+  if (btn) activateCategoryTab(btn);
 });
+categoryTabsEl.addEventListener('keydown', e => {
+  if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+  const tabs = Array.from(categoryTabsEl.querySelectorAll('.tab-btn'));
+  const currentIdx = tabs.indexOf(document.activeElement);
+  if (currentIdx === -1) return;
+  e.preventDefault();
+  const nextIdx = e.key === 'ArrowRight' ? (currentIdx + 1) % tabs.length : (currentIdx - 1 + tabs.length) % tabs.length;
+  tabs[nextIdx].focus();
+  activateCategoryTab(tabs[nextIdx]);
+  tabs[nextIdx].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+});
+
+// Category-tab row is position:sticky under the 56px nav; give it a
+// boundary (hairline + soft shadow) only once the page has actually
+// scrolled underneath it, so it doesn't draw a line under itself at rest.
+window.addEventListener('scroll', () => {
+  categoryTabsEl.classList.toggle('is-stuck', window.scrollY > 4);
+}, { passive: true });
 
 // A date is bookable when: it's not in the past, and — for mobile — it's not
 // a Sunday, or — for clinic — it falls on CLINIC_WEEKDAY on/after
@@ -2518,8 +2824,8 @@ if (document.readyState === 'loading') {
 <div class="footbar">
   <div class="footbar-inner">
     <div class="foot-summary-col">
-      <div class="foot-label" id="foot-sum">No treatment selected</div>
-      <div class="foot-total" id="foot-total">—</div>
+      <div class="foot-label" id="foot-sum">Select a treatment</div>
+      <div class="foot-total" id="foot-total"></div>
       <div class="foot-helper hidden" id="foot-helper">Select a venue to continue</div>
     </div>
     <button class="foot-cta" id="foot-cta" onclick="footerContinue()" disabled><span id="foot-cta-label">Continue</span><svg id="foot-cta-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>

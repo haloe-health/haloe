@@ -26,11 +26,11 @@ const SERVICES = {
     { name: 'Head, Scalp & Full Body', time: '1 hr 15 min', price: 115, desc: 'Scalp to sole — the complete dry-cupping session.' },
   ],
   wet: [
-    { name: 'Head & Scalp', time: '1 hour', price: 70, desc: 'Traditional hijama focused on the head and scalp.' },
-    { name: 'Targeted Area / Sports Injury', time: '1 hour', price: 80, desc: 'Hijama on a specific area of tension.' },
-    { name: 'Full Back', time: '1 hour', price: 90, desc: 'Full-back hijama, the most-requested session.' },
-    { name: 'Full Body', time: '1 hr 30 min', price: 120, desc: 'Whole-body hijama for an all-over reset.' },
-    { name: 'Head, Scalp & Full Body', time: '1 hr 45 min', price: 150, desc: 'The complete hijama session, head to toe.' },
+    { name: 'Head & Scalp', time: '1 hour', price: 70, desc: 'Traditional hijama (wet cupping) focused on the head and scalp.' },
+    { name: 'Targeted Area / Sports Injury', time: '1 hour', price: 80, desc: 'Hijama, or wet cupping, on a specific area of tension.' },
+    { name: 'Full Back', time: '1 hour', price: 90, desc: 'Full-back hijama (wet cupping), the most-requested session.' },
+    { name: 'Full Body', time: '1 hr 30 min', price: 120, desc: 'Whole-body hijama, or wet cupping, for an all-over reset.' },
+    { name: 'Head, Scalp & Full Body', time: '1 hr 45 min', price: 150, desc: 'The complete hijama (wet cupping) session, head to toe.' },
   ],
   packages: [
     { name: 'Pain & Mobility', time: '4 sessions · 8–12 wks', price: 340, desc: 'Targeted cupping to support ease of movement and tension relief.' },
