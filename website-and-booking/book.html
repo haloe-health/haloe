@@ -593,27 +593,34 @@
   /* ---- Where step: two selectable cards ----
      The radio input is the real source of truth (native keyboard nav: Tab
      into the group, arrow keys / Space to switch) but is visually hidden —
-     the <label> wrapping it is the whole clickable/visible card. Layout
-     follows design/where-step-stitch.html (a Stitch export): icon tile +
-     tag/radio row, title, subtitle-with-icon, hairline divider, two bullet
-     lines — reskinned with this page's own tokens instead of the mockup's. */
+     the <label> wrapping it is the whole clickable/visible card.
+     Compact row layout (Sep 2026) — both cards must fit on screen together
+     at 375x667 with the header and sticky bar still visible, so this
+     replaced the old tall stacked-block layout (icon row, title, subtitle,
+     divider, two bullet lines, ~330px each) with a single row: icon tile,
+     then title/subtitle/descriptor stacked, then the selection ring at the
+     far right. The chips, divider and bullet list are gone — everything
+     that isn't the title or the venue/label subtitle folds into one
+     descriptor line. */
   .where-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    margin: 0.5rem 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.962rem; /* 12px */
+    margin: 1.923rem 0 1.5rem; /* 24px above the first card */
   }
   @media (min-width: 768px) {
-    .where-grid { grid-template-columns: 1fr 1fr; }
+    .where-grid { flex-direction: row; }
+    .where-card { flex: 1 1 0; }
   }
   .where-card {
     position: relative;
     display: flex;
-    flex-direction: column;
-    padding: 1.5rem;
+    align-items: center;
+    gap: 0.962rem; /* 12px */
+    padding: 1.282rem; /* 16px */
     background: var(--obsidian-elevated);
     border: 1px solid var(--hairline-border);
-    border-radius: var(--radius-xl);
+    border-radius: 1.923rem; /* 24px */
     cursor: pointer;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
@@ -635,18 +642,11 @@
     border-color: var(--active-border);
     box-shadow: 0 0 0 3px var(--active-border);
   }
-  .where-top-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 1.1rem;
-  }
   .where-icon-tile {
-    width: 84px;
-    height: 84px;
+    width: 44px;
+    height: 44px;
     flex: none;
-    border-radius: var(--radius-md);
+    border-radius: 0.962rem;
     background: rgba(200, 169, 110, 0.08);
     border: 1px solid var(--hairline-border);
     display: flex;
@@ -654,24 +654,41 @@
     justify-content: center;
     color: var(--gold-primary);
   }
-  .where-icon-tile svg { width: 40px; height: 40px; display: block; }
-  .where-top-right { display: flex; align-items: center; gap: 0.55rem; flex: none; }
-  .where-tag {
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 5px 11px;
-    border-radius: 999px;
-    white-space: nowrap;
-    background: rgba(200, 169, 110, 0.08);
-    border: 1px solid rgba(200, 169, 110, 0.25);
+  .where-icon-tile svg { width: 22px; height: 22px; display: block; }
+  .where-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.16rem; }
+  .where-title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    color: var(--cream);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .where-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 14px;
     color: var(--gold-highlight);
+  }
+  .where-subtitle svg { width: 13px; height: 13px; flex: none; }
+  /* Muted descriptor — folds in what used to be the chip + divider + two
+     bullet lines. Same --text-muted token used for body copy elsewhere on
+     this page, already >=4.5:1 against the card surface in both themes.
+     At 15px (the site's body-copy floor — never shrunk to force a fit) the
+     full copy doesn't reliably fit one line in the ~220px text column at
+     375px wide, and truncating it would silently cut off the actual travel
+     fee, so this wraps to a second line rather than ellipsizing; there's
+     enough vertical headroom in the target 140px card for that. */
+  .where-descriptor {
+    font-size: 1.202rem; /* 15px */
+    color: var(--text-muted);
+    line-height: 1.35;
   }
   /* Decorative — the real selection state lives on the hidden radio input,
      which screen readers read natively. This ring is purely visual. */
   .where-radio-ring {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     flex: none;
     border-radius: 999px;
     border: 1px solid var(--hairline-border);
@@ -690,26 +707,6 @@
   }
   .where-card.selected .where-radio-ring { border-color: var(--gold-primary); background: rgba(200, 169, 110, 0.12); }
   .where-card.selected .where-radio-ring::after { background: var(--gold-primary); }
-  .where-title {
-    font-family: var(--font-heading);
-    font-size: 22px;
-    color: var(--cream);
-    font-weight: 500;
-    line-height: 1.2;
-    margin-bottom: 0.35rem;
-  }
-  .where-subtitle {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 14px;
-    color: var(--gold-highlight);
-  }
-  .where-subtitle svg { width: 14px; height: 14px; flex: none; }
-  .where-divider { border-top: 1px solid var(--hairline-border); margin: 1rem 0 0.75rem; }
-  .where-bullets { display: flex; flex-direction: column; gap: 0.45rem; }
-  .where-bullet { display: flex; align-items: center; gap: 0.5rem; font-size: 13px; color: var(--text-cashmere); line-height: 1.4; }
-  .where-dot { width: 4px; height: 4px; flex: none; border-radius: 999px; background: var(--gold-primary); }
 
   /* ---- Location Toggle ---- (styling reuses the shared .segmented / .seg-option component) */
   /* Apple step 1: the travel-fee note is a quiet line, not a bordered box */
@@ -1502,61 +1499,47 @@
     <div class="where-grid" id="where-grid">
       <label class="where-card" id="where-clinic" for="where-clinic-radio">
         <input type="radio" name="whereLocation" id="where-clinic-radio" value="clinic" onchange="selectLocation('clinic')">
-        <span class="where-top-row">
-          <span class="where-icon-tile" aria-hidden="true">
-            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="7" width="30" height="35"/>
-              <rect x="20" y="30" width="8" height="12"/>
-              <rect x="14" y="14" width="6" height="6"/>
-              <rect x="28" y="14" width="6" height="6"/>
-              <rect x="14" y="24" width="6" height="6"/>
-              <rect x="28" y="24" width="6" height="6"/>
-            </svg>
+        <span class="where-icon-tile" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="7" width="30" height="35"/>
+            <rect x="20" y="30" width="8" height="12"/>
+            <rect x="14" y="14" width="6" height="6"/>
+            <rect x="28" y="14" width="6" height="6"/>
+            <rect x="14" y="24" width="6" height="6"/>
+            <rect x="28" y="24" width="6" height="6"/>
+          </svg>
+        </span>
+        <span class="where-info">
+          <span class="where-title">Clinic Day</span>
+          <span class="where-subtitle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg>
+            <span id="where-clinic-venue"></span>
           </span>
-          <span class="where-top-right">
-            <span class="where-tag">City centre</span>
-            <span class="where-radio-ring" aria-hidden="true"></span>
-          </span>
+          <span class="where-descriptor">Tuesdays &middot; Private room &middot; Reception &amp; lift</span>
         </span>
-        <span class="where-title">Clinic Day</span>
-        <span class="where-subtitle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.1-7-11.5A7 7 0 0 1 19 9.5C19 14.9 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.3"/></svg>
-          <span id="where-clinic-venue"></span>
-        </span>
-        <span class="where-divider" aria-hidden="true"></span>
-        <span class="where-bullets">
-          <span class="where-bullet"><span class="where-dot" aria-hidden="true"></span>Every Tuesday &middot; Private treatment room</span>
-          <span class="where-bullet"><span class="where-dot" aria-hidden="true"></span>Reception and lift access</span>
-        </span>
+        <span class="where-radio-ring" aria-hidden="true"></span>
       </label>
       <label class="where-card" id="where-mobile" for="where-mobile-radio">
         <input type="radio" name="whereLocation" id="where-mobile-radio" value="mobile" onchange="selectLocation('mobile')">
-        <span class="where-top-row">
-          <span class="where-icon-tile" aria-hidden="true">
-            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
-              <path d="M4 29v6h4"/>
-              <path d="M40 35h4v-4a2 2 0 0 0-2-2"/>
-              <circle cx="14" cy="35" r="3.5"/>
-              <circle cx="34" cy="35" r="3.5"/>
-              <path d="M17.5 35h13"/>
-            </svg>
+        <span class="where-icon-tile" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 29h4l3-9a3 3 0 0 1 2.8-2h16.4a3 3 0 0 1 2.8 2l3 9h4a2 2 0 0 1 2 2v4h-4"/>
+            <path d="M4 29v6h4"/>
+            <path d="M40 35h4v-4a2 2 0 0 0-2-2"/>
+            <circle cx="14" cy="35" r="3.5"/>
+            <circle cx="34" cy="35" r="3.5"/>
+            <path d="M17.5 35h13"/>
+          </svg>
+        </span>
+        <span class="where-info">
+          <span class="where-title">Home Visit</span>
+          <span class="where-subtitle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 4.9 5.3.6-4 3.6 1.1 5.3L12 14.9l-4.6 2.5 1.1-5.3-4-3.6 5.3-.6z"/></svg>
+            Halima comes to you
           </span>
-          <span class="where-top-right">
-            <span class="where-tag">Across Manchester</span>
-            <span class="where-radio-ring" aria-hidden="true"></span>
-          </span>
+          <span class="where-descriptor">Greater Manchester &middot; Travel fee from <span id="where-mobile-fee"></span></span>
         </span>
-        <span class="where-title">Home Visit</span>
-        <span class="where-subtitle">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 4.9 5.3.6-4 3.6 1.1 5.3L12 14.9l-4.6 2.5 1.1-5.3-4-3.6 5.3-.6z"/></svg>
-          Halima comes to you
-        </span>
-        <span class="where-divider" aria-hidden="true"></span>
-        <span class="where-bullets">
-          <span class="where-bullet"><span class="where-dot" aria-hidden="true"></span>Across Greater Manchester</span>
-          <span class="where-bullet"><span class="where-dot" aria-hidden="true"></span>Full sterile setup brought to you</span>
-        </span>
+        <span class="where-radio-ring" aria-hidden="true"></span>
       </label>
     </div>
 
@@ -1776,6 +1759,11 @@ const TRAVEL_ZONE_A_PENCE = 1500; // £15 — Oldham & nearby
 const TRAVEL_ZONE_B_PENCE = 3500; // £35 — rest of Greater Manchester
 const TRAVEL_ZONE_A_M_DISTRICTS = new Set([9, 24, 35, 40, 43]);
 const TRAVEL_ZONE_B_AREAS = new Set(['M', 'SK', 'BL', 'WN', 'WA']);
+
+// Step 1's Home Visit card descriptor ("Travel fee from £15") reads the real
+// Zone A minimum above rather than a hard-coded figure, so it can't drift
+// from the actual fee.
+document.getElementById('where-mobile-fee').textContent = `£${TRAVEL_ZONE_A_PENCE / 100}`;
 
 function parseOutwardCode(raw) {
   const cleaned = String(raw || '').toUpperCase().replace(/\s+/g, '');
