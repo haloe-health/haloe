@@ -1541,36 +1541,54 @@
   }
 
   /* ---- Consent checkboxes (replaces ios-toggle on step 4) ---- */
+  /* ---- Eyebrow divider (location + consent headings) ---- */
+  .s4-eyebrow {
+    display: flex; align-items: center; gap: 10px;
+    margin: 24px 0 12px;
+  }
+  .s4-eyebrow-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #a8873a; white-space: nowrap;
+  }
+  .s4-eyebrow::after {
+    content: ''; flex: 1; height: 1px; background: #e8e2d6;
+  }
+  /* ---- Location block ---- */
+  .s4-location-address {
+    font-size: 14px; font-weight: 600; color: #1a1208; line-height: 1.4;
+    margin: 0 0 3px;
+  }
+  .s4-location-sub {
+    font-size: 12px; color: #888; line-height: 1.4; margin: 0;
+  }
+  /* ---- Consent ---- */
   .consent-block { margin-bottom: 1.6rem; }
   .consent-row {
-    display: flex; align-items: flex-start; gap: 0.85rem;
-    padding: 0.88rem 0; cursor: pointer;
-    border-bottom: 1px solid var(--hairline-border);
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; cursor: pointer; min-height: 44px;
+    border-bottom: 1px solid #e8e2d6;
   }
   .consent-block .consent-row:last-child { border-bottom: none; }
   .consent-check {
-    flex: none; width: 24px; height: 24px; margin-top: 0.07rem;
-    border: 1.5px solid rgba(255,255,255,0.22);
-    border-radius: 6px;
-    background: rgba(255,255,255,0.06);
+    flex: none; width: 22px; height: 22px; margin-top: 1px;
+    border: 1.5px solid #ccc; border-radius: 6px;
+    background: #ffffff;
     -webkit-appearance: none; appearance: none;
     cursor: pointer; position: relative;
     transition: border-color 0.18s, background 0.18s;
   }
   .consent-check:checked {
-    background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary));
-    border-color: transparent;
+    background: #a8873a;
+    border-color: #a8873a;
   }
   .consent-check:checked::after {
-    content: '';
-    position: absolute; left: 7px; top: 3px;
-    width: 6px; height: 11px;
-    border: 2px solid var(--obsidian-base);
-    border-top: none; border-left: none;
-    transform: rotate(45deg);
+    content: '✓';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #ffffff; line-height: 1;
   }
-  .consent-check:focus-visible { box-shadow: 0 0 0 3px var(--active-border); }
-  .consent-text { font-size: 0.875rem; color: var(--cream); line-height: 1.55; }
+  .consent-check:focus-visible { box-shadow: 0 0 0 3px rgba(168,135,58,0.25); }
+  .consent-text { font-size: 13px; color: #1a1208; line-height: 1.5; }
 
 </style>
 </head>
@@ -1800,11 +1818,12 @@
     </div>
 
     <div id="clinic-venue-block" style="display:none;">
-      <p class="ios-group-label">Your appointment location</p>
-      <p class="clinic-venue-note-text loc-line" id="clinic-venue-note" style="margin-top:0;margin-bottom:1rem;"></p>
+      <div class="s4-eyebrow"><span class="s4-eyebrow-label">📍 Location</span></div>
+      <p class="s4-location-address" id="clinic-venue-address"></p>
+      <p class="s4-location-sub" id="clinic-venue-sub"></p>
     </div>
 
-    <p class="ios-group-label">Consent</p>
+    <div class="s4-eyebrow"><span class="s4-eyebrow-label">Before you continue</span></div>
     <div class="consent-block">
       <label class="consent-row">
         <input type="checkbox" class="consent-check" id="consent1" onchange="checkStep3()">
@@ -2710,13 +2729,13 @@ function markTouched(id) { touchedFields.add(id); checkStep3(); }
 function checkStep3() {
   document.getElementById('address-row').style.display = isClinic() ? 'none' : '';
   const addressError = document.getElementById('address-error');
-  const venueNote = document.getElementById('clinic-venue-note');
   const venueBlock = document.getElementById('clinic-venue-block');
   if (isClinic()) {
     if (addressError) addressError.classList.remove('visible');
-    if (venueNote) {
-      venueNote.textContent = `${CLINIC_VENUE_ADDRESS} · Check in at reception on arrival.`;
-    }
+    const addrEl = document.getElementById('clinic-venue-address');
+    const subEl  = document.getElementById('clinic-venue-sub');
+    if (addrEl) addrEl.textContent = CLINIC_VENUE_ADDRESS;
+    if (subEl)  subEl.textContent  = 'Check in at reception on arrival.';
     if (venueBlock) venueBlock.style.display = '';
   } else {
     if (venueBlock) venueBlock.style.display = 'none';
