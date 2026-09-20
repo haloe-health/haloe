@@ -2235,7 +2235,9 @@ function updateRail() {
       // repeating them here (steps 3+) is handled by the branch below.
       fs.textContent = `${svc.name} · ${priceFmt(netPrice(svc))}`;
     } else {
-      const bits = [svc.name, svc.time];
+      // Name · date · time only — omit svc.time (duration) to avoid truncation,
+      // especially for packages whose time string is long.
+      const bits = [svc.name];
       if (dateStr) bits.push(dateStr);
       if (state.time) bits.push(state.time);
       // Location prefix on Treatment step onwards, dropped on phone widths
