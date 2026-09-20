@@ -64,14 +64,49 @@
     --gold: #C8A96E;
     --gold-deep: #8a6a2c;
     --gold-soft: rgba(200,169,110,0.16);
-    --card-radius: 28px;
-    --card-radius-sm: 18px;
+    --cream-deep: #EFE7D8;
+    /* One radius family (Sep 2026): 24px for every card, --card-radius-sm
+       kept as an alias (same value) rather than deleted, since removing it
+       would mean hunting every existing usage across this file just to
+       swap a variable name for no visual change. */
+    --card-radius: 24px;
+    --card-radius-sm: 24px;
     --card-shadow: 0 8px 24px rgba(13,13,13,0.06);
     --dark-card-bg: #0D0D0D;
     --container: 1180px;
     --font-heading: 'Playfair Display', 'Poppins', serif;
     --font-body: 'Poppins', sans-serif;
     --font-wordmark: 'Tan Ashford', 'Playfair Display', Georgia, serif;
+
+    /* Semantic tokens for the things that actually need to flip in dark
+       mode. Deliberately separate from --cream/--ink/--white/--body
+       themselves: those are reused as intentional fixed-dark surfaces
+       elsewhere (the footer, .card--dark) that must NOT flip just because
+       the page theme did. */
+    --bg: var(--cream);
+    --surface: var(--white);
+    --text: var(--ink);
+    --text-muted: var(--body);
+    --header-bg: rgba(245,240,232,0.92);
+    --hairline: rgba(13,13,13,0.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1A1712;
+      --surface: #262119;
+      --text: #F5F0E8;
+      --text-muted: #C9C0B2;
+      --header-bg: rgba(26,23,18,0.92);
+      --hairline: rgba(245,240,232,0.12);
+      --card-shadow: 0 8px 24px rgba(0,0,0,0.28);
+      --gold-soft: rgba(200,169,110,0.22);
+      --cream-deep: #302A20;
+    }
+    /* The flower mark's outline is drawn in near-black — on a dark page
+       that reads as invisible. A cream disc behind it (same trick as the
+       cream pill baked into the email logo PNG) keeps it legible without
+       touching haloe-logo-flower.svg itself. */
+    .brand img { background:var(--cream); border-radius:50%; }
   }
   @font-face {
     font-family: 'Tan Ashford';
@@ -86,8 +121,8 @@
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } }
 
   body {
-    background:var(--cream);
-    color:var(--body);
+    background:var(--bg);
+    color:var(--text-muted);
     font-family:var(--font-body);
     font-weight:400;
     font-size:16px;
@@ -96,21 +131,26 @@
     position:relative;
   }
 
-  /* Faint gold line-art wallpaper (cups / leaves / honeycomb), tiled at ~6%
-     opacity behind everything — fixed so it doesn't scroll away, sits below
-     the page content and above nothing (z-index:0, content is z-index:1+). */
+  /* Gold line-art wallpaper (cups / leaves / honeycomb), tiled behind
+     everything — fixed so it doesn't scroll away, sits below the page
+     content and above nothing (z-index:0, content is z-index:1+).
+     Raised from 0.06 to 0.10 (Sep 2026) so it reads as a deliberate brand
+     texture rather than barely-visible noise; dimmed to 0.05 in dark mode
+     since the same gold stroke shows up more strongly against a dark
+     charcoal background at equal opacity. */
   body::before {
     content:'';
     position:fixed; inset:0; z-index:0;
     background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAiIGhlaWdodD0iMTYwIiB2aWV3Qm94PSIwIDAgMTYwIDE2MCI+CiAgPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOGE2YTJjIiBzdHJva2Utd2lkdGg9IjEuMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjQsNiA0MCwxNSA0MCwzMyAyNCw0MiA4LDMzIDgsMTUiLz4KICAgIDxwYXRoIGQ9Ik0xMDggMjIgYTE2IDExIDAgMSAwIDAuMSAwIi8+CiAgICA8cGF0aCBkPSJNMTAwIDIyIHEwIDggNCA4Ii8+CiAgICA8cGF0aCBkPSJNMTE2IDIyIHEwIDggLTQgOCIvPgogICAgPGxpbmUgeDE9IjEwOCIgeTE9IjMzIiB4Mj0iMTA4IiB5Mj0iNDAiLz4KICAgIDxwYXRoIGQ9Ik00MCAxMDAgQyAyOCAxMTIgMjggMTMwIDQwIDE0MiBDIDUyIDEzMCA1MiAxMTIgNDAgMTAwIFoiLz4KICAgIDxwYXRoIGQ9Ik00MCAxMTIgTDQwIDE0MiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxMjgsOTYgMTQ0LDEwNSAxNDQsMTIzIDEyOCwxMzIgMTEyLDEyMyAxMTIsMTA1Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjgsMTIwIDI0LDEyOSAyNCwxNDcgOCwxNTYgLTgsMTQ3IC04LDEyOSIvPgogIDwvZz4KPC9zdmc+");
     background-repeat:repeat;
     background-size:160px 160px;
-    opacity:0.06;
+    opacity:0.10;
     pointer-events:none;
   }
+  @media (prefers-color-scheme: dark) { body::before { opacity:0.05; } }
   #siteHeader, main, footer.site-footer { position:relative; z-index:1; }
 
-  h1, h2, h3, h4 { font-family:var(--font-heading); font-weight:600; color:var(--ink); line-height:1.15; }
+  h1, h2, h3, h4 { font-family:var(--font-heading); font-weight:600; color:var(--text); line-height:1.15; }
   a { color:inherit; }
   img { max-width:100%; display:block; }
   button { font-family:inherit; }
@@ -119,7 +159,8 @@
   @media (min-width:768px) { .container { padding:0 40px; } }
   @media (min-width:1280px) { .container { padding:0 80px; } }
 
-  section { padding:56px 0; }
+  section { padding:32px 0; }
+  @media (min-width:768px) { section { padding:48px 0; } }
   @media (min-width:1024px) { section { padding:88px 0; } }
 
   .section-eyebrow {
@@ -128,11 +169,11 @@
   }
   .section-head { max-width:640px; margin:0 0 32px; }
   .section-head h2 { font-size:clamp(1.7rem,4vw,2.4rem); }
-  .section-head p { margin-top:10px; color:var(--body); font-size:1rem; }
+  .section-head p { margin-top:10px; color:var(--text-muted); font-size:1rem; }
 
   /* ---- Cards ---- */
   .card {
-    background:var(--white);
+    background:var(--surface);
     border-radius:var(--card-radius);
     box-shadow:var(--card-shadow);
   }
@@ -154,8 +195,8 @@
   .btn-pill:active { transform:translateY(0); }
   .btn-gold { background:var(--gold); color:var(--ink); }
   .btn-gold:hover { background:#d4bb85; }
-  .btn-outline { background:transparent; color:var(--ink); border:1.5px solid var(--ink); }
-  .btn-outline:hover { background:rgba(13,13,13,0.05); }
+  .btn-outline { background:transparent; color:var(--text); border:1.5px solid var(--text); }
+  .btn-outline:hover { background:var(--hairline); }
   .btn-outline-gold { background:transparent; color:var(--gold-deep); border:1.5px solid var(--gold); }
   .btn-outline-gold:hover { background:var(--gold-soft); }
   @media (prefers-reduced-motion: reduce) {
@@ -166,29 +207,40 @@
   .link-gold { color:var(--gold-deep); font-weight:600; text-decoration:none; }
   .link-gold:hover { text-decoration:underline; }
 
+  /* Visible focus ring, site-wide within this page — keyboard-focusable
+     elements (links, buttons, the hamburger, cond-card, etc.) all rely on
+     this one rule rather than each defining their own. */
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline:2px solid var(--gold-deep); outline-offset:2px; border-radius:4px;
+  }
+
   /* ============================================================
      HEADER
      ============================================================ */
+  /* Header height, hamburger circle and (see .brand below) logo sizing all
+     sit on the 8pt grid: 48px hamburger (>=44px minimum tap target and a
+     clean 8pt multiple — 44 itself isn't), 16px vertical header padding
+     -> 80px total header height on mobile. */
   #siteHeader {
     position:sticky; top:0; z-index:100;
-    background:rgba(245,240,232,0.92);
+    background:var(--header-bg);
     backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-    border-bottom:1px solid rgba(13,13,13,0.06);
+    border-bottom:1px solid var(--hairline);
   }
   .header-inner {
-    max-width:var(--container); margin:0 auto; padding:12px 20px;
+    max-width:var(--container); margin:0 auto; padding:16px 20px;
     display:flex; align-items:center; justify-content:space-between; gap:12px;
   }
-  @media (min-width:768px) { .header-inner { padding:14px 40px; } }
+  @media (min-width:768px) { .header-inner { padding:16px 40px; } }
   @media (min-width:1280px) { .header-inner { padding:16px 80px; } }
 
   .menu-btn {
-    width:44px; height:44px; border-radius:50%; border:1px solid rgba(13,13,13,0.12);
-    background:var(--white); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    width:48px; height:48px; border-radius:50%; border:1px solid var(--hairline);
+    background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
     cursor:pointer; flex:none;
     transition:transform 0.15s ease;
   }
-  .menu-btn span { display:block; width:18px; height:2px; background:var(--ink); border-radius:1px; transition:transform 0.25s ease, opacity 0.25s ease; }
+  .menu-btn span { display:block; width:18px; height:2px; background:var(--text); border-radius:1px; transition:transform 0.25s ease, opacity 0.25s ease; }
   .menu-btn:hover { transform:translateY(-2px); }
   .menu-btn[aria-expanded="true"] span:nth-child(1) { transform:translateY(6px) rotate(45deg); }
   .menu-btn[aria-expanded="true"] span:nth-child(2) { opacity:0; }
@@ -197,32 +249,32 @@
   /* Lock-up alignment (Sep 2026): font-size lives on .brand itself, not the
      wordmark, so the icon's em-based height/offset below resolves against
      the SAME reference the wordmark uses — em on the icon would otherwise
-     inherit font-size from .brand's own ancestor instead of the wordmark's,
+     inherit font-size from its own ancestor instead of the wordmark's,
      silently breaking the scaling this whole lock-up depends on.
      1.17em/-0.2918em aren't round numbers — they come from measuring Tan
      Ashford's actual rendered glyphs (canvas TextMetrics on "haloe": the
      font's ascenders overshoot its own em-box, so naive flex centering
-     undershoots the optical centre). See COMPONENTS.md before touching. */
+     undershoots the optical centre) — this already makes the icon match
+     the wordmark's cap-height, vertically centred, gap = 0.35x the icon's
+     width (~the width of the wordmark's "a"). See COMPONENTS.md before
+     touching. The wordmark's own font-size (1.5rem = 24px) is what's on
+     the 8pt grid; the icon's derived 1.17em is a measured consequence of
+     that, not a free value — snapping it to a round px figure instead
+     would reintroduce the exact baseline-sitting misalignment this fixed. */
   .brand { display:flex; align-items:center; gap:calc(1.17em * 0.35); text-decoration:none; flex:1; justify-content:center; font-size:1.5rem; }
   .brand img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
-  .brand .wordmark { font-family:var(--font-wordmark); font-style:normal; font-weight:normal; font-size:1em; line-height:1; color:var(--ink); letter-spacing:0.02em; }
+  .brand .wordmark { font-family:var(--font-wordmark); font-style:normal; font-weight:normal; font-size:1em; line-height:1; color:var(--text); letter-spacing:0.02em; }
 
-  .header-actions { display:flex; align-items:center; gap:10px; flex:none; }
-  .icon-btn {
-    width:44px; height:44px; border-radius:50%; background:var(--gold);
-    display:flex; align-items:center; justify-content:center; flex:none;
-    text-decoration:none; color:var(--ink);
-    transition:transform 0.15s ease;
-  }
-  .icon-btn:hover { transform:translateY(-2px); }
-  .icon-btn svg { width:20px; height:20px; }
-  .header-actions .btn-gold { display:none; }
-  @media (min-width:560px) { .header-actions .btn-gold { display:inline-flex; } }
+  /* Invisible spacer balancing .menu-btn's width so .brand's flex:1 +
+     justify-content:center lands on the header's true visual centre, not
+     just the centre of the leftover space. The gold WhatsApp bubble that
+     used to sit here is gone — the sticky bottom bar already has WhatsApp. */
+  .header-spacer { width:48px; height:48px; flex:none; }
 
   /* Mobile nav overlay */
   .nav-overlay {
     position:fixed; inset:0; z-index:200;
-    background:var(--cream);
+    background:var(--bg);
     display:flex; flex-direction:column;
     padding:20px;
     opacity:0; visibility:hidden; transform:translateY(-8px);
@@ -232,13 +284,13 @@
   @media (prefers-reduced-motion: reduce) { .nav-overlay { transition:none; } }
   .nav-overlay-top { display:flex; justify-content:flex-end; }
   .nav-overlay-close {
-    width:44px; height:44px; border-radius:50%; border:1px solid rgba(13,13,13,0.12);
-    background:var(--white); font-size:1.4rem; line-height:1; cursor:pointer; color:var(--ink);
+    width:48px; height:48px; border-radius:50%; border:1px solid var(--hairline);
+    background:var(--surface); font-size:1.4rem; line-height:1; cursor:pointer; color:var(--text);
   }
   .nav-overlay-links { list-style:none; margin:40px 0; display:flex; flex-direction:column; gap:6px; }
   .nav-overlay-links a {
     display:block; padding:16px 4px; font-family:var(--font-heading); font-size:1.6rem; font-weight:500;
-    text-decoration:none; color:var(--ink); border-bottom:1px solid rgba(13,13,13,0.08);
+    text-decoration:none; color:var(--text); border-bottom:1px solid var(--hairline);
   }
   .nav-overlay-cta { margin-top:auto; width:100%; }
   body.nav-open { overflow:hidden; }
@@ -249,24 +301,31 @@
   .hero { padding-top:28px; }
   .badge-pill {
     display:inline-flex; align-items:center; gap:8px;
-    background:var(--white); border-radius:999px; padding:10px 18px;
-    box-shadow:var(--card-shadow); font-size:0.85rem; font-weight:600; color:var(--ink);
+    background:var(--surface); border-radius:999px; padding:10px 18px;
+    box-shadow:var(--card-shadow); font-size:0.85rem; font-weight:600; color:var(--text);
   }
   .badge-pill svg { width:16px; height:16px; flex:none; color:var(--gold-deep); }
-  .hero-title { font-size:clamp(2.2rem,7vw,3.6rem); margin-top:20px; max-width:12ch; }
+  /* max-width was 12ch — too tight for "Modern standards." at the mobile
+     floor of this clamp (35.2px/2.2rem): the italic wrapped to a second
+     line, giving three visual lines instead of two. 14.5ch verified with
+     no wrap at 375-430px (measured via getBoundingClientRect, not eyeballed)
+     and scales the same way at the desktop end of the clamp since ch is
+     relative to font-size. */
+  .hero-title { font-size:clamp(2.2rem,7vw,3.6rem); margin-top:20px; max-width:14.5ch; }
   .hero-title em { font-style:italic; color:var(--gold-deep); }
   .hero-sub { margin-top:14px; max-width:52ch; font-size:1.02rem; }
+  /* Promo card: dashed border -> a slightly deeper cream fill, same 24px
+     radius as every other card (no separate "sm" look). */
   .offer-box {
-    margin-top:24px; border:1.5px dashed var(--gold); border-radius:var(--card-radius-sm);
-    padding:16px 20px; display:inline-flex; flex-direction:column; gap:2px;
-    background:rgba(255,255,255,0.5); text-decoration:none;
-    transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    margin-top:24px; border-radius:var(--card-radius);
+    padding:20px; display:inline-flex; flex-direction:column; gap:2px;
+    background:var(--cream-deep); text-decoration:none;
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
   }
-  .offer-box:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); background:rgba(255,255,255,0.75); }
+  .offer-box:hover { transform:translateY(-2px); box-shadow:var(--card-shadow); }
   .offer-box .offer-label { font-size:0.72rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold-deep); }
-  .offer-box .offer-value { font-family:var(--font-heading); font-size:1.3rem; color:var(--ink); }
-  .offer-box .offer-detail { font-size:0.78rem; color:var(--body); margin-top:2px; }
-  .hero-talk { margin-top:20px; font-size:0.95rem; }
+  .offer-box .offer-value { font-family:var(--font-heading); font-size:1.3rem; color:var(--text); }
+  .offer-box .offer-detail { font-size:0.78rem; color:var(--text-muted); margin-top:2px; }
 
   /* ============================================================
      ACTION CARDS
@@ -274,9 +333,14 @@
   .action-cards { display:flex; flex-direction:column; gap:14px; padding-top:0; padding-bottom:0; }
   .action-card {
     display:flex; align-items:center; gap:16px;
-    padding:20px 22px; text-decoration:none; color:var(--ink);
+    padding:20px 22px; text-decoration:none; color:var(--text);
     transition:transform 0.15s ease, box-shadow 0.15s ease;
   }
+  /* .action-card--dark still needs var(--cream) text on its always-dark
+     background, regardless of page theme — restated here (same
+     specificity as .action-card above, but later in source) since it'd
+     otherwise lose to the color:var(--text) rule just added above it. */
+  .action-card--dark { color:var(--cream); }
   .action-card:hover, .action-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
   .action-card--dark:hover { box-shadow:0 12px 28px rgba(13,13,13,0.28); }
   .action-icon {
@@ -301,8 +365,8 @@
      ============================================================ */
   .trust-strip { display:flex; flex-wrap:wrap; gap:10px; padding-top:0; }
   .trust-pill {
-    background:var(--white); border-radius:999px; padding:10px 18px;
-    font-size:0.82rem; font-weight:600; color:var(--ink); box-shadow:var(--card-shadow);
+    background:var(--surface); border-radius:999px; padding:10px 18px;
+    font-size:0.82rem; font-weight:600; color:var(--text); box-shadow:var(--card-shadow);
     display:inline-flex; align-items:center; gap:8px;
   }
   .trust-pill svg { width:14px; height:14px; color:var(--gold-deep); flex:none; }
@@ -341,7 +405,7 @@
     display:flex; align-items:center; justify-content:center; color:var(--gold-deep);
   }
   .cond-icon svg { width:24px; height:24px; }
-  .cond-card h3 { font-size:0.92rem; font-family:var(--font-body); font-weight:600; color:var(--ink); line-height:1.3; }
+  .cond-card h3 { font-size:0.92rem; font-family:var(--font-body); font-weight:600; color:var(--text); line-height:1.3; }
   .cond-hint { text-align:center; color:var(--gold-deep); font-size:0.85rem; font-weight:600; margin-top:-16px; margin-bottom:28px; }
 
   /* Condition modal — restyled light */
@@ -354,12 +418,12 @@
   .cond-overlay.open { opacity:1; visibility:visible; }
   @media (min-width:768px) { .cond-overlay { align-items:center; } }
   .cond-modal {
-    background:var(--white); border-radius:28px 28px 0 0; width:100%; max-width:560px;
+    background:var(--surface); border-radius:24px 24px 0 0; width:100%; max-width:560px;
     max-height:85vh; overflow-y:auto; padding:32px 24px;
     transform:translateY(24px); transition:transform 0.25s ease;
   }
   .cond-overlay.open .cond-modal { transform:translateY(0); }
-  @media (min-width:768px) { .cond-modal { border-radius:28px; padding:40px; } }
+  @media (min-width:768px) { .cond-modal { border-radius:24px; padding:40px; } }
   @media (prefers-reduced-motion: reduce) { .cond-overlay, .cond-modal { transition:none; } }
   .cond-modal-top { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
   .cond-modal-icon {
@@ -368,14 +432,14 @@
   }
   .cond-modal-icon svg { width:26px; height:26px; }
   .cond-modal-close {
-    width:36px; height:36px; border-radius:50%; border:1px solid rgba(13,13,13,0.12);
-    background:var(--cream); font-size:1.2rem; cursor:pointer; color:var(--ink); flex:none;
+    width:44px; height:44px; border-radius:50%; border:1px solid var(--hairline);
+    background:var(--bg); font-size:1.2rem; cursor:pointer; color:var(--text); flex:none;
   }
   .cond-modal h3 { font-size:0.8rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold-deep); margin-top:18px; }
-  .cond-modal h4 { font-size:1.5rem; margin-top:6px; }
-  .cond-modal p { margin-top:14px; font-size:0.98rem; }
+  .cond-modal h4 { font-size:1.5rem; margin-top:6px; color:var(--text); }
+  .cond-modal p { margin-top:14px; font-size:0.98rem; color:var(--text-muted); }
   .cond-modal-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
-  .cond-modal-tag { background:var(--cream); border-radius:999px; padding:6px 14px; font-size:0.78rem; font-weight:600; color:var(--ink); }
+  .cond-modal-tag { background:var(--bg); border-radius:999px; padding:6px 14px; font-size:0.78rem; font-weight:600; color:var(--text); }
   .cond-modal-cta { margin-top:24px; width:100%; text-align:center; }
 
   /* ============================================================
@@ -385,7 +449,7 @@
   @media (min-width:600px) { .price-grid { grid-template-columns:repeat(2,1fr); } }
   @media (min-width:1024px) { .price-grid { grid-template-columns:repeat(4,1fr); } }
   .price-card {
-    padding:26px 22px; text-decoration:none; color:var(--ink);
+    padding:26px 22px; text-decoration:none; color:var(--text);
     display:flex; flex-direction:column; gap:10px;
     transition:transform 0.15s ease, box-shadow 0.15s ease;
   }
@@ -396,10 +460,10 @@
   }
   .price-icon svg { width:22px; height:22px; }
   .price-card h3 { font-size:1.05rem; }
-  .price-from { color:var(--body); font-size:0.92rem; }
-  .price-from strong { color:var(--ink); font-size:1.3rem; font-family:var(--font-heading); }
+  .price-from { color:var(--text-muted); font-size:0.92rem; }
+  .price-from strong { color:var(--text); font-size:1.3rem; font-family:var(--font-heading); }
   .price-arrow { margin-top:auto; align-self:flex-end; color:var(--gold-deep); font-size:1.2rem; }
-  .price-note { margin-top:20px; font-size:0.82rem; color:var(--body); }
+  .price-note { margin-top:20px; font-size:0.82rem; color:var(--text-muted); }
 
   /* ============================================================
      PROCESS ("What to expect")
@@ -417,9 +481,9 @@
      ============================================================ */
   .reviews-head { display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-bottom:28px; }
   .google-badge {
-    display:inline-flex; align-items:center; gap:8px; background:var(--white);
+    display:inline-flex; align-items:center; gap:8px; background:var(--surface);
     border-radius:999px; padding:8px 16px; box-shadow:var(--card-shadow);
-    font-size:0.82rem; font-weight:600; color:var(--ink);
+    font-size:0.82rem; font-weight:600; color:var(--text);
   }
   .google-badge svg { width:16px; height:16px; color:var(--gold-deep); }
   .review-grid { display:grid; grid-template-columns:1fr; gap:14px; }
@@ -437,16 +501,16 @@
   .faq-section .section-eyebrow { color:var(--ink); opacity:0.7; }
   .faq-section .section-head h2 { color:var(--ink); }
   .faq-list { display:flex; flex-direction:column; gap:12px; }
-  .faq-item { background:var(--white); border-radius:var(--card-radius-sm); overflow:hidden; }
+  .faq-item { background:var(--surface); border-radius:var(--card-radius); overflow:hidden; }
   .faq-q {
     width:100%; text-align:left; background:none; border:none; cursor:pointer;
     padding:18px 20px; display:flex; justify-content:space-between; align-items:center; gap:16px;
-    font-weight:600; font-size:0.98rem; color:var(--ink); min-height:44px;
+    font-weight:600; font-size:0.98rem; color:var(--text); min-height:44px;
   }
   .faq-q .faq-chevron { flex:none; transition:transform 0.25s ease; color:var(--gold-deep); }
   .faq-item.open .faq-q .faq-chevron { transform:rotate(180deg); }
   .faq-a { max-height:0; overflow:hidden; transition:max-height 0.3s ease; }
-  .faq-a-inner { padding:0 20px 18px; font-size:0.92rem; color:var(--body); }
+  .faq-a-inner { padding:0 20px 18px; font-size:0.92rem; color:var(--text-muted); }
   @media (prefers-reduced-motion: reduce) { .faq-a, .faq-q .faq-chevron { transition:none; } }
 
   /* ============================================================
@@ -454,7 +518,7 @@
      ============================================================ */
   .clinic-card { padding:32px 24px; display:flex; flex-direction:column; gap:16px; }
   .clinic-facts { display:flex; flex-wrap:wrap; gap:8px; }
-  .clinic-address { color:var(--body); font-size:0.92rem; }
+  .clinic-address { color:var(--text-muted); font-size:0.92rem; }
   @media (min-width:1024px) {
     .clinic-card { flex-direction:row; align-items:center; gap:40px; padding:48px; }
     .clinic-card .clinic-copy { flex:1; }
@@ -486,26 +550,48 @@
   .footer-brand img { height:1.17em; width:1.17em; display:block; transform:translateY(-0.2918em); }
   .footer-brand span { font-family:var(--font-wordmark); font-style:normal; font-size:1em; line-height:1; }
   .footer-col h5 { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
-  .footer-col a, .footer-col p { display:block; color:#C8C2B7; text-decoration:none; font-size:0.9rem; margin-bottom:8px; }
+  /* Was #C8C2B7 / #8E887F — greys outside the gold/ink/cream palette;
+     swapped for cream at reduced opacity, same muted-on-dark hierarchy,
+     no colour outside the approved set. */
+  .footer-col a, .footer-col p { display:block; color:rgba(245,240,232,0.75); text-decoration:none; font-size:0.9rem; margin-bottom:8px; }
   .footer-col a:hover { color:var(--gold); }
   .footer-cols { display:grid; grid-template-columns:repeat(2,1fr); gap:24px; }
   @media (min-width:768px) { .footer-cols { grid-template-columns:repeat(3,1fr); gap:40px; } }
-  .footer-bottom { margin-top:40px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); font-size:0.8rem; color:#8E887F; }
+  .footer-bottom { margin-top:40px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); font-size:0.8rem; color:rgba(245,240,232,0.55); }
 
   /* ============================================================
      STICKY MOBILE BOTTOM BAR
      ============================================================ */
+  /* One primary action (56px-tall full-width gold pill) plus WhatsApp as a
+     56x56 icon-only outline circle — not a second full-text button, so
+     there's a clear single primary action per screen.
+     padding-bottom uses env(safe-area-inset-bottom) so the bar itself
+     never sits under a phone's home-indicator gesture area; BAR_H below
+     (56px pill + 20px top/bottom padding) is the fixed part or the body's
+     reserved space and the scroll-padding both need to match. */
   .mobile-bar {
     position:fixed; bottom:0; left:0; right:0; z-index:90;
-    background:rgba(245,240,232,0.96); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-    border-top:1px solid rgba(13,13,13,0.08);
-    padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));
-    display:flex; gap:10px;
+    background:var(--header-bg); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--hairline);
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+    display:flex; align-items:center; gap:10px;
   }
-  .mobile-bar .btn-pill { flex:1; }
+  .mobile-bar .btn-pill { flex:1; height:56px; min-height:56px; font-size:1rem; }
+  .mobile-bar .icon-btn {
+    width:56px; height:56px; flex:none; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent; border:1.5px solid var(--text); color:var(--text);
+    transition:transform 0.15s ease, background 0.15s ease;
+  }
+  .mobile-bar .icon-btn:hover { background:var(--hairline); transform:translateY(-2px); }
+  .mobile-bar .icon-btn svg { width:24px; height:24px; }
   @media (min-width:768px) { .mobile-bar { display:none; } }
-  body { padding-bottom:78px; }
-  @media (min-width:768px) { body { padding-bottom:0; } }
+  /* 56px pill + 16px top/bottom padding = 88px, plus the safe-area inset —
+     both the reserved body space AND the scroll target need the same
+     figure, or content (e.g. a page's last line of text) can still end up
+     hidden behind the fixed bar on a short screen. */
+  body { padding-bottom:calc(88px + env(safe-area-inset-bottom,0px)); scroll-padding-bottom:calc(88px + env(safe-area-inset-bottom,0px)); }
+  @media (min-width:768px) { body { padding-bottom:0; scroll-padding-bottom:0; } }
 
   /* ============================================================
      MOTION — fade + rise on scroll, staggered
@@ -528,19 +614,16 @@
      ============================================================ -->
 <header id="siteHeader">
   <div class="header-inner">
-    <button class="menu-btn" id="navHamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navOverlay" onclick="toggleNavOverlay()">
+    <button class="menu-btn" id="navHamburger" aria-label="Menu" aria-expanded="false" aria-controls="navOverlay" onclick="toggleNavOverlay()">
       <span></span><span></span><span></span>
     </button>
     <a href="#" class="brand" aria-label="haloe home">
       <img src="haloe-logo-flower.svg" alt="">
       <span class="wordmark">haloe</span>
     </a>
-    <div class="header-actions">
-      <a href="https://wa.me/447474833643" class="icon-btn" target="_blank" rel="noopener" aria-label="Message haloe on WhatsApp">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 9 18.6z"/><path d="M8.5 9.7c0 3.8 2.5 6.3 6 6.3"/></svg>
-      </a>
-      <a href="book.html" class="btn-pill btn-gold">Book now</a>
-    </div>
+    <!-- Balances .menu-btn's width so .brand stays visually centred — the
+         header's WhatsApp bubble is gone; the sticky bottom bar covers it. -->
+    <span class="header-spacer" aria-hidden="true"></span>
   </div>
 </header>
 
@@ -576,7 +659,9 @@
       <span class="offer-value">HALOE20</span>
       <span class="offer-detail">20% off your first booking · online only · ends 31 Oct</span>
     </a>
-    <p class="hero-talk reveal">Rather talk? <a href="https://wa.me/447474833643" class="link-gold" target="_blank" rel="noopener">Message us on WhatsApp →</a></p>
+    <!-- The "Rather talk?" WhatsApp line was removed (Sep 2026) — the
+         sticky bottom bar already gives every mobile visitor a WhatsApp
+         entry point, so this was a third path to the same place. -->
   </div>
 </section>
 
@@ -1577,8 +1662,10 @@ hbInit();
      STICKY MOBILE BOTTOM BAR
      ============================================================ -->
 <div class="mobile-bar">
-  <a href="book.html" class="btn-pill btn-gold">Book your session</a>
-  <a href="https://wa.me/447474833643" class="btn-pill btn-outline" target="_blank" rel="noopener">WhatsApp</a>
+  <a href="book.html" class="btn-pill btn-gold">Book a session</a>
+  <a href="https://wa.me/447474833643" class="icon-btn" target="_blank" rel="noopener" aria-label="Message on WhatsApp">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.4-4.2A8 8 0 1 1 9 18.6z"/><path d="M8.5 9.7c0 3.8 2.5 6.3 6 6.3"/></svg>
+  </a>
 </div>
 
 <script src="services-data.js"></script>
