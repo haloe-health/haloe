@@ -577,14 +577,6 @@
   }
   @keyframes skeletonPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { .skeleton-block { animation: none; opacity: 0.75; } }
-  /* Description line clamps at two lines max (never three) per spec —
-     applies to every category, packages included. */
-  .svc-meta-line {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
   .packages-policy-line {
     font-size: 0.92rem;
     color: var(--text-muted);
