@@ -393,71 +393,79 @@
     color: var(--cream);
     font-weight: 500;
   }
-  /* Category tabs: horizontally-scrolling pill row, content-sized (not
-     squeezed to equal columns — "Hijama" and "Packages" would otherwise
-     clip or wrap). Sticky directly under the 56px nav; a scroll-snap stop
-     per pill, 16px leading padding, and a right-edge fade (mask-image, not
-     a solid overlay div, so it survives the row's own background changing
-     between light/dark) hint that the row scrolls. role="tablist" is set
-     on the element in markup; arrow-key navigation is wired in JS. */
-  .category-tabs {
-    display: flex;
-    flex-wrap: nowrap;
-    width: 100%;
-    gap: 6px;
-    padding: 3px 32px 3px 16px;
-    border-radius: 16px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent 100%);
-            mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent 100%);
+  /* Category tabs: scrollable pill row. Wrapper holds the ::after fade so
+     the pseudo stays fixed at the visible right edge while the pills scroll.
+     Sticky directly under the 56px nav; arrow-key navigation wired in JS. */
+  .category-tabs-wrap {
     position: sticky;
     top: 56px;
     z-index: 50;
     background: var(--black);
     transition: box-shadow 0.2s ease;
+    margin-bottom: 1.2rem;
+  }
+  .category-tabs-wrap.is-stuck { box-shadow: 0 1px 0 var(--hairline), 0 4px 12px rgba(13,13,13,0.06); }
+  .category-tabs-wrap::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 40px;
+    background: linear-gradient(to right, transparent, var(--tab-fade-to, var(--black)));
+    pointer-events: none;
+    z-index: 1;
+  }
+  .category-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 6px 40px 6px 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    background: transparent;
+    border-radius: 0;
+    margin-bottom: 0;
   }
   .category-tabs::-webkit-scrollbar { display: none; }
-  /* Boundary only appears once the page has actually scrolled under the
-     sticky row (toggled in JS) — at rest, the row sits flush with the page
-     background so there's nothing to separate. */
-  .category-tabs.is-stuck { box-shadow: 0 1px 0 var(--hairline), 0 4px 12px rgba(13,13,13,0.06); }
-  .category-tabs .seg-option { border-radius: 13px; }
-  /* Each category is a tappable pill: the inactive tabs carry a solid
-     surface fill so they read as buttons (not disabled text), and the
-     selected one fills with brand gold. min-height 44px (was 26/34px) —
-     the (pointer:coarse) bump below is no longer needed since this is now
-     the baseline for every pointer type. */
   .category-tabs .seg-option {
-    background: var(--white);
-    color: var(--text-muted);
     flex: none;
     scroll-snap-align: start;
-    min-height: 44px;
-    padding: 0.5rem 1.15rem;
+    border-radius: 999px;
+    border: none;
+    padding: 10px 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    min-height: 0;
+    white-space: nowrap;
+    cursor: pointer;
+    background: #ede8df;
+    color: #5a5040;
+    transition: background 0.18s, color 0.18s;
   }
   .category-tabs .seg-option.active {
-    background: var(--gold);
-    color: var(--obsidian-base);
+    background: #a8873a;
+    color: #fff;
   }
-  .category-tabs .seg-option:hover:not(.active) {
-    background: var(--obsidian-floating);
-    color: var(--cream);
+  @media (prefers-color-scheme: dark) {
+    .category-tabs .seg-option {
+      background: rgba(255,255,255,0.10);
+      color: var(--text-muted);
+    }
+    .category-tabs .seg-option.active {
+      background: #a8873a;
+      color: #fff;
+    }
   }
-  /* Phones: same scrolling row, just a touch tighter so more of it previews
-     on-screen at once. min-height stays 44px (the shared baseline set
-     above) — this used to drop to 34px here, under the tap-target minimum. */
+  @media (hover: hover) {
+    .category-tabs .seg-option:hover:not(.active) { filter: brightness(0.93); }
+  }
   @media (max-width: 560px) {
     .category-tabs {
-      gap: 4px;
-      padding: 3px 32px 3px 16px;
-    }
-    .category-tabs .seg-option {
-      font-size: 0.86rem;
-      padding-left: 0.85rem;
-      padding-right: 0.85rem;
+      gap: 8px;
+      padding: 6px 40px 6px 16px;
     }
     .footbar .foot-cta {
       font-size: 1.1rem;
@@ -1707,11 +1715,13 @@
     <p class="panel-title">Choose your treatment.</p>
     <p class="panel-sub">Prices shown are treatment only — travel fee added for home visits.</p>
 
-    <div class="category-tabs segmented" id="category-tabs" role="tablist" aria-label="Treatment category">
-      <button class="tab-btn seg-option active" data-cat="massage" role="tab" aria-selected="true" tabindex="0">Massage</button>
-      <button class="tab-btn seg-option" data-cat="dry" role="tab" aria-selected="false" tabindex="-1">Dry Cupping</button>
-      <button class="tab-btn seg-option" data-cat="wet" role="tab" aria-selected="false" tabindex="-1">Hijama</button>
-      <button class="tab-btn seg-option" data-cat="packages" role="tab" aria-selected="false" tabindex="-1">Packages</button>
+    <div class="category-tabs-wrap" id="category-tabs-wrap">
+      <div class="category-tabs segmented" id="category-tabs" role="tablist" aria-label="Treatment category">
+        <button class="tab-btn seg-option active" data-cat="massage" role="tab" aria-selected="true" tabindex="0">Massage</button>
+        <button class="tab-btn seg-option" data-cat="dry" role="tab" aria-selected="false" tabindex="-1">Dry Cupping</button>
+        <button class="tab-btn seg-option" data-cat="wet" role="tab" aria-selected="false" tabindex="-1">Hijama</button>
+        <button class="tab-btn seg-option" data-cat="packages" role="tab" aria-selected="false" tabindex="-1">Packages</button>
+      </div>
     </div>
     <p class="packages-policy-line hidden" id="packages-policy-line">Packages are paid in full. Free reschedule or full refund up to 48 hours before a session; inside 48 hours, sessions are non-refundable but can be moved once.</p>
 
@@ -2454,7 +2464,7 @@ categoryTabsEl.addEventListener('keydown', e => {
 // boundary (hairline + soft shadow) only once the page has actually
 // scrolled underneath it, so it doesn't draw a line under itself at rest.
 window.addEventListener('scroll', () => {
-  categoryTabsEl.classList.toggle('is-stuck', window.scrollY > 4);
+  document.getElementById('category-tabs-wrap').classList.toggle('is-stuck', window.scrollY > 4);
 }, { passive: true });
 
 // A date is bookable when: it's not in the past, and — for mobile — it's not
