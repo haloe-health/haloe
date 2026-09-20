@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>haloe email logo generator</title>
+<style>
+  @font-face {
+    font-family: 'Tan Ashford';
+    src: url('../fonts/TAN-ASHFORD.woff2') format('woff2'),
+         url('../fonts/TAN-ASHFORD.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block; /* this page needs the real font, not a flash of fallback */
+  }
+  body { font-family: Arial, sans-serif; background: #222; color: #eee; padding: 32px; }
+  h1 { font-size: 1.1rem; }
+  canvas { display: block; background: #444; margin: 20px 0; image-rendering: pixelated; }
+  #preview { max-width: 100%; height: auto; border: 1px dashed #888; }
+  a.download { display: inline-block; background: #C8A96E; color: #111; padding: 10px 20px;
+    border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+  pre { background: #111; padding: 12px; overflow: auto; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>haloe email logo generator</h1>
+<p>Regenerates <code>images/email-logo@2x.png</code> — the flower icon +
+"haloe" wordmark lock-up baked into a single PNG on a cream rounded-pill
+background, used by <code>functions/_email.js</code>'s <code>emailHeader()</code>
+in every transactional email.</p>
+<p>Reads <code>../haloe-logo-flower.svg</code> (never edited) and
+<code>../fonts/TAN-ASHFORD.woff2</code> as-is. Open this file through the
+local dev server (<code>http://localhost:8788/tools/email-logo-generator.html</code>)
+so both relative paths resolve — opening it directly from disk (file://) won't
+fetch the SVG.</p>
+
+<h2>Target proportions</h2>
+<ul>
+  <li>Icon height = the wordmark's own ascender-top-to-baseline span (measured
+    live via canvas <code>TextMetrics.actualBoundingBoxAscent</code> on the
+    string "haloe" in Tan Ashford — this font's ascenders overshoot its own
+    em-box, so this is <em>not</em> a fixed em multiple of a "normal" font;
+    it's re-measured every time this page runs).</li>
+  <li>Icon vertically centred on that same span (its top sits at the
+    ascender-top, its bottom at the baseline).</li>
+  <li>Gap between icon and wordmark = the measured width of the letter "a" in
+    the same font/size.</li>
+  <li>Cream (#F5F0E8) rounded-pill background baked into the raster, ~24px
+    padding at 1x, exported at 2x for retina.</li>
+</ul>
+
+<div id="status">Loading…</div>
+<canvas id="canvas"></canvas>
+<div id="output"></div>
+
+<script>
+const FONT_SIZE = 80; // logical reference size, 1x — scaled to 2x when drawn
+const SCALE = 2;
+const PAD = 24; // logical px, 1x
+const PILL_BG = '#F5F0E8';
+const WORDMARK_COLOR = '#0D0D0D';
+
+async function run() {
+  const status = document.getElementById('status');
+  try {
+    await document.fonts.load(`${FONT_SIZE}px "Tan Ashford"`);
+    await document.fonts.ready;
+    if (!document.fonts.check(`${FONT_SIZE}px "Tan Ashford"`)) {
+      throw new Error('Tan Ashford did not load — check ../fonts/TAN-ASHFORD.woff2 is reachable');
+    }
+
+    const svgText = await fetch('../haloe-logo-flower.svg').then(r => {
+      if (!r.ok) throw new Error('Could not fetch ../haloe-logo-flower.svg (' + r.status + ')');
+      return r.text();
+    });
+    const img = new Image();
+    const svgBlobUrl = URL.createObjectURL(new Blob([svgText], { type: 'image/svg+xml' }));
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = svgBlobUrl; });
+
+    // --- Measure the wordmark at the reference size ---
+    const measure = document.createElement('canvas').getContext('2d');
+    measure.font = `normal ${FONT_SIZE}px "Tan Ashford"`;
+    if ('letterSpacing' in measure) measure.letterSpacing = (0.02 * FONT_SIZE) + 'px';
+    const m = measure.measureText('haloe');
+    const ascent = m.actualBoundingBoxAscent;   // baseline -> top of "h"/"l" ascenders
+    const descent = m.actualBoundingBoxDescent; // ~0, "haloe" has no descenders
+    const textWidth = m.width;
+    const aWidth = measure.measureText('a').width; // the requested gap unit
+
+    // Sanity check: Tan Ashford's ascenders genuinely overshoot its own
+    // em-box (ascent measures ~1.17x the font-size — confirmed against
+    // Arial/Playfair Display controls, which measure ~0.72-0.79x). A ratio
+    // in that "normal font" range here means the @font-face above silently
+    // failed to load and this measured a fallback font instead — checking
+    // document.fonts.check()/.ready is NOT sufficient (both can report
+    // true even when nothing actually loaded, seen in testing), so this
+    // ratio is the real guard.
+    const ascentRatio = ascent / FONT_SIZE;
+    if (ascentRatio < 0.95) {
+      throw new Error(`Measured ascent ratio ${ascentRatio.toFixed(2)} looks like a fallback font, not Tan Ashford (expect ~1.17). Check ../fonts/TAN-ASHFORD.woff2 is reachable.`);
+    }
+
+    // --- Layout (logical / 1x units) ---
+    const iconSize = ascent;         // icon height == full ascender-to-baseline span
+    const gap = aWidth;              // gap == width of "a"
+    const contentH = ascent + descent; // total ink height of the wordmark (descent ~0)
+    const contentW = iconSize + gap + textWidth;
+    const width1x = contentW + PAD * 2;
+    const height1x = Math.max(iconSize, contentH) + PAD * 2;
+
+    // --- Draw at SCALE ---
+    const c = document.getElementById('canvas');
+    const width = Math.ceil(width1x * SCALE);
+    const height = Math.ceil(height1x * SCALE);
+    c.width = width; c.height = height;
+    c.style.width = width1x + 'px'; // display at 1x on screen, file stays 2x
+    const ctx = c.getContext('2d');
+
+    const pad = PAD * SCALE;
+    const iconPx = iconSize * SCALE;
+    const gapPx = gap * SCALE;
+    const fontPx = FONT_SIZE * SCALE;
+
+    ctx.fillStyle = PILL_BG;
+    ctx.beginPath();
+    ctx.roundRect(0, 0, width, height, height / 2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Baseline sits so the wordmark's ink is vertically centred in the canvas
+    // (top padding + however much taller the icon might be than the text ink,
+    // halved) — with icon height == ascent exactly, icon and text ink share
+    // the same top/bottom, so this reduces to "pad from the top" either way.
+    const inkTop = pad + (height - pad * 2 - Math.max(iconPx, contentH * SCALE)) / 2;
+    const baselineY = inkTop + ascent * SCALE;
+
+    // Icon: top at the ascender-top, bottom at the baseline — i.e. vertically
+    // centred on the wordmark's own cap-height span by construction.
+    ctx.drawImage(img, pad, baselineY - iconPx, iconPx, iconPx);
+
+    ctx.fillStyle = WORDMARK_COLOR;
+    ctx.font = `normal ${fontPx}px "Tan Ashford"`;
+    if ('letterSpacing' in ctx) ctx.letterSpacing = (0.02 * fontPx) + 'px';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText('haloe', pad + iconPx + gapPx, baselineY);
+
+    const blob = await new Promise(res => c.toBlob(res, 'image/png'));
+    const url = URL.createObjectURL(blob);
+    const img2 = document.createElement('img');
+    img2.id = 'preview';
+    img2.src = url;
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'email-logo@2x.png';
+    a.className = 'download';
+    a.textContent = 'Download email-logo@2x.png (' + width + '×' + height + ')';
+
+    const info = document.createElement('pre');
+    info.textContent = JSON.stringify({
+      fileWidth: width, fileHeight: height,
+      displayWidthAt1x: Math.round(width1x), displayHeightAt1x: Math.round(height1x),
+      ascent, descent, textWidth, aWidth, iconSize, gap,
+    }, null, 2);
+
+    const output = document.getElementById('output');
+    output.appendChild(a);
+    output.appendChild(document.createElement('br'));
+    output.appendChild(img2);
+    output.appendChild(info);
+
+    status.textContent = 'Done — ' + width + '×' + height + ' (' + Math.round(width1x) + '×' + Math.round(height1x) + ' at 1x)';
+  } catch (err) {
+    status.textContent = 'Error: ' + err.message;
+    console.error(err);
+  }
+}
+run();
+</script>
+</body>
+</html>

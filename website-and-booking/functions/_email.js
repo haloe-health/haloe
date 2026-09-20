@@ -32,7 +32,7 @@ export const FONT = "'Poppins', 'Helvetica Neue', Arial, sans-serif";
 export const FONT_HEADING = FONT;
 
 // The flower logo + "haloe" wordmark, pre-rendered together as a single PNG
-// (2x, 545x190) because email clients don't render SVG reliably and won't
+// (2x, 1068x286) because email clients don't render SVG reliably and won't
 // load the self-hosted Tan Ashford font for the wordmark. The cream rounded
 // pill background is baked into the raster image itself (not the
 // surrounding HTML) — Gmail/Apple Mail dark mode can still invert the page's
@@ -41,24 +41,25 @@ export const FONT_HEADING = FONT;
 // an inverted-dark page background, unreadable. An opaque background baked
 // into the pixels can't be touched by that inversion.
 //
-// Lock-up (Sep 2026): the icon is NOT baseline-sitting — it's centred on the
-// wordmark's cap-height span (top of the "l"/"h" ascender to the baseline),
-// same alignment as .brand/.footer-brand/.nav-logo/.footer-left on the
-// live site (see index.html's .brand comment for where 1.17/0.35 come
-// from — Tan Ashford's real rendered ascent, measured via canvas
-// TextMetrics, not a guess). Regenerate by drawing the icon at
-// height = 1.17 × the wordmark's font-size, with its bottom edge at the
-// text baseline (so it spans exactly the ascender-to-baseline range), gap
-// = 0.35 × the icon's width, then compare a screenshot of the result
-// against a live-site .brand clone at the same font-size before saving —
-// the original 272x95 display numbers (545x190 file) came from that
-// comparison. Bumped to 344x120 (Sep 2026) — same file, same aspect ratio
-// (2.868, vs 2.867 at these rounded values — a ~0.06% difference that's
-// invisible in practice), just rendered larger so the mark reads with more
-// visual weight next to the "haloe" wordmark baked into the same image.
+// Lock-up (Sep 2026, regenerated): the icon's height matches the full
+// height of the wordmark — the ascender-top ("h"/"l") to baseline span —
+// and it's vertically centred on that span (not baseline-sitting); the gap
+// between icon and wordmark is the width of the letter "a" at the same
+// size. All three numbers are measured live, not hand-picked — Tan
+// Ashford's ascenders overshoot its own em-box (confirmed against Arial/
+// Playfair Display controls), so a fixed em multiple would be wrong for
+// this font specifically.
+//
+// Regenerate with tools/email-logo-generator.html (open it through the
+// local dev server, e.g. http://localhost:8788/tools/email-logo-generator.html,
+// so its fetches of ../haloe-logo-flower.svg and ../fonts/TAN-ASHFORD.woff2
+// resolve) — it renders the real, unedited logo SVG next to "haloe" set in
+// the real Tan Ashford font-face, measures both via canvas TextMetrics, and
+// gives a "Download email-logo@2x.png" link sized/positioned from those
+// measurements. Save its output over this file.
 export const LOGO_URL = 'https://haloe.health/images/email-logo@2x.png';
 export const LOGO_WIDTH = 344;
-export const LOGO_HEIGHT = 120;
+export const LOGO_HEIGHT = 92;
 
 // POST an email through the Resend REST API. Throws on a non-2xx response.
 export async function sendEmail(apiKey, payload) {
