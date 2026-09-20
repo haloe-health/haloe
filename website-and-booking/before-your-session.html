@@ -7,7 +7,6 @@
 <meta name="description" content="Everything to expect at your haloe hijama session in Manchester, and how to prepare. A calm wellness space for women and men.">
 <link rel="canonical" href="https://haloe.health/before-your-session.html">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="haloe">
@@ -37,16 +36,8 @@
     --dim: #5a5247;
     --border: rgba(13,13,13,0.1);
     --radius: 0px;
-    --font-heading: 'Tan Ashford', Georgia, serif;
-    --font-wordmark: 'Tan Ashford', Georgia, serif;
-  }
-  @font-face {
-    font-family: 'Tan Ashford';
-    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
-         url('fonts/TAN-ASHFORD.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
+    --font-heading: 'Poppins', sans-serif;
+    --font-wordmark: 'Poppins', sans-serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -146,20 +137,16 @@
   .section-tag.center { justify-content:center; }
   .section-tag::before { content:''; width:24px; height:1px; background:var(--gold); opacity:0.6; }
 
-  /* Headings — Tan Ashford again (Sep 2026, reverts the brief Poppins
-     pass). Normal weight/font-synthesis:none (no bold or italic cut to
-     fake), -0.025em tracking, no italic gold second line either way. */
   h1 {
     font-family:var(--font-heading);
-    font-size:clamp(1.75rem,7vw,2.75rem);
-    font-weight:normal; font-synthesis:none; line-height:1.05;
-    margin-bottom:24px; letter-spacing:-0.025em;
+    font-size:clamp(1.75rem, 5vw, 2rem);
+    font-weight:600; line-height:1.1;
+    margin-bottom:24px;
   }
   h2 {
     font-family:var(--font-heading);
-    font-size:clamp(1.5rem,5.5vw,2rem);
-    font-weight:normal; font-synthesis:none; line-height:1.05; margin-bottom:20px;
-    letter-spacing:-0.025em;
+    font-size:1.5rem;
+    font-weight:600; line-height:1.1; margin-bottom:20px;
   }
   .cert-tag {
     font-size:0.6rem; letter-spacing:0.14em; text-transform:uppercase;

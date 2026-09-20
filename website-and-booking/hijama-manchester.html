@@ -7,7 +7,6 @@
 <meta name="description" content="Hijama and cupping therapy in Manchester for women and men. Home visits across Greater Manchester or our Tuesday clinic at Milton Hall, Deansgate.">
 <link rel="canonical" href="https://haloe.health/hijama-manchester.html">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="haloe">
 <meta property="og:title" content="Hijama &amp; Cupping Therapy in Manchester | haloe">
@@ -72,17 +71,9 @@
     --white: #0D0D0D;
     --dim: #5a5247;
     --border: rgba(13,13,13,0.1);
-    --font-heading: 'Tan Ashford', Georgia, serif;
+    --font-heading: 'Poppins', sans-serif;
     --font-body: 'Poppins', sans-serif;
-    --font-wordmark: 'Tan Ashford', Georgia, serif;
-  }
-  @font-face {
-    font-family: 'Tan Ashford';
-    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
-         url('fonts/TAN-ASHFORD.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
+    --font-wordmark: 'Poppins', sans-serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -182,9 +173,9 @@
   }
   .eyebrow::before, .eyebrow::after { content:''; width:32px; height:1px; background:var(--gold); opacity:0.6; }
   h1 {
-    font-family:var(--font-heading); font-weight:normal; font-synthesis:none;
-    font-size:clamp(1.75rem,7vw,2.75rem); line-height:1.05;
-    letter-spacing:-0.025em; margin-bottom:20px;
+    font-family:var(--font-heading); font-weight:600;
+    font-size:clamp(1.75rem, 5vw, 2rem); line-height:1.1;
+    margin-bottom:20px;
   }
   .page-sub { color:var(--dim); font-size:1rem; max-width:560px; margin:0 auto; line-height:1.9; }
 
@@ -196,9 +187,8 @@
   }
   .section-tag::before { content:''; width:22px; height:1px; background:var(--gold); opacity:0.6; }
   h2 {
-    font-family:var(--font-heading); font-weight:normal; font-synthesis:none;
-    font-size:clamp(1.5rem,5.5vw,2rem); line-height:1.05; margin-bottom:22px;
-    letter-spacing:-0.025em;
+    font-family:var(--font-heading); font-weight:600;
+    font-size:1.5rem; line-height:1.1; margin-bottom:22px;
   }
   p { color:var(--dim); line-height:1.9; margin-bottom:18px; font-size:0.97rem; }
   p:last-child { margin-bottom:0; }

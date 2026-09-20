@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Your health &amp; consent form · haloe</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <meta name="description" content="Your private health and consent form for haloe — a short, confidential intake before your hijama session in Manchester.">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53,16 +52,8 @@
     --border: rgba(13,13,13,0.1);
     --surface: #FFFFFF;
     --error: #C0392B;
-    --font-heading: 'Tan Ashford', Georgia, serif;
-    --font-wordmark: 'Tan Ashford', Georgia, serif;
-  }
-  @font-face {
-    font-family: 'Tan Ashford';
-    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
-         url('fonts/TAN-ASHFORD.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
+    --font-heading: 'Poppins', sans-serif;
+    --font-wordmark: 'Poppins', sans-serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -129,13 +120,7 @@
   .intro-head { margin-bottom:40px; }
   .intro-head .eyebrow { font-size:0.6rem; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold-deep); margin-bottom:18px; display:flex; align-items:center; gap:12px; }
   .intro-head .eyebrow::before { content:''; width:24px; height:1px; background:var(--gold); opacity:0.6; }
-  /* This page later sets html{font-size:78%} (search "Apple pass" below),
-     which rem is always relative to regardless of cascade order — so every
-     rem size here needs dividing by 0.78 to actually render at the sizes
-     the spec gives (28-44px), not 78% of them. vw is viewport-relative,
-     unaffected, so only the rem bounds are scaled: 1.75rem/2.75rem ->
-     2.244rem/3.526rem. */
-  h1 { font-family:var(--font-heading); font-synthesis:none; font-size:clamp(2.244rem,7vw,3.526rem); font-weight:normal; line-height:1.05; letter-spacing:-0.025em; margin-bottom:18px; }
+  h1 { font-family:var(--font-heading); font-size:28px; font-weight:600; line-height:1.1; margin-bottom:18px; }
   .intro-line { color:var(--dim); font-size:1rem; line-height:1.9; max-width:600px; }
 
   /* Progress bar */
@@ -150,8 +135,7 @@
   .step { display:none; }
   .step.active { display:block; animation:fadeUp 0.5s ease both; }
   @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-  /* 78%-root compensated (see the h1 comment above): 1.5rem/2rem -> 1.923rem/2.564rem. */
-  .step h2 { font-family:var(--font-heading); font-synthesis:none; font-size:clamp(1.923rem,5.5vw,2.564rem); font-weight:normal; line-height:1.05; letter-spacing:-0.025em; margin-bottom:8px; }
+  .step h2 { font-family:var(--font-heading); font-size:24px; font-weight:600; line-height:1.1; margin-bottom:8px; }
   .section-intro { color:var(--dim); font-size:0.9rem; line-height:1.8; margin-bottom:28px; padding:16px 18px; border-left:2px solid rgba(201,160,64,0.3); background:rgba(201,160,64,0.03); border-radius:0 6px 6px 0; }
 
   /* Fields */
@@ -210,8 +194,7 @@
   .screen { display:none; text-align:center; padding:60px 0; }
   .screen.active { display:block; animation:fadeUp 0.5s ease both; }
   .screen .mark { width:64px; height:64px; border-radius:50%; border:1px solid rgba(201,160,64,0.4); display:flex; align-items:center; justify-content:center; margin:0 auto 28px; color:var(--gold-deep); font-size:1.6rem; }
-  /* 78%-root compensated (see the h1 comment above): 1.5rem/2rem -> 1.923rem/2.564rem. */
-  .screen h2 { font-family:var(--font-heading); font-synthesis:none; font-size:clamp(1.923rem,5.5vw,2.564rem); font-weight:normal; line-height:1.05; letter-spacing:-0.025em; margin-bottom:18px; }
+  .screen h2 { font-family:var(--font-heading); font-size:24px; font-weight:600; line-height:1.1; margin-bottom:18px; }
   .screen p { color:var(--dim); font-size:0.95rem; line-height:1.95; max-width:520px; margin:0 auto 22px; }
 
   /* Footer */

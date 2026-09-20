@@ -7,7 +7,6 @@
 <meta name="description" content="Book your hijama or cupping session in Manchester with haloe. Secure online booking.">
 <link rel="canonical" href="https://haloe.health/book.html">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <!-- Open Graph / social preview -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="haloe">
@@ -20,31 +19,11 @@
 <meta name="twitter:title" content="Book a Session — haloe Hijama Manchester">
 <meta name="twitter:description" content="Book your hijama or cupping session in Manchester with haloe. Secure online booking.">
 <meta name="twitter:image" content="https://haloe.health/images/og-image.jpg">
-<!-- Poppins only (Sep 2026) — the booking flow no longer uses a serif
-     display font anywhere, so Playfair Display was dropped from this
-     request entirely rather than left to download unused. preconnect gets
-     the connection to Google's font origins open before the stylesheet
-     link is even parsed, which is the effective way to speed up a
-     Google-Fonts-hosted family before first paint — Google serves the
-     actual woff2 from a per-request, UA-subsetted URL that isn't known
-     until their CSS response comes back, so a direct <link rel="preload">
-     to a specific font file (as intake.html does for the self-hosted Tan
-     Ashford, which now IS preloaded above — Tan Ashford is back as the
-     site's heading font, Sep 2026) isn't available here. 300/400/500/600
-     are the weights actually used across this page (checked via grep, not
-     guessed). -->
+<!-- Poppins only — 300/400/500/600 are the weights used on this page. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  @font-face {
-    font-family: 'Tan Ashford';
-    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
-         url('fonts/TAN-ASHFORD.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-  }
   /* ── Branded loading screen (presentation only) ──
      Minimal on purpose (Sep 2026, replaced a bigger icon + shimmer-bar
      version): just the flower, static but for a gentle opacity pulse — no
@@ -121,10 +100,7 @@
     --radius-xl: 3rem;
     --radius-full: 9999px;
 
-    /* Tan Ashford is the heading font site-wide again (Sep 2026) — .panel-title
-       is the only non-h1-h4 "heading" on this page that uses it. .where-title
-       is a card label and uses Poppins 600 instead. */
-    --font-heading: 'Tan Ashford', Georgia, serif;
+    --font-heading: 'Poppins', sans-serif;
   }
 
   /* Dark mode (Sep 2026): a defined dark palette, not auto-inversion.
@@ -331,21 +307,13 @@
     color: var(--text-sand);
     margin-bottom: 0.5rem;
   }
-  /* Step titles: Tan Ashford again (Sep 2026, reverts the brief Poppins
-     experiment) — same treatment as the site's other headings: normal
-     weight (no bold cut), font-synthesis:none (no italic face either),
-     -0.025em tracking. clamp(1.5rem,6vw,1.75rem) per spec; line-height
-     1.15 since these read as a smaller/secondary heading tier than a
-     page h1. Never italic, no gold second line. */
   .panel-title {
     font-family: var(--font-heading);
-    font-size: clamp(1.5rem, 6vw, 1.75rem);
-    font-weight: normal;
-    font-synthesis: none;
+    font-size: 28px;
+    font-weight: 600;
     color: var(--cream);
     margin-bottom: 0.5rem;
-    letter-spacing: -0.025em;
-    line-height: 1.15;
+    line-height: 1.2;
   }
   .panel-sub {
     font-size: 1rem;

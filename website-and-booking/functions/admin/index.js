@@ -26,17 +26,8 @@ const HTML = `<!DOCTYPE html>
 <!-- Absolute path — this page is served from a Function at /admin, not a
      static file at the site root, so a relative "fonts/..." would resolve
      to /admin/fonts/... and 404. -->
-<link rel="preload" href="/fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  @font-face {
-    font-family: 'Tan Ashford';
-    src: url('/fonts/TAN-ASHFORD.woff2') format('woff2'),
-         url('/fonts/TAN-ASHFORD.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-  }
   :root {
     --cream: #F5F0E8;
     --white: #FFFFFF;
@@ -51,7 +42,7 @@ const HTML = `<!DOCTYPE html>
     --red-soft: rgba(179,65,58,0.08);
     --green: #3f8a5c;
     --green-soft: rgba(63,138,92,0.12);
-    --font-heading: 'Tan Ashford', Georgia, serif;
+    --font-heading: 'Poppins', Arial, sans-serif;
     font-size: 87.5%;
   }
   * { box-sizing: border-box; }
@@ -63,12 +54,7 @@ const HTML = `<!DOCTYPE html>
     padding: 1.25rem;
     padding-bottom: 6rem;
   }
-  /* Tan Ashford, matching every other page's headings — kept at its
-     existing compact size rather than the full clamp() scale, though:
-     this is a dense dashboard table view, not a content page, and a
-     28px+ heading would eat space the booking list needs. Same call made
-     for this page in the earlier Poppins-headings pass. */
-  h1 { font-family: var(--font-heading); font-synthesis: none; font-size: 1.4rem; font-weight: normal; letter-spacing: -0.025em; margin: 0 0 0.2rem; }
+  h1 { font-family: var(--font-heading); font-size: 1.4rem; font-weight: 600; margin: 0 0 0.2rem; }
   .sub { color: var(--body); margin: 0 0 1.5rem; font-size: 0.85rem; }
   .toolbar {
     display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;
