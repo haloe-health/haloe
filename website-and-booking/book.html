@@ -1856,11 +1856,16 @@ function travelFeeFor(zone) {
   return 0;
 }
 
+function priceFmt(pounds) {
+  // Format a pounds value for display. Whole numbers show as £40; fractional
+  // amounts (e.g. the 50p test treatment) show as £0.50.
+  return Number.isInteger(pounds) ? `£${pounds}` : `£${pounds.toFixed(2)}`;
+}
 function priceHtml(svc) {
-  // The £1 test item rounds back to £1, so it gets no misleading strikethrough.
-  return netPrice(svc) < svc.price
-    ? `<s class="was">£${svc.price}</s> £${netPrice(svc)}`
-    : `£${svc.price}`;
+  const net = netPrice(svc);
+  return net < svc.price
+    ? `<s class="was">${priceFmt(svc.price)}</s> ${priceFmt(net)}`
+    : priceFmt(net);
 }
 
 // A discount code can knock a whole-pound price into pence (e.g. £72 - 20% =
@@ -1980,6 +1985,12 @@ const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
    Without this the wizard always opened on Massage, so someone who tapped
    "Stress & Anxiety" landed on face massages instead of their package.
    The category alone is enough; svc is optional and matched by exact name. */
+// Show the "Test booking" treatment only when ?test=1 is in the URL.
+// Remove this flag (and the TEST ONLY entries in services-data.js,
+// functions/_services.js and HB_SERVICES in index.html) before sustained
+// live traffic. One line to change: set TEST_MODE = false here.
+const TEST_MODE = new URLSearchParams(location.search).has('test');
+
 function applyDeepLink() {
   const params = new URLSearchParams(location.search);
 
@@ -2067,7 +2078,7 @@ function updateRail() {
     ).join('');
   }
   const totalEl = document.getElementById('rail-total');
-  if (totalEl) totalEl.textContent = svc ? `£${netPrice(svc)}` : '—';
+  if (totalEl) totalEl.textContent = svc ? priceFmt(netPrice(svc)) : '—';
   const ring = document.getElementById('rail-ring');
   if (ring) ring.style.setProperty('--p', `${Math.round((currentStep / 5) * 100)}%`);
   const lbl = document.getElementById('rail-ring-label');
@@ -2090,7 +2101,7 @@ function updateRail() {
       // Step 2's bar is just "Select a treatment" / "Face Massage · £40" —
       // date/time haven't been chosen yet at this point in the flow, and
       // repeating them here (steps 3+) is handled by the branch below.
-      fs.textContent = `${svc.name} · £${netPrice(svc)}`;
+      fs.textContent = `${svc.name} · ${priceFmt(netPrice(svc))}`;
     } else {
       const bits = [svc.name, svc.time];
       if (dateStr) bits.push(dateStr);
@@ -2199,7 +2210,11 @@ function renderServices() {
     return;
   }
 
-  const ordered = isPackages ? orderedPackages(services) : orderedTreatments(services);
+  // Hide test-only treatments unless ?test=1 is in the URL. The data entry
+  // in services-data.js is the single source of truth; this filter is the
+  // only place that controls visibility.
+  const visibleServices = TEST_MODE ? services : services.filter(s => s.name !== 'Test booking');
+  const ordered = isPackages ? orderedPackages(visibleServices) : orderedTreatments(visibleServices);
 
   grid.innerHTML = ordered.map(({ s, i }) => {
     const selected = state.serviceIndex === i;

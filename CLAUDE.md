@@ -127,3 +127,24 @@ The address collected at step 3 is deliberately **kept out of the URL**. It trav
 - Mobile calendar disables past dates and Sundays; clinic calendar disables everything except `CLINIC_WEEKDAY` on/after `CLINIC_START_DATE` (see Service model). Mobile time slots are a fixed hard-coded list, 10:00–20:00 in 30-minute steps, duplicated in both `book.html` and `index.html`; clinic time slots come from `CLINIC_SLOT_TEMPLATE`, duplicated the same way.
 - **`book.html` slots now reflect real availability** — on date select it fetches `/availability`, then greys out any slot that would overlap an existing booking given the selected treatment's duration (parsed from its `time`). Changing treatment re-validates the chosen slot on return to step 2. It also disables any time **earlier than now when the chosen day is today** (`slotIsPast`), so this-morning's slots can't be booked. The homepage widget does **not** do this (see reservation section above).
 - The site serves extensionless URLs — `/book.html` redirects to `/book`. Query strings survive the redirect, but `curl` needs `-L` or you'll read an empty 308 and wrongly conclude a deploy failed.
+
+## Testing
+
+### End-to-end booking test (50p)
+
+Use this URL to run a real payment through the full booking flow without charging a real-money amount:
+
+```
+https://haloe.health/book?test=1
+```
+
+The `?test=1` flag reveals a **"Test booking"** treatment in the Massage category (45 min, £0.50). It is invisible on all normal visits and does not appear on `/book`, `/book?anything-else`, or on `index.html`'s hidden widget. After checkout:
+
+- The booking appears in `/admin` exactly like a real one.
+- Halima's notification email fires.
+- The customer confirmation email fires (use your own email at the Details step).
+- The row lands in Supabase `bookings` with `status = 'confirmed'`.
+
+**To remove the test treatment** when it's no longer needed: delete the three `// TEST ONLY` entries — one each in `services-data.js`, `functions/_services.js`, and `HB_SERVICES` in `index.html`. The `TEST_MODE` filter in `book.html` then has nothing to show and is harmless; you can remove it too if you like (search for `TEST_MODE`).
+
+Stripe minimum charge in the UK is 30p; 50p clears it comfortably.

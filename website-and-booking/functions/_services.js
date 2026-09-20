@@ -12,6 +12,8 @@
 // client-supplied duration.
 export const SERVICES = {
   massage: [
+    // TEST ONLY — remove before sustained live traffic
+    { name: 'Test booking', price: 0.50, min: 45 },
     { name: 'Face Massage', price: 40, min: 45 },
     { name: 'Head Massage', price: 40, min: 45 },
     { name: 'Face & Head Massage', price: 70, min: 60 },
@@ -53,7 +55,8 @@ export const SERVICES = {
 const PROMO_DISCOUNT = 0;
 
 export function netPrice(svc) {
-  return Math.round(svc.price * (1 - PROMO_DISCOUNT));
+  // Round at the pence level (see services-data.js for the rationale).
+  return Math.round(svc.price * (1 - PROMO_DISCOUNT) * 100) / 100;
 }
 
 // Looks a treatment up by its exact display name, scoped to `category` when

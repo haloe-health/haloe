@@ -24,7 +24,7 @@ export async function onRequestPost(context) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    const originalAmount = netPrice(svc) * 100; // pence — the TREATMENT price only
+    const originalAmount = Math.round(netPrice(svc) * 100); // pence — the TREATMENT price only
 
     // The discount is re-validated from scratch here — never trust that the
     // client's earlier /apply-discount check still holds. A code could have
