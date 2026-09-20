@@ -283,8 +283,12 @@ alongside the "No". Clear the field on change if that matters for the record.
 
 The honeycomb flower mark next to the "haloe" wordmark, in Tan Ashford.
 Appears as `.brand`/`.footer-brand` (`index.html`), `.nav-logo`/`.footer-left`
-(`before-your-session.html`, `intake.html`), and as a baked PNG for email
-(`images/email-logo@2x.png`, via `functions/_email.js`).
+(`before-your-session.html`, `intake.html`), as a baked PNG for email
+(`images/email-logo@2x.png`, via `functions/_email.js`), and as the
+centre-screen lock-up in `intro.js`'s page-load animation (which also reads
+this same 1.17em/-0.2918em/0.35× geometry to zoom into the flower's yellow
+hexagon — see that file for how it locates the hexagon's centre live via
+`getBBox()` rather than hand-measuring it).
 
 **The icon is vertically centred on the wordmark's cap-height, not
 baseline-sitting.** Cap-height here means the span from the top of the "l"/"h"
