@@ -52,7 +52,7 @@
     width: 46px; height: 46px; border-radius: 50%;
     background: rgba(201,160,64,0.14);
     display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 1rem;
+    margin: 0 auto 24px;
   }
   .tick svg {
     width: 22px; height: 22px;
@@ -140,6 +140,7 @@
   </div>
   <h1>You&rsquo;re booked.</h1>
   <p class="sub" id="payment-sub"></p>
+  <p class="sub" id="payment-paid" style="margin-top:2px;"></p>
   <div class="items" id="items"></div>
 
   <div class="group">
@@ -189,8 +190,8 @@
   const paid = gbp(amount);
 
   const bits = [treatment, [date, time].filter(Boolean).join(', ')].filter(Boolean);
-  bits.push(`Paid in full — ${paid}`);
   document.getElementById('payment-sub').textContent = bits.join(' · ');
+  document.getElementById('payment-paid').textContent = `Paid in full — ${paid}`;
 
   // Itemised breakdown — treatment, discount (never applied to travel),
   // travel (home visits only), total. Rows with nothing to show are skipped
