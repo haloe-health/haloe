@@ -1169,6 +1169,13 @@
     font-size: 0.72rem; color: var(--text-muted); text-decoration: underline;
     background: none; border: none; cursor: pointer; padding: 0; flex: none;
   }
+  /* The launch-offer line. Kept word-for-word in step with index.html's
+     promo banner / CTA chip and hijama-manchester.html's price intro — one
+     offer, one sentence, three pages. */
+  .discount-note {
+    font-size: 0.72rem; color: var(--text-muted); text-align: center;
+    margin-top: 0.55rem; line-height: 1.6;
+  }
   .hidden { display: none !important; }
 
   /* ---- Summary ---- */
@@ -1823,6 +1830,7 @@
       <p class="field-error" id="discount-error"></p>
       <div class="discount-line hidden" id="discount-applied"></div>
     </div>
+    <p class="discount-note">Launch offer: 20% off all treatments until 31 October 2026. Use code HALOE20 at checkout.</p>
 
     <p class="cancellation-policy">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>
 

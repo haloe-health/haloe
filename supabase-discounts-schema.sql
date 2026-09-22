@@ -20,12 +20,27 @@ create table if not exists public.discount_codes (
 );
 
 -- HALOE20 — 20% off, online bookings only (book.html, not the homepage
--- WhatsApp widget), one redemption per customer email, valid until
--- 31 Oct 2026 23:59 UK time. That's 23:59 UTC: BST has already ended by then
--- (UK clocks go back on 25 Oct 2026), so UK time and UTC are the same.
+-- WhatsApp widget), valid until 31 Oct 2026 23:59 UK time. That's 23:59 UTC:
+-- BST has already ended by then (UK clocks go back on 25 Oct 2026), so UK
+-- time and UTC are the same.
+--
+-- single_use_per_email is FALSE (Sep 2026): the launch offer is "20% off all
+-- treatments", not "off your first session", so a returning customer gets the
+-- discount on every booking they make before it expires. The column itself
+-- stays — it's a per-code switch, and a future code may well want it on.
 insert into public.discount_codes (code, percent, expires_at, single_use_per_email, active, created_at)
-values ('HALOE20', 20, 1793491140, true, true, extract(epoch from now())::bigint)
+values ('HALOE20', 20, 1793491140, false, true, extract(epoch from now())::bigint)
 on conflict (code) do nothing;
+
+-- The insert above is `do nothing`, so on a database where HALOE20 already
+-- exists it changes nothing — this update is what actually moves an existing
+-- row onto the current terms. Idempotent, safe to re-run.
+update public.discount_codes
+   set single_use_per_email = false,
+       expires_at           = 1793491140,
+       percent              = 20,
+       active               = true
+ where code = 'HALOE20';
 
 -- ------------------------------------------------------------------ --
 -- Row Level Security — deny-all by default, same lockdown as every other

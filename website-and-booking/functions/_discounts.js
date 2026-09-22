@@ -2,7 +2,8 @@
 // live "Apply" check on step 5) and create-checkout.js (which re-validates
 // from scratch at payment time; a code accepted a minute earlier could have
 // expired, been deactivated, or just been redeemed by the same email in a
-// second tab). The `_` prefix keeps this file from becoming a route.
+// second tab — for codes that are single-use). The `_` prefix keeps this
+// file from becoming a route.
 //
 // Codes live in Supabase's discount_codes table (supabase-discounts-schema.sql)
 // rather than being hardcoded here, so Halima can add more later — a SQL
@@ -26,11 +27,15 @@ export async function validateDiscountCode(env, rawCode, email, now) {
   if (!row || !row.active) return { ok: false, reason: 'invalid_code' };
   if (row.expires_at && now > row.expires_at) return { ok: false, reason: 'expired' };
 
+  // Per-code switch, OFF for HALOE20 (see supabase-discounts-schema.sql): the
+  // launch offer is "20% off all treatments", so it applies to every booking a
+  // customer makes while it runs, not just their first. The branch stays for
+  // any future code that does want one redemption per person.
   if (row.single_use_per_email) {
     const normalizedEmail = String(email || '').trim().toLowerCase();
     if (!normalizedEmail) return { ok: false, reason: 'missing_email' };
 
-    // "First booking per customer email" — checked against completed
+    // One redemption per customer email — checked against completed
     // (paid) bookings only. A pending hold that lapsed was never a real
     // booking, so it shouldn't block a genuine retry.
     const used = await sbRequest(env, {
