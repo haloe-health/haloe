@@ -18,8 +18,6 @@ export const SERVICES = {
     { name: 'Head & Foot Massage', price: 60, min: 60 },
     { name: 'Back, Neck & Shoulders', price: 75, min: 60 },
     { name: 'Full Body Massage', price: 90, min: 75 },
-    // TEMPORARY (Oct 2026) — see the matching entry in services-data.js.
-    { name: 'Test Booking (£1)', price: 1, min: 30 },
   ],
   dry: [
     { name: 'Face Cupping', price: 50, min: 45 },

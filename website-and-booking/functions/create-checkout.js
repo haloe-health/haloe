@@ -96,11 +96,9 @@ export async function onRequestPost(context) {
 
     let totalAmount = treatmentAmount + travelPence;
     // Stripe's minimum UK card charge is £0.30 — a session below that can
-    // never actually be created. In practice this only matters for the £1
-    // Test Booking treatment stacked with a discount code (real treatments
-    // never discount below 30p even at the site's maximum discount); treat
-    // it the same way a genuine £0 booking is treated, rather than letting
-    // Stripe reject it.
+    // never actually be created. No current treatment/discount combination
+    // reaches this low, but if one ever does, treat it the same way a
+    // genuine £0 booking is treated rather than letting Stripe reject it.
     if (totalAmount > 0 && totalAmount < 30) totalAmount = 0;
 
     const secretKey = context.env.STRIPE_SECRET_KEY;

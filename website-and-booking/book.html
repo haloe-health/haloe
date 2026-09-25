@@ -1982,14 +1982,6 @@ function formatPounds(pence) {
   return '£' + (pence / 100).toFixed(2).replace(/\.00$/, '');
 }
 
-// TEMPORARY (Oct 2026): "Test Booking (£1)" is a real, ordinary entry at the
-// end of SERVICES.massage (services-data.js) — ordinary in every way except
-// this name check, which puts a "TEST" banner on the Step 5 pass so it can't
-// be mistaken for a real booking. Remove this constant along with the
-// SERVICES entries (services-data.js + functions/_services.js) once testing
-// is done.
-const TEST_TREATMENT_NAME = 'Test Booking (£1)';
-
 let state = {
   category: 'massage',
   serviceIndex: null,
@@ -2784,11 +2776,7 @@ function renderSummary() {
       </div>` : '';
 
   // Presented as an appointment pass: when it is, then what it is.
-  const testBanner = service.name === TEST_TREATMENT_NAME
-    ? `<div style="background:#E5736A;color:#fff;font-weight:700;font-size:0.95rem;letter-spacing:0.04em;text-align:center;padding:8px;border-radius:10px 10px 0 0;">⚠ TEST BOOKING — not a real treatment</div>`
-    : '';
   card.innerHTML = `
-    ${testBanner}
     <div class="pass">
       <div class="pass-when">
         <div class="pass-date">${dateStr}</div>
