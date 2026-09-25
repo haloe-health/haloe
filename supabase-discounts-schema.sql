@@ -64,23 +64,37 @@ alter table public.discount_codes add column if not exists valid_until bigint;
 alter table public.discount_codes add column if not exists period text;
 alter table public.discount_codes add column if not exists allowed_email text;
 
--- Backfill the new columns from the old ones wherever the new ones are
--- still empty (a fresh table has no rows, so this is a no-op there).
-update public.discount_codes
-   set type = coalesce(type, 'promo'),
-       percent_off = coalesce(percent_off, percent),
-       valid_from = coalesce(valid_from, created_at),
-       valid_until = coalesce(valid_until, expires_at),
-       max_uses_per_customer = case when single_use_per_email then 1 else max_uses_per_customer end
- where percent_off is null;
+-- Backfill the new columns from the old ones, then drop the old ones —
+-- but only on a database that still HAS the old columns. The first run of
+-- this file already does that migration and drops percent/expires_at/
+-- single_use_per_email; every run after that must skip this block
+-- entirely, or it errors referencing columns that no longer exist (exactly
+-- what broke re-running this file after the first successful migration).
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'discount_codes' and column_name = 'percent'
+  ) then
+    update public.discount_codes
+       set type = coalesce(type, 'promo'),
+           percent_off = coalesce(percent_off, percent),
+           valid_from = coalesce(valid_from, created_at),
+           valid_until = coalesce(valid_until, expires_at),
+           max_uses_per_customer = case when single_use_per_email then 1 else max_uses_per_customer end
+     where percent_off is null;
 
+    alter table public.discount_codes drop column percent;
+    alter table public.discount_codes drop column if exists expires_at;
+    alter table public.discount_codes drop column if exists single_use_per_email;
+  end if;
+end $$;
+
+-- Safe to re-run unconditionally: a no-op once every row already satisfies
+-- it (from a prior run, or because the table was just created with no rows).
 alter table public.discount_codes alter column percent_off set not null;
 alter table public.discount_codes alter column valid_from set not null;
 alter table public.discount_codes alter column type set not null;
-
-alter table public.discount_codes drop column if exists percent;
-alter table public.discount_codes drop column if exists expires_at;
-alter table public.discount_codes drop column if exists single_use_per_email;
 
 create unique index if not exists discount_codes_id_unique on public.discount_codes(id);
 create index if not exists discount_codes_collaborator_idx on public.discount_codes(collaborator_id);
@@ -137,12 +151,19 @@ create unique index if not exists code_redemptions_active_per_period
 -- ------------------------------------------------------------------ --
 -- Seed collaborators and codes.
 -- ------------------------------------------------------------------ --
+-- `on conflict do nothing` below needs a real conflict target to dedupe
+-- against — collaborators.id is a generated identity (never conflicts on
+-- insert) and nothing else on the table was unique, so without this index
+-- every re-run of this file would insert a second Yasmin/Dog Business/POD
+-- Football row rather than a genuine no-op.
+create unique index if not exists collaborators_name_unique on public.collaborators(name);
+
 insert into public.collaborators (name, business_name, type, email, instagram, deliverables_agreed, created_at)
 values
   ('Yasmin', null, 'influencer', null, 'yasmzee', true, extract(epoch from now())::bigint),
   ('Dog Business', 'Dog Business', 'business', null, null, true, extract(epoch from now())::bigint),
   ('POD Football', 'POD Football', 'club', null, null, true, extract(epoch from now())::bigint)
-on conflict do nothing;
+on conflict (name) do nothing;
 
 -- HALOE20 — public launch offer, 20% off all treatments, expires 31 Oct 2026
 -- 23:59 UK time (= 23:59 UTC; BST has ended by then).
