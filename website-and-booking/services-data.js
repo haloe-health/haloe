@@ -11,6 +11,12 @@
 // index.html's booking widget keeps its own separate HB_SERVICES /
 // HB_PROMO_DISCOUNT copy (see CLAUDE.md) — it predates this file and has its
 // own quirks (badges, no desc on non-package items), so it wasn't folded in.
+//
+// The hidden £1 "Test Booking" treatment (book.html?treatment=test, for
+// testing live Stripe payments cheaply) is deliberately NOT defined here —
+// this file drives every public treatment list, and it must never appear in
+// one. It lives only in book.html (injected at runtime, only behind that
+// query param) and functions/_services.js (server-side pricing).
 const SERVICES = {
   massage: [
 { name: 'Face Massage', time: '45 min', price: 40, desc: 'Gentle facial massage to relax and refresh.' },
