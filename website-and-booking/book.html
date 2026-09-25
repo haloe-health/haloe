@@ -2956,7 +2956,9 @@ function discountErrorMessage(reason) {
     missing_email: 'Please add your email on the previous step first.',
     invalid_code: 'That code isn’t valid.',
     expired: 'That code has expired.',
-    already_used: 'That code has already been used with this email.',
+    already_used: 'That code has already been used.',
+    wrong_email: 'That code isn’t valid for your email.',
+    not_first_time: 'That code is for first-time clients only.',
   }[reason] || 'That code isn’t valid.';
 }
 
@@ -2982,6 +2984,8 @@ async function applyDiscountCode(codeOverride) {
     if (errEl) { errEl.textContent = discountErrorMessage('missing_email'); errEl.classList.add('visible'); }
     return;
   }
+  const phoneField = document.getElementById('phone');
+  const phone = phoneField ? phoneField.value.trim() : '';
 
   const svc = SERVICES[state.category][state.serviceIndex];
   if (btn) { btn.disabled = true; btn.textContent = 'Checking…'; }
@@ -2990,7 +2994,7 @@ async function applyDiscountCode(codeOverride) {
     const res = await fetch('/apply-discount', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, email, treatmentName: svc.name, treatmentCategory: state.category }),
+      body: JSON.stringify({ code, email, phone, treatmentName: svc.name, treatmentCategory: state.category }),
     });
     const data = await res.json();
 

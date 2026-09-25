@@ -9,21 +9,9 @@
 //   STRIPE_WEBHOOK_SECRET  — the signing secret for this webhook endpoint (whsec_…)
 //   RESEND_API_KEY         — Resend API key for sending email
 
-import {
-  WHITE, INK, BODY_TEXT, GOLD_DEEP, HAIRLINE, FONT, FONT_HEADING,
-  sendEmail, esc, emailHeader, emailFooter, emailShell, heroRow, infoCard,
-} from './_email.js';
 import { confirmBooking } from './_bookings.js';
-import { CLINIC_VENUE_ADDRESS } from './_clinic.js';
-
-const FROM = 'haloe <halima@haloe.health>';
-const HALIMA_EMAIL = 'halima@haloe.health';
-// The intake form is deliberately NOT linked from this email. Halima speaks to
-// each client on WhatsApp first and sends https://haloe.health/intake herself.
-// The form is still live and still writes to D1 — only the automatic prompts
-// were removed (this email, booking-confirmed.html, book.html, index.html).
-// To restore, put back the paragraph + emailButton(INTAKE_URL, …) block and
-// re-add emailButton to the ./_email.js import above.
+import { confirmDiscountRedemption } from './_discounts.js';
+import { notifyBooking, formatGBP, upperPostcode } from './_notify.js';
 
 export async function onRequestPost(context) {
   // --- Read the RAW body first (required for signature verification) ---
@@ -157,53 +145,21 @@ export async function onRequestPost(context) {
       }
     }
 
-    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel, discountLabel, travelLabel, travelZone, travelPence, slotConflict };
-
-    // WhatsApp notification to Halima. Sent before the email block and wrapped in
-    // its own try/catch so it still fires if Resend is unconfigured or failing —
-    // the two alert paths must not be able to take each other down.
-    // No-ops until Twilio is configured.
-    try {
-      await sendWhatsAppNotification(context.env, detail);
-    } catch (err) {
-      console.error('Failed to send WhatsApp notification:', err);
-    }
-
-    const apiKey = context.env.RESEND_API_KEY;
-    if (!apiKey) {
-      console.error('RESEND_API_KEY is not configured; cannot send confirmation emails');
-      return new Response('OK', { status: 200 });
-    }
-
-    // Send the customer confirmation (skip gracefully if we have no address)
-    if (email) {
+    // Flip the discount-code redemption from 'reserved' to 'confirmed' —
+    // create-checkout.js reserves it before Stripe the same way it reserves
+    // the slot. Best-effort: a discount code is never the thing that should
+    // block a paid customer's confirmation from going out.
+    const redemptionId = md.discountRedemptionId;
+    if (redemptionId && context.env.SUPABASE_URL && context.env.SUPABASE_SERVICE_ROLE_KEY) {
       try {
-        await sendEmail(apiKey, {
-          from: FROM,
-          to: [email],
-          reply_to: HALIMA_EMAIL,
-          subject: 'Your haloe booking is confirmed',
-          html: clientEmailHtml(detail),
-        });
+        await confirmDiscountRedemption(context.env, Number(redemptionId), bookingId ? Number(bookingId) : null);
       } catch (err) {
-        console.error('Failed to send client confirmation email:', err);
+        console.error('Failed to confirm discount redemption:', err);
       }
-    } else {
-      console.error('No customer email on session; skipping client confirmation email');
     }
 
-    // Notify Halima
-    try {
-      await sendEmail(apiKey, {
-        from: FROM,
-        to: [HALIMA_EMAIL],
-        reply_to: email || HALIMA_EMAIL,
-        subject: `${slotConflict ? "⚠ TIME CLASH — " : ""}New booking — ${name}`,
-        html: halimaEmailHtml(detail),
-      });
-    } catch (err) {
-      console.error('Failed to send Halima notification email:', err);
-    }
+    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel, discountLabel, travelLabel, travelZone, travelPence, slotConflict };
+    await notifyBooking(context.env, detail);
   } catch (err) {
     // Log, but still acknowledge so Stripe does not retry indefinitely
     console.error('Error handling checkout.session.completed:', err);
@@ -262,170 +218,3 @@ function constantTimeEqual(a, b) {
   return result === 0;
 }
 
-/* ------------------------------------------------------------------ */
-/* WhatsApp notification to Halima                                     */
-/* ------------------------------------------------------------------ */
-
-// Sends Halima a WhatsApp message the moment payment succeeds, via Twilio.
-//
-// Note this arrives from the Twilio business number, NOT the client's number —
-// sending as the client is not possible and would be impersonation. The client's
-// own number is included in the body so Halima can reply to them directly.
-//
-// Env vars (Cloudflare Pages dashboard, never in code):
-//   TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM, HALOE_WHATSAPP_TO
-// If any are missing this logs and returns, so the webhook stays healthy.
-async function sendWhatsAppNotification(env, d) {
-  const sid = env.TWILIO_ACCOUNT_SID;
-  const token = env.TWILIO_AUTH_TOKEN;
-  const from = env.TWILIO_WHATSAPP_FROM;
-  const to = env.HALOE_WHATSAPP_TO;
-
-  if (!sid || !token || !from || !to) {
-    console.log('Twilio not configured; skipping WhatsApp notification');
-    return;
-  }
-
-  const body = [
-    'New haloe booking — payment received',
-    '',
-    `Name: ${d.name}`,
-    d.phone ? `Phone: ${d.phone}` : null,
-    d.email ? `Email: ${d.email}` : null,
-    `Treatment: ${d.treatment}`,
-    d.date ? `Date: ${d.date}` : null,
-    d.time ? `Time: ${d.time}` : null,
-    `Location: ${locationLabel(d)}`,
-    d.location === 'mobile' && d.address ? `Address: ${d.address}` : null,
-    `Payment: ${d.paymentLabel}`,
-    d.notes ? `Notes: ${d.notes}` : null,
-  ]
-    .filter(Boolean)
-    .join('\n');
-
-  const form = new URLSearchParams({ From: from, To: to, Body: body });
-
-  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}/Messages.json`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${btoa(`${sid}:${token}`)}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: form.toString(),
-  });
-
-  if (!res.ok) {
-    console.error('Twilio error:', res.status, await res.text());
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/* Email sending + formatting                                          */
-/* ------------------------------------------------------------------ */
-
-function formatGBP(pence) {
-  const pounds = (Number(pence) || 0) / 100;
-  return '£' + (Number.isInteger(pounds) ? String(pounds) : pounds.toFixed(2));
-}
-
-// A single label/value row for the details table.
-// Uppercase any UK-postcode-looking token inside a free-text address, and
-// normalise the gap to a single space — so "9, ol9 7qe" reads "9, OL9 7QE".
-// Street names and other words are left untouched.
-function upperPostcode(str) {
-  if (!str) return str;
-  return String(str).replace(
-    /\b([A-Za-z]{1,2}[0-9][A-Za-z0-9]?)\s*([0-9][A-Za-z]{2})\b/g,
-    (_, out, inc) => `${out.toUpperCase()} ${inc.toUpperCase()}`,
-  );
-}
-
-// Friendly display label for the enum stored in metadata[location].
-function locationLabel(d) {
-  return d.location === 'clinic' ? 'Clinic Day' : 'Home visit';
-}
-
-/* ------------------------------------------------------------------ */
-/* Email templates                                                     */
-/* ------------------------------------------------------------------ */
-
-// Warm, premium, on-brand confirmation for the customer.
-// COMPLIANCE: wellness/symptom language only — no claims to treat/cure/manage conditions.
-function clientEmailHtml(d) {
-  const clinicNote = d.location === 'clinic'
-    ? `<p style="color:${INK};font-size:14px;font-weight:600;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Getting there</p>
-       <p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Milton Hall is at 244 Deansgate. When you arrive, Musa at the concierge desk will be expecting you — just give your name and he'll point you to Room 4 on the 3rd floor. Take the lift, or if you'd rather, the wide baroque staircase is worth the climb. Please arrive five minutes early. The room sits behind a key-coded door, so if it's closed, take a seat and Halima will come and collect you.</p>`
-    : '';
-  const cancellationNote = `<p style="color:${BODY_TEXT};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>`;
-
-  const inner = `${emailHeader()}
-              <!-- Intro -->
-              <tr>
-                <td style="padding:28px 4px 18px;">
-                  <h1 style="color:${INK};font-size:24px;font-weight:normal;margin:0 0 16px;font-family:${FONT_HEADING};">Your booking is confirmed</h1>
-                  <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 14px;font-family:${FONT};">Dear ${esc(d.name)},</p>
-                  <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0;font-family:${FONT};">Thank you for booking with haloe. Your payment has been received and your appointment is reserved. We look forward to welcoming you for a calm, restorative session.</p>
-                </td>
-              </tr>
-              ${heroRow(d.date, d.time, locationLabel(d))}
-              ${infoCard([
-                { label: 'Treatment', value: d.treatment },
-                { label: 'Price', value: d.originalAmountLabel },
-                { label: d.discountRowLabel, value: d.discountLabel },
-                { label: 'Travel', value: d.travelLabel },
-                { label: 'Total paid', value: d.amount, gold: true },
-              ])}
-              <!-- Clinic venue note -->
-              ${clinicNote ? `<tr><td style="padding:4px 4px 14px;">${clinicNote}</td></tr>` : ''}
-              <!-- Personal note + compliance -->
-              <tr>
-                <td style="padding:6px 4px 0;">
-                  <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">Halima will be in touch personally on WhatsApp to confirm the final details, send your health form, and answer any questions you may have.</p>
-                  ${cancellationNote}
-                  <p style="color:${BODY_TEXT};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">haloe offers complementary wellness therapy to support your general wellbeing, relaxation and everyday tension. It is not a substitute for medical advice, diagnosis or treatment.</p>
-                </td>
-              </tr>
-              ${emailFooter()}`;
-
-  return emailShell(inner);
-}
-
-// Plain, information-dense notification for Halima with everything she needs to follow up.
-function halimaEmailHtml(d) {
-  const travelZoneLabel = d.location === 'mobile'
-    ? (d.travelZone === 'A' ? `Zone A — ${formatGBP(d.travelPence)}`
-      : d.travelZone === 'B' ? `Zone B — ${formatGBP(d.travelPence)}`
-      : d.travelZone === 'C' ? 'Zone C — travel TBC' : '')
-    : '';
-
-  const inner = `<tr>
-                <td style="padding:0 0 16px;">
-                  <div style="color:${GOLD_DEEP};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:${FONT};font-weight:600;">New booking &middot; payment received</div>
-                  <h1 style="color:${INK};font-size:22px;font-weight:normal;margin:8px 0 0;font-family:${FONT_HEADING};">${esc(d.name)}</h1>
-                </td>
-              </tr>
-              ${heroRow(d.date, d.time, locationLabel(d))}
-              ${infoCard([
-                { label: 'Treatment', value: d.treatment },
-                { label: 'Price', value: d.originalAmountLabel },
-                { label: d.discountRowLabel, value: d.discountLabel },
-                { label: 'Travel', value: d.travelLabel },
-                { label: 'Total paid', value: d.amount, gold: true },
-              ])}
-              ${infoCard([
-                { label: 'Location', value: d.location === 'clinic' ? `${locationLabel(d)} — ${d.venue}` : locationLabel(d) },
-                { label: 'Address', value: d.location === 'clinic' ? CLINIC_VENUE_ADDRESS : d.address },
-                { label: 'Postcode zone', value: travelZoneLabel },
-                { label: 'Phone', value: d.phone },
-                { label: 'Email', value: d.email },
-                { label: 'Notes', value: d.notes },
-                { label: 'Travel note', value: d.travelZone === 'C' ? '⚠ Confirm travel cost with the client before the session' : '' },
-                { label: 'Time clash', value: d.slotConflict ? '⚠ This time overlaps another booking — the payment landed after the 10-minute hold lapsed. Check /admin and reschedule one of them.' : '' },
-              ])}
-              <tr>
-                <td style="padding:6px 2px 0;">
-                  <p style="color:${BODY_TEXT};font-size:13px;line-height:1.7;margin:0;font-family:${FONT};">Reply to this email to reach ${esc(d.name)} directly${d.phone ? `, or message them on ${esc(d.phone)}` : ''}.</p>
-                </td>
-              </tr>`;
-  return emailShell(inner);
-}

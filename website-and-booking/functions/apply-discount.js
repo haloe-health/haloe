@@ -10,7 +10,7 @@ import { findService, netPrice } from './_services.js';
 
 export async function onRequestPost(context) {
   try {
-    const { code, email, treatmentName, treatmentCategory } = await context.request.json();
+    const { code, email, phone, treatmentName, treatmentCategory } = await context.request.json();
 
     // Category-scoped — see the comment on findService() (_services.js):
     // four treatment names are reused across dry/wet cupping at different
@@ -33,7 +33,7 @@ export async function onRequestPost(context) {
     }
 
     const now = Math.floor(Date.now() / 1000);
-    const result = await validateDiscountCode(context.env, code, email, now);
+    const result = await validateDiscountCode(context.env, code, email, phone, now);
     if (!result.ok) {
       return new Response(JSON.stringify({ ok: false, error: result.reason }), {
         status: 200,

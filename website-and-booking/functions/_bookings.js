@@ -20,6 +20,7 @@
 // reopen.
 
 import { sbRequest } from './_supabase.js';
+import { releaseRedemptionForCancelledBooking } from './_discounts.js';
 
 // How long a slot is held while the customer is on Stripe Checkout.
 export const HOLD_SECONDS = 10 * 60; // 10 min
@@ -191,7 +192,11 @@ export async function cancelBooking(env, bookingId) {
     prefer: 'return=representation',
     body: { status: 'cancelled' },
   });
-  return Array.isArray(rows) && rows.length > 0;
+  const cancelled = Array.isArray(rows) && rows.length > 0;
+  // A gift/reward/competition code used on this booking becomes usable again
+  // — see the comment on releaseRedemptionForCancelledBooking (_discounts.js).
+  if (cancelled) await releaseRedemptionForCancelledBooking(env, bookingId);
+  return cancelled;
 }
 
 export async function releaseBooking(env, bookingId) {

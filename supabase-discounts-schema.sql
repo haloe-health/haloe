@@ -102,8 +102,11 @@ create table if not exists public.code_redemptions (
   discount_amount  integer not null,       -- pence
   status           text not null default 'reserved',  -- 'reserved' | 'confirmed' | 'released'
   period_key       text,                    -- e.g. '2026-W41' or '2026-10', competition codes only
+  hold_expires_at  bigint,                  -- unix seconds; a 'reserved' row past this is treated as abandoned
   created_at       bigint not null
 );
+
+alter table public.code_redemptions add column if not exists hold_expires_at bigint;
 
 create index if not exists code_redemptions_code_idx on public.code_redemptions(code_id);
 create index if not exists code_redemptions_booking_idx on public.code_redemptions(booking_id);
@@ -114,6 +117,14 @@ create index if not exists code_redemptions_booking_idx on public.code_redemptio
 -- lapsed attempt doesn't permanently lock the code.
 create unique index if not exists code_redemptions_active_per_code
   on public.code_redemptions(code_id)
+  where status in ('reserved', 'confirmed');
+
+-- One live redemption per (code, customer email) — enforces
+-- max_uses_per_customer = 1 (every gift/audience/reward/competition code
+-- here) at the database level, the same "insert races the unique index"
+-- guarantee as the per-code index above.
+create unique index if not exists code_redemptions_active_per_customer
+  on public.code_redemptions(code_id, customer_email)
   where status in ('reserved', 'confirmed');
 
 -- One redemption per (code, period) for competition codes — a second

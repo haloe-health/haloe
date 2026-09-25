@@ -1,9 +1,10 @@
-import { reserveSlot, releaseBooking, slotToMinutes, STRIPE_SESSION_SECONDS } from './_bookings.js';
+import { reserveSlot, confirmBooking, releaseBooking, slotToMinutes, STRIPE_SESSION_SECONDS } from './_bookings.js';
 import { isOfferableStart } from './_slots.js';
 import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
 import { findService, netPrice } from './_services.js';
-import { validateDiscountCode, applyDiscount } from './_discounts.js';
+import { validateDiscountCode, applyDiscount, reserveDiscountCode, confirmDiscountRedemption, releaseDiscountReservation } from './_discounts.js';
 import { travelZoneFor, travelFeeFor } from './_travel.js';
+import { notifyBooking, formatGBP, upperPostcode } from './_notify.js';
 
 export async function onRequestPost(context) {
   try {
@@ -25,10 +26,12 @@ export async function onRequestPost(context) {
       });
     }
     const originalAmount = Math.round(netPrice(svc) * 100); // pence — the TREATMENT price only
+    const now = Math.floor(Date.now() / 1000);
+    const hasSupabase = Boolean(context.env.SUPABASE_URL && context.env.SUPABASE_SERVICE_ROLE_KEY);
 
     // The discount is re-validated from scratch here — never trust that the
     // client's earlier /apply-discount check still holds. A code could have
-    // expired, been deactivated, or been redeemed by the same email in
+    // expired, been deactivated, or been redeemed by the same email/phone in
     // another tab in the meantime. A code that fails re-validation rejects
     // the checkout outright (rather than silently charging full price)
     // rather than surprise a customer who saw a discounted total.
@@ -41,15 +44,15 @@ export async function onRequestPost(context) {
     let appliedCode = null;
     let appliedPercent = 0;
     let discountPenceApplied = 0;
+    let discountRedemptionId = null;
     if (discountCode) {
-      if (!context.env.SUPABASE_URL || !context.env.SUPABASE_SERVICE_ROLE_KEY) {
+      if (!hasSupabase) {
         return new Response(JSON.stringify({ error: 'discount_unavailable' }), {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
         });
       }
-      const now = Math.floor(Date.now() / 1000);
-      const result = await validateDiscountCode(context.env, discountCode, customerEmail, now);
+      const result = await validateDiscountCode(context.env, discountCode, customerEmail, customerPhone, now);
       if (!result.ok) {
         return new Response(JSON.stringify({ error: 'discount_invalid', reason: result.reason }), {
           status: 400,
@@ -61,6 +64,22 @@ export async function onRequestPost(context) {
       discountPenceApplied = applied.discountPence;
       appliedCode = result.code;
       appliedPercent = result.percent;
+
+      // Reserved the moment it passes validation — see the file header on
+      // _discounts.js for why the INSERT itself is what actually prevents
+      // two simultaneous bookings both using up a single-use code.
+      discountRedemptionId = await reserveDiscountCode(context.env, {
+        codeId: result.codeId,
+        email: customerEmail,
+        discountPence: discountPenceApplied,
+        periodKey: result.periodKey,
+      }, now);
+      if (discountRedemptionId === null) {
+        return new Response(JSON.stringify({ error: 'discount_invalid', reason: 'already_used' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
     }
 
     // Travel fee — home visits only, zone computed server-side from the
@@ -85,9 +104,11 @@ export async function onRequestPost(context) {
     // isn't on the grid (or is inside the same-day minimum notice) can only
     // come from a tampered or stale request. Rejected outright — this is
     // static config, so there's nothing to fail open over.
-    const now = Math.floor(Date.now() / 1000);
     const startMin = slotToMinutes(time);
     if (startMin === null || !isOfferableStart({ location: location === 'clinic' ? 'clinic' : 'mobile', dateISO: bookingDate, startMin })) {
+      if (discountRedemptionId !== null) {
+        try { await releaseDiscountReservation(context.env, discountRedemptionId); } catch (e) { console.error('releaseDiscountReservation failed:', e); }
+      }
       return new Response(JSON.stringify({ error: 'slot_invalid' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -101,7 +122,6 @@ export async function onRequestPost(context) {
     // from the client. If Supabase isn't configured we fail OPEN and let the
     // booking proceed unreserved — never block a paying customer over an
     // availability bug.
-    const hasSupabase = Boolean(context.env.SUPABASE_URL && context.env.SUPABASE_SERVICE_ROLE_KEY);
     const duration = Number(svc.min) > 0 ? Number(svc.min) : 60;
     let bookingId = null;
 
@@ -126,6 +146,9 @@ export async function onRequestPost(context) {
 
         if (bookingId === null) {
           // Someone else took it during checkout. Ask the client to pick again.
+          if (discountRedemptionId !== null) {
+            try { await releaseDiscountReservation(context.env, discountRedemptionId); } catch (e) { console.error('releaseDiscountReservation failed:', e); }
+          }
           return new Response(JSON.stringify({ error: 'slot_taken' }), {
             status: 409,
             headers: { 'Content-Type': 'application/json' },
@@ -135,6 +158,54 @@ export async function onRequestPost(context) {
         console.error('Slot reservation failed (proceeding without hold):', err);
         bookingId = null;
       }
+    }
+
+    const venueAddress = location === 'clinic' ? `${venue} — ${CLINIC_VENUE_ADDRESS}` : customerAddress;
+
+    // --- Free booking (a 100%-off gift/reward/competition code) ---
+    // No Stripe involved at all — there's nothing to pay, and Stripe Checkout
+    // doesn't take £0 sessions. Confirm the slot and the redemption straight
+    // away and send the exact same notifications the webhook would send for a
+    // paid booking (see _notify.js).
+    if (totalAmount === 0) {
+      let slotConflict = false;
+      if (hasSupabase && bookingId !== null) {
+        try {
+          const result = await confirmBooking(context.env, bookingId);
+          slotConflict = Boolean(result && result.conflict);
+        } catch (err) {
+          console.error('Failed to confirm free booking slot:', err);
+        }
+      }
+      if (hasSupabase && discountRedemptionId !== null) {
+        try { await confirmDiscountRedemption(context.env, discountRedemptionId, bookingId); } catch (err) { console.error('Failed to confirm discount redemption:', err); }
+      }
+
+      const detail = {
+        name: customerName, phone: customerPhone, email: customerEmail,
+        treatment: treatmentName, date, time, location: location || 'mobile', venue,
+        address: upperPostcode(location === 'clinic' ? venueAddress : customerAddress),
+        amount: formatGBP(0), paymentLabel: `${formatGBP(0)} — paid in full`, notes,
+        originalAmountLabel: appliedCode ? formatGBP(originalAmount) : '',
+        discountRowLabel: appliedCode ? `${appliedCode} discount` : '',
+        discountLabel: appliedCode ? `−${formatGBP(discountPenceApplied)}` : '',
+        travelLabel: location === 'mobile' ? (travelZone === 'C' ? 'Confirmed by WhatsApp before the session' : formatGBP(travelPence)) : '',
+        travelZone: location === 'mobile' ? travelZone : '',
+        travelPence: location === 'mobile' ? travelPence : 0,
+        slotConflict,
+      };
+      await notifyBooking(context.env, detail);
+
+      const successParams = new URLSearchParams({
+        name: customerName || '', treatment: treatmentName || '', date: date || '', time: time || '',
+        location: location || 'mobile', venue: venue || '', amount: '0', treatmentAmount: '0',
+        ...(appliedCode ? { discountCode: appliedCode, discountAmount: String(discountPenceApplied), originalAmount: String(originalAmount) } : {}),
+        ...(location === 'mobile' ? { travelZone, travelPence: '0' } : {}),
+      });
+      return new Response(JSON.stringify({ url: `${origin}/booking-confirmed.html?${successParams.toString()}` }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const productName = `Full payment — ${treatmentName}`;
@@ -180,6 +251,7 @@ export async function onRequestPost(context) {
       params.append('metadata[discountCode]', appliedCode);
       params.append('metadata[discountPence]', String(discountPenceApplied));
       params.append('metadata[originalAmountPence]', String(originalAmount));
+      if (discountRedemptionId !== null) params.append('metadata[discountRedemptionId]', String(discountRedemptionId));
     }
     if (location === 'mobile') {
       params.append('metadata[travelZone]', travelZone);
@@ -230,9 +302,13 @@ export async function onRequestPost(context) {
 
     if (!response.ok) {
       console.error('Stripe error:', session);
-      // Payment setup failed — free the slot we just held so it isn't stuck.
+      // Payment setup failed — free the slot and the discount reservation we
+      // just held so neither is stuck.
       if (hasSupabase && bookingId !== null) {
         try { await releaseBooking(context.env, bookingId); } catch (e) { console.error('releaseBooking failed:', e); }
+      }
+      if (hasSupabase && discountRedemptionId !== null) {
+        try { await releaseDiscountReservation(context.env, discountRedemptionId); } catch (e) { console.error('releaseDiscountReservation failed:', e); }
       }
       return new Response(JSON.stringify({ error: session.error?.message || 'Stripe error' }), {
         status: 500,
