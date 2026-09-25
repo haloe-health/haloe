@@ -18,6 +18,8 @@ export const SERVICES = {
     { name: 'Head & Foot Massage', price: 60, min: 60 },
     { name: 'Back, Neck & Shoulders', price: 75, min: 60 },
     { name: 'Full Body Massage', price: 90, min: 75 },
+    // TEMPORARY (Oct 2026) — see the matching entry in services-data.js.
+    { name: 'Test Booking (£1)', price: 1, min: 30 },
   ],
   dry: [
     { name: 'Face Cupping', price: 50, min: 45 },
@@ -47,14 +49,6 @@ export const SERVICES = {
   ],
 };
 
-// A hidden £1 treatment for testing live Stripe payments cheaply
-// (haloe.health/book?treatment=test — see book.html). Deliberately NOT a key
-// in SERVICES: SERVICES drives every public treatment list (book.html's Step
-// 2, hijama-manchester.html's price list, index.html's widget mirrors its
-// own copy), and this must never appear in any of them. findService() below
-// only ever returns it when the caller explicitly asks for category 'test'.
-export const TEST_SERVICE = { name: 'Test Booking', price: 1, min: 30 };
-
 // Same as services-data.js — ended Sep 2026, kept at 0 in step with that
 // file. HALOE20 (functions/_discounts.js) is the only discount left,
 // applied on top of this full price server-side in create-checkout.js.
@@ -78,9 +72,6 @@ export function netPrice(svc) {
 // for callers that genuinely have no category, and callers should migrate
 // off it.
 export function findService(treatmentName, category) {
-  if (category === 'test') {
-    return treatmentName === TEST_SERVICE.name ? TEST_SERVICE : null;
-  }
   if (category) {
     const list = SERVICES[category];
     if (!list) return null;

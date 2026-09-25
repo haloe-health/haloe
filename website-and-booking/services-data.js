@@ -12,11 +12,11 @@
 // HB_PROMO_DISCOUNT copy (see CLAUDE.md) — it predates this file and has its
 // own quirks (badges, no desc on non-package items), so it wasn't folded in.
 //
-// The hidden £1 "Test Booking" treatment (book.html?treatment=test, for
-// testing live Stripe payments cheaply) is deliberately NOT defined here —
-// this file drives every public treatment list, and it must never appear in
-// one. It lives only in book.html (injected at runtime, only behind that
-// query param) and functions/_services.js (server-side pricing).
+// TEMPORARY (Oct 2026): "Test Booking (£1)" at the end of the massage list is
+// for testing live Stripe payments cheaply — a real, ordinary treatment in
+// every way (book.html flags it with a "TEST" banner on Step 5 by name; see
+// buildSummary()/renderSummary()). functions/_services.js mirrors it —
+// remove it from BOTH files once testing is done.
 const SERVICES = {
   massage: [
 { name: 'Face Massage', time: '45 min', price: 40, desc: 'Gentle facial massage to relax and refresh.' },
@@ -25,6 +25,7 @@ const SERVICES = {
     { name: 'Head & Foot Massage', time: '1 hour', price: 60, desc: 'Head and feet, for head-to-toe ease.' },
     { name: 'Back, Neck & Shoulders', time: '1 hour', price: 75, desc: 'Eases everyday tension where you hold it most.' },
     { name: 'Full Body Massage', time: '1 hr 15 min', price: 90, desc: 'A slow, head-to-toe reset for tired muscles.' },
+    { name: 'Test Booking (£1)', time: '30 min', price: 1, desc: 'Internal test booking — not a real treatment.' },
   ],
   dry: [
     { name: 'Face Cupping', time: '45 min', price: 50, desc: 'Gentle suction to lift and refresh the skin.' },

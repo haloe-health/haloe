@@ -1982,13 +1982,13 @@ function formatPounds(pence) {
   return '£' + (pence / 100).toFixed(2).replace(/\.00$/, '');
 }
 
-// A hidden £1, 30-minute treatment for testing live Stripe payments cheaply
-// — only reachable via book.html?treatment=test (see applyTestDeepLink()
-// below). Deliberately kept OUT of SERVICES itself: SERVICES drives every
-// public treatment list (Step 2, hijama-manchester.html's price list), and
-// this must never appear in any of them. functions/_services.js mirrors it
-// server-side the same way.
-const TEST_SERVICE = { name: 'Test Booking', time: '30 min', price: 1, desc: 'Internal test booking — not a real treatment.' };
+// TEMPORARY (Oct 2026): "Test Booking (£1)" is a real, ordinary entry at the
+// end of SERVICES.massage (services-data.js) — ordinary in every way except
+// this name check, which puts a "TEST" banner on the Step 5 pass so it can't
+// be mistaken for a real booking. Remove this constant along with the
+// SERVICES entries (services-data.js + functions/_services.js) once testing
+// is done.
+const TEST_TREATMENT_NAME = 'Test Booking (£1)';
 
 let state = {
   category: 'massage',
@@ -2105,20 +2105,6 @@ const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 function applyDeepLink() {
   const params = new URLSearchParams(location.search);
-
-  // The hidden £1 test treatment — only reachable this way, never through
-  // the normal category tabs. Injects itself as a one-off pseudo-category so
-  // every existing SERVICES[state.category][state.serviceIndex] lookup keeps
-  // working unmodified; skipTreatmentConfirm (already used for package deep
-  // links) carries the customer straight from Where to Date & Time, since
-  // there's nothing to choose on Step 2 for a single hidden treatment.
-  if (params.get('treatment') === 'test') {
-    SERVICES.test = [TEST_SERVICE];
-    state.category = 'test';
-    state.serviceIndex = 0;
-    state.isTestBooking = true;
-    skipTreatmentConfirm = true;
-  }
 
   // Pre-select the location (e.g. the homepage's "Book a Tuesday slot"
   // button) — independent of any cat/svc deep link below.
@@ -2761,7 +2747,7 @@ function buildSummary() {
   if (state.serviceIndex === null || !SERVICES[state.category]) return {};
   if (!SERVICES[state.category][state.serviceIndex]) return {};
   const service = SERVICES[state.category][state.serviceIndex];
-  const catLabel = { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package', test: 'Internal test' }[state.category];
+  const catLabel = { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package' }[state.category];
   const dateStr = state.date ? state.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
   const locationLabel = isClinic() ? `Clinic Day — ${CLINIC_VENUE_NAME}` : 'Home visit';
   const name = document.getElementById('fullname').value.trim();
@@ -2798,7 +2784,7 @@ function renderSummary() {
       </div>` : '';
 
   // Presented as an appointment pass: when it is, then what it is.
-  const testBanner = state.isTestBooking
+  const testBanner = service.name === TEST_TREATMENT_NAME
     ? `<div style="background:#E5736A;color:#fff;font-weight:700;font-size:0.95rem;letter-spacing:0.04em;text-align:center;padding:8px;border-radius:10px 10px 0 0;">⚠ TEST BOOKING — not a real treatment</div>`
     : '';
   card.innerHTML = `
