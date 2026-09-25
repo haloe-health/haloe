@@ -2895,7 +2895,20 @@ async function handlePayment() {
         resetPayButtons();
         return;
       }
-      alert('Payment setup failed. Please try again.');
+      // Any other 400 — show the server's actual reason rather than a
+      // generic message, so a real cause (e.g. an unrecognised treatment) is
+      // visible instead of hidden behind "please try again".
+      alert(`Payment setup failed: ${errBody.reason || errBody.error || 'unknown error'}. Please try again, or let Halima know if it keeps happening.`);
+      resetPayButtons();
+      return;
+    }
+
+    if (!res.ok) {
+      // 500s and anything else unexpected — same principle: surface what the
+      // server actually said instead of a blanket "please try again", so a
+      // real bug (a bad env var, a schema mismatch) is visible on the spot.
+      const errBody = await res.json().catch(() => ({}));
+      alert(`Payment setup failed: ${errBody.error || `server error (${res.status})`}. Please try again, or let Halima know if it keeps happening.`);
       resetPayButtons();
       return;
     }
@@ -2907,11 +2920,11 @@ async function handlePayment() {
       try { sessionStorage.setItem('haloe_address', address); } catch (e) {}
       window.location.href = data.url;
     } else {
-      alert('Payment setup failed. Please try again.');
+      alert('Payment setup failed: the server didn’t return a payment link. Please try again, or let Halima know if it keeps happening.');
       resetPayButtons();
     }
   } catch (err) {
-    alert('Something went wrong. Please try again.');
+    alert(`Something went wrong: ${err.message || err}. Please try again.`);
     resetPayButtons();
   }
 }
