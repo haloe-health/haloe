@@ -21,8 +21,9 @@ Marketing site + booking flow for **haloe**, a hijama/cupping & massage wellness
 - **Booking.** haloe.health/book — the only path that takes payment (see `book.html` below).
 - **Discount codes** (full mechanics in the Conventions section further down):
   - `HALOE20` — public launch code, 20% off, expires 31 Oct 2026 23:59 UK time.
-  - `HALOE-YASMZEE` / `HALOE-DB` / `HALOE-POD` — private collaborator gift codes, 100% off, locked to that collaborator's email, one use each.
+  - `GUEST-YASMZEE` / `GUEST-DB` / `GUEST-POD` — private collaborator gift codes (renamed from `HALOE-NAME` on 29 Sep 2026 so the free code reads as a personal invitation, apart from the HALOE20 family), 100% off, locked to that collaborator's email, one use each.
   - `YASMZEE25` / `DB25` / `POD25` — collaborator audience codes, 25% off, first-time clients only.
+  - `POD-GOTW` / `POD-POTM` — POD Football prize-scheme codes (goal of the week, player of the month), separate from the 25% model. Every 5 bookings on a `NAME25` code earns that collaborator another free treatment.
 - **Socials.** `@haloe.health` on TikTok, Instagram and YouTube is the business account. Halima's personal `@halima.env` is separate — never conflate the two or imply they're the same account in copy.
 
 ## Architecture

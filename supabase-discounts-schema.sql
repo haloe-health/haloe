@@ -174,7 +174,7 @@ on conflict (code) do update set
   first_time_only = excluded.first_time_only, active = true;
 
 insert into public.discount_codes (code, type, percent_off, collaborator_id, max_uses_total, max_uses_per_customer, first_time_only, valid_from, allowed_email, active, created_at)
-select 'HALOE-YASMZEE', 'gift', 100, c.id, 1, 1, false, extract(epoch from now())::bigint, null, true, extract(epoch from now())::bigint
+select 'GUEST-YASMZEE', 'gift', 100, c.id, 1, 1, false, extract(epoch from now())::bigint, null, true, extract(epoch from now())::bigint
 from public.collaborators c where c.name = 'Yasmin'
 on conflict (code) do nothing;
 
@@ -184,7 +184,7 @@ from public.collaborators c where c.name = 'Yasmin'
 on conflict (code) do nothing;
 
 insert into public.discount_codes (code, type, percent_off, collaborator_id, max_uses_total, max_uses_per_customer, first_time_only, valid_from, allowed_email, active, created_at)
-select 'HALOE-DB', 'gift', 100, c.id, 1, 1, false, extract(epoch from now())::bigint, null, true, extract(epoch from now())::bigint
+select 'GUEST-DB', 'gift', 100, c.id, 1, 1, false, extract(epoch from now())::bigint, null, true, extract(epoch from now())::bigint
 from public.collaborators c where c.name = 'Dog Business'
 on conflict (code) do nothing;
 
@@ -194,7 +194,7 @@ from public.collaborators c where c.name = 'Dog Business'
 on conflict (code) do nothing;
 
 insert into public.discount_codes (code, type, percent_off, collaborator_id, max_uses_total, max_uses_per_customer, first_time_only, valid_from, allowed_email, active, created_at)
-select 'HALOE-POD', 'gift', 100, c.id, 1, 1, false, extract(epoch from now())::bigint, null, true, extract(epoch from now())::bigint
+select 'GUEST-POD', 'gift', 100, c.id, 1, 1, false, extract(epoch from now())::bigint, null, true, extract(epoch from now())::bigint
 from public.collaborators c where c.name = 'POD Football'
 on conflict (code) do nothing;
 
