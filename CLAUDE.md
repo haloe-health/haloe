@@ -23,7 +23,7 @@ Marketing site + booking flow for **haloe**, a hijama/cupping & massage wellness
   - `HALOE20` — public launch code, 20% off, expires 31 Oct 2026 23:59 UK time.
   - `GUEST-YASMZEE` / `GUEST-DB` / `GUEST-POD` — private collaborator gift codes (renamed from `HALOE-NAME` on 29 Sep 2026 so the free code reads as a personal invitation, apart from the HALOE20 family), 100% off, locked to that collaborator's email, one use each.
   - `YASMZEE25` / `DB25` / `POD25` — collaborator audience codes, 25% off, first-time clients only.
-  - `POD-GOTW` / `POD-POTM` — POD Football prize-scheme codes (goal of the week, player of the month), separate from the 25% model. Every 5 bookings on a `NAME25` code earns that collaborator another free treatment.
+  - POD Football prize codes are **minted per winner** (`POD-GOTW-W40`, `POD-POTM-OCT`) — single-use, 100% off, type `competition`, tagged to POD Football — with `node website-and-booking/tools/mint-pod-code.mjs <GOTW|POTM> <label> [winner-email]`. The shared `POD-GOTW`/`POD-POTM` codes are retired (`active=false`). Every 5 bookings on a `NAME25` code earns that collaborator another free treatment. `GUEST-` codes have `allowed_email` null until Halima has each collaborator's email; lock one with `node website-and-booking/tools/set-code-email.mjs <CODE> <email>` (`--clear` to unlock).
 - **Socials.** `@haloe.health` on TikTok, Instagram and YouTube is the business account. Halima's personal `@halima.env` is separate — never conflate the two or imply they're the same account in copy.
 
 ## Architecture

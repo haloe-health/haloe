@@ -203,15 +203,10 @@ select 'POD25', 'audience', 25, c.id, null, 1, true, extract(epoch from now())::
 from public.collaborators c where c.name = 'POD Football'
 on conflict (code) do nothing;
 
-insert into public.discount_codes (code, type, percent_off, collaborator_id, max_uses_total, max_uses_per_customer, first_time_only, valid_from, period, active, created_at)
-select 'POD-GOTW', 'competition', 100, c.id, null, 1, false, extract(epoch from now())::bigint, 'week', true, extract(epoch from now())::bigint
-from public.collaborators c where c.name = 'POD Football'
-on conflict (code) do nothing;
-
-insert into public.discount_codes (code, type, percent_off, collaborator_id, max_uses_total, max_uses_per_customer, first_time_only, valid_from, period, active, created_at)
-select 'POD-POTM', 'competition', 100, c.id, null, 1, false, extract(epoch from now())::bigint, 'month', true, extract(epoch from now())::bigint
-from public.collaborators c where c.name = 'POD Football'
-on conflict (code) do nothing;
+-- POD prize codes are minted per winner (POD-GOTW-W40, POD-POTM-OCT, ...) with
+-- website-and-booking/tools/mint-pod-code.mjs. The old shared POD-GOTW / POD-POTM
+-- codes are retired: single-use-per-period meant only one winner could ever redeem.
+update public.discount_codes set active = false where code in ('POD-GOTW', 'POD-POTM');
 
 -- ------------------------------------------------------------------ --
 -- Row Level Security — deny-all by default. The Cloudflare Functions use
