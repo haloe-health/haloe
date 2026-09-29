@@ -128,13 +128,13 @@ export function emailHeader() {
               </tr>`;
 }
 
-// The "With warmth, Halima" footer row (used at the bottom of client-facing emails).
+// The "From haloe / Manchester" sign-off row (bottom of every transactional email).
 export function emailFooter() {
   return `<!-- Footer -->
               <tr>
                 <td align="center" bgcolor="${CREAM}" style="padding:26px 4px 8px;border-top:1px solid ${HAIRLINE};background:${CREAM};">
-                  <div style="color:${BODY_TEXT};font-size:12px;letter-spacing:1px;font-family:${FONT};">With warmth,<br><span style="color:${GOLD_DEEP};font-weight:600;">Halima &middot; haloe</span></div>
-                  <div style="color:${BODY_TEXT};font-size:11px;margin-top:12px;font-family:${FONT};opacity:0.8;">Women &amp; Men &middot; Manchester</div>
+                  <div style="color:${GOLD_DEEP};font-size:12px;letter-spacing:1px;font-weight:600;font-family:${FONT};">From haloe</div>
+                  <div style="color:${BODY_TEXT};font-size:11px;margin-top:12px;font-family:${FONT};opacity:0.8;">Manchester</div>
                 </td>
               </tr>`;
 }
