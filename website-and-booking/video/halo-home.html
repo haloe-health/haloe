@@ -19,12 +19,12 @@
 </head>
 <body>
 <canvas id="cv" width="320" height="180"></canvas>
-<div id="ctl"><button id="pp">PAUSE</button><input id="scrub" type="range" min="0" max="21.5" step="0.01" value="0"><span id="tl">0.0</span><button id="rec">REC 1080p</button></div>
+<div id="ctl"><button id="pp">PAUSE</button><input id="scrub" type="range" min="0" max="28" step="0.01" value="0"><span id="tl">0.0</span><button id="rec">REC 1080p</button></div>
 
 <script>
 (async function(){
 try{ await document.fonts.load('16px "Press Start 2P"'); }catch(e){}
-const W=320,H=180,DUR=21.5,HOLD=1;
+const W=320,H=180,DUR=28,HOLD=1;
 const cv=document.getElementById('cv'), c=cv.getContext('2d');
 c.imageSmoothingEnabled=false;
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
@@ -216,12 +216,16 @@ function drawHalima(ctx,ox,oy,o){
   const lu=o.lookUp?1:0, hy=by-41-(lu?1:0);
   ELL(ctx,ox,hy,14,16,P.creamD);ELL(ctx,ox,hy,13,15,P.cream);
   for(let r=0;r<8;r++){const h=13+r;R(ctx,ox-h-1,by-31+r,h*2+3,1,P.creamD);R(ctx,ox-h,by-31+r,h*2+1,1,P.cream);}
-  ELL(ctx,ox,hy+1,9,10,'#E6D7BA');ELL(ctx,ox,hy+1,8,9,P.skin);
+  if(o.back){for(let r=0;r<26;r++){const hw2=Math.max(0,13-Math.round(r*.5));R(ctx,ox-hw2-1,hy+5+r,hw2*2+3,1,P.creamD);R(ctx,ox-hw2,hy+5+r,hw2*2+1,1,P.cream);}
+    R(ctx,ox-1,hy+8,1,16,'#E3D6BA');
+  }else{
+    ELL(ctx,ox,hy+1,9,10,'#E6D7BA');ELL(ctx,ox,hy+1,8,9,P.skin);
   const ey=hy-1-(lu?1:0);
   R(ctx,ox-4,ey-3,3,1,'#2B1A12');R(ctx,ox+2,ey-3,3,1,'#2B1A12');   // brows
   R(ctx,ox-4,ey,2,2,'#1A0E08');R(ctx,ox+3,ey,2,2,'#1A0E08');R(ctx,ox-4,ey,1,1,P.white);R(ctx,ox+3,ey,1,1,P.white);
   R(ctx,ox-7,hy+3,2,1,'#E8896E');R(ctx,ox+6,hy+3,2,1,'#E8896E');
   R(ctx,ox-3,hy+6,1,1,'#C0303A');R(ctx,ox+4,hy+6,1,1,'#C0303A');R(ctx,ox-2,hy+7,6,1,'#C0303A');
+  }
 }
 function drawHalimaFaded(ctx,x,y,o,op){
   if(op>=.999){drawHalima(ctx,x,y,o);return;}
@@ -275,10 +279,125 @@ const inCv=document.createElement('canvas');inCv.width=W;inCv.height=H;
   for(let y=127;y<H;y+=2)for(const f of [.3,.5,.7]){const p=(y-124)/(H-124),l=lerp(100,2,p),r=lerp(200,318,p);g.fillStyle='#E0DED6';g.fillRect(Math.round(lerp(l,r,f)),y,1,1);}
 })();
 
+/* ================= MANCHESTER BUILDING: lobby -> stained glass -> staircase ================= */
+function mkCanvas(){const k=document.createElement('canvas');k.width=W;k.height=H;const g=k.getContext('2d');g.imageSmoothingEnabled=false;return[k,g];}
+function damask(g,x0,y0,x1,y1){
+  R(g,x0,y0,x1-x0,y1-y0,'#1B2A5A');
+  for(let row=0,y=y0+6;y<y1;row++,y+=16)for(let x=x0+(row%2?7:0)+6;x<x1;x+=14){
+    ELL(g,x,y,3,5,'#8E96AE');R(g,x-1,y-8,3,2,'#8E96AE');R(g,x-7,y-1,3,2,'#6E7690');R(g,x+5,y-1,3,2,'#6E7690');R(g,x-1,y+6,3,2,'#6E7690');}
+}
+function checker(g,y0,vpy,k1,k2){
+  const img=g.getImageData(0,y0,W,H-y0),d=img.data;
+  for(let y=y0;y<H;y++){const dy=y-vpy;for(let x=0;x<W;x++){
+    const dark=((Math.floor((x-160)/dy*k1)+Math.floor(k2/dy))&1)===0,i=((y-y0)*W+x)*4,col=dark?[20,20,26]:[237,233,224];
+    d[i]=col[0];d[i+1]=col[1];d[i+2]=col[2];d[i+3]=255;}}
+  g.putImageData(img,0,y0);
+}
+// ---- shot 1: lobby with checkered floor, terracotta warrior, reception, red-carpet stairs
+const lobbyCv=(function(){
+  const[k,g]=mkCanvas();
+  damask(g,0,0,W,114);
+  R(g,0,0,W,3,'#F1ECE0');R(g,50,3,220,22,'#7A5A3E');
+  for(let i=0;i<70;i++){const x=56+((i*37)%208),y=6+((i*17)%16);R(g,x,y,3,2,i%3?'#C8A878':'#3A2A1E');}
+  R(g,0,24,W,6,'#F1ECE0');R(g,0,30,W,1,'#C9C3B5');
+  R(g,128,52,112,62,'#5A2A22');for(let x=128;x<240;x+=6)R(g,x,52,1,62,'#7A3A30');for(let y=52;y<114;y+=6)R(g,128,y,112,1,'#7A3A30');
+  R(g,240,36,80,78,'#46586A');
+  R(g,0,30,30,84,'#101C44');R(g,3,34,24,70,'#E8E2D4');R(g,5,36,20,66,'#1B2A5A');R(g,12,60,6,4,'#FFE9A0');
+  R(g,104,36,18,72,'#101C44');R(g,106,38,14,64,'#E8E2D4');R(g,108,40,10,60,'#1B2A5A');R(g,111,64,4,4,'#FFE9A0');
+  R(g,126,106,116,4,'#3A3A3A');R(g,126,106,116,1,'#E8C77A');R(g,134,110,100,4,'#2A2A2A');R(g,134,110,100,1,'#E8C77A');
+  // terracotta warrior
+  ELL(g,180,60,5,6,'#D8794A');R(g,178,52,5,4,'#C8683A');R(g,172,66,17,36,'#D8794A');R(g,172,66,6,36,'#B8603A');
+  R(g,168,70,5,22,'#D8794A');R(g,189,70,5,22,'#C8683A');R(g,172,96,17,6,'#C8683A');R(g,170,102,21,5,'#A85A34');
+  // red-carpet staircase climbing up-left with banister and tiled dado
+  for(let i=0;i<9;i++){const x=96-i*8,y=112-i*7;R(g,x,y,26,3,'#B03A48');R(g,x,y,26,1,'#C8C8D0');R(g,x,y+3,26,4,'#6A2A30');}
+  for(let i=0;i<70;i++)R(g,102-i*.95,106-i*.8,3,2,'#6B3A1E');
+  for(let i=0;i<9;i++)R(g,98-i*8,106-i*7,2,12,'#4A2A12');
+  for(let i=0;i<8;i++)R(g,30+i*9,56+i*0,0,0,'#000');
+  R(g,34,108,70,8,'#B8652A');for(let x=34;x<104;x+=7)R(g,x,108,1,8,'#8A4A1E');
+  // reception desk + sign
+  R(g,248,102,72,44,'#14141A');R(g,254,108,60,34,'#2A2A30');R(g,258,112,52,26,'#14141A');
+  R(g,258,92,44,12,'#8A3A5A');for(let i=0;i<4;i++)R(g,262,95+i*2,36-i*3,1,'#F5F0E8');
+  // chandelier
+  R(g,150,0,1,14,'#C9C9D0');ELL(g,150,22,11,6,'#E8F4FF');
+  for(let i=0;i<5;i++)for(let j=0;j<=i;j++)R(g,150-i*2+j*4,28+i*3,2,2,j%2?'#FFFFFF':'#BFE8FF');
+  checker(g,114,70,3.2,70);
+  return k;
+})();
+// ---- shot 2: stained-glass crest window (Manchester coat of arms)
+const glassCv=(function(){
+  const[k,g]=mkCanvas();
+  damask(g,0,0,W,128);
+  R(g,0,0,W,12,'#F1ECE0');R(g,0,12,W,3,'#C9C3B5');
+  const pane=(x,y,w,h)=>{R(g,x-2,y-2,w+4,h+4,'#E8E2D4');R(g,x,y,w,h,'#DCE8FF');for(let xx=x+10;xx<x+w;xx+=11)R(g,xx,y,1,h,'#7A7A88');for(let yy=y+12;yy<y+h;yy+=12)R(g,x,yy,w,1,'#7A7A88');};
+  pane(6,18,68,104);pane(92,18,58,104);pane(192,22,50,60);
+  // crest: red/gold diagonal stripes, ship, wheel, scroll
+  R(g,26,60,26,30,'#F0B020');for(let i=0;i<30;i++){R(g,26,60+i,26,1,'#F0B020');for(let x=0;x<26;x++)if(((x+i)%12)<5)R(g,26+x,60+i,1,1,'#D8302A');}
+  R(g,26,52,26,8,'#4A9ACA');R(g,35,54,10,5,'#7A4A22');R(g,32,45,16,6,'#E8C77A');ELL(g,40,42,5,4,'#E8C77A');
+  R(g,12,96,56,6,'#F5F0E8');for(let i=0;i<10;i++)R(g,16+i*5,98,3,1,'#6A6A78');
+  // green diamond
+  for(let i=-16;i<=16;i++){const hw=16-Math.abs(i);R(g,121-hw,66+i,hw*2+1,1,hw>12?'#F0D020':'#3CB44A');}
+  for(const[x,y]of[[104,50],[138,50],[104,84],[138,84]])R(g,x,y,3,3,'#E8602A');
+  // wood dado + red carpet landing + steps
+  R(g,0,122,W,10,'#5A2A1E');for(let x=0;x<W;x+=8)R(g,x,122,1,10,'#3A1A12');
+  R(g,0,132,W,24,'#B03A48');R(g,0,156,W,3,'#C8C8D0');R(g,0,159,W,9,'#8A2A38');R(g,0,168,W,3,'#C8C8D0');R(g,0,171,W,9,'#6A2A30');
+  return k;
+})();
+// ---- shot 3: climbing the staircase toward the wooden door
+const stairCv=(function(){
+  const[k,g]=mkCanvas();
+  damask(g,0,0,W,H);
+  for(let i=0;i<30;i++){ELL(g,160,20,3+i*.5,2+i*.2,'#FFFFFF');}
+  g.globalAlpha=1;
+  const ya=[];for(let i=0;i<=10;i++)ya.push(Math.round(82+98*Math.pow(i/10,1.4)));
+  for(let y=82;y<H;y++){
+    let i=0;while(i<9&&ya[i+1]<=y)i++;
+    const j=y-ya[i],len=ya[i+1]-ya[i],w=lerp(44,230,(y-82)/98),l=Math.round(160-w/2),r=Math.round(160+w/2);
+    R(g,l,y,r-l,1,j===0?'#C8C8D0':j<len*.35?'#6A2A30':'#B03A48');
+    R(g,l-7,y,7,1,'#3A2010');R(g,r,y,Math.round(8+w*.06),1,'#B8652A');
+    if((y+Math.round(w))%7===0)R(g,r,y,Math.round(8+w*.06),1,'#8A4A1E');
+  }
+  // banister on the right
+  for(let i=0;i<64;i++)R(g,214-i*.72,152-i*1.05,3,2,'#7A4A22');
+  for(let i=0;i<7;i++)R(g,208-i*7,150-i*10,2,12,'#4A2A12');
+  // door (panel drawn dynamically)
+  R(g,138,38,44,46,'#B87A3A');R(g,142,42,36,42,'#FFF6B0');R(g,116,56,10,8,'#2F5AA0');
+  // fire extinguisher
+  R(g,246,100,6,14,'#D82020');R(g,247,97,4,3,'#222');
+  return k;
+})();
+
+function drawHalimaScaled(ctx,x,y,s,o){
+  sc.clearRect(0,0,90,80);drawHalima(sc,45,70,o);
+  ctx.drawImage(sprCv,0,0,90,80,Math.round(x-45*s),Math.round(y-70*s),Math.round(90*s),Math.round(80*s));
+}
+function drawStairs(t){
+  c.imageSmoothingEnabled=false;
+  const tt=t-18.6;
+  if(t<21.0){
+    c.drawImage(lobbyCv,0,0);
+    for(let i=0;i<7;i++)R(c,142+((i*13+Math.floor(t*7))%20),26+((i*7)%14),1,1,'#FFFFFF');
+    const p=seg(tt,0,2.2),e=eio(p);
+    drawHalimaScaled(c,lerp(235,112,e),lerp(176,126,e),lerp(1,.6,e),{back:true,walk:p<1?tt*7:undefined,armL:0,armR:0,breath:Math.round(Math.sin(t*2))});
+    CTXT(c,'MILTON HALL',W/2,6,8,P.yellow,'#000');
+  }else if(t<22.8){
+    c.drawImage(glassCv,0,0);
+    drawHalimaScaled(c,170,180,1.1,{back:true,lookUp:true,armL:0,armR:0,breath:Math.round(Math.sin(t*2))});
+  }else{
+    c.drawImage(stairCv,0,0);
+    const q=t-22.8,p=seg(q,0,1.7),e=eio(p);
+    const open=eio(seg(q,1.3,1.9));
+    const pw=Math.round(34*(1-open));
+    if(pw>0){R(c,142,42,pw,42,'#8A4A22');R(c,142,42,pw,1,'#6A3A18');if(pw>8)R(c,142+pw-5,62,2,3,'#E8C77A');}
+    if(open>0)for(let y=84;y<H;y++)for(let x=160-Math.round(20+(y-84)*.7*open);x<=160+Math.round(20+(y-84)*.7*open);x++)if(((x+y)&1)===0&&y<150)R(c,x,y,1,1,P.glow);
+    if(q<1.95)drawHalimaScaled(c,160+Math.round(Math.sin(q*6)*1),lerp(180,100,e),lerp(1,.5,e),{back:true,walk:q*8,armL:0,armR:0});
+    CTXT(c,'ROOM 4',W/2,6,8,P.yellow,'#000');
+  }
+}
+
 /* ================= RENDER ================= */
 function render(t){
   c.imageSmoothingEnabled=false;
-  const inForest=t<18.6;
+  const inForest=t<18.6;const T=t;
   if(inForest){
     const[top,bot]=skyAt(t);
     for(let y=0;y<HOR;y+=6)R(c,0,y,W,6,rgb(mix(top,bot,y/HOR)));
@@ -310,8 +429,10 @@ function render(t){
     if(t<18.6){for(let x=30;x<=290;x+=8){if(x>ix)R(c,x,171,2,2,P.pink);}
       R(c,ix-5,172,10,3,P.white);R(c,ix-1,164,1,8,P.white);for(let i=0;i<6;i++)R(c,ix+1,166+i,Math.max(1,6-i),1,P.cream);
       TXT(c,'ID',4,167,8,P.white,'#000');TXT(c,'BD',150,158,8,P.white,'#000');TXT(c,'MC',296,167,8,P.white,'#000');}
+  } else if(t<25.0){
+    drawStairs(t);
   } else {
-    t-=6.5;
+    t-=12.9;
     c.drawImage(inCv,0,0);
     const w2=seg(t,12.4,13.0);
     const wave=t>13?lerp(0,-150+Math.sin((t-13)*9)*14,eout(seg(t,13,13.4))):0;
@@ -331,7 +452,7 @@ function render(t){
       for(let x=10;x<W-10;x+=10){R(c,x,2+1,2,2,P.pink);}}
   }
   // dithered transition wipe (forest -> interior)
-  const tw=Math.sin(Math.PI*seg(inForest?t-6.5:t,11.2,13.0));
+  const tw=Math.max(Math.sin(Math.PI*seg(T,17.7,19.5)),Math.sin(Math.PI*seg(T,24.1,25.9)),Math.sin(Math.PI*seg(T,20.7,21.3)),Math.sin(Math.PI*seg(T,22.5,23.1)));
   if(tw>0){const lvl=Math.round(tw*16),im=c.getImageData(0,0,W,H),d=im.data;
     for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(BAYER[(y&3)*4+(x&3)]<lvl){const i=(y*W+x)*4;d[i]=255;d[i+1]=246;d[i+2]=176;}}
     c.putImageData(im,0,0);}
