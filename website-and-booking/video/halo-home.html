@@ -56,7 +56,7 @@ function pine(ctx,cx,base,h,col,trunk){
     const half=Math.round((.3+.7*within)*maxHalf*(.55+.45*(tier+1)/tiers)); ctx.fillRect(cx-half,top+r,half*2+1,1);}
 }
 function mkTrees(seed,span,hMin,hMax,step){const r=rng(seed),a=[];for(let x=0;x<span;x+=step*(.7+r()*.7))a.push({x:Math.round(x),h:Math.round(hMin+r()*(hMax-hMin))});return a;}
-const farT=mkTrees(11,700,60,90,26), midT=mkTrees(22,700,80,115,34), nearT=mkTrees(33,900,100,140,60);
+const farT=mkTrees(11,700,60,90,26), midT=mkTrees(22,700,80,115,34), nearT=mkTrees(33,900,96,122,60);
 const stars=(()=>{const r=rng(3),a=[];for(let i=0;i<46;i++)a.push({x:Math.round(r()*W),y:Math.round(14+r()*90),p:r()*6.28});return a;})();
 const grass=(()=>{const r=rng(8),a=[];for(let x=0;x<900;x+=9+r()*14)a.push({x:Math.round(x),y:Math.round(PATHY+28+r()*(H-PATHY-30))});return a;})();
 const PELLETS=[];for(let x=14;x<420;x+=14)PELLETS.push(x);
@@ -67,9 +67,13 @@ function drawCup(ctx,sx,frac,dop){
   const hwAt=k=>k<=CUP_H*.35?CUP_HW:Math.round(CUP_HW*Math.sqrt(Math.max(0,1-Math.pow((k-CUP_H*.35)/(CUP_H*.65),2))));
   for(let k=0;k<full;k++){
     const y=BASE-k, hw=hwAt(k*1/Math.max(frac,.0001)*frac); // grow upward, shape fixed
-    ctx.fillStyle=P.yellow; ctx.fillRect(sx-hw,y,hw*2+1,1);
-    if(hw>3){ctx.fillStyle='#FFF1B0';ctx.fillRect(sx-hw+2,y,hw*2-3,1);
-      ctx.fillStyle='#F0CB52';ctx.fillRect(sx+hw-9,y,7,1);}
+    // see-through glass: solid yellow outline, faint tint inside so the forest shows through
+    const edge=Math.min(hw+1,Math.max(2,hw-hwAt(k+1)+1));
+    ctx.fillStyle=P.yellow;
+    if(k===full-1||hw<=2){ctx.fillRect(sx-hw,y,hw*2+1,1);}
+    else{ctx.fillRect(sx-hw,y,edge,1);ctx.fillRect(sx+hw-edge+1,y,edge,1);
+      ctx.fillStyle='rgba(255,241,176,0.18)';ctx.fillRect(sx-hw+edge,y,(hw-edge)*2+1-edge+1,1);
+      ctx.fillStyle='rgba(255,212,0,0.22)';ctx.fillRect(sx+hw-edge-7,y,7,1);}
   }
   // highlight stripe
   ctx.fillStyle=P.white;
@@ -224,9 +228,6 @@ function render(t){
       c.fillStyle=P.yellow;for(let a=0;a<48;a++){const th=a/48*Math.PI*2;c.fillRect(Math.round(csx-16+Math.cos(th)*r),Math.round(BASE-30+Math.sin(th)*r),1,1);}}
       if(d>0&&d<.6)CTXT(c,'KNOCK!',csx-30,BASE-DOOR_H-14-Math.round(d*10),8,P.white,'#000');});
     drawHalimaFaded(c,hx,hy,{walk,armR,lookUp,breath:0},op);
-    // HUD
-    TXT(c,'1UP',8,3,8,P.cyan);TXT(c,String(Math.min(999990,eaten*10)).padStart(6,'0'),8,12,8,P.white);
-    CTXT(c,'HIGH SCORE',W/2+10,3,8,P.white);CTXT(c,'010000',W/2+10,12,8,P.white);
   } else {
     c.drawImage(inCv,0,0);
     const w2=seg(t,12.4,13.0);
