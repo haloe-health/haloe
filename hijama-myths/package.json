@@ -1,0 +1,24 @@
+{
+  "name": "hijama-myths",
+  "version": "1.0.0",
+  "private": true,
+  "description": "haloe — Hijama Myths series (Remotion)",
+  "scripts": {
+    "audio": "node scripts/detect-audio.mjs",
+    "studio": "node scripts/detect-audio.mjs && remotion studio src/index.ts",
+    "render": "node scripts/detect-audio.mjs && remotion render src/index.ts myth-01 out/haloe-myth-01.mp4",
+    "thumb": "node scripts/detect-audio.mjs && remotion still src/index.ts myth-01 out/haloe-myth-01-thumb.png --frame=449",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.531",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.531"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}
