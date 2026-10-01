@@ -463,25 +463,61 @@ function renderMain(t){
 const PRO=10;
 const lawnCv=(function(){
   const[k,g]=mkCanvas();
-  R(g,0,0,W,38,'#1E5AA8');for(let y=0;y<38;y+=6)R(g,0,y,W,3,y<18?'#1A4F96':'#2263B3');
-  R(g,0,38,W,6,'#C8B890');for(let x=0;x<W;x+=6)R(g,x,38,2,6,'#E8E0D0');
-  R(g,0,44,W,136,'#2F8A2F');for(let y=44;y<H;y+=10)R(g,0,y,W,5,'#379A37');
-  // tree shadows on the lawn
-  [[40,90,50,22],[260,110,36,30],[80,160,60,14]].forEach(([x,y,rx,ry])=>ELL(g,x,y,rx,ry,'#1F6A24'));
-  // pool
-  ELL(g,196,52,18,6,'#E8E0D0');ELL(g,196,52,16,5,'#4AA0D8');
-  // villa on the left
-  R(g,0,36,30,70,'#B8A888');R(g,0,32,34,6,'#8A7A6A');for(let y=48;y<100;y+=12){R(g,0,y,30,2,'#8A7A6A');for(let x=3;x<28;x+=7)R(g,x,y+3,3,7,'#5A4A3A');}
-  // hedges + round bushes
-  for(let x=120;x<W;x+=4)R(g,x,Math.round(66+(x-120)*.32),4,4,'#14501E');
-  [[250,96,9],[274,104,10],[300,92,9],[290,128,13]].forEach(([x,y,r])=>{ELL(g,x,y,r,r,'#1F6A28');ELL(g,x-2,y-2,r*.6,r*.6,'#3A8A32');});
-  // cypress trees
-  [[40,30,8,34],[150,26,8,32],[304,44,10,44],[18,50,6,26]].forEach(([x,y,rx,ry])=>{ELL(g,x,y,rx,ry,'#0F4020');ELL(g,x-2,y-2,rx*.5,ry*.6,'#1A5A2C');});
+  for(let y=0;y<46;y+=6)R(g,0,y,W,6,rgb(mix([0x5F,0xAE,0xEA],[0xCF,0xEA,0xFA],y/46)));
+  [[40,14,22],[150,24,18],[250,10,26]].forEach(([x,y,w])=>{ELL(g,x,y,w,4,'#FFFFFF');ELL(g,x+8,y+2,w*.6,3,'#FFFFFF');});
+  R(g,0,46,W,38,'#1E5AA8');for(let y=46;y<84;y+=5)R(g,0,y,W,2,y<62?'#1A4F96':'#2263B3');
+  // yacht on the sea
+  R(g,222,68,20,5,'#F5F0E8');R(g,222,72,20,1,'#14141C');R(g,228,63,9,5,'#E8E8F0');R(g,230,64,5,2,'#2A4A6A');for(let i=0;i<5;i++)R(g,214-i*4,72+(i%2),3,1,'#CFE4FF');
+  // cypress trees + villa
+  [[150,66,8,34],[268,62,9,40],[304,56,11,52]].forEach(([x,y,rx,ry])=>{ELL(g,x,y,rx,ry,'#0F4020');ELL(g,x-2,y-3,rx*.5,ry*.6,'#1A5A2C');});
+  R(g,0,38,56,76,'#C9B896');R(g,0,32,62,8,'#8A7A6A');
+  for(let y=48;y<104;y+=14){R(g,0,y+9,56,2,'#8A7A6A');for(let x=4;x<52;x+=11){R(g,x,y,6,9,'#5A4A3A');R(g,x+1,y-2,4,2,'#5A4A3A');}}
+  [[70,70,9,44],[100,76,8,36]].forEach(([x,y,rx,ry])=>{ELL(g,x,y,rx,ry,'#0F4020');ELL(g,x-2,y-3,rx*.5,ry*.6,'#1A5A2C');});
+  // balustrade + hedge row
+  R(g,0,84,W,6,'#E8E0D0');for(let x=0;x<W;x+=8)R(g,x,84,2,6,'#C9C3B5');
+  R(g,60,88,W-60,6,'#14501E');for(let x=64;x<W;x+=14)ELL(g,x,90,7,6,'#1F6A28');
+  // lawn
+  R(g,0,94,W,86,'#2F8A2F');for(let y=94;y<H;y+=8)R(g,0,y,W,4,'#379A37');
+  ELL(g,92,134,44,7,'#1F6A24');ELL(g,250,160,56,9,'#1F6A24');
   // foreground bushes
-  [[56,176,32],[214,182,30],[292,158,24],[8,150,22]].forEach(([x,y,r])=>{ELL(g,x,y,r,r,'#2A7A2A');ELL(g,x-r*.2,y-r*.25,r*.7,r*.65,'#3A9A34');
+  [[26,178,32],[306,174,30],[8,128,16]].forEach(([x,y,r])=>{ELL(g,x,y,r,r,'#2A7A2A');ELL(g,x-r*.2,y-r*.25,r*.7,r*.65,'#3A9A34');
     for(let i=0;i<14;i++)R(g,x-r+((i*29)%(r*2)),y-r+((i*17)%(r*2)),2,2,'#5FB84A');});
   return k;
 })();
+function dogSide(x,y,t,run){
+  const f=run?(Math.floor(t*10)%2):0;
+  R(c,x-8,y-9,14,7,'#E0A04A');R(c,x+5,y-14,7,7,'#E0A04A');R(c,x+5,y-14,2,5,'#B87A3A');R(c,x+11,y-11,3,3,'#C88A3A');R(c,x+13,y-11,2,2,'#222');R(c,x+9,y-12,1,1,'#222');
+  R(c,x-11,y-11+(Math.floor(t*8)%2),3,2,'#E0A04A');R(c,x-7+f*2,y-3,2,3+0,'#C88A3A');R(c,x+3-f*2,y-3,2,3,'#C88A3A');R(c,x-2,y-3,2,3,'#E0A04A');
+}
+function heliParked(hx,gy,t,spin,doorOpen){
+  R(c,hx-92,gy-36,62,5,'#14141C');R(c,hx-94,gy-56,6,24,'#14141C');
+  const th=Math.round(16*Math.abs(Math.cos(spin*1.5)))+3;R(c,hx-91,gy-46-th/2,1,th,'#C9C9D0');
+  ELL(c,hx,gy-30,34,22,'#14141C');ELL(c,hx+30,gy-26,15,15,'#14141C');ELL(c,hx,gy-16,31,8,'#0A0A10');
+  R(c,hx-30,gy-26,60,1,'#E8C77A');
+  ELL(c,hx+32,gy-31,9,9,'#6AB8E8');R(c,hx+29,gy-36,3,2,'#FFFFFF');
+  // door
+  if(doorOpen){R(c,hx-12,gy-46,22,30,'#0A0A12');R(c,hx-8,gy-30,12,10,'#4A4A58');R(c,hx-8,gy-34,3,6,'#4A4A58');R(c,hx-16,gy-46,5,30,'#1E1E28');R(c,hx-16,gy-46,5,2,'#3A3A46');}
+  else{R(c,hx-13,gy-47,24,32,'#3A3A46');R(c,hx-12,gy-46,22,30,'#1E1E28');R(c,hx-9,gy-43,16,11,'#6AB8E8');R(c,hx-9,gy-43,16,1,'#9AD4F4');R(c,hx+6,gy-26,3,1,'#E8C77A');}
+  R(c,hx-3,gy-58,6,12,'#14141C');
+  const w=Math.round(130*Math.abs(Math.cos(spin)))+12;R(c,hx-Math.round(w/2),gy-60,w,2,'#E8E8F0');R(c,hx-Math.round(w/2)+2,gy-58,Math.max(0,w-4),1,'#9A9AA8');
+  R(c,hx-32,gy,68,2,'#666');R(c,hx-22,gy-8,2,8,'#666');R(c,hx+16,gy-8,2,8,'#666');
+}
+function drawLawnScene(t){
+  c.drawImage(lawnCv,0,0);seaGlint(t,48,82);
+  const gy0=148,hx0=214,lift=t>5.2?eio(seg(t,5.2,6.6)):0;
+  const hx=Math.round(hx0+lift*90),gy=Math.round(gy0-lift*150);
+  const spin=t<2?t*3:6+(t-2)*(t<5.2?22:40);
+  ELL(c,hx0,gy0+3,Math.round(46-lift*14),4,'#1F6A24');
+  const doorOpen=t>2.6&&t<4.8&&lift===0;
+  heliParked(hx,gy,t,spin,doorOpen);
+  // Halima walks over the lawn and climbs aboard; the dog follows
+  const pH=seg(t,0.2,3.0),xh=lerp(-24,hx0-6,eio(pH));
+  if(t<3.7)drawHalimaScaledFaded(c,xh,152,.62,{walk:pH<1?t*8:undefined,armL:undefined,armR:undefined},1-seg(t,3.0,3.7));
+  const pD=seg(t,0.8,4.0),xd=lerp(-40,hx0-8,eio(pD));
+  if(t<4.7){const hop=t>4.0?Math.sin(seg(t,4.0,4.6)*Math.PI)*10:0;if(t<4.0||Math.floor(t*14)%2===0)dogSide(Math.round(xd),Math.round(152-hop),t,pD<1);}
+  if(t>0.3&&t<4.2)CTXT(c,'haloe'.substring(0,Math.round(5*clamp((t-0.3)/0.9))),W/2,8,16,P.yellow,'#0A3A12');
+}
+
 function seaGlint(t,y0,y1){
   for(let i=0;i<40;i++){const x=(i*53)%W,y=y0+((i*31)%(y1-y0));if(Math.sin(t*4+i)>.4)R(c,x,y,2,1,'#CFE4FF');}
 }
@@ -518,22 +554,7 @@ function drawHalimaScaledFaded(ctx,x,y,s,o,op){
 function drawPrologue(t){
   c.imageSmoothingEnabled=false;
   if(t<6.6){
-    c.drawImage(lawnCv,0,0);seaGlint(t,2,36);
-    const hx=170,hy0=104,lift=t>5.2?eio(seg(t,5.2,6.6))*150:0,hy=Math.round(hy0-lift);
-    const spin=t<2?t*3:6+(t-2)*(t<5.2?22:40)+(t>5.2?(t-5.2)*0:0);
-    // shadow stays on the ground
-    ELL(c,hx+7,hy0+12,Math.round(12-lift*.04),Math.round(16-lift*.05),'#1F6A24');
-    if(t>2.5)for(let k=0;k<4;k++){const a=spin+k*Math.PI/2;for(let i=3;i<28;i++)R(c,Math.round(hx+7+Math.cos(a)*i),Math.round(hy0+12+Math.sin(a)*i*.8),1,1,'#1F6A24');}
-    // Halima (back view) walks to the helicopter; her dog follows
-    const path=(p)=>[lerp(112,hx-7,eio(p)),lerp(176,hy0+16,eio(p)),lerp(.56,.42,eio(p))];
-    const ph=seg(t,0.4,3.6),pd=seg(t,0.9,4.3);
-    const [dx,dy]=path(pd);
-    if(t<4.9){const dop=1-seg(t,4.4,4.9);if(dop>0){const[x2,y2]=[dx-12,dy+4];if(dop>.99||Math.floor(t*14)%2)dog(Math.round(x2),Math.round(y2),t,'run');}}
-    if(t<4.1){const[x,y,s]=path(ph);drawHalimaScaledFaded(c,x,y,s,{back:true,walk:ph<1?t*8:undefined,armL:0,armR:0},1-seg(t,3.5,4.1));}
-    heliTop(hx,hy,t,spin);
-    // title
-    const q='haloe';
-    if(t>0.3&&t<4.2)CTXT(c,q.substring(0,Math.round(q.length*clamp((t-0.3)/0.9))),W/2,146,16,P.yellow,'#0A3A12');
+    drawLawnScene(t);
   }else{
     const hor=HOR;
     for(let y=0;y<hor;y+=6)R(c,0,y,W,6,rgb(mix([0x3E,0x9B,0xE0],[0xBF,0xE8,0xFF],y/hor)));
