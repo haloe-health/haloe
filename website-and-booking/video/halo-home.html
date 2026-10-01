@@ -287,8 +287,8 @@ function render(t){
     if(t>11.6&&t<14.2){ELL(c,64,36,9,9,'#FFF3B0');ELL(c,68,33,8,8,rgb(top));}
     clouds.forEach(cl=>{const x=((cl.x-t*5)%(W+60)+W+60)%(W+60)-30,col=t<1.5?'#FFC4B0':t<9?'#FFFFFF':t<11.8?'#FFC48A':t<13.4?'#3A3A7A':'#9AA3B5';
       ELL(c,x,cl.y,cl.w,5,col);ELL(c,x-cl.w*.4,cl.y+2,cl.w*.6,4,col);ELL(c,x+cl.w*.5,cl.y+1,cl.w*.5,4,col);});
-    if(t<5)drawBD(Math.round(lerp(185,-195,eio(seg(t,0.2,4.0)))),t);
-    if(t>4.6&&t<14.4)drawID(Math.round(t<10.5?lerp(470,215,eio(seg(t,4.8,9.2))):lerp(215,-210,eio(seg(t,11.6,14.2)))),t);
+    if(t<5)drawID(Math.round(lerp(185,-195,eio(seg(t,0.2,4.0)))),t);
+    if(t>4.6&&t<14.4)drawBD(Math.round(t<10.5?lerp(470,215,eio(seg(t,4.8,9.2))):lerp(215,-210,eio(seg(t,11.6,14.2)))),t);
     if(t>13.2)drawMC(Math.round(lerp(470,215,eio(seg(t,13.4,16.4)))),t);
     // sea
     for(let y=HOR;y<H;y++){const p=(y-HOR)/(H-HOR);R(c,0,y,W,1,rgb(mix(mix([0x2F,0x6F,0xD0],[0x0B,0x1A,0x6B],p),mix(top,bot,.6),t>8?.25*(1-p):0)));}
@@ -300,16 +300,16 @@ function render(t){
     const wa=(t>9.4&&t<11.4)?9.4:(t>16.6?16.6:0),arrive=wa?seg(t,wa,wa+.4):0,wave=wa?-150*arrive+Math.sin((t-wa)*9)*12*arrive:0;
     const rowing=!wa,rs=Math.sin(t*2.4);
     drawHalima(c,128,by+5,{armR:rowing?-35+rs*25:wave,armL:rowing?35-rs*25:0,lookUp:(t>7.8&&t<9.4)||(t>15&&t<16.6),breath:Math.round(Math.sin(t*2))});
-    drawBoatFront(by,t,t<5.8?2:t<12?1:3);
+    drawBoatFront(by,t,t<5.8?1:t<12?2:3);
     if(t>14.2&&t<18.6){for(let i=0;i<70;i++){const rx=(i*47)%W,ry=Math.round((i*29+t*150)%H);R(c,rx,ry,1,3,'#C8D8F0');}}
     // captions
     const cap=(s,a,b)=>{if(t>a&&t<b)CTXT(c,s.substring(0,Math.round(s.length*clamp((t-a)/.6))),W/2,8,8,P.yellow,'#000');};
-    cap('BANGLADESH',0.3,3.8);cap('INDONESIA',8.4,11.6);cap('MANCHESTER',15.2,18.6);
+    cap('INDONESIA',0.3,3.8);cap('BANGLADESH',8.4,11.6);cap('MANCHESTER',15.2,18.6);
     // route strip: pellets eaten as the yacht icon travels UK -> ID
     const pr=t<11.8?seg(t,0.4,9.2)*.5:.5+seg(t,11.8,16.4)*.5,ix=Math.round(lerp(30,290,pr));
     if(t<18.6){for(let x=30;x<=290;x+=8){if(x>ix)R(c,x,171,2,2,P.pink);}
       R(c,ix-5,172,10,3,P.white);R(c,ix-1,164,1,8,P.white);for(let i=0;i<6;i++)R(c,ix+1,166+i,Math.max(1,6-i),1,P.cream);
-      TXT(c,'BD',4,167,8,P.white,'#000');TXT(c,'ID',150,158,8,P.white,'#000');TXT(c,'MC',296,167,8,P.white,'#000');}
+      TXT(c,'ID',4,167,8,P.white,'#000');TXT(c,'BD',150,158,8,P.white,'#000');TXT(c,'MC',296,167,8,P.white,'#000');}
   } else {
     t-=6.5;
     c.drawImage(inCv,0,0);
