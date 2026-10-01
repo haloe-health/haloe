@@ -47,7 +47,7 @@ function TXT(ctx,s,x,y,size,col,shadow){ctx.font=size+'px "Press Start 2P",monos
 function CTXT(ctx,s,cx,y,size,col,shadow){ctx.font=size+'px "Press Start 2P",monospace';const w=ctx.measureText(s).width;TXT(ctx,s,Math.round(cx-w/2),y,size,col,shadow);}
 
 /* ================= FOREST ================= */
-const SC_END=155, CUPX=370, CUP_H=128, CUP_HW=55, BASE=156, PATHY=146, DOOR_W=32, DOOR_H=58;
+const SC_END=155, OAKX=370, OAK_H=146, BASE=156, PATHY=146, DOOR_W=32, DOOR_H=58;
 function pine(ctx,cx,base,h,col,trunk){
   R(ctx,cx-1,base-Math.round(h*.18),3,Math.round(h*.18),trunk);
   const crown=Math.round(h*.88), top=base-Math.round(h*.12)-crown, tiers=3, tierH=crown/tiers, maxHalf=Math.round(h*.3);
@@ -62,27 +62,29 @@ const grass=(()=>{const r=rng(8),a=[];for(let x=0;x<900;x+=9+r()*14)a.push({x:Ma
 const PELLETS=[];for(let x=14;x<420;x+=14)PELLETS.push(x);
 const POWER=[126,266];
 
-function drawCup(ctx,sx,frac,dop){
-  const full=Math.round(CUP_H*frac); if(full<=0)return;
-  const hwAt=k=>k<=CUP_H*.35?CUP_HW:Math.round(CUP_HW*Math.sqrt(Math.max(0,1-Math.pow((k-CUP_H*.35)/(CUP_H*.65),2))));
-  for(let k=0;k<full;k++){
-    const y=BASE-k, hw=hwAt(k*1/Math.max(frac,.0001)*frac); // grow upward, shape fixed
-    // see-through glass: solid yellow outline, faint tint inside so the forest shows through
-    const edge=Math.min(hw+1,Math.max(2,hw-hwAt(k+1)+1));
-    ctx.fillStyle=P.yellow;
-    if(k===full-1||hw<=2){ctx.fillRect(sx-hw,y,hw*2+1,1);}
-    else{ctx.fillRect(sx-hw,y,edge,1);ctx.fillRect(sx+hw-edge+1,y,edge,1);
-      ctx.fillStyle='rgba(255,241,176,0.18)';ctx.fillRect(sx-hw+edge,y,(hw-edge)*2+1-edge+1,1);
-      ctx.fillStyle='rgba(255,212,0,0.22)';ctx.fillRect(sx+hw-edge-7,y,7,1);}
+function drawOak(ctx,sx,frac,dop){
+  const full=Math.round(OAK_H*frac); if(full<=0)return;
+  ctx.save();ctx.beginPath();ctx.rect(0,BASE-full,W,full+2);ctx.clip();
+  // trunk (flared roots, gentle taper) with bark shading
+  for(let k=0;k<80;k++){
+    const hw=Math.round(21+(k<12?(12-k)*.9:0)-k*.06), y=BASE-k;
+    R(ctx,sx-hw-1,y,hw*2+3,1,'#2E1C0C');R(ctx,sx-hw,y,hw*2+1,1,'#4A2E14');
+    R(ctx,sx-hw+3,y,Math.round(hw*.9),1,'#5C3A1B');
+    if(((k>>2)&1)===0){R(ctx,sx-hw+8,y,1,3,'#3A2410');R(ctx,sx+hw-9,y,1,3,'#3A2410');R(ctx,sx+2,y,1,3,'#3A2410');}
   }
-  // highlight stripe
-  ctx.fillStyle=P.white;
-  for(let k=Math.round(CUP_H*.12);k<Math.min(full,Math.round(CUP_H*.72));k++){const hw=hwAt(k);ctx.fillRect(sx-hw+7+(k>CUP_H*.4?Math.round((k-CUP_H*.4)*.25):0),BASE-k,3,1);}
-  ctx.fillStyle=P.cyan;
-  for(let k=Math.round(CUP_H*.12);k<Math.min(full,Math.round(CUP_H*.72));k++){const hw=hwAt(k);ctx.fillRect(sx-hw+10+(k>CUP_H*.4?Math.round((k-CUP_H*.4)*.25):0),BASE-k,1,1);}
-  // rim
-  if(full>6){R(ctx,sx-CUP_HW-1,BASE-7,CUP_HW*2+3,8,P.gold);R(ctx,sx-CUP_HW-1,BASE-7,CUP_HW*2+3,2,P.yellow);}
-  if(frac>=.999){R(ctx,sx-5,BASE-CUP_H-6,10,7,P.blue);R(ctx,sx-3,BASE-CUP_H-9,6,4,P.cyan);}
+  // roots
+  R(ctx,sx-32,BASE-3,10,4,'#4A2E14');R(ctx,sx+22,BASE-3,10,4,'#4A2E14');
+  // branches
+  for(let i=0;i<26;i++){R(ctx,sx-18-i,BASE-70-i,7,7,'#4A2E14');R(ctx,sx+12+i,BASE-70-i,7,7,'#4A2E14');}
+  // canopy: outline pass, body pass, light + shade
+  const blobs=[[-46,97,36,25],[0,114,48,29],[46,97,36,25],[-22,126,30,15],[24,127,30,14],[0,88,34,20],[-64,84,20,14],[64,84,20,14]];
+  blobs.forEach(([dx,k,rx,ry])=>ELL(ctx,sx+dx,BASE-k,rx+2,ry+2,'#07351F'));
+  blobs.forEach(([dx,k,rx,ry])=>ELL(ctx,sx+dx,BASE-k,rx,ry,'#0F7A3F'));
+  blobs.forEach(([dx,k,rx,ry])=>ELL(ctx,sx+dx+Math.round(rx*.25),BASE-k+Math.round(ry*.3),Math.round(rx*.7),Math.round(ry*.55),'#0B5A33'));
+  [[-50,104,18,9],[-6,124,22,9],[40,106,16,8],[-24,132,12,5]].forEach(([dx,k,rx,ry])=>ELL(ctx,sx+dx,BASE-k,rx,ry,'#1FA050'));
+  ctx.fillStyle='#7ED957';for(let i=0;i<40;i++){const px=sx-60+((i*37)%120),py=BASE-(96+((i*53)%40));if(((px+py)&3)===0)ctx.fillRect(px,py,2,1);}
+  // acorns / leaf sparkle
+  ctx.restore();
   // door
   if(frac>.85){
     const doorBase=BASE, half=k=>k<DOOR_H-16?16:Math.floor(Math.sqrt(Math.max(0,256-Math.pow(k-(DOOR_H-16),2))));
@@ -206,7 +208,7 @@ function render(t){
     else if(t<5.8){hx=56;lookUp=t>4.8&&t<5.7;}
     else if(t<7.1){hx=Math.round(lerp(56,165,eio(seg(t,5.8,7.1))));walk=t*7.2;}
     else if(t<10.4){hx=165;}
-    else{const p=eio(seg(t,10.4,11.9));hx=Math.round(lerp(165,CUPX-SC_END,p));walk=t*6.5;op=1-seg(t,11.0,11.9);}
+    else{const p=eio(seg(t,10.4,11.9));hx=Math.round(lerp(165,OAKX-SC_END,p));walk=t*6.5;op=1-seg(t,11.0,11.9);}
     // pellets
     let eaten=0;const hWorld=scroll+hx;
     PELLETS.forEach(px=>{if(px<hWorld-6)eaten++;else{const sx=px-scroll;if(sx>-3&&sx<W+3)R(c,sx,PATHY+18,2,2,P.pink);}});
@@ -214,9 +216,9 @@ function render(t){
     // cup
     const cp=seg(t,2.8,5.2),frac=Math.round(eout(cp)*24)/24;
     const dop=Math.round(eio(seg(t,9.5,10.5))*8)/8;
-    const csx=CUPX-scroll;
+    const csx=OAKX-scroll;
     const knockT=[7.5,8.2,8.9];
-    if(frac>0)drawCup(c,csx,frac,dop);
+    if(frac>0)drawOak(c,csx,frac,dop);
     // light cone from open door
     if(dop>0){for(let y=BASE-DOOR_H+6;y<H;y++){const half=Math.round(14+(y-(BASE-DOOR_H+6))*.9*dop+ (y>BASE?(y-BASE)*1.2:0));
       for(let x=csx-half;x<=csx+half;x++)if(((x+y)&1)===0&&y>BASE-4)R(c,x,y,1,1,P.glow);}}
