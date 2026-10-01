@@ -23,6 +23,25 @@
     --sep2: rgba(13,13,13,0.14);
     --font-heading: 'Poppins', sans-serif;
   }
+  /* Dark mode — same page background and text tokens as book.html's
+     prefers-color-scheme: dark block, so booking and confirmation read as one
+     flow. Cards use the dark card surface (#1C1C1E) with 10% white hairlines.
+     No pure white anywhere. Light mode above is untouched. */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page-bg: #1A1712;
+      --ink: #F5F0E8;
+      --t2: #C9C0B2;
+      --t3: #9C9484;
+      --s1: #1C1C1E;
+      --s3: #2E2820;
+      --sep: rgba(255,255,255,0.10);
+      --sep2: rgba(255,255,255,0.10);
+    }
+    .group, .items { box-shadow: none; border: 1px solid rgba(255,255,255,0.10); }
+  }
+
   /* Root scaled to 78% (16px -> 12.5px) — every rem size below, including
      h1's, is sized relative to THAT, not 16px. */
   html { font-size: 78%; }
