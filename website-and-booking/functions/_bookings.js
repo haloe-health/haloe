@@ -84,6 +84,8 @@ function activeFilter(now) {
 }
 
 // Active (blocking) bookings for a date. Returns [{ s: startMin, e: endMin }].
+// end_min already includes the turnaround gap (create-checkout.js), so these
+// are blocked intervals, not treatment lengths.
 // Every booking blocks the day regardless of venue — Halima is one person,
 // so a clinic slot and a home visit at the same time can't both happen.
 export async function busyIntervals(env, bookingDate, now) {

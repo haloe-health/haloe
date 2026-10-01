@@ -9,7 +9,11 @@
 //     The last start is bookable for ANY duration — there is no
 //     "must finish by closing" rule.
 //   • A start is offered only if [start, start + duration) doesn't overlap
-//     an existing active booking that day. No prep/clean-up buffers.
+//     an existing active booking that day.
+//   • Every booking blocks its treatment length PLUS TURNAROUND_MIN (below)
+//     so Halima gets a gap between clients. The buffer is never shown to the
+//     client. It is stored in the booking's end_min (see create-checkout.js),
+//     so a booking's end_min means "blocked until", not "treatment ends".
 //   • Same-day starts need at least MIN_NOTICE_MIN of notice.
 
 // ---- Editable config -------------------------------------------------- //
@@ -38,6 +42,12 @@ export const HOURS = {
 };
 
 export const SLOT_STEP_MIN = 30;
+// Turnaround gap after every booking, clinic and mobile. A booking blocks
+// start → start + treatment length + TURNAROUND_MIN. It may run past closing;
+// the last start of the day is still offered for any treatment (no closing
+// rule — see below). Mirrored nowhere else: browser code only ever sends the
+// real treatment length, and the server adds this.
+export const TURNAROUND_MIN = 15;
 export const MIN_NOTICE_MIN = 120;       // same-day bookings need 2 h notice
 
 // How far ahead "next available date" searches before giving up.
@@ -86,15 +96,16 @@ export function startGrid(location, weekday) {
 // Available start times (minutes) for one day.
 //   location    'clinic' | 'mobile'
 //   weekday     0–6
-//   durationMin treatment length
-//   busy        [{ s, e }] active bookings that day (minutes)
+//   durationMin treatment length (the real one — the turnaround is added here)
+//   busy        [{ s, e }] blocked intervals that day (minutes); stored bookings
+//               already include their own turnaround in `e`
 //   nowMin      minutes-from-midnight of "now" IF the day is today, else null.
 //               Starts at or before nowMin + MIN_NOTICE_MIN are hidden.
-export function generateSlots({ location, weekday, durationMin, busy = [], nowMin = null, minNoticeMin = MIN_NOTICE_MIN }) {
+export function generateSlots({ location, weekday, durationMin, busy = [], nowMin = null, minNoticeMin = MIN_NOTICE_MIN, turnaroundMin = TURNAROUND_MIN }) {
   const dur = Number(durationMin) > 0 ? Number(durationMin) : 60;
   return startGrid(location, weekday).filter((start) => {
     if (nowMin !== null && start < nowMin + minNoticeMin) return false;
-    const end = start + dur;
+    const end = start + dur + turnaroundMin; // blocked until — real length + turnaround
     return !busy.some((b) => start < b.e && end > b.s);
   });
 }

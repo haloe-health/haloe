@@ -2,8 +2,10 @@
 // Tests for the dynamic slot generation logic in functions/_slots.js.
 // Plain-node, no test framework needed.
 
-import { generateSlots, startGrid, groupSlots } from '../functions/_slots.js';
-import { resolveCart, formatDuration } from '../functions/_services.js';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import { generateSlots, startGrid, groupSlots, TURNAROUND_MIN, minutesToLabel } from '../functions/_slots.js';
+import { resolveCart, formatDuration, SERVICES as SERVER_SERVICES } from '../functions/_services.js';
 import { applyDiscount } from '../functions/_discounts.js';
 
 let pass = 0, fail = 0;
@@ -37,18 +39,19 @@ ok('19:30 offered (last-start rule)', slotsEmpty.includes(1170));
 console.log('\nWith 10:00–11:00 booked (600–660), 1 h treatment');
 const busy1 = [{ s: 600, e: 660 }]; // 10:00–11:00
 const slots1 = generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: 60, busy: busy1 });
-// 9:00 → end 10:00 → 600 is not > 600 → FREE (ends exactly as the booking starts)
+// NOTE: every slot now blocks treatment + TURNAROUND_MIN (15), so a 60 min start blocks 75 min.
+// 9:00 → end 10:15 → overlaps 600–660 → removed (the buffer pushes it in)
 // 9:30 → end 10:30 → overlaps busy 600–660? 570+60=630 > 600 → yes, removed
 // 10:00 → end 11:00 → overlaps exactly → yes, removed
 // 10:30 → end 11:30 → start 630 < 660 → yes, removed
 // 11:00 → end 12:00 → start 660 not < 660 → FREE
-ok('9:00 available (ends exactly at 10:00)', slots1.includes(540));
+ok('9:00 removed (60 + 15 buffer runs into 10:00)', !slots1.includes(540));
 ok('9:30 removed (end overlaps busy)', !slots1.includes(570));
 ok('10:00 removed (starts in busy)', !slots1.includes(600));
 ok('10:30 removed (overlaps busy end)', !slots1.includes(630));
 ok('11:00 available', slots1.includes(660));
 ok('19:30 still available', slots1.includes(1170));
-eq('19 slots remain', slots1.length, 19);
+eq('18 slots remain', slots1.length, 18);
 
 console.log('\nWith same 10:00–11:00 booked, 1 h 30 treatment');
 const slots2 = generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: 90, busy: busy1 });
@@ -107,7 +110,7 @@ console.log('  ' + tue6Oct.map(m => {
 eq('22 slots', tue6Oct.length, 22);
 ok('first slot is 9:00 am', tue6Oct[0] === 540);
 
-// With 10:00 Full Back booked (60 min) → 9:30, 10:00, 10:30 removed; 9:00 survives (19 slots)
+// With the 10:00–11:00 block → 9:00, 9:30, 10:00, 10:30 removed (18 slots) — the 15 min turnaround removes 9:00 too
 console.log('\nVerification: Tue 6 Oct — 10:00 Full Back (60 min) booked');
 const withFullBack = generateSlots({ location: 'clinic', weekday: 2, durationMin: 60, busy: [{ s: 600, e: 660 }] });
 console.log('  ' + withFullBack.map(m => {
@@ -116,8 +119,8 @@ console.log('  ' + withFullBack.map(m => {
   let h12 = h24 % 12; if (!h12) h12 = 12;
   return `${h12}:${mm} ${p}`;
 }).join('  '));
-eq('19 slots after 1h booking', withFullBack.length, 19);
-ok('First available is 9:00, then 11:00', withFullBack[0] === 540 && withFullBack[1] === 660);
+eq('18 slots after 1h booking (9:00 now blocked by the buffer)', withFullBack.length, 18);
+ok('First available is 11:00', withFullBack[0] === 660);
 
 // ── Multi-treatment bookings ──────────────────────────────────────────────
 console.log('\nMulti-treatment: resolveCart');
@@ -156,7 +159,7 @@ const busy11 = [{ s: 660, e: 720 }];
 ok('a lone 45 min treatment fits at 10:00', generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: 45, busy: busy11 }).includes(600));
 ok('the 90 min pair does NOT fit at 10:00', !generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(600));
 ok('the 90 min pair fits at 9:00 (ends 10:30)', generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(540));
-ok('the 90 min pair fits at 9:30 (ends 11:00 exactly)', generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(570));
+ok('the 90 min pair does NOT fit at 9:30 (buffer runs it into 11:00)', !generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(570));
 // 12:00–12:30 booked: a 90 min session can't start 10:30–12:00, but 45 min can start 11:00 → 11:45
 const busyNoon = [{ s: 720, e: 750 }];
 const s90 = generateSlots({ location: 'mobile', weekday: MOBILE_DAY, durationMin: 90, busy: busyNoon });
@@ -165,7 +168,52 @@ ok('mobile: 90 min cannot start 11:00 (runs into 12:00 booking)', !s90.includes(
 ok('mobile: 45 min can start 11:00', s45.includes(660));
 ok('mobile: 90 min can start 12:30', s90.includes(750));
 ok('mobile: last start 20:00 still offered (no closing rule)', s90.includes(1200));
-ok('mobile: 10:30 offered for 90 min (ends 12:00 exactly)', s90.includes(630));
+ok('mobile: 10:30 NOT offered for 90 min (90 + 15 runs into 12:00)', !s90.includes(630));
+ok('mobile: 10:00 offered for 90 min (ends 11:45 incl. buffer)', s90.includes(600));
+
+// ── Turnaround buffer + durations ─────────────────────────────────────────
+console.log('\nTurnaround buffer: a 9:00 clinic booking, then the next slot offered');
+eq('TURNAROUND_MIN is 15', TURNAROUND_MIN, 15);
+const nextAfter900 = (lenMin) => {
+  const blockedUntil = 540 + lenMin + TURNAROUND_MIN;
+  const slots = generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: lenMin, busy: [{ s: 540, e: blockedUntil }] });
+  return minutesToLabel(slots.find((t) => t > 540));
+};
+eq('45 min  → next 10:00 am', nextAfter900(45), '10:00 am');
+eq('60 min  → next 10:30 am', nextAfter900(60), '10:30 am');
+eq('75 min  → next 10:30 am', nextAfter900(75), '10:30 am');
+eq('90 min  → next 11:00 am', nextAfter900(90), '11:00 am');
+eq('105 min → next 11:00 am', nextAfter900(105), '11:00 am');
+eq('Face + Head Massage (90) → next 11:00 am', nextAfter900(two.totalMin), '11:00 am');
+
+console.log('\nTurnaround buffer: applies to the NEW booking too (gap before the next client)');
+// Someone is booked 12:00–12:45 (+15 → blocked to 13:00 is stored as e=780; here a block starting 12:00).
+const noonBlock = [{ s: 720, e: 780 }];
+const s60 = generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: 60, busy: noonBlock });
+ok('60 min at 10:45 would not exist on the grid; 10:30 (ends 11:30 + 15 = 11:45) fits', s60.includes(630));
+ok('60 min at 11:00 (ends 12:00 + 15 buffer) runs into the 12:00 booking → removed', !s60.includes(660));
+ok('45 min at 11:00 (ends 11:45 + 15 = 12:00) fits exactly', generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: 45, busy: noonBlock }).includes(660));
+
+console.log('\nTurnaround buffer: never removes the last slot (it may run past closing)');
+for (const len of [45, 75, 105, 120]) {
+  ok(`${len} min: 19:30 clinic start still offered on an empty day`, generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: len }).includes(1170));
+  ok(`${len} min: 20:00 mobile start still offered on an empty day`, generateSlots({ location: 'mobile', weekday: MOBILE_DAY, durationMin: len }).includes(1200));
+}
+
+console.log('\nDurations: server (_services.js) and browser (services-data.js) agree for EVERY treatment');
+const ctx = {}; vm.createContext(ctx);
+vm.runInContext(fs.readFileSync(new URL('../services-data.js', import.meta.url), 'utf8') + ';this.SERVICES = SERVICES;', ctx);
+const parseTime = (t) => { const h = /(\d+)\s*(?:hours?|hrs?|hr)\b/i.exec(t), m = /(\d+)\s*min/i.exec(t); return (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0) || 60; };
+let durationMismatches = 0;
+for (const cat of Object.keys(SERVER_SERVICES)) {
+  SERVER_SERVICES[cat].forEach((srv, i) => {
+    const cli = ctx.SERVICES[cat][i];
+    const cliMin = cli.sessionMin || parseTime(cli.time);
+    if (cli.name !== srv.name || cliMin !== srv.min) { durationMismatches++; console.error(`     mismatch: ${cat} ${srv.name} client ${cliMin} server ${srv.min}`); }
+  });
+}
+eq('no client/server duration mismatches', durationMismatches, 0);
+ok('every package is 75 min on the server', SERVER_SERVICES.packages.every((p) => p.min === 75));
 
 // Summary
 console.log(`\n${pass + fail} tests — ${pass} passed, ${fail} failed${fail ? ' ← FIX BEFORE SHIPPING' : ''}\n`);

@@ -36,14 +36,14 @@ export const SERVICES = {
     { name: 'Head, Scalp & Full Body', price: 150, min: 105 },
   ],
   packages: [
-    { name: 'Pain & Mobility', price: 340, min: 60 },
-    { name: 'Breathe & Reset', price: 340, min: 60 },
-    { name: 'Cycle Comfort', price: 340, min: 60 },
-    { name: 'Stress & Sleep', price: 480, min: 60 },
-    { name: 'Headache & Tension', price: 480, min: 60 },
-    { name: 'Digestion & Comfort', price: 480, min: 60 },
-    { name: 'Circulation & Energy', price: 600, min: 60 },
-    { name: "Women's Cycle Care", price: 600, min: 60 },
+    { name: 'Pain & Mobility', price: 340, min: 75 },
+    { name: 'Breathe & Reset', price: 340, min: 75 },
+    { name: 'Cycle Comfort', price: 340, min: 75 },
+    { name: 'Stress & Sleep', price: 480, min: 75 },
+    { name: 'Headache & Tension', price: 480, min: 75 },
+    { name: 'Digestion & Comfort', price: 480, min: 75 },
+    { name: 'Circulation & Energy', price: 600, min: 75 },
+    { name: "Women's Cycle Care", price: 600, min: 75 },
   ],
 };
 

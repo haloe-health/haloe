@@ -1,5 +1,5 @@
 import { reserveSlot, confirmBooking, releaseBooking, slotToMinutes, STRIPE_SESSION_SECONDS } from './_bookings.js';
-import { isOfferableStart } from './_slots.js';
+import { isOfferableStart, TURNAROUND_MIN } from './_slots.js';
 import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
 import { resolveCart, formatDuration } from './_services.js';
 import { validateDiscountCode, applyDiscount, reserveDiscountCode, confirmDiscountRedemption, releaseDiscountReservation } from './_discounts.js';
@@ -133,7 +133,8 @@ export async function onRequestPost(context) {
     // from the client. If Supabase isn't configured we fail OPEN and let the
     // booking proceed unreserved — never block a paying customer over an
     // availability bug.
-    // One slot sized to every selected treatment back to back (no buffers exist).
+    // One slot sized to every selected treatment back to back; the turnaround
+    // gap is added to the held interval (endMin below), not to what's shown.
     const duration = totalDurationMin;
     let bookingId = null;
 
@@ -142,7 +143,9 @@ export async function onRequestPost(context) {
         bookingId = await reserveSlot(context.env, {
           bookingDate,
           startMin,
-          endMin: startMin + duration,
+          // Blocked-until: the treatment plus the turnaround gap. The client is
+          // only ever told the real length (emails, summary, admin).
+          endMin: startMin + duration + TURNAROUND_MIN,
           treatment: treatmentName,
           treatments: cart.items.length > 1 ? cart.items.map(x => ({ name: x.name, category: x.category, pricePence: x.pricePence, min: x.min })) : null,
           name: customerName,
