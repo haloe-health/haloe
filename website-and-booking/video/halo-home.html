@@ -19,12 +19,12 @@
 </head>
 <body>
 <canvas id="cv" width="320" height="180"></canvas>
-<div id="ctl"><button id="pp">PAUSE</button><input id="scrub" type="range" min="0" max="38" step="0.01" value="0"><span id="tl">0.0</span><button id="rec">REC 1080p</button></div>
+<div id="ctl"><button id="pp">PAUSE</button><input id="scrub" type="range" min="0" max="42" step="0.01" value="0"><span id="tl">0.0</span><button id="rec">REC 1080p</button></div>
 
 <script>
 (async function(){
 try{ await document.fonts.load('16px "Press Start 2P"'); }catch(e){}
-const W=320,H=180,DUR=38,HOLD=1;
+const W=320,H=180,DUR=42,HOLD=1;
 const cv=document.getElementById('cv'), c=cv.getContext('2d');
 c.imageSmoothingEnabled=false;
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
@@ -460,7 +460,7 @@ function renderMain(t){
 }
 
 /* ================= PROLOGUE: lawn -> helicopter -> sky to Indonesia ================= */
-const PRO=10;
+const PRO=14;
 const lawnCv=(function(){
   const[k,g]=mkCanvas();
   for(let y=0;y<46;y+=6)R(g,0,y,W,6,rgb(mix([0x5F,0xAE,0xEA],[0xCF,0xEA,0xFA],y/46)));
@@ -512,9 +512,9 @@ function heliFront(hx,gy,doorOpen){
 }
 function drawLawnScene(t){
   c.drawImage(lawnCv,0,0);seaGlint(t,48,82);
-  const gy0=148,hx0=214,lift=t>5.2?eio(seg(t,5.2,6.6)):0;
-  const hx=Math.round(hx0+lift*90),gy=Math.round(gy0-lift*150);
-  const spin=t<2?t*3:6+(t-2)*(t<5.2?22:40);
+  const gy0=148,hx0=214,e1=eio(seg(t,5.0,7.2)),q=Math.pow(seg(t,7.2,8.9),2.2),up=e1*22+q*230,rt=e1*6+q*150,lift=up/230;
+  const hx=Math.round(hx0+rt),gy=Math.round(gy0-up);
+  const spin=t<2?t*3:6+(t-2)*(t<5.0?22:40);
   ELL(c,hx0,gy0+3,Math.round(46-lift*14),4,'#1F6A24');
   const doorOpen=t>2.4&&t<4.9;
   heliParked(hx,gy,t,spin,doorOpen);
@@ -575,18 +575,38 @@ function drawHalimaScaledFaded(ctx,x,y,s,o,op){
 }
 function drawPrologue(t){
   c.imageSmoothingEnabled=false;
-  if(t<6.6){
+  if(t<9.0){
     drawLawnScene(t);
   }else{
-    const hor=HOR;
+    // inside the cabin: sky rushing past the window, birds, Halima waves hello
+    const u=t-9.0,hor=HOR;
     for(let y=0;y<hor;y+=6)R(c,0,y,W,6,rgb(mix([0x3E,0x9B,0xE0],[0xBF,0xE8,0xFF],y/hor)));
-    ELL(c,250,50,14,14,P.yellow);R(c,251,42,3,3,P.black);
-    for(let i=0;i<6;i++){const x=((i*83-(t-6.6)*55)%(W+80)+W+80)%(W+80)-40,y=20+((i*37)%70);ELL(c,x,y,18+(i%3)*6,5,'#FFFFFF');ELL(c,x-8,y+2,12,4,'#FFFFFF');}
-    if(t>8.2)drawID(Math.round(lerp(520,215,eio(seg(t,8.2,10)))),t);
+    ELL(c,250,52,14,14,P.yellow);R(c,251,44,3,3,P.black);
+    for(let i=0;i<7;i++){const x=((i*83-u*70)%(W+80)+W+80)%(W+80)-40,y=20+((i*37)%70);ELL(c,x,y,18+(i%3)*6,5,'#FFFFFF');ELL(c,x-8,y+2,12,4,'#FFFFFF');}
+    if(u>3.2)drawID(Math.round(lerp(520,215,eio(seg(u,3.2,5)))),t);
     for(let y=hor;y<H;y++){const p=(y-hor)/(H-hor);R(c,0,y,W,1,rgb(mix([0x2F,0x6F,0xD0],[0x0B,0x1A,0x6B],p)));}
-    for(let y=hor+3;y<H;y+=5){const sp=40+(y-hor)*1.2;for(let k=-1;k<16;k++){R(c,Math.round(k*22+((y*3-t*sp)%22+22)%22),y,5,1,'#9FC4FF');}}
-    heliSide(150,Math.round(66+Math.sin(t*3)*2),t);
-    if(t>7&&t<9.8)CTXT(c,'TO INDONESIA'.substring(0,Math.round(12*clamp((t-7)/.6))),W/2,8,8,P.yellow,'#000');
+    for(let y=hor+3;y<H;y+=5){const sp=60+(y-hor)*1.4;for(let k=-1;k<16;k++){R(c,Math.round(k*22+((y*3-u*sp)%22+22)%22),y,5,1,'#9FC4FF');}}
+    // birds drifting past (gulls flap their wings)
+    const bird=(bx,by,s,ph)=>{const fl=Math.sin(ph)>0?1:-.3;R(c,bx-s,by,s*2+1,s,'#F5F5FA');
+      for(let k=1;k<=5*s;k++){const wy=by-Math.round(k*.55*fl);R(c,bx-s-k,wy,1,Math.max(1,s>1?2:1),'#F5F5FA');R(c,bx+s+k,wy,1,Math.max(1,s>1?2:1),'#F5F5FA');}
+      R(c,bx+s*2,by,s,s,'#F0B020');};
+    for(let i=0;i<8;i++){const x=((i*57+W-u*(28+i*5))%(W+70)+W+70)%(W+70)-35;bird(Math.round(x),Math.round(26+((i*29)%80)+Math.sin(u*3+i)*4),1,u*14+i);}
+    // one big friendly gull swoops right past the window
+    if(u>1.0&&u<3.2){const p=seg(u,1.0,3.2);bird(Math.round(lerp(W+20,-30,p)),Math.round(70+Math.sin(p*6)*6),3,u*12);}
+    // cabin frame, dashboard and seat
+    R(c,70,102,104,80,'#2A2A38');R(c,70,102,104,3,'#4A4A58');
+    const wave=u>1.0?lerp(0,-150,eout(seg(u,1.0,1.5)))+(u>1.5&&u<4?Math.sin((u-1.5)*10)*14:0):0;
+    drawHalimaScaled(c,122,190,1.6,{armR:wave,armL:0,lookUp:u>0.4,breath:Math.round(Math.sin(t*2))});
+    // the dog peeks out of the window too
+    const wag=Math.floor(u*8)%2;
+    R(c,204,136,18,14,'#E0A04A');R(c,201,132,5,12,'#B87A3A');R(c,220,141,7,6,'#C88A3A');R(c,225,141,3,3,'#222');R(c,212,138,2,2,'#222');R(c,214+wag,148,3,3,'#E88AA0');
+    R(c,0,0,W,12,'#14141C');R(c,0,0,16,H,'#14141C');R(c,W-16,0,16,H,'#14141C');R(c,0,150,W,30,'#14141C');
+    R(c,16,12,W-32,1,'#2A2A38');R(c,16,12,1,138,'#2A2A38');R(c,W-17,12,1,138,'#2A2A38');R(c,0,150,W,1,'#3A3A46');
+    // speech bubble: "HI BIRDS!"
+    if(u>1.3&&u<4.0){const msg='HI BIRDS!',n=Math.round(msg.length*clamp((u-1.3)/0.7));
+      R(c,150,46,88,22,'#14141C');R(c,151,47,86,20,'#FFFFFF');R(c,152,68,6,4,'#14141C');R(c,153,66,4,3,'#FFFFFF');
+      TXT(c,msg.substring(0,n),158,52,8,'#14141C');}
+    if(u>0.2&&u<4.9)CTXT(c,'TO INDONESIA'.substring(0,Math.round(12*clamp((u-0.2)/.8))),W/2,2,8,P.yellow);
   }
 }
 function ditherCover(w){
@@ -596,7 +616,7 @@ function ditherCover(w){
 }
 function render(t){
   if(t<PRO)drawPrologue(t);else renderMain(t-PRO);
-  ditherCover(Math.max(Math.sin(Math.PI*seg(t,PRO-.9,PRO+.9)),(t<PRO?Math.sin(Math.PI*seg(t,6.3,6.9)):0)));
+  ditherCover(Math.max(Math.sin(Math.PI*seg(t,PRO-.9,PRO+.9)),(t<PRO?Math.sin(Math.PI*seg(t,8.6,9.3)):0)));
 }
 
 /* ================= PLAYBACK ================= */
