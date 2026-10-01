@@ -47,13 +47,13 @@ function TXT(ctx,s,x,y,size,col,shadow){ctx.font=size+'px "Press Start 2P",monos
 function CTXT(ctx,s,cx,y,size,col,shadow){ctx.font=size+'px "Press Start 2P",monospace';const w=ctx.measureText(s).width;TXT(ctx,s,Math.round(cx-w/2),y,size,col,shadow);}
 
 /* ================= FOREST ================= */
-const SC_END=155, OAKX=370, OAK_H=146, BASE=156, PATHY=146, DOOR_W=32, DOOR_H=58;
+const SC_END=155, OAKX=370, OAK_H=126, BASE=156, PATHY=146, DOOR_W=32, DOOR_H=58;
 function pine(ctx,cx,base,h,col,trunk){
   R(ctx,cx-1,base-Math.round(h*.18),3,Math.round(h*.18),trunk);
   const crown=Math.round(h*.88), top=base-Math.round(h*.12)-crown, tiers=3, tierH=crown/tiers, maxHalf=Math.round(h*.3);
   ctx.fillStyle=col;
   for(let r=0;r<crown;r++){const tier=Math.floor(r/tierH), within=(r%tierH)/tierH;
-    const half=Math.round((.3+.7*within)*maxHalf*(.55+.45*(tier+1)/tiers)); ctx.fillRect(cx-half,top+r,half*2+1,1);}
+    const half=Math.round((.04+.96*within)*maxHalf*(.55+.45*(tier+1)/tiers)); ctx.fillRect(cx-half,top+r,half*2+1,1);}
 }
 function mkTrees(seed,span,hMin,hMax,step){const r=rng(seed),a=[];for(let x=0;x<span;x+=step*(.7+r()*.7))a.push({x:Math.round(x),h:Math.round(hMin+r()*(hMax-hMin))});return a;}
 const farT=mkTrees(11,700,60,90,26), midT=mkTrees(22,700,80,115,34), nearT=mkTrees(33,900,96,122,60);
@@ -66,7 +66,7 @@ function drawOak(ctx,sx,frac,dop){
   const full=Math.round(OAK_H*frac); if(full<=0)return;
   ctx.save();ctx.beginPath();ctx.rect(0,BASE-full,W,full+2);ctx.clip();
   // trunk (flared roots, gentle taper) with bark shading
-  for(let k=0;k<80;k++){
+  for(let k=0;k<64;k++){
     const hw=Math.round(21+(k<12?(12-k)*.9:0)-k*.06), y=BASE-k;
     R(ctx,sx-hw-1,y,hw*2+3,1,'#2E1C0C');R(ctx,sx-hw,y,hw*2+1,1,'#4A2E14');
     R(ctx,sx-hw+3,y,Math.round(hw*.9),1,'#5C3A1B');
@@ -75,14 +75,15 @@ function drawOak(ctx,sx,frac,dop){
   // roots
   R(ctx,sx-32,BASE-3,10,4,'#4A2E14');R(ctx,sx+22,BASE-3,10,4,'#4A2E14');
   // branches
-  for(let i=0;i<26;i++){R(ctx,sx-18-i,BASE-70-i,7,7,'#4A2E14');R(ctx,sx+12+i,BASE-70-i,7,7,'#4A2E14');}
+  for(let i=0;i<20;i++){R(ctx,sx-18-i,BASE-54-i,7,7,'#4A2E14');R(ctx,sx+12+i,BASE-54-i,7,7,'#4A2E14');}
   // canopy: outline pass, body pass, light + shade
-  const blobs=[[-46,97,36,25],[0,114,48,29],[46,97,36,25],[-22,126,30,15],[24,127,30,14],[0,88,34,20],[-64,84,20,14],[64,84,20,14]];
+  const SH=(a)=>a.map(([dx,k,rx,ry])=>[Math.round(dx*.85),k-22,Math.round(rx*.85),Math.round(ry*.85)]);
+  const blobs=SH([[-46,97,36,25],[0,114,48,29],[46,97,36,25],[-22,126,30,15],[24,127,30,14],[0,88,34,20],[-64,84,20,14],[64,84,20,14]]);
   blobs.forEach(([dx,k,rx,ry])=>ELL(ctx,sx+dx,BASE-k,rx+2,ry+2,'#07351F'));
   blobs.forEach(([dx,k,rx,ry])=>ELL(ctx,sx+dx,BASE-k,rx,ry,'#0F7A3F'));
   blobs.forEach(([dx,k,rx,ry])=>ELL(ctx,sx+dx+Math.round(rx*.25),BASE-k+Math.round(ry*.3),Math.round(rx*.7),Math.round(ry*.55),'#0B5A33'));
-  [[-50,104,18,9],[-6,124,22,9],[40,106,16,8],[-24,132,12,5]].forEach(([dx,k,rx,ry])=>ELL(ctx,sx+dx,BASE-k,rx,ry,'#1FA050'));
-  ctx.fillStyle='#7ED957';for(let i=0;i<40;i++){const px=sx-60+((i*37)%120),py=BASE-(96+((i*53)%40));if(((px+py)&3)===0)ctx.fillRect(px,py,2,1);}
+  SH([[-50,104,18,9],[-6,124,22,9],[40,106,16,8],[-24,132,12,5]]).forEach(([dx,k,rx,ry])=>ELL(ctx,sx+dx,BASE-k,rx,ry,'#1FA050'));
+  ctx.fillStyle='#7ED957';for(let i=0;i<40;i++){const px=sx-52+((i*37)%104),py=BASE-(76+((i*53)%34));if(((px+py)&3)===0)ctx.fillRect(px,py,2,1);}
   // acorns / leaf sparkle
   ctx.restore();
   // door
