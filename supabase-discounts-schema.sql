@@ -129,9 +129,22 @@ create index if not exists code_redemptions_booking_idx on public.code_redemptio
 -- single-use code (gift/reward/competition codes, max_uses_total = 1) — the
 -- concurrency guard the brief asks for. Released holds don't count, so a
 -- lapsed attempt doesn't permanently lock the code.
+-- enforce_limits (added Oct 2026): the three unique indexes below used to
+-- cover EVERY redemption, which silently capped a public promo code like
+-- HALOE20 at one use per code and one per email, whatever its row said. Now
+-- only rows written with enforce_limits = true are constrained; promo codes
+-- are reserved with false (see reserveDiscountCode in _discounts.js), so they
+-- can be used any number of times, by anyone, until they expire. Existing
+-- rows default to true, so every other code type behaves exactly as before.
+alter table public.code_redemptions add column if not exists enforce_limits boolean not null default true;
+
+drop index if exists public.code_redemptions_active_per_code;
+drop index if exists public.code_redemptions_active_per_customer;
+drop index if exists public.code_redemptions_active_per_period;
+
 create unique index if not exists code_redemptions_active_per_code
   on public.code_redemptions(code_id)
-  where status in ('reserved', 'confirmed');
+  where status in ('reserved', 'confirmed') and enforce_limits;
 
 -- One live redemption per (code, customer email) — enforces
 -- max_uses_per_customer = 1 (every gift/audience/reward/competition code
@@ -139,14 +152,14 @@ create unique index if not exists code_redemptions_active_per_code
 -- guarantee as the per-code index above.
 create unique index if not exists code_redemptions_active_per_customer
   on public.code_redemptions(code_id, customer_email)
-  where status in ('reserved', 'confirmed');
+  where status in ('reserved', 'confirmed') and enforce_limits;
 
 -- One redemption per (code, period) for competition codes — a second
 -- GOTW/POTM winner attempt in the same week/month is blocked even though the
 -- code itself is reused across periods.
 create unique index if not exists code_redemptions_active_per_period
   on public.code_redemptions(code_id, period_key)
-  where status in ('reserved', 'confirmed') and period_key is not null;
+  where status in ('reserved', 'confirmed') and period_key is not null and enforce_limits;
 
 -- ------------------------------------------------------------------ --
 -- Seed collaborators and codes.
@@ -168,10 +181,12 @@ on conflict (name) do nothing;
 -- HALOE20 — public launch offer, 20% off all treatments, expires 31 Oct 2026
 -- 23:59 UK time (= 23:59 UTC; BST has ended by then).
 insert into public.discount_codes (code, type, percent_off, collaborator_id, max_uses_total, max_uses_per_customer, first_time_only, valid_from, valid_until, period, allowed_email, active, created_at)
-values ('HALOE20', 'promo', 20, null, null, null, false, extract(epoch from now())::bigint, 1793491140, null, null, true, extract(epoch from now())::bigint)
+values ('HALOE20', 'promo', 20, null, null, null, false, extract(epoch from now())::bigint, 1793491199, null, null, true, extract(epoch from now())::bigint)
 on conflict (code) do update set
   type = excluded.type, percent_off = excluded.percent_off, valid_until = excluded.valid_until,
-  first_time_only = excluded.first_time_only, active = true;
+  first_time_only = excluded.first_time_only, active = true,
+  -- reusable: no total cap, no per-customer cap (1793491199 = 31 Oct 2026 23:59:59 UK)
+  max_uses_total = null, max_uses_per_customer = null;
 
 insert into public.discount_codes (code, type, percent_off, collaborator_id, max_uses_total, max_uses_per_customer, first_time_only, valid_from, allowed_email, active, created_at)
 select 'GUEST-YASMZEE', 'gift', 100, c.id, 1, 1, false, extract(epoch from now())::bigint, null, true, extract(epoch from now())::bigint

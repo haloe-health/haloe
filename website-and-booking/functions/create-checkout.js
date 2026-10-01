@@ -78,6 +78,7 @@ export async function onRequestPost(context) {
         email: customerEmail,
         discountPence: discountPenceApplied,
         periodKey: result.periodKey,
+        type: result.type,
       }, now);
       if (discountRedemptionId === null) {
         return new Response(JSON.stringify({ error: 'discount_invalid', reason: 'already_used' }), {
