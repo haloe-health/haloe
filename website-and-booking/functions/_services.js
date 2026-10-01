@@ -81,3 +81,48 @@ export function findService(treatmentName, category) {
   }
   return null;
 }
+
+// Multi-treatment bookings (Oct 2026). `items` is [{ name, category }] as sent
+// by book.html. Resolves every entry against the catalogue above (never
+// trusting a client price or duration) and returns the combined figures:
+//   { ok: true, items: [{ name, category, pricePence, min }], totalPence, totalMin }
+//   { ok: false, error: 'unknown_treatment' | 'no_treatments' | 'too_many_treatments'
+//                     | 'package_not_combinable' }
+// The same treatment twice is collapsed to one; a package (a multi-session
+// product) must be the only thing in the booking.
+export const MAX_TREATMENTS_PER_BOOKING = 6;
+
+export function resolveCart(items) {
+  if (!Array.isArray(items) || items.length === 0) return { ok: false, error: 'no_treatments' };
+  const seen = new Set();
+  const out = [];
+  for (const it of items) {
+    const svc = findService(it && it.name, it && it.category);
+    if (!svc) return { ok: false, error: 'unknown_treatment' };
+    const key = `${it.category}:${svc.name}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({
+      name: svc.name,
+      category: it.category,
+      pricePence: Math.round(netPrice(svc) * 100),
+      min: Number(svc.min) > 0 ? Number(svc.min) : 60,
+    });
+  }
+  if (out.length > MAX_TREATMENTS_PER_BOOKING) return { ok: false, error: 'too_many_treatments' };
+  if (out.length > 1 && out.some(x => x.category === 'packages')) return { ok: false, error: 'package_not_combinable' };
+  return {
+    ok: true,
+    items: out,
+    totalPence: out.reduce((n, x) => n + x.pricePence, 0),
+    totalMin: out.reduce((n, x) => n + x.min, 0),
+  };
+}
+
+// 105 -> '1 hr 45 min', 60 -> '1 hour', 45 -> '45 min' (same wording as services-data.js).
+export function formatDuration(min) {
+  const h = Math.floor(min / 60), m = min % 60;
+  if (h && m) return `${h} hr ${m} min`;
+  if (h) return h === 1 ? '1 hour' : `${h} hours`;
+  return `${m} min`;
+}

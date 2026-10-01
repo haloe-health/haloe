@@ -3,6 +3,8 @@
 // Plain-node, no test framework needed.
 
 import { generateSlots, startGrid, groupSlots } from '../functions/_slots.js';
+import { resolveCart, formatDuration } from '../functions/_services.js';
+import { applyDiscount } from '../functions/_discounts.js';
 
 let pass = 0, fail = 0;
 function ok(label, expr) {
@@ -110,6 +112,53 @@ console.log('  ' + withFullBack.map(m => {
 }).join('  '));
 eq('18 slots after 1h booking', withFullBack.length, 18);
 ok('First available is 11:00', withFullBack[0] === 660);
+
+// ── Multi-treatment bookings ──────────────────────────────────────────────
+console.log('\nMulti-treatment: resolveCart');
+const two = resolveCart([{ name: 'Face Massage', category: 'massage' }, { name: 'Head Massage', category: 'massage' }]);
+ok('two treatments resolve', two.ok);
+eq('combined price £80 (8000p)', two.totalPence, 8000);
+eq('combined duration 90 min', two.totalMin, 90);
+eq('duration label', formatDuration(two.totalMin), '1 hr 30 min');
+
+const wetTwo = resolveCart([{ name: 'Full Back', category: 'wet' }, { name: 'Head & Scalp', category: 'wet' }]);
+eq('wet pair priced per category (£90 + £70 = 16000p)', wetTwo.totalPence, 16000);
+eq('wet pair 120 min', wetTwo.totalMin, 120);
+const crossCat = resolveCart([{ name: 'Full Back', category: 'dry' }, { name: 'Full Back', category: 'wet' }]);
+eq('same name in dry + wet are two distinct treatments (£80 + £90)', crossCat.totalPence, 17000);
+
+const single = resolveCart([{ name: 'Full Back', category: 'wet' }]);
+eq('single treatment unchanged: £90, 60 min', [single.totalPence, single.totalMin], [9000, 60]);
+eq('duplicate is collapsed', resolveCart([{ name: 'Face Massage', category: 'massage' }, { name: 'Face Massage', category: 'massage' }]).items.length, 1);
+eq('unknown treatment rejected', resolveCart([{ name: 'Nope', category: 'massage' }]).error, 'unknown_treatment');
+eq('wrong category rejected (no fallback)', resolveCart([{ name: 'Face Massage', category: 'wet' }]).error, 'unknown_treatment');
+eq('empty cart rejected', resolveCart([]).error, 'no_treatments');
+eq('package cannot be combined', resolveCart([{ name: 'Cycle Comfort', category: 'packages' }, { name: 'Face Massage', category: 'massage' }]).error, 'package_not_combinable');
+ok('a package alone is fine', resolveCart([{ name: 'Cycle Comfort', category: 'packages' }]).ok);
+
+console.log('\nMulti-treatment: HALOE20 on the combined total');
+const d = applyDiscount(two.totalPence, 20);
+eq('20% off £80 = £16 off, £64 to pay', [d.discountPence, d.finalPence], [1600, 6400]);
+
+console.log('\nMulti-treatment: slots fit the COMBINED duration (Face + Head Massage = 90 min)');
+// 10:00–11:00 booked (600–660)
+const slotsTwo = generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy1 });
+ok('9:30 removed (would run to 11:00, into the booking)', !slotsTwo.includes(570));
+ok('11:00 offered (starts as the booking ends)', slotsTwo.includes(660));
+// 11:00–12:00 booked: a lone 45 min treatment fits at 10:00 (ends 10:45); the pair (90 min) does not
+const busy11 = [{ s: 660, e: 720 }];
+ok('a lone 45 min treatment fits at 10:00', generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: 45, busy: busy11 }).includes(600));
+ok('the 90 min pair does NOT fit at 10:00', !generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(600));
+ok('the 90 min pair fits at 9:30 (ends 11:00 exactly)', generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(570));
+// 12:00–12:30 booked: a 90 min session can't start 10:30–12:00, but 45 min can start 11:00 → 11:45
+const busyNoon = [{ s: 720, e: 750 }];
+const s90 = generateSlots({ location: 'mobile', weekday: MOBILE_DAY, durationMin: 90, busy: busyNoon });
+const s45 = generateSlots({ location: 'mobile', weekday: MOBILE_DAY, durationMin: 45, busy: busyNoon });
+ok('mobile: 90 min cannot start 11:00 (runs into 12:00 booking)', !s90.includes(660));
+ok('mobile: 45 min can start 11:00', s45.includes(660));
+ok('mobile: 90 min can start 12:30', s90.includes(750));
+ok('mobile: last start 20:00 still offered (no closing rule)', s90.includes(1200));
+ok('mobile: 10:30 offered for 90 min (ends 12:00 exactly)', s90.includes(630));
 
 // Summary
 console.log(`\n${pass + fail} tests — ${pass} passed, ${fail} failed${fail ? ' ← FIX BEFORE SHIPPING' : ''}\n`);

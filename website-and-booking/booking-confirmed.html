@@ -157,6 +157,9 @@
 <script>
   const params = new URLSearchParams(window.location.search);
   const treatment = params.get('treatment') || '';
+  // create-checkout.js joins a multi-treatment booking's names with ' + '.
+  const treatmentList = treatment.split(' + ').map(t => t.trim()).filter(Boolean);
+  const durationMin = parseInt(params.get('duration') || '0', 10);
   const date      = params.get('date')      || '';
   const time      = params.get('time')      || '';
   // NOTE: can't call this `location` — that shadows the global `window.location`
@@ -176,7 +179,8 @@
   const gbp = (pence) => '£' + (pence / 100).toFixed(2).replace(/\.00$/, '');
   const paid = gbp(amount);
 
-  const bits = [treatment, [date, time].filter(Boolean).join(', ')].filter(Boolean);
+  const durationLabel = (min) => { const h = Math.floor(min / 60), m = min % 60; return h && m ? `${h} hr ${m} min` : h ? (h === 1 ? '1 hour' : `${h} hours`) : `${m} min`; };
+  const bits = [treatmentList.length > 1 ? `${treatmentList.length} treatments` : treatment, [date, time].filter(Boolean).join(', ')].filter(Boolean);
   document.getElementById('payment-sub').textContent = bits.join(' · ');
   document.getElementById('payment-paid').textContent = `Paid in full — ${paid}`;
 
@@ -184,11 +188,18 @@
   // travel (home visits only), total. Rows with nothing to show are skipped
   // rather than left blank.
   const rows = [];
+  // Several treatments: one row each, then the combined duration. A single
+  // treatment keeps its original single "Treatment" price row.
+  if (treatmentList.length > 1) {
+    treatmentList.forEach((t, i) => rows.push([i === 0 ? 'Treatments' : '', t]));
+    if (durationMin > 0) rows.push(['Total duration', durationLabel(durationMin)]);
+  }
+  const subtotalLabel = treatmentList.length > 1 ? 'Treatments subtotal' : 'Treatment';
   if (discountCode) {
-    rows.push(['Treatment', gbp(originalAmount)]);
+    rows.push([subtotalLabel, gbp(originalAmount)]);
     rows.push([`${discountCode} discount`, `−${gbp(discountAmount)}`]);
   } else {
-    rows.push(['Treatment', gbp(treatmentAmount)]);
+    rows.push([subtotalLabel, gbp(treatmentAmount)]);
   }
   if (bookingLocation === 'mobile') {
     rows.push(['Travel', travelZone === 'C' ? 'Confirmed by WhatsApp' : gbp(travelPence)]);

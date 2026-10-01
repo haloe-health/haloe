@@ -464,6 +464,16 @@
   .service-card:focus-visible { outline: 2px solid var(--gold-deep); outline-offset: -2px; }
   .service-card.selected { background: var(--gold-soft, rgba(200,169,110,0.12)); }
   .service-card.selected:hover { background: var(--gold-soft, rgba(200,169,110,0.16)); }
+  /* Running summary of a multi-treatment selection (step 2) */
+  .cart-summary { margin-top: 1.4rem; padding: 0.9rem 1rem; background: var(--obsidian-floating); border-radius: 12px; }
+  .cart-title { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 0.4rem; }
+  .cart-row { display: flex; align-items: center; gap: 0.6rem; padding: 0.35rem 0; border-bottom: 1px solid var(--hairline); font-size: 0.95rem; color: var(--cream); }
+  .cart-name { flex: 1; min-width: 0; }
+  .cart-price { color: var(--text-muted); }
+  .cart-remove { background: none; border: none; color: var(--text-muted); font-size: 1.3rem; line-height: 1; cursor: pointer; padding: 0 0.25rem; }
+  .cart-total { display: flex; justify-content: space-between; gap: 1rem; padding-top: 0.7rem; font-size: 0.95rem; color: var(--cream); font-weight: 500; }
+  .cart-total .v { color: var(--gold-deep); }
+  .cart-note { font-size: 0.75rem; color: var(--text-muted); margin: 0.6rem 0 0; }
   /* Selection indicator: left-aligned 24px circle, 12px gap to text (the
      row's own `gap` above) — same treatment everywhere a list has a single
      selectable row (also used on the Packages tab). Selected = gold fill +
@@ -1680,7 +1690,7 @@
   <div class="panel" id="panel-2">
     <button class="btn-back" onclick="goToStep(1)">← Back</button>
     <p class="panel-title">Choose your treatment.</p>
-    <p class="panel-sub">Prices shown are treatment only — travel fee added for home visits.</p>
+    <p class="panel-sub">Choose one or more — they're done together in one session. Prices shown are treatment only; travel fee added for home visits.</p>
 
     <div class="category-tabs-wrap" id="category-tabs-wrap">
       <div class="category-tabs segmented" id="category-tabs" role="tablist" aria-label="Treatment category">
@@ -1692,7 +1702,9 @@
     </div>
     <p class="packages-policy-line hidden" id="packages-policy-line">Packages are paid in full. Free reschedule or full refund up to 48 hours before a session; inside 48 hours, sessions are non-refundable but can be moved once. For more information contact Halima on WhatsApp: <a href="https://wa.me/447474833643" style="color:#a8873a;text-decoration:none;">07474 833643</a></p>
 
-    <div class="service-grid" id="service-grid" role="radiogroup" aria-label="Treatment"></div>
+    <div class="service-grid" id="service-grid" role="group" aria-label="Treatments — select one or more"></div>
+
+    <div class="cart-summary hidden" id="cart-summary" aria-live="polite"></div>
 
     <button class="btn-primary" id="btn-step2" onclick="goToStep(3)" disabled>Continue — Choose Date & Time</button>
   </div>
@@ -1983,8 +1995,8 @@ function formatPounds(pence) {
 }
 
 let state = {
-  category: 'massage',
-  serviceIndex: null,
+  category: 'massage',   // which category TAB is showing (the cart below can span categories)
+  cart: [],              // selected treatments: [{ cat, i }] — several allowed, see toggleService()
   location: null, // 'clinic' | 'mobile' — chosen on the Where step
   date: null,
   time: null,
@@ -2090,6 +2102,37 @@ function whereContinue() {
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+/* ---- Multi-treatment cart (Oct 2026) ----
+   A booking can hold several treatments, done back to back in ONE slot:
+   the slot length is the sum of their durations and the price is the sum of
+   their prices. The server (functions/_services.js resolveCart) recomputes
+   both from its own catalogue and never trusts these figures. A package is a
+   multi-session product, so it can't be combined with anything else. */
+function cartItems() {
+  return state.cart
+    .map(({ cat, i }) => SERVICES[cat] && SERVICES[cat][i] ? { cat, i, svc: SERVICES[cat][i] } : null)
+    .filter(Boolean);
+}
+function inCart(cat, i) { return state.cart.some(c => c.cat === cat && c.i === i); }
+function cartPayload() { return cartItems().map(({ cat, svc }) => ({ name: svc.name, category: cat })); }
+function cartTotalPence() { return cartItems().reduce((n, { svc }) => n + Math.round(netPrice(svc) * 100), 0); }
+function durationText(min) {
+  const h = Math.floor(min / 60), m = min % 60;
+  if (h && m) return `${h} hr ${m} min`;
+  if (h) return h === 1 ? '1 hour' : `${h} hours`;
+  return `${m} min`;
+}
+// A discount applied to one selection is wrong for another — drop it, and
+// queue the same code to re-validate automatically on step 5.
+function clearDiscountForCartChange() {
+  if (!state.discount) return;
+  pendingDiscountCode = state.discount.code;
+  state.discount = null;
+  const input = document.getElementById('discount-code');
+  if (input) { input.value = pendingDiscountCode; input.disabled = false; }
+  renderDiscountLine();
+}
+
 /* Deep link from the homepage condition modals: ?cat=packages&svc=Stress%20%26%20Sleep
    Without this the wizard always opened on Massage, so someone who tapped
    "Stress & Anxiety" landed on face massages instead of their package.
@@ -2128,7 +2171,7 @@ function applyDeepLink() {
   if (wanted) {
     const i = SERVICES[cat].findIndex(s => s.name === wanted);
     if (i !== -1) {
-      state.serviceIndex = i;
+      state.cart = [{ cat, i }];
       matched = true;
       const btn = document.getElementById('btn-step2');
       if (btn) btn.disabled = false;
@@ -2161,8 +2204,11 @@ let currentStep = 1;
 // Live "Your booking" rail (Option B). Reflects state on every change; shows a
 // dash placeholder for anything not chosen yet.
 function updateRail() {
-  const svc = (state.serviceIndex !== null && SERVICES[state.category])
-    ? SERVICES[state.category][state.serviceIndex] : null;
+  const items = cartItems();
+  const svc = items.length ? items[0].svc : null; // truthy iff something is selected
+  const names = items.map(x => x.svc.name);
+  const totalMin = cartDurationMin();
+  const totalPence = cartTotalPence();
   const dateStr = state.date
     ? state.date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
     : '';
@@ -2170,8 +2216,8 @@ function updateRail() {
     : state.location === 'mobile' ? 'Home visit' : '';
   const rows = [
     ['Where', whereLabel],
-    ['Treatment', svc ? svc.name : ''],
-    ['Duration', svc ? svc.time : ''],
+    ['Treatment', names.join(' + ')],
+    ['Duration', svc ? (items.length > 1 ? durationText(totalMin) : (svc.time || durationText(totalMin))) : ''],
     ['Date', dateStr],
     ['Time', state.time || ''],
   ];
@@ -2182,7 +2228,7 @@ function updateRail() {
     ).join('');
   }
   const totalEl = document.getElementById('rail-total');
-  if (totalEl) totalEl.textContent = svc ? priceFmt(netPrice(svc)) : '—';
+  if (totalEl) totalEl.textContent = svc ? formatPounds(totalPence) : '—';
   const ring = document.getElementById('rail-ring');
   if (ring) ring.style.setProperty('--p', `${Math.round((currentStep / 5) * 100)}%`);
   const lbl = document.getElementById('rail-ring-label');
@@ -2205,11 +2251,13 @@ function updateRail() {
       // Step 2's bar is just "Select a treatment" / "Face Massage · £40" —
       // date/time haven't been chosen yet at this point in the flow, and
       // repeating them here (steps 3+) is handled by the branch below.
-      fs.textContent = `${svc.name} · ${priceFmt(netPrice(svc))}`;
+      fs.textContent = items.length > 1
+        ? `${items.length} treatments · ${formatPounds(totalPence)}`
+        : `${svc.name} · ${priceFmt(netPrice(svc))}`;
     } else {
       // Name · date · time only — omit svc.time (duration) to avoid truncation,
       // especially for packages whose time string is long.
-      const bits = [svc.name];
+      const bits = [items.length > 1 ? `${items.length} treatments · ${durationText(totalMin)}` : svc.name];
       if (dateStr) bits.push(dateStr);
       if (state.time) bits.push(state.time);
       // Location prefix on Treatment step onwards, dropped on phone widths
@@ -2220,7 +2268,8 @@ function updateRail() {
   const ft = document.getElementById('foot-total');
   // Blank rather than a stray "—" placeholder when nothing's picked yet —
   // the summary text alone ("Select a treatment") already says so.
-  if (ft) ft.innerHTML = svc && currentStep !== 2 ? priceHtml(svc) : '';
+  if (ft) ft.innerHTML = svc && currentStep !== 2
+    ? (items.length > 1 ? formatPounds(totalPence) : priceHtml(svc)) : '';
   const fh = document.getElementById('foot-helper');
   if (fh) fh.classList.toggle('hidden', !(currentStep === 1 && !state.location));
   const sc = document.querySelector('.foot-summary-col');
@@ -2324,7 +2373,7 @@ function renderServices() {
   const ordered = isPackages ? orderedPackages(visibleServices) : orderedTreatments(visibleServices);
 
   grid.innerHTML = ordered.map(({ s, i }) => {
-    const selected = state.serviceIndex === i;
+    const selected = inCart(state.category, i);
     const ring = `<span class="svc-ring" aria-hidden="true">${CHECK_SVG}</span>`;
     const priceEl = `<span class="svc-price">${priceHtml(s)}</span>`;
     let body;
@@ -2345,40 +2394,76 @@ function renderServices() {
         </span>
         <span class="svc-right-col">${priceEl}${durTag}</span>`;
     }
-    return `<div class="service-card${selected ? ' selected' : ''}" role="radio" aria-checked="${selected}" tabindex="${selected || (state.serviceIndex === null && ordered[0].i === i) ? '0' : '-1'}" onclick="selectService(${i})" onkeydown="serviceCardKeydown(event, ${i})">${ring}${body}</div>`;
+    return `<div class="service-card${selected ? ' selected' : ''}" role="checkbox" aria-checked="${selected}" tabindex="${(state.cart.length === 0 && ordered[0].i === i) || selected ? '0' : '-1'}" data-i="${i}" onclick="toggleService(${i})" onkeydown="serviceCardKeydown(event, ${i})">${ring}${body}</div>`;
   }).join('');
+  renderCartSummary();
 }
 
-function selectService(i) {
-  state.serviceIndex = i;
+// Clicking a treatment toggles it in or out of the booking, so several can be
+// picked and any of them deselected. A package can't share a booking with
+// anything else: picking one replaces the selection, and picking a
+// treatment drops any package.
+let cartNote = '';
+function toggleService(i) {
+  const cat = state.category;
+  cartNote = '';
+  if (inCart(cat, i)) {
+    state.cart = state.cart.filter(c => !(c.cat === cat && c.i === i));
+  } else if (cat === 'packages') {
+    if (state.cart.length) cartNote = 'A package is booked on its own, so your other selections were removed.';
+    state.cart = [{ cat, i }];
+  } else {
+    if (state.cart.some(c => c.cat === 'packages')) cartNote = 'Your package was removed — packages are booked on their own.';
+    state.cart = state.cart.filter(c => c.cat !== 'packages').concat([{ cat, i }]);
+  }
+  clearDiscountForCartChange();
+  // A chosen time may not fit the new combined length; loadSlots() (on
+  // arriving at step 3) drops it if so.
+  document.getElementById('btn-step2').disabled = state.cart.length === 0;
   renderServices();
-  document.getElementById('btn-step2').disabled = false;
   updateRail();
-  const row = document.querySelector(`.service-card[onclick="selectService(${i})"]`);
+  const row = document.querySelector(`.service-card[data-i="${i}"]`);
   if (row) row.focus();
 }
 
-// Standard radiogroup keyboard pattern: arrow keys move focus AND selection
-// between rows (in the currently-rendered/ordered sequence, not raw array
-// index), Enter/Space select the focused row.
+// Running summary under the list: every selected treatment (removable),
+// the combined duration and the combined price.
+function renderCartSummary() {
+  const el = document.getElementById('cart-summary');
+  if (!el) return;
+  const items = cartItems();
+  if (!items.length) { el.classList.add('hidden'); el.innerHTML = ''; return; }
+  const totalMin = cartDurationMin();
+  const rows = items.map(({ cat, i, svc }) =>
+    `<div class="cart-row"><span class="cart-name">${svc.name}</span>`
+    + `<span class="cart-price">${formatPounds(Math.round(netPrice(svc) * 100))}</span>`
+    + `<button type="button" class="cart-remove" aria-label="Remove ${svc.name}" onclick="removeFromCart('${cat}', ${i})">×</button></div>`
+  ).join('');
+  el.classList.remove('hidden');
+  el.innerHTML = `<p class="cart-title">Your selection</p>${rows}`
+    + `<div class="cart-total"><span>${items.length} treatment${items.length === 1 ? '' : 's'} · ${durationText(totalMin)}</span>`
+    + `<span class="v">${formatPounds(cartTotalPence())}</span></div>`
+    + (cartNote ? `<p class="cart-note">${cartNote}</p>` : '');
+}
+
+function removeFromCart(cat, i) {
+  state.cart = state.cart.filter(c => !(c.cat === cat && c.i === i));
+  cartNote = '';
+  clearDiscountForCartChange();
+  document.getElementById('btn-step2').disabled = state.cart.length === 0;
+  renderServices();
+  updateRail();
+}
+
+// Checkbox-group keyboard pattern: arrow keys move focus between rows (in
+// the rendered order), Enter/Space toggle the focused row.
 function serviceCardKeydown(e, i) {
   const cards = Array.from(document.querySelectorAll('#service-grid .service-card'));
-  const onclicks = cards.map(c => c.getAttribute('onclick'));
-  const currentPos = onclicks.indexOf(`selectService(${i})`);
-  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-    e.preventDefault();
-    const next = cards[(currentPos + 1) % cards.length];
-    const m = /selectService\((\d+)\)/.exec(next.getAttribute('onclick'));
-    if (m) selectService(parseInt(m[1], 10));
-  } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-    e.preventDefault();
-    const prev = cards[(currentPos - 1 + cards.length) % cards.length];
-    const m = /selectService\((\d+)\)/.exec(prev.getAttribute('onclick'));
-    if (m) selectService(parseInt(m[1], 10));
-  } else if (e.key === 'Enter' || e.key === ' ') {
-    e.preventDefault();
-    selectService(i);
-  }
+  const currentPos = cards.findIndex(c => c.dataset.i === String(i));
+  const focusAt = (pos) => { const c = cards[(pos + cards.length) % cards.length]; c.tabIndex = 0; c.focus(); };
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); focusAt(currentPos + 1); }
+  else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); focusAt(currentPos - 1); }
+  else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleService(i); }
 }
 
 // Category tabs: role="tablist"/"tab" semantics with aria-selected, plus
@@ -2395,9 +2480,7 @@ function activateCategoryTab(btn) {
   btn.classList.add('active');
   btn.setAttribute('aria-selected', 'true');
   btn.tabIndex = 0;
-  state.category = btn.dataset.cat;
-  state.serviceIndex = null;
-  document.getElementById('btn-step2').disabled = true;
+  state.category = btn.dataset.cat; // the selection persists across tabs
   renderServices();
   updateRail();
 }
@@ -2494,16 +2577,22 @@ function slotToMinutes(t) {
 // carries an explicit `sessionMin` (the length of its first session, which
 // is what gets booked). The server recomputes this from functions/_services.js
 // and never trusts a client figure — this drives the slot list only.
-function selectedDurationMin() {
-  const svc = SERVICES[state.category] && SERVICES[state.category][state.serviceIndex];
+function svcDurationMin(svc) {
   if (!svc) return 60;
   if (Number(svc.sessionMin) > 0) return Number(svc.sessionMin);
-  const s = svc.time || '';
-  const hr = /(\d+)\s*(?:hours?|hrs?|hr)\b/i.exec(s);
-  const mn = /(\d+)\s*min/i.exec(s);
+  const t = svc.time || '';
+  const hr = /(\d+)\s*(?:hours?|hrs?|hr)\b/i.exec(t);
+  const mn = /(\d+)\s*min/i.exec(t);
   const total = (hr ? parseInt(hr[1], 10) * 60 : 0) + (mn ? parseInt(mn[1], 10) : 0);
   return total > 0 ? total : 60;
 }
+// Combined length of everything selected, back to back — what the slot list
+// is checked against (falls back to 60 with nothing selected).
+function cartDurationMin() {
+  const items = cartItems();
+  return items.length ? items.reduce((n, { svc }) => n + svcDurationMin(svc), 0) : 60;
+}
+function selectedDurationMin() { return cartDurationMin(); }
 
 function toISODate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -2736,14 +2825,14 @@ function checkStep3() {
 }
 
 function buildSummary() {
-  if (state.serviceIndex === null || !SERVICES[state.category]) return {};
-  if (!SERVICES[state.category][state.serviceIndex]) return {};
-  const service = SERVICES[state.category][state.serviceIndex];
-  const catLabel = { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package' }[state.category];
+  const items = cartItems();
+  if (!items.length) return {};
+  const names = items.map(x => x.svc.name);
+  const catLabel = items.length > 1 ? '' : { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package' }[items[0].cat];
   const dateStr = state.date ? state.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
   const locationLabel = isClinic() ? `Clinic Day — ${CLINIC_VENUE_NAME}` : 'Home visit';
   const name = document.getElementById('fullname').value.trim();
-  return { service, catLabel, dateStr, locationLabel, name };
+  return { items, names, catLabel, dateStr, locationLabel, name };
 }
 
 // Travel fee for whatever's currently selected — 0 for clinic (no travel
@@ -2753,15 +2842,17 @@ function travelPenceForSelection() {
 }
 
 function renderSummary() {
-  const { service, catLabel, dateStr, locationLabel, name } = buildSummary();
+  const { items, names, catLabel, dateStr, locationLabel, name } = buildSummary();
+  const multi = items.length > 1;
+  const subtotalPence = cartTotalPence();
   const card = document.getElementById('summary-card');
   // A discount code can undercut the site-wide promo price shown by
   // priceHtml() — once one's applied, show what's actually being charged.
   // Always the TREATMENT price alone — travel (below) is never discounted.
-  const treatmentPence = state.discount ? state.discount.finalPence : netPrice(service) * 100;
+  const treatmentPence = state.discount ? state.discount.finalPence : subtotalPence;
   const priceHtmlOut = state.discount
-    ? `<s class="was">${formatPounds(netPrice(service) * 100)}</s> ${formatPounds(state.discount.finalPence)}`
-    : priceHtml(service);
+    ? `<s class="was">${formatPounds(subtotalPence)}</s> ${formatPounds(state.discount.finalPence)}`
+    : (multi ? formatPounds(subtotalPence) : priceHtml(items[0].svc));
 
   const travelPence = travelPenceForSelection();
   const travelRow = !isClinic() && state.travelZone ? `
@@ -2786,8 +2877,8 @@ function renderSummary() {
       <div class="pass-perf"><span></span></div>
       <div class="pass-what">
         <div>
-          <div class="pass-name">${service.name}</div>
-          <div class="pass-meta">${catLabel}${service.time ? ' · ' + service.time : ''}${name ? ' · ' + name : ''}</div>
+          <div class="pass-name">${names.join('<br>')}</div>
+          <div class="pass-meta">${multi ? `${items.length} treatments · ${durationText(cartDurationMin())}` : `${catLabel}${items[0].svc.time ? ' · ' + items[0].svc.time : ''}`}${name ? ' · ' + name : ''}</div>
         </div>
         <div class="pass-price">${priceHtmlOut}</div>
       </div>
@@ -2798,8 +2889,8 @@ function renderSummary() {
 }
 
 async function handlePayment() {
-  if (state.serviceIndex === null) { alert("Please go back and select a treatment."); return; }
-  const { service, dateStr, locationLabel } = buildSummary();
+  if (!state.cart.length) { alert("Please go back and select a treatment."); return; }
+  const { names, dateStr, locationLabel } = buildSummary();
   const name  = document.getElementById('fullname').value.trim();
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
@@ -2836,7 +2927,7 @@ async function handlePayment() {
   const fullBtn = document.getElementById('btn-full');
   if (fullBtn) { fullBtn.disabled = true; fullBtn.textContent = 'Redirecting to payment…'; }
 
-  const amount = netPrice(service) * 100; // pence — every booking is paid in full; create-checkout.js recomputes this itself if a discount code is present, never trusting this figure for the actual charge.
+  const amount = cartTotalPence(); // pence — every booking is paid in full; create-checkout.js recomputes this itself if a discount code is present, never trusting this figure for the actual charge.
 
   try {
     const res = await fetch('/create-checkout', {
@@ -2844,8 +2935,8 @@ async function handlePayment() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         amount,
-        treatmentName: service.name,
-        treatmentCategory: state.category,
+        // The whole selection; the server prices and times it from its own catalogue.
+        treatments: cartPayload(),
         customerEmail: email,
         customerName: name,
         customerPhone: phone,
@@ -2930,10 +3021,8 @@ async function handlePayment() {
 }
 
 function fullLabel() {
-  const svc = (state.serviceIndex !== null && SERVICES[state.category])
-    ? SERVICES[state.category][state.serviceIndex] : null;
-  if (!svc) return 'Pay in full';
-  const treatmentPence = state.discount ? state.discount.finalPence : netPrice(svc) * 100;
+  if (!state.cart.length) return 'Pay in full';
+  const treatmentPence = state.discount ? state.discount.finalPence : cartTotalPence();
   const totalPence = treatmentPence + travelPenceForSelection();
   return `Pay in full — ${formatPounds(totalPence)}`;
 }
@@ -2987,7 +3076,7 @@ async function applyDiscountCode(codeOverride) {
     if (errEl) { errEl.textContent = discountErrorMessage('missing_code'); errEl.classList.add('visible'); }
     return;
   }
-  if (state.serviceIndex === null || !SERVICES[state.category]) {
+  if (!state.cart.length) {
     if (errEl) { errEl.textContent = discountErrorMessage('unknown_treatment'); errEl.classList.add('visible'); }
     return;
   }
@@ -3000,14 +3089,13 @@ async function applyDiscountCode(codeOverride) {
   const phoneField = document.getElementById('phone');
   const phone = phoneField ? phoneField.value.trim() : '';
 
-  const svc = SERVICES[state.category][state.serviceIndex];
   if (btn) { btn.disabled = true; btn.textContent = 'Checking…'; }
 
   try {
     const res = await fetch('/apply-discount', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, email, phone, treatmentName: svc.name, treatmentCategory: state.category }),
+      body: JSON.stringify({ code, email, phone, treatments: cartPayload() }),
     });
     const data = await res.json();
 
@@ -3068,7 +3156,7 @@ function goToStep(n) {
   // Reset touched tracking whenever the customer navigates away from step 4
   // so errors don't carry over on Back+Forward.
   if (n !== 4) touchedFields.clear();
-  if (n === 5 && state.serviceIndex === null) { alert("Please select a treatment first."); return; }
+  if (n === 5 && !state.cart.length) { alert("Please select a treatment first."); return; }
   currentStep = n;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById(`panel-${n}`).classList.add('active');

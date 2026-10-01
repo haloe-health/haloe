@@ -6,18 +6,20 @@
 // re-validates and recomputes the amount itself at payment time; this endpoint's
 // response is never trusted for the actual charge.
 import { validateDiscountCode, applyDiscount } from './_discounts.js';
-import { findService, netPrice } from './_services.js';
+import { resolveCart } from './_services.js';
 
 export async function onRequestPost(context) {
   try {
-    const { code, email, phone, treatmentName, treatmentCategory } = await context.request.json();
+    const { code, email, phone, treatmentName, treatmentCategory, treatments } = await context.request.json();
 
     // Category-scoped — see the comment on findService() (_services.js):
     // four treatment names are reused across dry/wet cupping at different
     // prices, so a category-less lookup can silently price the wrong one.
-    const svc = findService(treatmentName, treatmentCategory);
-    if (!svc) {
-      return new Response(JSON.stringify({ ok: false, error: 'unknown_treatment' }), {
+    // `treatments` is the multi-treatment cart; the old single
+    // treatmentName/treatmentCategory pair is still accepted.
+    const cart = resolveCart(Array.isArray(treatments) ? treatments : [{ name: treatmentName, category: treatmentCategory }]);
+    if (!cart.ok) {
+      return new Response(JSON.stringify({ ok: false, error: cart.error }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
@@ -41,7 +43,7 @@ export async function onRequestPost(context) {
       });
     }
 
-    const originalAmountPence = netPrice(svc) * 100;
+    const originalAmountPence = cart.totalPence; // the COMBINED treatment price
     const { discountPence, finalPence } = applyDiscount(originalAmountPence, result.percent);
 
     return new Response(JSON.stringify({

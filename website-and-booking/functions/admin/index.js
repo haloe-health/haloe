@@ -213,6 +213,19 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+// Lists every treatment on a booking with the combined duration. Old rows
+// (and single-treatment bookings) have no treatments array and just show
+// the plain treatment text, exactly as before.
+function treatmentHtml(b) {
+  const list = Array.isArray(b.treatments) ? b.treatments : [];
+  if (list.length < 2) return escapeHtml(b.treatment || '');
+  const mins = list.reduce(function (n, t) { return n + (Number(t.min) || 0); }, 0);
+  const h = Math.floor(mins / 60), m = mins % 60;
+  const dur = h && m ? h + ' hr ' + m + ' min' : h ? h + (h === 1 ? ' hour' : ' hours') : m + ' min';
+  return list.map(function (t) { return escapeHtml(t.name); }).join('<br>') +
+    '<br><span style="opacity:.7">' + list.length + ' treatments · ' + dur + '</span>';
+}
+
 function money(pence) {
   if (pence === null || pence === undefined) return '—';
   return '£' + (pence / 100).toFixed(2);
@@ -309,7 +322,7 @@ function render() {
           '<span class="card-amount">' + money(b.amount_pence) + '</span>' +
         '</div>' +
         '<div class="card-name">' + escapeHtml(b.customer_name || 'Unknown') + '</div>' +
-        '<div class="card-treatment">' + escapeHtml(b.treatment || '') + '</div>' +
+        '<div class="card-treatment">' + treatmentHtml(b) + '</div>' +
         '<div class="card-badges">' + locBadge + statusBadge + discountBadge + conflictBadge + travelWarnBadge + '</div>' +
         address +
         actions +

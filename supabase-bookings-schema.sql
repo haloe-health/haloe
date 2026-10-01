@@ -41,6 +41,12 @@ alter table public.bookings add column if not exists discount_pence integer;
 alter table public.bookings add column if not exists travel_zone text;
 alter table public.bookings add column if not exists travel_pence integer;
 
+-- Added Oct 2026 for multi-treatment bookings. NULL for every single-treatment
+-- booking (including all existing rows) — `treatment` (text) still holds the
+-- display name, which for a multi booking is the names joined with ' + '.
+-- For a multi booking this is [{name, category, pricePence, min}, …].
+alter table public.bookings add column if not exists treatments jsonb;
+
 create index if not exists bookings_date_idx on public.bookings(booking_date);
 
 -- ------------------------------------------------------------------ --
@@ -62,7 +68,7 @@ create index if not exists bookings_date_idx on public.bookings(booking_date);
 -- it creates a second, overloaded function with the same name, which then
 -- makes `grant execute on function public.reserve_slot` ambiguous
 -- ("function name ... is not unique"). Drop every prior signature by its
--- exact original argument list first so only the current 16-arg version
+-- exact original argument list first so only the current 17-arg version
 -- remains.
 -- ------------------------------------------------------------------ --
 drop function if exists public.reserve_slot(
@@ -70,6 +76,9 @@ drop function if exists public.reserve_slot(
 );
 drop function if exists public.reserve_slot(
   date, integer, integer, text, text, text, text, text, text, integer, bigint, bigint, text, integer
+);
+drop function if exists public.reserve_slot(
+  date, integer, integer, text, text, text, text, text, text, integer, bigint, bigint, text, integer, text, integer
 );
 
 create or replace function public.reserve_slot(
@@ -88,7 +97,8 @@ create or replace function public.reserve_slot(
   p_discount_code text default null,
   p_discount_pence integer default null,
   p_travel_zone text default null,
-  p_travel_pence integer default null
+  p_travel_pence integer default null,
+  p_treatments jsonb default null
 ) returns bigint
 language plpgsql
 as $$
@@ -110,11 +120,11 @@ begin
   insert into public.bookings
     (booking_date, start_min, end_min, treatment, customer_name, customer_email,
      customer_phone, location, address, amount_pence, status, hold_expires_at, created_at,
-     discount_code, discount_pence, travel_zone, travel_pence)
+     discount_code, discount_pence, travel_zone, travel_pence, treatments)
   values
     (p_booking_date, p_start_min, p_end_min, p_treatment, p_customer_name, p_customer_email,
      p_customer_phone, p_location, p_address, p_amount_pence, 'pending', p_hold_expires_at, p_now,
-     p_discount_code, p_discount_pence, p_travel_zone, p_travel_pence)
+     p_discount_code, p_discount_pence, p_travel_zone, p_travel_pence, p_treatments)
   returning id into v_id;
 
   return v_id;
@@ -132,5 +142,5 @@ alter table public.bookings enable row level security;
 grant select, insert, update, delete on public.bookings to service_role;
 grant usage, select on sequence public.bookings_id_seq to service_role;
 grant execute on function public.reserve_slot(
-  date, integer, integer, text, text, text, text, text, text, integer, bigint, bigint, text, integer, text, integer
+  date, integer, integer, text, text, text, text, text, text, integer, bigint, bigint, text, integer, text, integer, jsonb
 ) to service_role;

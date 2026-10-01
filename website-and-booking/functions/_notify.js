@@ -32,6 +32,24 @@ export function upperPostcode(str) {
   );
 }
 
+// Every treatment on the booking, one per entry. Falls back to the single
+// `treatment` string for callers that predate multi-treatment bookings.
+function treatmentList(d) {
+  return Array.isArray(d.treatments) && d.treatments.length ? d.treatments : [d.treatment];
+}
+
+// infoCard rows for the treatment(s) + duration. One treatment renders
+// exactly as before (a single "Treatment" row, no duration row); several get
+// one row each, then the combined duration.
+function treatmentRows(d) {
+  const list = treatmentList(d);
+  if (list.length === 1) return [{ label: 'Treatment', value: list[0] }];
+  return [
+    ...list.map((t, i) => ({ label: i === 0 ? 'Treatments' : ' ', value: t })),
+    { label: 'Total duration', value: d.durationLabel },
+  ];
+}
+
 function locationLabel(d) {
   return d.location === 'clinic' ? 'Clinic Day' : 'Home visit';
 }
@@ -44,7 +62,7 @@ function locationLabel(d) {
 // for a free booking) must always still return 200 / a success URL to the
 // customer even if a notification silently fails.
 //
-// `d` fields: name, phone, email, treatment, date, time, location, venue,
+// `d` fields: name, phone, email, treatment, treatments (array of names), durationLabel, date, time, location, venue,
 // address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel,
 // discountLabel, travelLabel, travelZone, travelPence, slotConflict.
 export async function notifyBooking(env, d) {
@@ -115,7 +133,8 @@ async function sendWhatsAppNotification(env, d) {
     `Name: ${d.name}`,
     d.phone ? `Phone: ${d.phone}` : null,
     d.email ? `Email: ${d.email}` : null,
-    `Treatment: ${d.treatment}`,
+    `Treatment${treatmentList(d).length > 1 ? 's' : ''}: ${d.treatment}`,
+    d.durationLabel && treatmentList(d).length > 1 ? `Total duration: ${d.durationLabel}` : null,
     d.date ? `Date: ${d.date}` : null,
     d.time ? `Time: ${d.time}` : null,
     `Location: ${locationLabel(d)}`,
@@ -166,8 +185,8 @@ function clientEmailHtml(d) {
               </tr>
               ${heroRow(d.date, d.time, locationLabel(d))}
               ${infoCard([
-                { label: 'Treatment', value: d.treatment },
-                { label: 'Price', value: d.originalAmountLabel },
+                ...treatmentRows(d),
+                { label: treatmentList(d).length > 1 ? 'Treatments subtotal' : 'Price', value: d.originalAmountLabel },
                 { label: d.discountRowLabel, value: d.discountLabel },
                 { label: 'Travel', value: d.travelLabel },
                 { label: 'Total paid', value: d.amount, gold: true },
@@ -203,8 +222,8 @@ function halimaEmailHtml(d) {
               </tr>
               ${heroRow(d.date, d.time, locationLabel(d))}
               ${infoCard([
-                { label: 'Treatment', value: d.treatment },
-                { label: 'Price', value: d.originalAmountLabel },
+                ...treatmentRows(d),
+                { label: treatmentList(d).length > 1 ? 'Treatments subtotal' : 'Price', value: d.originalAmountLabel },
                 { label: d.discountRowLabel, value: d.discountLabel },
                 { label: 'Travel', value: d.travelLabel },
                 { label: 'Total paid', value: d.amount, gold: true },

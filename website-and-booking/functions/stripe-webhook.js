@@ -12,6 +12,7 @@
 import { confirmBooking } from './_bookings.js';
 import { confirmDiscountRedemption } from './_discounts.js';
 import { notifyBooking, formatGBP, upperPostcode } from './_notify.js';
+import { formatDuration } from './_services.js';
 
 export async function onRequestPost(context) {
   // --- Read the RAW body first (required for signature verification) ---
@@ -81,6 +82,13 @@ export async function onRequestPost(context) {
     const name = md.customerName || 'there';
     const phone = md.customerPhone || '';
     const treatment = md.treatmentName || 'Your treatment';
+    // create-checkout.js joins a multi-treatment booking's names with ' + '
+    // (no catalogue name contains that) — split back out so every treatment
+    // gets its own row in the emails. Old single-treatment sessions have no
+    // totalDurationMin metadata, so their duration line is simply omitted.
+    const treatments = treatment.split(' + ').map(t => t.trim()).filter(Boolean);
+    const totalDurationMin = parseInt(md.totalDurationMin || '0', 10);
+    const durationLabel = totalDurationMin > 0 ? formatDuration(totalDurationMin) : '';
     const date = md.date || '';
     const time = md.time || '';
     const location = md.location || 'mobile';
@@ -158,7 +166,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    const detail = { name, phone, email, treatment, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel, discountLabel, travelLabel, travelZone, travelPence, slotConflict };
+    const detail = { name, phone, email, treatment, treatments, durationLabel, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel, discountLabel, travelLabel, travelZone, travelPence, slotConflict };
     await notifyBooking(context.env, detail);
   } catch (err) {
     // Log, but still acknowledge so Stripe does not retry indefinitely

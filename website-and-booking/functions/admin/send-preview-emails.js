@@ -30,8 +30,10 @@ export async function onRequestGet(context) {
   // Self-consistent sample figures — Total paid is always derived from these
   // same three numbers (price - discount + travel), exactly like
   // create-checkout.js/stripe-webhook.js do from the real metadata.
-  const treatmentPence = 9000;   // £90
-  const discountPence = 1800;    // HALOE20, 20% off £90
+  // Sample is now a TWO-treatment booking (Full Back £90 + Head & Scalp £70,
+  // wet cupping) so the multi-treatment rows can be checked in a real inbox.
+  const treatmentPence = 16000;  // £160
+  const discountPence = 3200;    // HALOE20, 20% off £160
   const clinicTravelPence = 0;   // no travel fee on Clinic Day
   const mobileTravelPence = 1500; // Zone A
 
@@ -42,7 +44,9 @@ export async function onRequestGet(context) {
       name: 'Aisha Rahman',
       phone: '07123 456789',
       email: PREVIEW_TO,
-      treatment: 'Full Back',
+      treatment: 'Full Back + Head & Scalp',
+      treatments: ['Full Back', 'Head & Scalp'],
+      durationLabel: '2 hours',
       date: 'Tuesday, 6 October 2026',
       time: '2:00 pm',
       venue: 'Milton Hall',
@@ -77,6 +81,16 @@ function formatGBP(pence) {
   return '£' + (Number.isInteger(pounds) ? String(pounds) : pounds.toFixed(2));
 }
 
+// One row per treatment, then the combined duration (mirrors _notify.js).
+function treatmentRows(d) {
+  const list = Array.isArray(d.treatments) && d.treatments.length ? d.treatments : [d.treatment];
+  if (list.length === 1) return [{ label: 'Treatment', value: list[0] }];
+  return [
+    ...list.map((t, i) => ({ label: i === 0 ? 'Treatments' : ' ', value: t })),
+    { label: 'Total duration', value: d.durationLabel },
+  ];
+}
+
 // Friendly display label for the enum stored in metadata[location].
 function locationLabel(d) {
   return d.location === 'clinic' ? 'Clinic Day' : 'Home visit';
@@ -106,7 +120,7 @@ function clientEmailHtml(d) {
               </tr>
               ${heroRow(d.date, d.time, locationLabel(d))}
               ${infoCard([
-                { label: 'Treatment', value: d.treatment },
+                ...treatmentRows(d),
                 { label: 'Price', value: d.originalAmountLabel },
                 { label: d.discountRowLabel, value: d.discountLabel },
                 { label: 'Travel', value: d.travelLabel },
@@ -143,7 +157,7 @@ function halimaEmailHtml(d) {
               </tr>
               ${heroRow(d.date, d.time, locationLabel(d))}
               ${infoCard([
-                { label: 'Treatment', value: d.treatment },
+                ...treatmentRows(d),
                 { label: 'Price', value: d.originalAmountLabel },
                 { label: d.discountRowLabel, value: d.discountLabel },
                 { label: 'Travel', value: d.travelLabel },

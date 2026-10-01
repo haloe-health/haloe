@@ -1,31 +1,36 @@
 import { reserveSlot, confirmBooking, releaseBooking, slotToMinutes, STRIPE_SESSION_SECONDS } from './_bookings.js';
 import { isOfferableStart } from './_slots.js';
 import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
-import { findService, netPrice } from './_services.js';
+import { resolveCart, formatDuration } from './_services.js';
 import { validateDiscountCode, applyDiscount, reserveDiscountCode, confirmDiscountRedemption, releaseDiscountReservation } from './_discounts.js';
 import { travelZoneFor, travelFeeFor } from './_travel.js';
 import { notifyBooking, formatGBP, upperPostcode } from './_notify.js';
 
 export async function onRequestPost(context) {
   try {
-    const { treatmentName, treatmentCategory, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, discountCode, travelPostcode } = await context.request.json();
+    const { treatmentName: legacyName, treatmentCategory: legacyCategory, treatments, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, discountCode, travelPostcode } = await context.request.json();
     // location is 'clinic' | 'mobile'. Every booking is paid in full — there is
     // no deposit path.
     const venue = location === 'clinic' ? CLINIC_VENUE_NAME : '';
 
-    // Price comes from the server-side catalogue, never the client — a
-    // tampered request body must never be able to set its own amount.
-    // treatmentCategory is required: four names are reused across dry/wet
-    // cupping at different prices (see the comment on findService()) — a
-    // category-less lookup would silently resolve to the wrong one.
-    const svc = findService(treatmentName, treatmentCategory);
-    if (!svc) {
-      return new Response(JSON.stringify({ error: 'unknown_treatment' }), {
+    // Price AND duration come from the server-side catalogue, never the
+    // client — a tampered request body must never set its own amount or
+    // session length. `treatments` is the cart: [{ name, category }]. The old
+    // single treatmentName/treatmentCategory pair still works (one-item cart).
+    // category is required: four names are reused across dry/wet cupping at
+    // different prices (see the comment on findService()).
+    const cart = resolveCart(Array.isArray(treatments) ? treatments : [{ name: legacyName, category: legacyCategory }]);
+    if (!cart.ok) {
+      return new Response(JSON.stringify({ error: cart.error }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    const originalAmount = Math.round(netPrice(svc) * 100); // pence — the TREATMENT price only
+    // Display name for emails/Stripe/admin: "Face Massage + Head Massage".
+    // Names never contain " + ", so the webhook can split it back apart.
+    const treatmentName = cart.items.map(x => x.name).join(' + ');
+    const totalDurationMin = cart.totalMin;
+    const originalAmount = cart.totalPence; // pence — the COMBINED treatment price only
     const now = Math.floor(Date.now() / 1000);
     const hasSupabase = Boolean(context.env.SUPABASE_URL && context.env.SUPABASE_SERVICE_ROLE_KEY);
 
@@ -127,7 +132,8 @@ export async function onRequestPost(context) {
     // from the client. If Supabase isn't configured we fail OPEN and let the
     // booking proceed unreserved — never block a paying customer over an
     // availability bug.
-    const duration = Number(svc.min) > 0 ? Number(svc.min) : 60;
+    // One slot sized to every selected treatment back to back (no buffers exist).
+    const duration = totalDurationMin;
     let bookingId = null;
 
     if (hasSupabase && bookingDate && startMin !== null) {
@@ -137,6 +143,7 @@ export async function onRequestPost(context) {
           startMin,
           endMin: startMin + duration,
           treatment: treatmentName,
+          treatments: cart.items.length > 1 ? cart.items.map(x => ({ name: x.name, category: x.category, pricePence: x.pricePence, min: x.min })) : null,
           name: customerName,
           email: customerEmail,
           phone: customerPhone,
@@ -188,7 +195,8 @@ export async function onRequestPost(context) {
 
       const detail = {
         name: customerName, phone: customerPhone, email: customerEmail,
-        treatment: treatmentName, date, time, location: location || 'mobile', venue,
+        treatment: treatmentName, treatments: cart.items.map(x => x.name), durationLabel: formatDuration(totalDurationMin),
+        date, time, location: location || 'mobile', venue,
         address: upperPostcode(location === 'clinic' ? venueAddress : customerAddress),
         amount: formatGBP(0), paymentLabel: `${formatGBP(0)} — paid in full`, notes,
         originalAmountLabel: appliedCode ? formatGBP(originalAmount) : '',
@@ -202,7 +210,7 @@ export async function onRequestPost(context) {
       await notifyBooking(context.env, detail);
 
       const successParams = new URLSearchParams({
-        name: customerName || '', treatment: treatmentName || '', date: date || '', time: time || '',
+        name: customerName || '', treatment: treatmentName || '', duration: String(totalDurationMin), date: date || '', time: time || '',
         location: location || 'mobile', venue: venue || '', amount: '0', treatmentAmount: '0',
         ...(appliedCode ? { discountCode: appliedCode, discountAmount: String(discountPenceApplied), originalAmount: String(originalAmount) } : {}),
         ...(location === 'mobile' ? { travelZone, travelPence: '0' } : {}),
@@ -245,6 +253,8 @@ export async function onRequestPost(context) {
     params.append('metadata[customerName]', customerName);
     params.append('metadata[customerPhone]', customerPhone || '');
     params.append('metadata[treatmentName]', treatmentName);
+    params.append('metadata[treatmentCount]', String(cart.items.length));
+    params.append('metadata[totalDurationMin]', String(totalDurationMin));
     params.append('metadata[date]', date || '');
     params.append('metadata[time]', time || '');
     params.append('metadata[location]', location || 'mobile');
@@ -275,6 +285,7 @@ export async function onRequestPost(context) {
     const successParams = new URLSearchParams({
       name: customerName || '',
       treatment: treatmentName || '',
+      duration: String(totalDurationMin),
       date: date || '',
       time: time || '',
       location: location || 'mobile',
