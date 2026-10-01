@@ -1652,7 +1652,7 @@ hbInit();
   var grid = document.getElementById('priceGrid');
   if (!grid || typeof SERVICES === 'undefined') return;
   grid.innerHTML = CATS.map(function (c) {
-    var items = SERVICES[c.key] || [];
+    var items = (SERVICES[c.key] || []).filter(function (s) { return !s.testOnly; }); // temp test treatments stay hidden
     if (!items.length) return '';
     var min = Math.min.apply(null, items.map(netPrice));
     return '<a href="book.html?cat=' + c.key + '" class="price-card card reveal">' +

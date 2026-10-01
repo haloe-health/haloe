@@ -490,7 +490,7 @@ function renderPriceList(cat) {
   const list = document.createElement('div');
   list.className = 'price-list';
   list.id = 'price-list-' + cat;
-  list.innerHTML = SERVICES[cat].map(svc => `
+  list.innerHTML = SERVICES[cat].filter(svc => !svc.testOnly).map(svc => `
     <div class="price-row">
       <span class="price-name">${svc.name}${svc.time ? `<span class="price-meta">${svc.time}</span>` : ''}</span>
       <span class="price-amount">${priceHtmlFor(svc)}</span>

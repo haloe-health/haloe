@@ -19,6 +19,12 @@ const SERVICES = {
     { name: 'Head & Foot Massage', time: '1 hour', price: 60, desc: 'Head and feet, for head-to-toe ease.' },
     { name: 'Back, Neck & Shoulders', time: '1 hour', price: 75, desc: 'Eases everyday tension where you hold it most.' },
     { name: 'Full Body Massage', time: '1 hr 15 min', price: 90, desc: 'A slow, head-to-toe reset for tired muscles.' },
+    // TEMPORARY 50p test treatments for a live £1 end-to-end test — REMOVE after
+    // the test (and the matching two lines in functions/_services.js). `testOnly`
+    // hides them everywhere except book.html?test=1. Kept at the END of the array
+    // so no real treatment's index changes.
+    { name: 'Test Treatment A', time: '15 min', price: 0.5, desc: 'Internal test — not bookable.', testOnly: true },
+    { name: 'Test Treatment B', time: '15 min', price: 0.5, desc: 'Internal test — not bookable.', testOnly: true },
   ],
   dry: [
     { name: 'Face Cupping', time: '45 min', price: 50, desc: 'Gentle suction to lift and refresh the skin.' },

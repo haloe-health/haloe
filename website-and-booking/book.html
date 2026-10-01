@@ -2145,6 +2145,8 @@ const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
    their prices. The server (functions/_services.js resolveCart) recomputes
    both from its own catalogue and never trusts these figures. A package is a
    multi-session product, so it can't be combined with anything else. */
+// ?test=1 reveals the temporary testOnly treatments (see services-data.js).
+const TEST_MODE = new URLSearchParams(location.search).get('test') === '1';
 function cartItems() {
   return state.cart
     .map(({ cat, i }) => SERVICES[cat] && SERVICES[cat][i] ? { cat, i, svc: SERVICES[cat][i] } : null)
@@ -2206,7 +2208,7 @@ function applyDeepLink() {
   const wanted = params.get('svc');
   let matched = false;
   if (wanted) {
-    const i = SERVICES[cat].findIndex(s => s.name === wanted);
+    const i = SERVICES[cat].findIndex(s => s.name === wanted && (!s.testOnly || TEST_MODE));
     if (i !== -1) {
       state.cart = [{ cat, i }];
       matched = true;
@@ -2407,7 +2409,10 @@ function renderServices() {
   }
 
   const visibleServices = services;
-  const ordered = isPackages ? orderedPackages(visibleServices) : orderedTreatments(visibleServices);
+  // Temporary test treatments (testOnly) show only on ?test=1. Filtered AFTER
+  // ordering so every row keeps its real index into SERVICES.
+  const ordered = (isPackages ? orderedPackages(visibleServices) : orderedTreatments(visibleServices))
+    .filter(({ s }) => !s.testOnly || TEST_MODE);
 
   grid.innerHTML = ordered.map(({ s, i }) => {
     const selected = inCart(state.category, i);
