@@ -20,7 +20,7 @@ export const HOURS = {
   clinic: {
     0: null,
     1: null,
-    2: { first: '09:30', last: '19:30' }, // Tuesday — Milton Hall, Deansgate
+    2: { first: '09:00', last: '19:30' }, // Tuesday — Milton Hall, Deansgate
     3: null,
     4: null,
     5: null,
@@ -50,7 +50,7 @@ export function hhmmToMinutes(hhmm) {
   return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
 }
 
-// 570 -> '9:30 am' (the display format the rest of the booking flow uses).
+// 540 -> '9:00 am' (the display format the rest of the booking flow uses).
 export function minutesToLabel(min) {
   const h24 = Math.floor(min / 60);
   const mm = String(min % 60).padStart(2, '0');

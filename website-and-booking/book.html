@@ -1940,7 +1940,7 @@ const CLINIC_START_DATE = '2026-10-06';
 const HOURS = {
   clinic: {
     0: null, 1: null,
-    2: { first: '09:30', last: '19:30' }, // Tuesday — Milton Hall, Deansgate
+    2: { first: '09:00', last: '19:30' }, // Tuesday — Milton Hall, Deansgate
     3: null, 4: null, 5: null, 6: null,
   },
   mobile: {
@@ -1960,7 +1960,7 @@ function hhmmToMinutes(t) {
   const [h, m] = t.split(':').map(Number);
   return h * 60 + m;
 }
-// 570 -> '9:30 am' — the display format the rest of the flow (state.time,
+// 540 -> '9:00 am' — the display format the rest of the flow (state.time,
 // the summary pass, Stripe metadata, the emails) expects.
 function minutesToLabel(min) {
   const h24 = Math.floor(min / 60);
@@ -2635,7 +2635,7 @@ function toISODate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-// Is this '9:30 am'-style time one of the starts currently on offer?
+// Is this '9:00 am'-style time one of the starts currently on offer?
 function slotIsOffered(t) {
   const start = slotToMinutes(t);
   return start !== null && availableSlots.includes(start);

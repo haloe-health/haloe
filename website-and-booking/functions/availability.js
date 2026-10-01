@@ -6,7 +6,7 @@
 // least one free slot. Read-only; safe to call freely.
 //
 // Response: {
-//   slots: [570, 600, …],          // start minutes from midnight, ascending
+//   slots: [540, 570, …],          // start minutes from midnight, ascending
 //   busy:  [{ s, e }, …],          // active bookings that day (for the client's own re-check)
 //   next:  'YYYY-MM-DD' | null     // next date AFTER `date` with ≥1 free slot (within lookahead)
 // }
