@@ -19,12 +19,12 @@
 </head>
 <body>
 <canvas id="cv" width="320" height="180"></canvas>
-<div id="ctl"><button id="pp">PAUSE</button><input id="scrub" type="range" min="0" max="26" step="0.01" value="0"><span id="tl">0.0</span><button id="rec">REC 1080p</button></div>
+<div id="ctl"><button id="pp">PAUSE</button><input id="scrub" type="range" min="0" max="21.5" step="0.01" value="0"><span id="tl">0.0</span><button id="rec">REC 1080p</button></div>
 
 <script>
 (async function(){
 try{ await document.fonts.load('16px "Press Start 2P"'); }catch(e){}
-const W=320,H=180,DUR=26,HOLD=1;
+const W=320,H=180,DUR=21.5,HOLD=1;
 const cv=document.getElementById('cv'), c=cv.getContext('2d');
 c.imageSmoothingEnabled=false;
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
@@ -48,7 +48,7 @@ function CTXT(ctx,s,cx,y,size,col,shadow){ctx.font=size+'px "Press Start 2P",mon
 
 /* ================= YACHT VOYAGE ================= */
 const HOR=118;
-const SKYK=[[0,[0x6F,0x7F,0x9F],[0xC8,0xD0,0xDC]],[5,[0x3E,0x9B,0xE0],[0xBF,0xE8,0xFF]],[8,[0x3A,0x6C,0xD8],[0xFF,0xD9,0x8A]],[10.5,[0x7A,0x3A,0x9A],[0xFF,0x8A,0x3D]],[13,[0x0A,0x0A,0x3A],[0x2A,0x1A,0x5A]],[15.5,[0x1A,0x2A,0x6A],[0xFF,0x9A,0xA8]],[17.6,[0x5F,0xB0,0xE8],[0xFF,0xE2,0xB0]],[19,[0x5F,0xB0,0xE8],[0xFF,0xE2,0xB0]],[21.5,[0x7A,0x8A,0xA8],[0xD0,0xD8,0xE4]],[40,[0x7A,0x8A,0xA8],[0xD0,0xD8,0xE4]]];
+const SKYK=[[0,[0x1A,0x2A,0x6A],[0xFF,0x9A,0xA8]],[2.5,[0x5F,0xB0,0xE8],[0xFF,0xE2,0xB0]],[6,[0x3E,0x9B,0xE0],[0xBF,0xE8,0xFF]],[8.5,[0x3A,0x6C,0xD8],[0xFF,0xD9,0x8A]],[10.5,[0x7A,0x3A,0x9A],[0xFF,0x8A,0x3D]],[12.3,[0x0A,0x0A,0x3A],[0x2A,0x1A,0x5A]],[14.5,[0x7A,0x8A,0xA8],[0xD0,0xD8,0xE4]],[40,[0x7A,0x8A,0xA8],[0xD0,0xD8,0xE4]]];
 const mix=(a,b,p)=>a.map((v,i)=>Math.round(lerp(v,b[i],p)));
 const rgb=a=>`rgb(${a[0]},${a[1]},${a[2]})`;
 function skyAt(t){for(let i=0;i<SKYK.length-1;i++){const[t0,a0,b0]=SKYK[i],[t1,a1,b1]=SKYK[i+1];if(t<=t1){const p=clamp((t-t0)/(t1-t0));return[mix(a0,a1,p),mix(b0,b1,p)];}}return[SKYK[SKYK.length-1][1],SKYK[SKYK.length-1][2]];}
@@ -56,8 +56,8 @@ const clouds=(()=>{const r=rng(4),a=[];for(let i=0;i<7;i++)a.push({x:r()*W,y:14+
 const starsN=(()=>{const r=rng(9),a=[];for(let i=0;i<30;i++)a.push({x:Math.round(r()*W),y:Math.round(4+r()*60)});return a;})();
 
 function drawSun(t){
-  if(t<3.2||(t>11.9&&t<14.6)||t>19.6)return;
-  const x=250,y=Math.round(t<=11.9?(t<6?lerp(HOR+16,50,eout(seg(t,3.2,6))):lerp(50,HOR-6,seg(t,6,11.8))):lerp(HOR+16,54,eout(seg(t,14.6,17.4))));
+  if(t>11.3)return;
+  const x=250,y=Math.round(t<3?lerp(HOR+16,50,eout(seg(t,0,3))):lerp(50,HOR-6,seg(t,3,10.8)));
   const open=.12+.5*(.5+.5*Math.sin(t*9));
   c.fillStyle=P.yellow;
   for(let yy=-14;yy<=14;yy++)for(let xx=-14;xx<=14;xx++){
@@ -65,17 +65,6 @@ function drawSun(t){
     if(xx<0&&Math.abs(Math.atan2(yy,-xx))<open)continue;
     c.fillRect(x+xx,y+yy,1,1);}
   R(c,x+1,y-8,3,3,P.black);
-}
-function drawUK(ox){
-  R(c,ox-135,HOR-8,215,8,'#5C7A4C');
-  R(c,ox-135,HOR-26,60,18,'#F5F0E8');R(c,ox-135,HOR-28,60,3,'#4C9A3C');
-  for(let i=0;i<8;i++)R(c,ox-132+i*7,HOR-24+(i%3)*3,1,10,'#D8D2C4');
-  R(c,ox-14,HOR-66,15,58,'#C9A96E');R(c,ox-17,HOR-72,21,7,'#B89A62');
-  for(let y=HOR-62;y<HOR-10;y+=5)R(c,ox-10,y,1,3,'#A68A52');
-  ELL(c,ox-6,HOR-52,6,6,P.cream);R(c,ox-6,HOR-57,1,5,'#222');R(c,ox-6,HOR-52,4,1,'#222');
-  for(let i=0;i<10;i++)R(c,ox-6-Math.floor((10-i)*.7),HOR-82+i,Math.ceil((10-i)*1.4)+1,1,'#5A6A7A');
-  R(c,ox+8,HOR-26,55,18,'#B89A62');for(let x=ox+11;x<ox+60;x+=6){R(c,x,HOR-22,2,4,'#7A5A2A');R(c,x,HOR-16,2,4,'#7A5A2A');}
-  R(c,ox+30,HOR-34,8,8,'#B89A62');R(c,ox+33,HOR-38,2,4,'#7A5A2A');
 }
 function palm(px,base,lean){
   for(let i=0;i<24;i++)R(c,px+Math.round(Math.sin(i*.12)*3*lean),base-i,3,1,'#8B5A2B');
@@ -289,41 +278,40 @@ const inCv=document.createElement('canvas');inCv.width=W;inCv.height=H;
 /* ================= RENDER ================= */
 function render(t){
   c.imageSmoothingEnabled=false;
-  const inForest=t<23.1;
+  const inForest=t<18.6;
   if(inForest){
     const[top,bot]=skyAt(t);
     for(let y=0;y<HOR;y+=6)R(c,0,y,W,6,rgb(mix(top,bot,y/HOR)));
-    if(t>9.6&&t<16.5)starsN.forEach(s=>{if(s.y<50&&Math.sin(t*3+s.x)>-.4)R(c,s.x,s.y,1,1,'#FFFFFF');});
+    if(t>9.8&&t<14)starsN.forEach(s=>{if(s.y<50&&Math.sin(t*3+s.x)>-.4)R(c,s.x,s.y,1,1,'#FFFFFF');});
     drawSun(t);
-    if(t>12.4&&t<15.6){ELL(c,64,36,9,9,'#FFF3B0');ELL(c,68,33,8,8,rgb(top));}
-    clouds.forEach(cl=>{const x=((cl.x-t*5)%(W+60)+W+60)%(W+60)-30,col=t<4?'#9AA3B5':t<9?'#FFFFFF':t<12.3?'#FFC48A':t<15?'#3A3A7A':t<18.5?'#FFC4B0':'#9AA3B5';
+    if(t>11.6&&t<14.2){ELL(c,64,36,9,9,'#FFF3B0');ELL(c,68,33,8,8,rgb(top));}
+    clouds.forEach(cl=>{const x=((cl.x-t*5)%(W+60)+W+60)%(W+60)-30,col=t<1.5?'#FFC4B0':t<9?'#FFFFFF':t<11.8?'#FFC48A':t<13.4?'#3A3A7A':'#9AA3B5';
       ELL(c,x,cl.y,cl.w,5,col);ELL(c,x-cl.w*.4,cl.y+2,cl.w*.6,4,col);ELL(c,x+cl.w*.5,cl.y+1,cl.w*.5,4,col);});
-    drawUK(Math.round(lerp(185,-195,eio(seg(t,0.2,6.5)))));
-    drawID(Math.round(t<12.2?lerp(470,215,eio(seg(t,7,11.6))):lerp(215,-210,eio(seg(t,12.2,14.8)))),t);
-    if(t>13.3&&t<20.1)drawBD(Math.round(t<17.2?lerp(470,215,eio(seg(t,13.4,16.3))):lerp(215,-210,eio(seg(t,17.4,20)))),t);
-    if(t>18.5)drawMC(Math.round(lerp(470,215,eio(seg(t,18.6,21.2)))),t);
+    if(t<5)drawBD(Math.round(lerp(185,-195,eio(seg(t,0.2,4.0)))),t);
+    if(t>4.6&&t<14.4)drawID(Math.round(t<10.5?lerp(470,215,eio(seg(t,4.8,9.2))):lerp(215,-210,eio(seg(t,11.6,14.2)))),t);
+    if(t>13.2)drawMC(Math.round(lerp(470,215,eio(seg(t,13.4,16.4)))),t);
     // sea
     for(let y=HOR;y<H;y++){const p=(y-HOR)/(H-HOR);R(c,0,y,W,1,rgb(mix(mix([0x2F,0x6F,0xD0],[0x0B,0x1A,0x6B],p),mix(top,bot,.6),t>8?.25*(1-p):0)));}
-    if(t>3.2&&(t<11.9||(t>14.8&&t<19.6))){for(let y=HOR+2;y<H-6;y+=3){const w=Math.round(14-(y-HOR)*.12);if(w>2&&(y%6===2||Math.sin(t*5+y)>0))R(c,250-Math.round(w/2)+Math.round(Math.sin(t*4+y)*2),y,w,1,t>8?'#FFB347':'#FFE680');}}
+    if(t<11.3){for(let y=HOR+2;y<H-6;y+=3){const w=Math.round(14-(y-HOR)*.12);if(w>2&&(y%6===2||Math.sin(t*5+y)>0))R(c,250-Math.round(w/2)+Math.round(Math.sin(t*4+y)*2),y,w,1,t>8?'#FFB347':'#FFE680');}}
     for(let y=HOR+3;y<H;y+=5){const sp=18+(y-HOR)*.5;for(let k=-1;k<16;k++){const xx=Math.round(k*22+((y*3-t*sp)%22+22)%22);R(c,xx,y,5+Math.floor((y-HOR)/12),1,'#9FC4FF');}}
     // wooden rowing boat (bobbing) with Halima rowing
     const by=HOR+8+Math.round(Math.sin(t*2.2)*1);
     drawBoatBack(by);
-    const wa=(t>10.2&&t<12.2)?10.2:(t>16.3&&t<18.0)?16.3:(t>21.3?21.3:0),arrive=wa?seg(t,wa,wa+.4):0,wave=wa?-150*arrive+Math.sin((t-wa)*9)*12*arrive:0;
+    const wa=(t>9.4&&t<11.4)?9.4:(t>16.6?16.6:0),arrive=wa?seg(t,wa,wa+.4):0,wave=wa?-150*arrive+Math.sin((t-wa)*9)*12*arrive:0;
     const rowing=!wa,rs=Math.sin(t*2.4);
-    drawHalima(c,128,by+5,{armR:rowing?-35+rs*25:wave,armL:rowing?35-rs*25:0,lookUp:(t>8.6&&t<10.2)||(t>14.8&&t<16.3)||(t>19.4&&t<21.3),breath:Math.round(Math.sin(t*2))});
-    drawBoatFront(by,t,t<9.4?0:t<15.4?1:t<20?2:3);
-    if(t>19.5&&t<23.1){for(let i=0;i<70;i++){const rx=(i*47)%W,ry=Math.round((i*29+t*150)%H);R(c,rx,ry,1,3,'#C8D8F0');}}
+    drawHalima(c,128,by+5,{armR:rowing?-35+rs*25:wave,armL:rowing?35-rs*25:0,lookUp:(t>7.8&&t<9.4)||(t>15&&t<16.6),breath:Math.round(Math.sin(t*2))});
+    drawBoatFront(by,t,t<5.8?2:t<12?1:3);
+    if(t>14.2&&t<18.6){for(let i=0;i<70;i++){const rx=(i*47)%W,ry=Math.round((i*29+t*150)%H);R(c,rx,ry,1,3,'#C8D8F0');}}
     // captions
     const cap=(s,a,b)=>{if(t>a&&t<b)CTXT(c,s.substring(0,Math.round(s.length*clamp((t-a)/.6))),W/2,8,8,P.yellow,'#000');};
-    cap('UNITED KINGDOM',0.3,3.8);cap('INDONESIA',9.2,12);cap('BANGLADESH',15.0,18.1);cap('MANCHESTER',19.0,23.1);
+    cap('BANGLADESH',0.3,3.8);cap('INDONESIA',8.4,11.6);cap('MANCHESTER',15.2,18.6);
     // route strip: pellets eaten as the yacht icon travels UK -> ID
-    const pr=t<12.6?seg(t,0.4,11.4)/3:t<17.4?1/3+seg(t,12.6,16.4)/3:2/3+seg(t,17.4,21.2)/3,ix=Math.round(lerp(30,290,pr));
-    if(t<23.1){for(let x=30;x<=290;x+=8){if(x>ix)R(c,x,171,2,2,P.pink);}
+    const pr=t<11.8?seg(t,0.4,9.2)*.5:.5+seg(t,11.8,16.4)*.5,ix=Math.round(lerp(30,290,pr));
+    if(t<18.6){for(let x=30;x<=290;x+=8){if(x>ix)R(c,x,171,2,2,P.pink);}
       R(c,ix-5,172,10,3,P.white);R(c,ix-1,164,1,8,P.white);for(let i=0;i<6;i++)R(c,ix+1,166+i,Math.max(1,6-i),1,P.cream);
-      TXT(c,'UK',4,167,8,P.white,'#000');TXT(c,'ID',110,158,8,P.white,'#000');TXT(c,'BD',196,158,8,P.white,'#000');TXT(c,'MC',296,167,8,P.white,'#000');}
+      TXT(c,'BD',4,167,8,P.white,'#000');TXT(c,'ID',150,158,8,P.white,'#000');TXT(c,'MC',296,167,8,P.white,'#000');}
   } else {
-    t-=11;
+    t-=6.5;
     c.drawImage(inCv,0,0);
     const w2=seg(t,12.4,13.0);
     const wave=t>13?lerp(0,-150+Math.sin((t-13)*9)*14,eout(seg(t,13,13.4))):0;
@@ -343,7 +331,7 @@ function render(t){
       for(let x=10;x<W-10;x+=10){R(c,x,2+1,2,2,P.pink);}}
   }
   // dithered transition wipe (forest -> interior)
-  const tw=Math.sin(Math.PI*seg(inForest?t-11:t,11.2,13.0));
+  const tw=Math.sin(Math.PI*seg(inForest?t-6.5:t,11.2,13.0));
   if(tw>0){const lvl=Math.round(tw*16),im=c.getImageData(0,0,W,H),d=im.data;
     for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(BAYER[(y&3)*4+(x&3)]<lvl){const i=(y*W+x)*4;d[i]=255;d[i+1]=246;d[i+2]=176;}}
     c.putImageData(im,0,0);}
