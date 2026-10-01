@@ -36,5 +36,4 @@ Drop files in `assets/` — they are detected automatically on `studio`/`render`
 None present = silent render.
 
 ## Reference art
-`assets/halima-reference.jpg` is the photo Halima was drawn from. Add `assets/clinic-interior.png`
-and re-skin `src/components/Interior.tsx` (colours, furniture) to match the real room exactly.
+`assets/halima-reference.jpg` / `halima-character.jpg` are the photos Halima was drawn from; `assets/clinic-interior.jpg` is the real room that `src/components/Interior.tsx` is redrawn from.
