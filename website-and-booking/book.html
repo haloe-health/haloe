@@ -1575,6 +1575,43 @@
   .consent-check:focus-visible { box-shadow: 0 0 0 3px rgba(168,135,58,0.25); }
   .consent-text { font-size: 13px; color: #1a1208; line-height: 1.5; }
 
+  /* ---- Dark-mode contrast fixes (step 3 time slots, step 4 text/fields) ----
+     The rules above hard-code light-mode colours that vanish on the dark
+     page. Overridden here in dark mode only — light mode is untouched. The
+     (hover: hover) + :not(.selected) guard on .time-slot:hover and the gold
+     .selected state are deliberately left as they are. */
+  @media (prefers-color-scheme: dark) {
+    .time-slot { border-color: rgba(245,240,232,0.18); }
+    .time-slot.taken { color: rgba(245,240,232,0.38); border-color: rgba(245,240,232,0.08); }
+
+    .s4-location-address, .consent-text { color: var(--cream); }
+    .s4-location-sub { color: rgba(245,240,232,0.65); }
+    .s4-eyebrow::after { background: rgba(255,255,255,0.10); }
+    .consent-row { border-bottom-color: rgba(255,255,255,0.10); }
+    .consent-block .consent-row:last-child { border-bottom: none; }
+
+    /* No pure white in the palette: the notes/address textarea and the
+       unticked box take the dark card surface (#1C1C1E) with cream text. */
+    .field-input { background: #1C1C1E; color: var(--cream); border-color: rgba(255,255,255,0.10); }
+    .field-input:focus { border-color: var(--gold-primary); }
+    .field-input.invalid { border-color: #E5736A; }
+    .field-input:-webkit-autofill,
+    .field-input:-webkit-autofill:hover,
+    .field-input:-webkit-autofill:focus,
+    .field-input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 60px #1C1C1E inset !important;
+      -webkit-text-fill-color: var(--cream) !important;
+      box-shadow: 0 0 0 60px #1C1C1E inset !important;
+      caret-color: var(--cream);
+    }
+    .field-input.invalid:-webkit-autofill,
+    .field-input.invalid:-webkit-autofill:focus { -webkit-text-fill-color: #E5736A !important; }
+    .field-select option { background: #1C1C1E; color: var(--cream); }
+    .consent-check { background: #1C1C1E; border-color: rgba(245,240,232,0.30); }
+    .consent-check:checked { background: #a8873a; border-color: #a8873a; }
+    .consent-check:checked::after { color: var(--cream); }
+  }
+
 </style>
 </head>
 <body>
