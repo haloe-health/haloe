@@ -531,9 +531,9 @@ function drawPrologue(t){
     if(t<4.9){const dop=1-seg(t,4.4,4.9);if(dop>0){const[x2,y2]=[dx-12,dy+4];if(dop>.99||Math.floor(t*14)%2)dog(Math.round(x2),Math.round(y2),t,'run');}}
     if(t<4.1){const[x,y,s]=path(ph);drawHalimaScaledFaded(c,x,y,s,{back:true,walk:ph<1?t*8:undefined,armL:0,armR:0},1-seg(t,3.5,4.1));}
     heliTop(hx,hy,t,spin);
-    // typed quote
-    const q='HALIMA, THIS IS ALREADY YOURS.';
-    if(t>0.3&&t<3.6)CTXT(c,q.substring(0,Math.round(q.length*clamp((t-0.3)/1.4))),W/2,160,8,P.white,'#0A3A12');
+    // title
+    const q='haloe';
+    if(t>0.3&&t<4.2)CTXT(c,q.substring(0,Math.round(q.length*clamp((t-0.3)/0.9))),W/2,146,16,P.yellow,'#0A3A12');
   }else{
     const hor=HOR;
     for(let y=0;y<hor;y+=6)R(c,0,y,W,6,rgb(mix([0x3E,0x9B,0xE0],[0xBF,0xE8,0xFF],y/hor)));
