@@ -37,7 +37,7 @@ const BAYER=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
 
 // arcade palette
 const P={black:'#000',navy:'#050520',blue:'#2121DE',yellow:'#FFD400',gold:'#E0A800',pink:'#FFB8FF',cyan:'#00FFFF',red:'#FF2020',white:'#FFFFFF',
- cream:'#F5F0E8',creamD:'#BFA77A',skin:'#D08A5A',brown:'#5A3A1A',wood:'#C8742B',woodD:'#8B4A1B',glow:'#FFF6B0',
+ cream:'#F5F0E8',creamD:'#BFA77A',skin:'#C68642',brown:'#5A3A1A',wood:'#C8742B',woodD:'#8B4A1B',glow:'#FFF6B0',
  g1:'#07351F',g2:'#0B5A33',g3:'#0F7A3F',ground:'#0A2A18',path:'#3A2A12'};
 
 function R(ctx,x,y,w,h,col){ctx.fillStyle=col;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
@@ -179,28 +179,28 @@ function drawHalima(ctx,ox,oy,o){
   // shadow + feet
   ELL(ctx,ox,oy,16,2,'#06180e');
   const fo=Math.round(sw*4), lift=Math.round(Math.max(0,sw)*2), liftR=Math.round(Math.max(0,-sw)*2);
-  R(ctx,ox-11+fo,oy-3-lift,8,3,'#0A0A0E');R(ctx,ox+3-fo,oy-3-liftR,8,3,'#0A0A0E');
+  R(ctx,ox-11+fo,oy-3-lift,8,3,P.woodD);R(ctx,ox+3-fo,oy-3-liftR,8,3,P.woodD);
   // robe
   const hw=r=>8+Math.floor(r*.36);
-  for(let r=0;r<27;r++){const y=by-30+r,h=hw(r)+(moving?Math.round(sw*(r/27)):0);R(ctx,ox-h-1,y,h*2+3,1,r<12?'#3A3A44':'#2A2A30');R(ctx,ox-h,y,h*2+1,1,r<12?'#1C1C22':'#0E0E12');}
-  R(ctx,ox,by-22,1,10,'#3A3A44');R(ctx,ox-5,by-14,1,12,'#1A1A20');R(ctx,ox+5,by-14,1,12,'#1A1A20');R(ctx,ox-2,by-29,5,2,'#0E0E12');for(const k of [0,4,8])R(ctx,ox-1,by-26+k,2,2,'#E8C77A');
+  for(let r=0;r<27;r++){const y=by-30+r,h=hw(r)+(moving?Math.round(sw*(r/27)):0);R(ctx,ox-h-1,y,h*2+3,1,P.creamD);R(ctx,ox-h,y,h*2+1,1,P.cream);}
+  R(ctx,ox,by-24,1,22,'#D8C9A6');R(ctx,ox-5,by-18,1,15,'#E3D6BA');R(ctx,ox+5,by-18,1,15,'#E3D6BA');
   // arms
   function arm(px,py,deg){const th=deg*Math.PI/180,dx=-Math.sin(th),dy=Math.cos(th);
-    for(let pass=0;pass<2;pass++){const sz=pass?5:7,off=pass?2:3;ctx.fillStyle=pass?'#1C1C22':'#3A3A44';
+    for(let pass=0;pass<2;pass++){const sz=pass?5:7,off=pass?2:3;ctx.fillStyle=pass?P.cream:P.creamD;
       for(let i=0;i<17;i++)ctx.fillRect(Math.round(px+dx*i)-off,Math.round(py+dy*i)-off,sz,sz);}
     R(ctx,Math.round(px+dx*18)-2,Math.round(py+dy*18)-2,5,5,P.skin);}
   arm(ox-10,by-28,o.armL!==undefined?o.armL:sw*14);
   arm(ox+10,by-28,o.armR!==undefined?o.armR:-sw*14);
   // hijab
   const lu=o.lookUp?1:0, hy=by-41-(lu?1:0);
-  ELL(ctx,ox,hy,14,16,'#083628');ELL(ctx,ox,hy,13,15,'#0F5A44');
-  for(let r=0;r<8;r++){const h=13+r;R(ctx,ox-h-1,by-31+r,h*2+3,1,'#083628');R(ctx,ox-h,by-31+r,h*2+1,1,'#0F5A44');}
-  ELL(ctx,ox,hy+1,9,10,'#1F7A5C');ELL(ctx,ox,hy+1,8,9,P.skin);
+  ELL(ctx,ox,hy,14,16,P.creamD);ELL(ctx,ox,hy,13,15,P.cream);
+  for(let r=0;r<8;r++){const h=13+r;R(ctx,ox-h-1,by-31+r,h*2+3,1,P.creamD);R(ctx,ox-h,by-31+r,h*2+1,1,P.cream);}
+  ELL(ctx,ox,hy+1,9,10,'#E6D7BA');ELL(ctx,ox,hy+1,8,9,P.skin);
   const ey=hy-1-(lu?1:0);
   R(ctx,ox-4,ey-3,3,1,'#2B1A12');R(ctx,ox+2,ey-3,3,1,'#2B1A12');   // brows
   R(ctx,ox-4,ey,2,2,'#1A0E08');R(ctx,ox+3,ey,2,2,'#1A0E08');R(ctx,ox-4,ey,1,1,P.white);R(ctx,ox+3,ey,1,1,P.white);
   R(ctx,ox-7,hy+3,2,1,'#E8896E');R(ctx,ox+6,hy+3,2,1,'#E8896E');
-  R(ctx,ox-3,hy+6,1,1,'#C0303A');R(ctx,ox+4,hy+6,1,1,'#C0303A');R(ctx,ox-2,hy+6,6,1,'#FFFFFF');R(ctx,ox-2,hy+7,6,1,'#C0303A');
+  R(ctx,ox-3,hy+6,1,1,'#C0303A');R(ctx,ox+4,hy+6,1,1,'#C0303A');R(ctx,ox-2,hy+7,6,1,'#C0303A');
 }
 function drawHalimaFaded(ctx,x,y,o,op){
   if(op>=.999){drawHalima(ctx,x,y,o);return;}
