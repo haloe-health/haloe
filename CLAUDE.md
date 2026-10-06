@@ -105,6 +105,10 @@ The address collected at step 3 is deliberately **kept out of the URL**. It trav
 - Claims removed in July 2026, for reference on what the rule catches: *"draws out stagnant blood, toxins, and impurities to restore the body's natural balance"* (physiological claim), *"one of the oldest and most powerful forms of natural medicine"* (calls it medicine, asserts potency), and a hero line *"addressing pain, hormonal health, fatigue"* (names conditions).
 - **Outstanding:** the conditions section is still headed **"Conditions *we treat*"** in `index.html`. The word "treat" above a grid of named conditions is the clearest remaining violation on the site. Flagged with Halima; awaiting her decision on the replacement wording.
 
+## Open issues
+
+- **Audience discount codes fail on the second redemption (found 7 Oct 2026; fix in `reserveDiscountCode()` tonight).** `functions/_discounts.js` writes every non-`promo` redemption with `enforce_limits = true`, and the Postgres unique index `code_redemptions_active_per_code` (one active redemption per `code_id` where `enforce_limits`) then caps the code at ONE use in total. For type `audience` codes (`YASMZEE25`, `DB25`, `POD25` — no total cap, meant for many followers) the preview in `/apply-discount` passes but the second real booking hits unique-violation 23505, which `reserveDiscountCode()` reports as "code taken". `GUEST-*` (genuinely single-use) and `HALOE20` (promo, `enforce_limits=false`) are unaffected. Any multi-use cap (e.g. "3 uses") is blocked by the same index. Fix: write `audience` redemptions with `enforce_limits = false` (or otherwise stop them hitting the per-code index) and rely on the per-email check; keep the per-email guarantee. Needs a deploy.
+
 ## Workflow
 
 - **At the end of every task, always run `git add -A && git commit`.** Commit with a clear message, even for small edits.
