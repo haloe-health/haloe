@@ -376,6 +376,15 @@
   .process-num { font-family:'Poppins', sans-serif; font-weight:600; font-size:1.6rem; color:var(--gold); margin-bottom:8px; }
   .process-card h4 { font-size:1rem; }
   .process-card p { margin-top:8px; font-size:0.9rem; }
+  /* "What happens in your session" — five steps + "Does it hurt?" (moved here from before-your-session.html, Oct 2026) */
+  .process-steps { margin-top:14px; padding:24px 22px; }
+  .process-steps h3 { font-size:1.125rem; margin-bottom:16px; }
+  .session-steps { list-style:none; counter-reset:step; margin:0; padding:0; }
+  .session-steps li { position:relative; counter-increment:step; padding:2px 0 0 44px; margin-bottom:14px; min-height:30px; font-size:0.95rem; line-height:1.5; color:var(--text); }
+  .session-steps li:last-child { margin-bottom:0; }
+  .session-steps li::before { content:counter(step); position:absolute; left:0; top:0; width:30px; height:30px; border-radius:50%; background:var(--gold-soft); color:var(--gold-deep); font-weight:600; font-size:0.85rem; display:flex; align-items:center; justify-content:center; }
+  .process-steps h4 { margin:22px 0 6px; font-size:1rem; }
+  .process-steps h4 + p { margin:0; font-size:0.92rem; color:var(--text-muted); }
 
   /* ============================================================
      REVIEWS
@@ -681,6 +690,18 @@
         <h4>Your Plan</h4>
         <p>Most clients benefit from regular sessions. We'll build a personalised schedule around your goals.</p>
       </div>
+    </div>
+    <div class="process-steps card reveal">
+      <h3>What happens in your session</h3>
+      <ol class="session-steps">
+        <li>We talk first — health form &amp; a chat about what you need</li>
+        <li>Warm &amp; relax — massage to settle the muscles</li>
+        <li>Cups applied — suction lifts the skin gently</li>
+        <li>Gentle draw — tiny pricks (wet cupping only)</li>
+        <li>Soothe &amp; rest — black seed oil, then quiet rest time</li>
+      </ol>
+      <h4>Does it hurt?</h4>
+      <p>The suction feels like a firm tug. The wet cupping pricks feel like a quick light scratch. Most clients find the whole session relaxing — some fall asleep.</p>
     </div>
   </div>
 </section>
