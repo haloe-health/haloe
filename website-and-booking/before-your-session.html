@@ -22,6 +22,7 @@
 <meta name="twitter:title" content="haloe · hijama in Manchester">
 <meta name="twitter:description" content="Quiet, private hijama at Milton Hall, Deansgate. Tuesdays.">
 <meta name="twitter:image" content="https://haloe.health/og/haloe-og.jpg">
+<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
@@ -29,18 +30,15 @@
     /* Light theme (Sep 2026) — was true-black; --white/--dim are still the
        text-colour tokens (light text on dark before, now dark text on
        light), --page-bg is new for the former --black page background. */
-    --page-bg: #F5F0E8;
     --deep: #FFFFFF;
-    --gold: #C8A96E;
     --gold-light: #DBB85A;
-    --gold-deep: #8a6a2c;
     --gold-dim: rgba(200,169,110,0.14);
     --white: #0D0D0D;
     --dim: #5a5247;
     --border: rgba(13,13,13,0.1);
     --radius: 0px;
     --font-heading: 'Poppins', sans-serif;
-    --font-wordmark: 'Poppins', sans-serif;
+    --font-wordmark: 'Tan Ashford', Georgia, serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -88,8 +86,8 @@
   .nav-logo-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
   .nav-logo span {
     font-family:var(--font-wordmark);
-    font-size:1em; line-height:1; color:var(--gold-deep);
-    letter-spacing:0.02em; font-weight:normal;
+    font-style:normal; font-size:1em; line-height:1; color:#111;
+    letter-spacing:normal; font-weight:normal;
     text-transform:none;
   }
   nav ul { list-style:none; display:flex; gap:48px; align-items:center; }
@@ -158,191 +156,6 @@
     display:inline-block;
   }
 
-  /* ── Article layout (built from existing tokens) ── */
-  .article-hero {
-    padding:160px 24px 64px;
-    text-align:center;
-    background:radial-gradient(ellipse 80% 70% at 50% 0%, rgba(201,160,64,0.05) 0%, transparent 70%), var(--page-bg);
-    position:relative; z-index:1;
-  }
-  .article-hero .hero-pill {
-    display:inline-block;
-    font-size:0.6rem; letter-spacing:0.28em; text-transform:uppercase;
-    color:var(--gold-deep); border:1px solid rgba(201,160,64,0.4);
-    padding:8px 20px; border-radius:50px; margin-bottom:32px;
-  }
-  .article-hero h1 { margin-bottom:8px; }
-  /* Poppins regular, gold, upright (Sep 2026 — was italic, the same
-     gold-italic-subline pattern removed from every heading's <em> across
-     the site; this one's a standalone div rather than an em, but it's the
-     same visual pattern so it gets the same fix). */
-  .article-hero .hero-sub {
-    font-family:'Poppins',sans-serif; font-style:normal;
-    font-size:clamp(1.1rem,2.4vw,1.5rem); color:var(--gold-deep);
-    font-weight:400; margin-bottom:32px;
-  }
-  .article-hero .creds {
-    font-size:0.8rem; color:var(--dim); line-height:1.8;
-    max-width:520px; margin:0 auto; letter-spacing:0.02em;
-  }
-
-  .article { position:relative; z-index:1; max-width:760px; margin:0 auto; padding:0 24px 40px; }
-  .block { padding:48px 0; border-top:1px solid var(--border); }
-  .block:first-child { border-top:none; }
-  .block p { color:var(--dim); line-height:2.0; margin-bottom:20px; font-size:0.97rem; }
-  .block p:last-child { margin-bottom:0; }
-  .block p strong, .block strong { color:var(--white); font-weight:400; }
-  .lead p { color:var(--white); font-size:1.05rem; }
-
-  .eyebrow-label {
-    font-size:0.6rem; letter-spacing:0.2em; text-transform:uppercase;
-    color:var(--gold-deep); margin-bottom:16px; opacity:0.9;
-  }
-
-  /* Info cards — mirror the booking card style (.hb-card) */
-  .info-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
-  .info-card {
-    background:var(--deep);
-    box-shadow:0 8px 24px rgba(13,13,13,0.06);
-    border-radius:20px; padding:28px 24px;
-  }
-  .info-card h3 {
-    font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase;
-    color:var(--gold-deep); font-weight:500; margin-bottom:14px;
-  }
-  .info-card p { font-size:0.88rem; line-height:1.8; color:var(--dim); margin:0; }
-
-  /* Safety alert / callout — gold-accented box (mirrors .form-warn, stronger) */
-  .alert {
-    border:1px solid rgba(201,160,64,0.3);
-    border-left:3px solid var(--gold);
-    background:rgba(201,160,64,0.04);
-    border-radius:16px; padding:32px 30px;
-  }
-  .alert h2 { margin-bottom:18px; }
-  .alert p { color:var(--dim); }
-  .alert ul { list-style:none; margin:8px 0 22px; }
-  .alert ul li {
-    position:relative; padding-left:26px; margin-bottom:12px;
-    color:var(--white); font-size:0.95rem; line-height:1.6;
-  }
-  .alert ul li::before {
-    content:''; position:absolute; left:0; top:11px;
-    width:6px; height:6px; background:var(--gold); border-radius:50%;
-  }
-  .note-highlight {
-    margin-top:24px; padding:18px 22px;
-    background:rgba(201,160,64,0.08);
-    border:1px solid rgba(201,160,64,0.25);
-    border-radius:16px;
-    color:var(--white); font-size:0.92rem; line-height:1.7;
-  }
-  .note-highlight strong { color:var(--gold-deep); }
-
-  /* Numbered steps */
-  .steps { list-style:none; counter-reset:step; margin-bottom:24px; }
-  .steps li {
-    position:relative; counter-increment:step;
-    padding:20px 0 20px 64px; border-top:1px solid var(--border);
-    color:var(--white); font-size:1rem; line-height:1.6;
-  }
-  .steps li:first-child { border-top:none; }
-  .steps li::before {
-    content:counter(step);
-    position:absolute; left:0; top:18px;
-    width:36px; height:36px;
-    border:1px solid rgba(201,160,64,0.4); border-radius:50%;
-    color:var(--gold-deep); font-size:0.85rem;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .caption { font-size:0.88rem; color:var(--dim); font-style:italic; line-height:1.8; }
-
-  /* Pull-quote */
-  .pull-quote {
-    margin:32px 0 0; padding:28px 0 4px;
-    border-top:1px solid var(--border);
-    text-align:center;
-  }
-  .pull-quote blockquote {
-    font-family:'Poppins',sans-serif; font-style:italic;
-    font-size:1.3rem; line-height:1.6; color:var(--white);
-    font-weight:300; margin-bottom:14px; letter-spacing:-0.01em;
-  }
-  .pull-quote cite {
-    display:block; font-style:normal; font-size:0.75rem;
-    letter-spacing:0.12em; text-transform:uppercase; color:var(--gold-deep); opacity:0.85;
-  }
-
-  /* Offer list */
-  .offer-list { list-style:none; margin:8px 0 24px; }
-  .offer-list li {
-    padding:18px 0; border-top:1px solid var(--border);
-    display:flex; flex-direction:column; gap:4px;
-  }
-  .offer-list li:first-child { border-top:none; }
-  .offer-list .offer-name { color:var(--white); font-size:1rem; font-weight:400; }
-  .offer-list .offer-desc { color:var(--dim); font-size:0.88rem; }
-  .offer-note {
-    font-size:0.85rem; color:var(--dim); font-style:italic;
-    padding:16px 0; line-height:1.8;
-  }
-
-  /* Marks timeline */
-  .timeline {
-    display:flex; gap:0; margin-top:28px;
-    border:1px solid var(--border); border-radius:16px; overflow:hidden;
-  }
-  .timeline .t-step {
-    flex:1; padding:18px 10px; text-align:center;
-    border-right:1px solid var(--border);
-  }
-  .timeline .t-step:last-child { border-right:none; }
-  .timeline .t-day {
-    display:block; font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase;
-    color:var(--gold-deep); margin-bottom:6px;
-  }
-  .timeline .t-label { font-size:0.78rem; color:var(--dim); }
-
-  /* Before / after columns */
-  .checklists { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:24px; }
-  .checklist {
-    background:var(--deep);
-    box-shadow:0 8px 24px rgba(13,13,13,0.06);
-    border-radius:20px; padding:28px 26px;
-  }
-  .checklist h3 {
-    font-size:0.62rem; letter-spacing:0.2em; text-transform:uppercase;
-    color:var(--gold-deep); font-weight:500; margin-bottom:18px;
-  }
-  .checklist ul { list-style:none; }
-  .checklist ul li {
-    position:relative; padding-left:24px; margin-bottom:14px;
-    font-size:0.9rem; line-height:1.6; color:var(--white);
-  }
-  .checklist ul li:last-child { margin-bottom:0; }
-  .checklist ul li::before {
-    content:'✓'; position:absolute; left:0; top:0;
-    color:var(--gold-deep); font-size:0.85rem;
-  }
-  .reassure { font-size:0.92rem; color:var(--dim); line-height:1.9; font-style:italic; }
-
-  /* FAQ */
-  .faq-item { padding:24px 0; border-top:1px solid var(--border); }
-  .faq-item:first-of-type { border-top:none; }
-  .faq-item h3 { font-size:1.02rem; color:var(--white); font-weight:400; margin-bottom:12px; }
-  .faq-item p { margin:0; color:var(--dim); font-size:0.94rem; line-height:1.9; }
-
-  /* Closing */
-  .closing { text-align:center; }
-  .closing p { color:var(--white); font-size:1.1rem; line-height:1.8; }
-  .closing .closing-meta { color:var(--dim); font-size:0.85rem; margin-top:12px; }
-
-  /* Small-print compliance */
-  .fine-print {
-    margin-top:8px; padding:28px 0 0; border-top:1px solid var(--border);
-  }
-  .fine-print p { font-size:0.75rem; color:rgba(122,112,96,0.75); line-height:1.8; margin:0; }
-
   /* FOOTER — copied from index.html */
   footer {
     position:relative; z-index:1;
@@ -362,8 +175,8 @@
   .footer-left-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
   .footer-left span {
     font-family:var(--font-wordmark);
-    font-size:1em; line-height:1; color:var(--gold);
-    letter-spacing:0.02em; font-weight:normal;
+    font-style:normal; font-size:1em; line-height:1; color:var(--gold);
+    letter-spacing:normal; font-weight:normal;
   }
   .footer-links { display:flex; gap:32px; }
   .footer-links a {
@@ -433,17 +246,94 @@
     .nav-hamburger { display:flex; }
     .mobile-bar { display:flex; }
     body { padding-bottom:78px; }
-    .article-hero { padding:120px 20px 48px; }
-    .article { padding:0 20px 24px; }
-    .block { padding:40px 0; }
-    .info-cards { grid-template-columns:1fr; }
-    .checklists { grid-template-columns:1fr; }
-    .timeline { flex-wrap:wrap; }
-    .timeline .t-step { flex:1 0 33.33%; border-bottom:1px solid var(--border); }
     footer { flex-direction:column; gap:28px; text-align:center; padding:48px 24px; }
     .footer-links { flex-wrap:wrap; justify-content:center; }
     .footer-right { text-align:center; }
   }
+</style>
+<link rel="stylesheet" href="calm.css">
+<style>
+  /* before-your-session: layout only. Tokens, Tan Ashford title, Georgia intro
+     line, the gold label and the white card come from calm.css (shared with
+     intake.html) — nothing here redefines them. */
+  .btn { font-size:15px; letter-spacing:0; text-transform:none; padding:0 28px; height:48px; display:inline-flex; align-items:center; justify-content:center; }
+  .btn:hover { transform:none; box-shadow:none; }
+
+  .article-hero { padding:0 0 8px; text-align:left; background:none; }
+  .article-hero .section-label { display:block; margin:0 0 16px; }
+  .article-hero .step-lede { margin:0 0 12px; }
+  .article-hero .intro-line { margin:0 0 24px; }
+
+  /* one card per section, 24px between sections */
+  .article > .card { margin:0 0 24px; font-size:17px; line-height:1.5; font-weight:300; color:var(--ink); }
+  .card .section-label { margin:0 0 16px; line-height:1.4; }
+  .card p { margin:0 0 16px; font-size:17px; line-height:1.5; color:var(--ink); }
+  .card p:last-child { margin-bottom:0; }
+  .card strong { font-weight:500; color:var(--ink); }
+  .card .label-note { text-transform:none; letter-spacing:0; font-style:italic; font-weight:300; font-size:14px; color:var(--muted); }
+
+  /* sub-blocks inside a card sit on the warm fill, like intake's controls */
+  .info-cards, .checklists { display:flex; flex-direction:column; gap:16px; }
+  .info-card, .checklist, .note-highlight, .pull-quote, .faq-item, .offer-list li, .timeline .t-step { background:var(--fill); border-radius:16px; }
+  .info-card, .checklist, .faq-item { padding:16px; }
+  .info-card .section-label, .checklist .section-label { margin:0 0 8px; }
+  .info-card p { margin:0; }
+
+  .alert ul { list-style:none; margin:0 0 16px; padding:0; }
+  .alert ul li { position:relative; padding-left:22px; margin-bottom:12px; font-size:17px; line-height:1.5; color:var(--ink); }
+  .alert ul li:last-child { margin-bottom:0; }
+  .alert ul li::before { content:''; position:absolute; left:0; top:9px; width:6px; height:6px; border-radius:50%; background:var(--gold); }
+  .note-highlight { margin-top:16px; padding:16px; font-size:17px; line-height:1.5; color:var(--ink); }
+  .note-highlight strong { color:var(--gold-deep); }
+
+  .steps { list-style:none; counter-reset:step; margin:0 0 16px; padding:0; }
+  .steps li { position:relative; counter-increment:step; padding:3px 0 0 48px; margin-bottom:16px; min-height:32px; font-size:17px; line-height:1.5; color:var(--ink); }
+  .steps li:last-child { margin-bottom:0; }
+  .steps li::before { content:counter(step); position:absolute; left:0; top:0; width:32px; height:32px; border-radius:50%; background:var(--fill); color:var(--gold-deep); font-size:14px; font-weight:500; display:flex; align-items:center; justify-content:center; }
+  .card .caption, .card .offer-note { font-size:14px; line-height:1.5; font-style:italic; color:var(--muted); }
+  .steps + .caption { margin-top:0; }
+
+  .pull-quote { margin:16px 0 0; padding:16px; text-align:center; }
+  .pull-quote blockquote { margin:0 0 8px; font-family:var(--serif-text); font-style:italic; font-size:19px; line-height:1.45; font-weight:400; color:var(--ink); }
+  .pull-quote cite { display:block; font-style:normal; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold-deep); line-height:1.5; }
+
+  .offer-list { list-style:none; margin:0 0 16px; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .offer-list li { padding:14px 16px; display:flex; flex-direction:column; gap:2px; }
+  .offer-list .offer-name { font-size:17px; font-weight:400; color:var(--ink); }
+  .offer-list .offer-desc { font-size:15px; color:var(--muted); }
+
+  .timeline { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:16px; }
+  .timeline .t-step { padding:12px 8px; text-align:center; }
+  .timeline .t-day { display:block; margin-bottom:4px; font-size:12px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold-deep); }
+  .timeline .t-label { font-size:14px; color:var(--muted); }
+
+  .checklists { margin-bottom:16px; }
+  .checklist ul { list-style:none; margin:0; padding:0; }
+  .checklist ul li { position:relative; padding-left:26px; margin-bottom:12px; font-size:17px; line-height:1.5; color:var(--ink); }
+  .checklist ul li:last-child { margin-bottom:0; }
+  .checklist ul li::before { content:'✓'; position:absolute; left:0; top:0; color:var(--gold-deep); font-size:15px; }
+  .card .reassure { font-style:italic; color:var(--muted); }
+
+  .faq-item { margin-bottom:12px; }
+  .faq-item:last-child { margin-bottom:0; }
+  .faq-item h3 { margin:0 0 8px; font-size:17px; line-height:1.4; font-weight:500; color:var(--ink); }
+  .faq-item p { margin:0; }
+
+  .closing { text-align:center; }
+  .card .closing-meta { margin-top:8px; font-size:14px; color:var(--muted); }
+  .fine-print { margin:0 0 16px; padding:0 4px; border:0; }
+  .fine-print p { margin:0; font-size:14px; line-height:1.5; color:var(--muted); }
+
+  /* html is 78% for the shared nav, so the footer's rem sizes are pinned to
+     what they rendered at before */
+  .footer-left { font-size:20.8px; }
+  .footer-links a { font-size:11px; }
+  .footer-right { font-size:10.4px; }
+
+  /* the phone CTA bar: same soft-fade bar as intake's action bar */
+  .mobile-bar { background:linear-gradient(to top, var(--page-bg) 52%, rgba(245,240,232,0)); border-top:0; backdrop-filter:none; -webkit-backdrop-filter:none; padding:28px 16px calc(16px + env(safe-area-inset-bottom,0px)); gap:12px; pointer-events:none; }
+  .mobile-bar .btn { pointer-events:auto; flex:1; padding:0 28px; }
+  @media(max-width:860px){ body { padding-bottom:calc(96px + 24px + env(safe-area-inset-bottom,0px)); } }
 </style>
 </head>
 <body>
@@ -475,45 +365,47 @@
   <a href="book.html" class="btn btn-gold nav-overlay-cta">Book Now</a>
 </div>
 
+<div class="wrap">
+
 <!-- HERO -->
 <header class="article-hero">
-  <span class="hero-pill">3-Minute Read</span>
+  <span class="section-label">3-Minute Read</span>
   <h1>Your session at haloe</h1>
-  <div class="hero-sub">What to expect</div>
-  <p class="creds">Halima Yasmin — CMA &amp; IPHM Accredited · Level 5 Diploma (Distinction) · women &amp; men</p>
+  <div class="step-lede">What to expect</div>
+  <p class="intro-line">Halima Yasmin — CMA &amp; IPHM Accredited · Level 5 Diploma (Distinction) · women &amp; men</p>
 </header>
 
 <article class="article">
 
   <!-- A note from Halima -->
-  <section class="block lead">
-    <div class="eyebrow-label">A note from Halima</div>
+  <section class="card block lead">
+    <div class="eyebrow-label section-label">A note from Halima</div>
     <p>Thank you for booking with me. Whether this is your very first hijama session or you've had cupping before, I want you to feel completely at ease from the moment you arrive. This guide tells you exactly what will happen, what to bring, and how to look after yourself afterwards.</p>
     <p>If you're nervous — that's completely normal, and you wouldn't be the first. Every session is private and unhurried — just you and me. You set the pace, and I work around you.</p>
   </section>
 
   <!-- Three info cards -->
-  <section class="block">
+  <section class="card block">
     <div class="info-cards">
       <div class="info-card">
-        <h3>Location</h3>
+        <h3 class="section-label">Location</h3>
         <p>For a home visit, Halima comes to you — just have a comfortable, private space ready. Home visits: £15 travel in Oldham and nearby, £35 across the rest of Greater Manchester. Or come to our Tuesday clinic on Deansgate — no travel fee. For a Clinic Day booking, check in at reception on arrival at the venue.</p>
       </div>
       <div class="info-card">
-        <h3>How long to allow</h3>
+        <h3 class="section-label">How long to allow</h3>
         <p>Add 20–30 minutes on top of your treatment time for the health form at the start and rest time at the end. A 1-hour session means roughly 1h 30m in total.</p>
       </div>
       <div class="info-card">
-        <h3>Payment</h3>
+        <h3 class="section-label">Payment</h3>
         <p>Paid in full online when you book. Your confirmation shows the full amount.</p>
       </div>
     </div>
   </section>
 
   <!-- Safety alert -->
-  <section class="block">
+  <section class="card block">
     <div class="alert">
-      <h2>Before we begin — your safety</h2>
+      <h2 class="section-label">Before we begin — your safety</h2>
       <p>Wet cupping cannot be performed if you:</p>
       <ul>
         <li>Are pregnant</li>
@@ -527,8 +419,8 @@
   </section>
 
   <!-- What happens in your session -->
-  <section class="block">
-    <h2>What happens in your session</h2>
+  <section class="card block">
+    <h2 class="section-label">What happens in your session</h2>
     <ol class="steps">
       <li>We talk first — health form &amp; a chat about what you need</li>
       <li>Warm &amp; relax — massage to settle the muscles</li>
@@ -540,8 +432,8 @@
   </section>
 
   <!-- What is hijama -->
-  <section class="block">
-    <h2>What is hijama?</h2>
+  <section class="card block">
+    <h2 class="section-label">What is hijama?</h2>
     <p>Hijama, or wet cupping, is one of the world's oldest natural therapies — a practice rooted in prophetic (sunnah) tradition. In dry cupping the skin stays completely intact: gentle suction only, ideal for facial work, tension and cosmetic use. In wet cupping (hijama), a few tiny, shallow pricks allow a small amount of stagnant blood to be drawn, supporting circulation, detoxification and deeper therapeutic work.</p>
     <div class="pull-quote">
       <blockquote>"The best of the remedies you have is hijama."</blockquote>
@@ -550,8 +442,8 @@
   </section>
 
   <!-- What we offer -->
-  <section class="block">
-    <h2>What we offer</h2>
+  <section class="card block">
+    <h2 class="section-label">What we offer</h2>
     <ul class="offer-list">
       <li>
         <span class="offer-name">Massage</span>
@@ -571,20 +463,20 @@
   </section>
 
   <!-- What to wear & bring -->
-  <section class="block">
-    <h2>What to wear &amp; bring</h2>
+  <section class="card block">
+    <h2 class="section-label">What to wear &amp; bring</h2>
     <p>Wear loose, comfortable clothing that can be moved aside easily — you won't need to fully undress. Only the area being treated will be uncovered, and you'll be draped throughout. Your modesty is fully respected at every point. Bring a list of any medications you take. Everything else — oils, aftercare — is provided.</p>
   </section>
 
   <!-- To take home -->
-  <section class="block">
-    <h2>To take home</h2>
+  <section class="card block">
+    <h2 class="section-label">To take home</h2>
     <p>After every wet cupping session, you'll leave with a bottle of black seed oil to apply to the treated area. It soothes the skin, supports healing, and is a sunnah remedy in its own right.</p>
   </section>
 
   <!-- The marks -->
-  <section class="block">
-    <h2>The marks <span style="color:var(--dim);font-size:0.7em;font-style:italic;">(wet cupping only)</span></h2>
+  <section class="card block">
+    <h2 class="section-label">The marks <span class="label-note">(wet cupping only)</span></h2>
     <p>Wet cupping leaves small circular marks that look like light bruising. They are not scars — your body clears them naturally, usually within one to two weeks.</p>
     <div class="timeline">
       <div class="t-step"><span class="t-day">Day 0</span><span class="t-label">just after</span></div>
@@ -596,11 +488,11 @@
   </section>
 
   <!-- Before & after checklists -->
-  <section class="block">
-    <h2>Before &amp; after</h2>
+  <section class="card block">
+    <h2 class="section-label">Before &amp; after</h2>
     <div class="checklists">
       <div class="checklist">
-        <h3>Before your session</h3>
+        <h3 class="section-label">Before your session</h3>
         <ul>
           <li>Eat 2–3 hours beforehand, not right before</li>
           <li>Drink plenty of water the day before and morning of</li>
@@ -609,7 +501,7 @@
         </ul>
       </div>
       <div class="checklist">
-        <h3>After your session</h3>
+        <h3 class="section-label">After your session</h3>
         <ul>
           <li>Rest 10–15 min before heading home</li>
           <li>Keep the area clean and dry for 24–48 hours</li>
@@ -622,8 +514,8 @@
   </section>
 
   <!-- FAQ -->
-  <section class="block">
-    <h2>A few quick answers</h2>
+  <section class="card block">
+    <h2 class="section-label">A few quick answers</h2>
     <div class="faq-item">
       <h3>Does it hurt?</h3>
       <p>The suction feels like a firm tug. The wet cupping pricks feel like a quick light scratch. Most clients find the whole session relaxing — some fall asleep.</p>
@@ -643,7 +535,7 @@
   </section>
 
   <!-- Closing -->
-  <section class="block closing">
+  <section class="card block closing">
     <p>I look forward to seeing you. — Halima</p>
     <p class="closing-meta">@haloe.health · Manchester · any questions, message me any time</p>
   </section>
@@ -654,6 +546,8 @@
   </div>
 
 </article>
+
+</div><!-- /.wrap -->
 
 <!-- FOOTER -->
 <footer>

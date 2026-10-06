@@ -265,6 +265,9 @@
     .footer-right { text-align:center; }
   }
 
+</style>
+<link rel="stylesheet" href="calm.css">
+<style>
   /* ==================================================================
      Calm redesign (Oct 2026) — cream page, white cards, gold accent, serif
      headings. Mobile-first and deliberately CSS-led: every field id and radio
@@ -273,32 +276,8 @@
      adjacency chains are gone. Sizes are in px on purpose: the page keeps
      html{font-size:78%} for the shared nav, so rem would shrink the form.
      ================================================================== */
-  @font-face {
-    font-family: 'Tan Ashford';
-    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
-         url('fonts/TAN-ASHFORD.woff') format('woff');
-    font-weight: normal; font-style: normal; font-display: swap;
-  }
-  html { font-size: 78%; }
-  :root {
-    --page-bg: #F5F0E8;
-    --card: #FFFFFF;
-    --fill: #EFE9DD;          /* warm grey: inactive controls, input wells */
-    --fill-hover: #E8E1D2;
-    --ink: #1C1A16;
-    --muted: #6B6354;
-    --gold: #C8A96E;
-    --gold-deep: #8a6a2c;
-    --ring: rgba(200,169,110,0.5);
-    --shadow: 0 1px 2px rgba(60,45,20,0.04), 0 6px 20px rgba(60,45,20,0.05);
-    --serif: 'Tan Ashford', Georgia, 'Times New Roman', serif;      /* display: page + screen titles */
-    --serif-text: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif; /* softer serif for sentences */
-  }
-  body { background: var(--page-bg); color: var(--ink); font-size: 16px; }
 
   /* Nav stays compact so the form gets the screen */
-  nav { padding: 12px 20px; }
-  @media (min-width: 861px) { nav { padding: 14px 40px; } }
   footer { display: none; }
 
   /* Page frame: 16px gutters */
@@ -307,13 +286,10 @@
   .wrap { max-width: 600px; padding: 88px 16px calc(var(--bar-h) + 24px); }
   .intro-head { display: none; margin: 8px 0 0; }
   .wrap:has(.step[data-step="1"].active) .intro-head { display: block; }
-  h1 { font-family: var(--serif); font-weight: normal; font-size: 30px; line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 12px; color: var(--ink); }
-  .intro-line { font-size: 15px; line-height: 1.65; color: var(--muted); max-width: none; }
 
   /* Step header: "STEP 3 OF 5" gold left, step name right, dots centred below */
   .progress { position: static; background: none; padding: 24px 0; margin: 0; }
   .progress-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 14px; }
-  .progress-step { font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-deep); }
   .progress-name { font-size: 14px; color: var(--muted); letter-spacing: 0; text-align: right; }
   .progress-dots { display: flex; justify-content: center; gap: 8px; padding: 0; }
   .progress-dots i { display: block; width: 8px; height: 8px; border-radius: 999px; background: var(--fill-hover); font-style: normal; transition: background 150ms ease, width 150ms ease; }
@@ -322,12 +298,10 @@
 
   /* Step intro: one short serif line, then any longer note in quiet text */
   .step > h2 { display: none; }
-  .step-lede { font-family: var(--serif-text); font-size: 21px; line-height: 1.35; letter-spacing: -0.005em; color: var(--ink); margin: 0 0 20px; }
   .section-intro { font-size: 14px; line-height: 1.6; color: var(--muted); background: none; border: 0; border-radius: 0; padding: 0; margin: -6px 0 20px; }
 
   /* One question per card */
   .group { display: contents; }
-  .field { background: var(--card); border-radius: 24px; padding: 20px; margin: 0 0 16px; box-shadow: var(--shadow); }
   .field > label.q { display: block; font-size: 17px; line-height: 1.4; font-weight: 400; color: var(--ink); margin: 0 0 12px; letter-spacing: 0; text-transform: none; }
   .field .opt-hint { display: block; margin-top: 4px; font-size: 14px; line-height: 1.45; font-style: italic; font-weight: 300; color: var(--muted); letter-spacing: 0; text-transform: none; }
 
