@@ -7,6 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Your private health and consent form for haloe — a short, confidential intake before your hijama session in Manchester.">
 <meta name="robots" content="noindex">
+<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
@@ -53,7 +54,7 @@
     --surface: #FFFFFF;
     --error: #C0392B;
     --font-heading: 'Poppins', sans-serif;
-    --font-wordmark: 'Poppins', sans-serif;
+    --font-wordmark: 'Tan Ashford', Georgia, serif;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -91,7 +92,7 @@
     transform:translateY(-0.2918em);
   }
   .nav-logo-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
-  .nav-logo span { font-family:var(--font-wordmark); font-size:1em; line-height:1; color:var(--gold-deep); letter-spacing:0.02em; font-weight:normal; text-transform:none; }
+  .nav-logo span { font-family:var(--font-wordmark); font-style:normal; font-size:1em; line-height:1; color:var(--gold-deep); letter-spacing:normal; font-weight:normal; text-transform:none; }
   nav ul { list-style:none; display:flex; gap:48px; align-items:center; }
   nav ul a { color:var(--dim); text-decoration:none; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; transition:color 0.4s; font-weight:400; }
   nav ul a:hover { color:var(--gold-deep); }
@@ -209,7 +210,7 @@
     transform:translateY(-0.2918em);
   }
   .footer-left-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
-  .footer-left span { font-family:var(--font-wordmark); font-size:1em; line-height:1; color:var(--gold); letter-spacing:0.02em; font-weight:normal; }
+  .footer-left span { font-family:var(--font-wordmark); font-style:normal; font-size:1em; line-height:1; color:var(--gold); letter-spacing:normal; font-weight:normal; }
   .footer-links { display:flex; gap:32px; }
   .footer-links a { color:#f7f2ea; text-decoration:none; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; transition:color 0.4s; opacity:0.6; }
   .footer-links a:hover { color:var(--gold); opacity:1; }
@@ -301,7 +302,9 @@
   footer { display: none; }
 
   /* Page frame: 16px gutters */
-  .wrap { max-width: 600px; padding: 88px 16px 24px; }
+  /* --bar-h = the fixed action bar (32 fade + 48 button + 16 bottom); the page is padded by it plus 24px so the last card always clears the bar */
+  :root { --bar-h: calc(96px + env(safe-area-inset-bottom)); }
+  .wrap { max-width: 600px; padding: 88px 16px calc(var(--bar-h) + 24px); }
   .intro-head { display: none; margin: 8px 0 0; }
   .wrap:has(.step[data-step="1"].active) .intro-head { display: block; }
   h1 { font-family: var(--serif); font-weight: normal; font-size: 30px; line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 12px; color: var(--ink); }
@@ -447,13 +450,17 @@
   .field-error.visible { display: block; }
   .field:has(.invalid) { box-shadow: 0 0 0 1.5px rgba(192,57,43,0.4), var(--shadow); }
 
-  /* Sticky action bar with a soft fade, so the buttons are always reachable
-     without covering the last card. The bar ignores taps; its buttons don't. */
+  /* Action bar: pinned to the bottom of the viewport with a soft fade, so the
+     buttons are always reachable. The bar ignores taps; its buttons don't.
+     Fixed (not sticky) needs a transform-free ancestor — hence the opacity-only
+     step animation below. Content padding comes from --bar-h on .wrap. */
+  .step.active { animation: stepIn 250ms ease both; }
+  @keyframes stepIn { from { opacity: 0; } to { opacity: 1; } }
   .step-nav {
-    position: sticky; bottom: 0; z-index: 40;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
     display: flex; align-items: center; gap: 12px;
-    margin: 8px -16px 0; padding: 32px 16px calc(16px + env(safe-area-inset-bottom));
-    border: 0;
+    margin: 0; border: 0;
+    padding: 32px max(16px, calc((100vw - 600px) / 2 + 16px)) calc(16px + env(safe-area-inset-bottom));
     background: linear-gradient(to top, var(--page-bg) 52%, rgba(245,240,232,0));
     pointer-events: none;
   }
