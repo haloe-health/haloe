@@ -71,6 +71,7 @@ create table if not exists public.intake_forms (
   photo_consent           text,
   signature_name          text,
   signature_date          text,
+  signature_path          text,   -- drawn signature, e.g. 'signatures/42.png' (private Storage bucket; see supabase-intake-signature.sql)
 
   created_at              timestamptz not null default now()
 );

@@ -265,469 +265,226 @@
   }
 
   /* ==================================================================
-     Apple pass — matches the booking flow (book.html / booking-confirmed).
-     Deliberately CSS-only: no markup is touched, so every field id and
-     radio name the D1 submission depends on is untouched by construction.
+     Calm redesign (Oct 2026) — cream page, white cards, gold accent, serif
+     headings. Mobile-first and deliberately CSS-led: every field id and radio
+     name that collect() reads is untouched. Replaced the old black "Apple
+     pass" (grouped inset rows) — one question per card now, so the :has()
+     adjacency chains are gone. Sizes are in px on purpose: the page keeps
+     html{font-size:78%} for the shared nav, so rem would shrink the form.
      ================================================================== */
+  @font-face {
+    font-family: 'Tan Ashford';
+    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
+         url('fonts/TAN-ASHFORD.woff') format('woff');
+    font-weight: normal; font-style: normal; font-display: swap;
+  }
   html { font-size: 78%; }
   :root {
-    /* Light theme (Sep 2026) — was the true-black Apple pass. --a-t1 stays
-       the row/field TEXT colour (now dark ink); the iOS toggle knob is a
-       separate --a-knob token since it must stay light-on-gold when checked,
-       not follow --a-t1's flip to dark. */
-    --a-bg: #F5F0E8;
-    --a-s1: #FFFFFF;
-    --a-s3: #E5DFD2;
-    --a-t1: #0D0D0D;
-    --a-t2: #5a5247;
-    --a-t3: #8a8272;
-    --a-sep: rgba(13,13,13,0.08);
-    --a-sep2: rgba(13,13,13,0.14);
-    --a-knob: #FFFFFF;
+    --page-bg: #F5F0E8;
+    --card: #FFFFFF;
+    --fill: #EFE9DD;          /* warm grey: inactive controls, input wells */
+    --fill-hover: #E8E1D2;
+    --ink: #1C1A16;
+    --muted: #6B6354;
+    --gold: #C8A96E;
+    --gold-deep: #8a6a2c;
+    --ring: rgba(200,169,110,0.5);
+    --shadow: 0 1px 2px rgba(60,45,20,0.04), 0 6px 20px rgba(60,45,20,0.05);
+    --serif: 'Tan Ashford', Georgia, 'Times New Roman', serif;      /* display: page + screen titles */
+    --serif-text: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif; /* softer serif for sentences */
   }
-  body { background: var(--a-bg); }
+  body { background: var(--page-bg); color: var(--ink); font-size: 16px; }
 
-  /* Headings: no separate override needed here any more — the h1/.step h2/
-     .screen h2 rules above already give Tan Ashford, normal weight,
-     -0.025em tracking and no italic, compensated for this page's 78% root
-     scale. This block used to re-pin a smaller Poppins size/weight to
-     match the booking flow's density; letting the shared rules stand
-     instead keeps this page's headings consistent with every other page. */
+  /* Nav stays compact so the form gets the screen */
+  nav { padding: 12px 20px; }
+  @media (min-width: 861px) { nav { padding: 14px 40px; } }
+  footer { display: none; }
 
-  /* Progress: a hairline rule rather than a gold bar */
-  .progress { background: var(--a-bg); }
-  .progress-track { height: 2px; background: var(--a-sep); }
-  .progress-fill { background: var(--gold); }
-  .progress-step { letter-spacing: 0.14em; color: var(--a-t3); }
-  .progress-name { color: var(--a-t2); }
+  /* Page frame: 16px gutters */
+  .wrap { max-width: 600px; padding: 88px 16px 24px; }
+  .intro-head { display: none; margin: 8px 0 0; }
+  .wrap:has(.step[data-step="1"].active) .intro-head { display: block; }
+  h1 { font-family: var(--serif); font-weight: normal; font-size: 30px; line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 12px; color: var(--ink); }
+  .intro-line { font-size: 15px; line-height: 1.65; color: var(--muted); max-width: none; }
 
-  /* Fields */
-  .field { margin-bottom: 0.9rem; }
-  .field label.q {
-    font-size: 1.05rem;
-    font-weight: 300;
-    letter-spacing: 0;
-    text-transform: none;
-    color: var(--a-t1);
-    margin-bottom: 0.4rem;
-  }
-  .field input[type="text"],
-  .field input[type="tel"],
-  .field input[type="email"],
-  .field input[type="date"],
-  .field select,
-  .field textarea,
-  input[type="text"], input[type="tel"], input[type="email"], input[type="date"],
-  select, textarea {
-    background: var(--a-s1) !important;
-    border: 1px solid var(--a-sep) !important;
-    border-radius: 10px !important;
-    color: var(--a-t1) !important;
-    font-size: 1.05rem !important;
-    font-weight: 300;
-    padding: 0.6rem 0.8rem !important;
-    box-shadow: none !important;
-  }
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--gold) !important;
-    outline: none;
-  }
-  ::placeholder { color: #5A5A5F; }
+  /* Step header: "STEP 3 OF 5" gold left, step name right, dots centred below */
+  .progress { position: static; background: none; padding: 24px 0; margin: 0; }
+  .progress-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 14px; }
+  .progress-step { font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-deep); }
+  .progress-name { font-size: 14px; color: var(--muted); letter-spacing: 0; text-align: right; }
+  .progress-dots { display: flex; justify-content: center; gap: 8px; padding: 0; }
+  .progress-dots i { display: block; width: 8px; height: 8px; border-radius: 999px; background: var(--fill-hover); font-style: normal; transition: background 150ms ease, width 150ms ease; }
+  .progress-dots i.done { background: rgba(200,169,110,0.55); }
+  .progress-dots i.on { background: var(--gold); width: 24px; }
 
-  /* Yes/No answers become an Apple segmented control */
-  .choices {
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 2px;
-    background: var(--a-s1);
-    border-radius: 9px;
-    padding: 2px;
+  /* Step intro: one short serif line, then any longer note in quiet text */
+  .step > h2 { display: none; }
+  .step-lede { font-family: var(--serif-text); font-size: 21px; line-height: 1.35; letter-spacing: -0.005em; color: var(--ink); margin: 0 0 20px; }
+  .section-intro { font-size: 14px; line-height: 1.6; color: var(--muted); background: none; border: 0; border-radius: 0; padding: 0; margin: -6px 0 20px; }
+
+  /* One question per card */
+  .group { display: contents; }
+  .field { background: var(--card); border-radius: 24px; padding: 20px; margin: 0 0 16px; box-shadow: var(--shadow); }
+  .field > label.q { display: block; font-size: 17px; line-height: 1.4; font-weight: 400; color: var(--ink); margin: 0 0 12px; letter-spacing: 0; text-transform: none; }
+  .field .opt-hint { display: block; margin-top: 4px; font-size: 14px; line-height: 1.45; font-style: italic; font-weight: 300; color: var(--muted); letter-spacing: 0; text-transform: none; }
+
+  /* Text inputs: 48px, label above in small muted caps */
+  .field:has(> input[type]) > label.q { font-size: 12px; font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+  .field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date], .field select {
+    display: block; width: 100%; height: 48px; padding: 0 16px;
+    background: var(--fill); border: 0; border-radius: 14px; box-shadow: none;
+    font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 300; line-height: 1.2; color: var(--ink);
+    text-align: left; -webkit-appearance: none; appearance: none;
+    transition: box-shadow 150ms ease, background 150ms ease;
   }
-  .choices .opt {
-    margin: 0;
-    border: none !important;
-    background: none !important;
-    border-radius: 7px;
-    padding: 0;
-    overflow: hidden;
+  .field input[type=date]::-webkit-date-and-time-value { text-align: left; }
+  .field select {
+    padding-right: 44px; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1.5l6 6 6-6' fill='none' stroke='%236B6354' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 18px center;
   }
-  .choices .opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .field textarea {
+    display: block; width: 100%; min-height: 96px; padding: 12px 16px; resize: none;
+    background: var(--fill); border: 0; border-radius: 14px; box-shadow: none;
+    font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 300; line-height: 1.5; color: var(--ink);
+    -webkit-appearance: none; appearance: none; transition: box-shadow 150ms ease, background 150ms ease;
+  }
+  .field input::placeholder, .field textarea::placeholder { color: #9A917F; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; background: #FBF8F2; box-shadow: 0 0 0 3px var(--ring); }
+  .field input.invalid, .field select.invalid, .field textarea.invalid { background: #FBEFEC; }
+
+  /* Choices: one segmented component. Yes/No sit right-aligned, 44px tall */
+  .choices { display: flex; flex-wrap: nowrap; gap: 6px; justify-content: flex-end; background: none; padding: 0; border-radius: 0; outline: 0; }
+  .choices.invalid { outline: 0; }
+  .choices .opt { position: relative; flex: 0 0 auto; margin: 0; padding: 0; border: 0; background: none; overflow: visible; cursor: pointer; }
+  .choices .opt input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
   .choices .opt span {
-    display: block;
-    padding: 0.42rem 1rem;
-    font-size: 0.95rem;
-    color: var(--a-t2);
-    border-radius: 7px;
-    cursor: pointer;
-    transition: background 0.18s, color 0.18s;
-    white-space: nowrap;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 44px; min-width: 88px; padding: 0 20px;
+    border: 0 !important; border-radius: 999px;
+    background: var(--fill); color: var(--muted);
+    font-size: 15px; font-weight: 400; line-height: 1.3; white-space: nowrap; text-align: center;
+    transition: background 150ms ease, color 150ms ease; user-select: none; -webkit-tap-highlight-color: transparent;
   }
-  .choices .opt:hover span { color: var(--a-t1); }
-  .choices .opt input:checked + span {
-    background: var(--gold);
-    color: #000;
-    font-weight: 500;
-  }
+  @media (hover: hover) { .choices .opt:hover input:not(:checked) + span { background: var(--fill-hover); color: var(--ink); } }
+  .choices .opt input:checked + span { background: var(--gold); color: var(--ink); font-weight: 500; }
+  .choices .opt input:focus-visible + span { box-shadow: 0 0 0 3px var(--ring); }
+  /* three short options: equal columns, side by side */
+  .choices.wide { justify-content: stretch; }
+  .choices.wide .opt { flex: 1 1 0; min-width: 0; }
+  .choices.wide .opt span { min-width: 0; padding: 0 8px; }
+  /* long labels: stacked rows, never narrower than 44px */
+  .choices.stack { flex-direction: column; align-items: stretch; gap: 8px; }
+  .choices.stack .opt { flex: none; }
+  .choices.stack .opt span { justify-content: flex-start; min-width: 0; padding: 10px 16px; border-radius: 14px; text-align: left; white-space: normal; font-size: 15px; }
 
-  /* Checkboxes become iOS toggles */
-  .check-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.85rem;
-    padding: 0.62rem 0.85rem;
-    border-bottom: 1px solid var(--a-sep);
-    cursor: pointer;
-  }
-  .check-list {
-    background: var(--a-s1);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  .check-list .check-item:last-child { border-bottom: none; }
-  .check-item input { position: absolute; opacity: 0; pointer-events: none; }
-  .check-item .check-box {
-    order: 2;
-    margin-left: auto;
-    position: relative;
-    flex: none;
-    width: 38px; height: 22px;
-    border-radius: 999px;
-    background: var(--a-s3);
-    border: none !important;
-    margin-top: 0.1rem;
-    transition: background 0.2s;
-  }
-  .check-item .check-box::after {
-    content: '';
-    position: absolute; top: 2px; left: 2px;
-    width: 18px; height: 18px; border-radius: 50%;
-    background: var(--a-knob);
-    transition: transform 0.2s;
-  }
-  .check-item input:checked ~ .check-box { background: var(--gold); }
-  /* Keep the round knob when checked — override the legacy checkmark ::after
-     (5x9 tick) that otherwise clipped the toggle into a sliver. */
-  .check-item input:checked ~ .check-box::after {
-    transform: translateX(16px);
-    width: 18px;
-    height: 18px;
-    border: none;
-    border-radius: 50%;
-    background: var(--a-knob);
-  }
-  .check-item > span:not(.check-box) {
-    order: 1;
-    flex: 1;
-    font-size: 1rem;
-    line-height: 1.55;
-    color: var(--a-t1);
-  }
-
-  /* Buttons: Apple pills */
-  .btn, button.btn, .step-nav button {
-    border-radius: 999px !important;
-    font-size: 0.82rem !important;
-    letter-spacing: 0 !important;
-    text-transform: none !important;
-    padding: 0.65rem 1.5rem !important;
-  }
-
-  /* ---- Option A: questions as rows inside grouped cards ----
-     Built entirely from :has() on the existing markup, so no ids or radio
-     names move. Consecutive rows fuse into one card: every row is rounded at
-     the top, and any row that follows another has that rounding removed. */
-  .field:has(> .choices),
-  .field:has(> input[type="text"]),
-  .field:has(> input[type="tel"]),
-  .field:has(> input[type="email"]),
-  .field:has(> input[type="date"]),
-  .field:has(> select) {
-    background: var(--a-s1);
-    padding: 0.7rem 0.85rem;
-    margin: 0;
-    border-bottom: 1px solid var(--a-sep);
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-  }
-  /* Yes/No answers stay a row (label left, segmented right); free-text and
-     select fields stack the label above a full-width input, so long question
-     labels aren't squeezed into a narrow column. */
-  .field:has(> .choices) {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.9rem;
-  }
-  /* a row that follows another row is mid-card, so square off its top */
-  .field:has(> .choices) + .field:has(> .choices),
-  .field:has(> .choices) + .field:has(> input),
-  .field:has(> .choices) + .field:has(> select),
-  .field:has(> input) + .field:has(> .choices),
-  .field:has(> input) + .field:has(> input),
-  .field:has(> input) + .field:has(> select),
-  .field:has(> select) + .field:has(> .choices),
-  .field:has(> select) + .field:has(> input),
-  .field:has(> select) + .field:has(> select) {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-  /* the last row of a run closes the card */
-  .field:has(> .choices):not(:has(+ .field:has(> .choices))):not(:has(+ .field:has(> input))):not(:has(+ .field:has(> select))),
-  .field:has(> input):not(:has(+ .field:has(> .choices))):not(:has(+ .field:has(> input))):not(:has(+ .field:has(> select))),
-  .field:has(> select):not(:has(+ .field:has(> .choices))):not(:has(+ .field:has(> input))):not(:has(+ .field:has(> select))) {
-    border-bottom: none;
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-    margin-bottom: 0.8rem;
-  }
-  /* Yes/No: label shares the row. Inputs/selects: label sits above. */
-  .field:has(> .choices) > label.q {
-    flex: 1;
-    min-width: 0;
-    margin-bottom: 0;
-    font-size: 1.05rem;
-    line-height: 1.45;
-  }
-  .field:has(> input) > label.q,
-  .field:has(> select) > label.q {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 1.05rem;
-    line-height: 1.4;
-  }
-  .field:has(> .choices) > .choices { flex: none; background: var(--a-s3); }
-  /* Questions with 3 or more options (diabetes, blood-borne, etc.) can't fit
-     beside the label in one row — the last option got cut off. Stack the
-     label, then list the options vertically full-width so nothing clips. */
-  .field:has(> .choices):has(.opt:nth-of-type(3)) { display: block; }
-  .field:has(> .choices):has(.opt:nth-of-type(3)) > label.q {
-    display: block;
-    flex: none;
-    margin-bottom: 0.55rem;
-  }
-  .field:has(> .choices):has(.opt:nth-of-type(3)) > .choices {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    width: 100%;
-    margin-left: 0;
-  }
-  .field:has(> .choices):has(.opt:nth-of-type(3)) .opt span {
-    display: block;
-    text-align: center;
-    white-space: normal;
-    padding: 0.6rem 0.8rem;
-  }
-  .field:has(> input) > input[type],
-  .field:has(> select) > select {
-    display: block;
-    width: 100%;
-    background: none !important;
-    border: none !important;
-    padding: 0 !important;
-    text-align: left;
-    border-radius: 0 !important;
-  }
-  .field:has(> .choices) > .field-error,
-  .field:has(> input) > .field-error,
-  .field:has(> select) > .field-error { flex-basis: 100%; margin-top: 0.2rem; }
-
-  /* Textareas stay full width — they need the room */
-  .field:has(> textarea) { margin-bottom: 0.8rem; }
-  .field:has(> textarea) > label.q { display: block; margin-bottom: 0.4rem; }
-
-  /* ---- Vertical rhythm: the page sat too far down ----
-     The nav is 81px tall but .wrap reserved 150px, leaving ~69px of dead
-     space. Trim the nav a little, close the gap, and re-anchor the sticky
-     progress bar to the real nav height (it was 76px, so it slid underneath). */
-  nav { padding: 14px 40px !important; }
-  .wrap { padding-top: 88px !important; padding-bottom: 56px !important; }
-  .intro-head { margin-bottom: 26px !important; }
-  .progress { top: 66px !important; }
-  @media (max-width: 720px) {
-    nav { padding: 12px 20px !important; }
-    .wrap { padding-top: 76px !important; }
-    .progress { top: 58px !important; }
-  }
-
-  /* Progress as Apple dots, matching the booking flow */
-  .progress-dots { display: flex; justify-content: center; gap: 7px; padding-top: 2px; }
-  .progress-dots i {
-    display: block; width: 6px; height: 6px; border-radius: 999px;
-    background: var(--a-s3); font-style: normal;
-    transition: background 0.25s, width 0.25s;
-  }
-  .progress-dots i.done { background: rgba(201,160,64,0.55); }
-  .progress-dots i.on { background: var(--gold); width: 18px; }
-  .progress-meta { margin-bottom: 8px; }
-
-  /* "I confirm I am 18 or over" reads as a consent, so it renders as a
-     switch rather than Yes/No. Both radios stay in the DOM untouched — the
-     stored value is still 'Yes' — but only the Yes option is shown, and the
-     step can't be passed while it's off. */
-  .choices.as-toggle { background: none; padding: 0; gap: 0; }
+  /* "I confirm I am 18 or over" is a consent, so it stays a switch (the No
+     radio stays in the DOM, hidden — the stored value is still 'Yes') */
+  .field:has(> .choices.as-toggle) { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  .field:has(> .choices.as-toggle) > label.q { flex: 1; min-width: 0; margin: 0; }
+  .choices.as-toggle { flex: none; gap: 0; }
   .choices.as-toggle .opt:has(input[value="No"]) { display: none; }
+  .choices.as-toggle .opt:has(input[value="Yes"]) { padding: 8px 0; }
   .choices.as-toggle .opt:has(input[value="Yes"]) span {
-    display: block;
-    position: relative;
-    width: 38px; height: 22px;
-    padding: 0;
-    border-radius: 999px;
-    background: var(--a-s3);
-    font-size: 0;
-    transition: background 0.2s;
+    position: relative; display: block; width: 52px; height: 30px; min-width: 0; min-height: 0; padding: 0;
+    border-radius: 999px; background: #D8D0BF; font-size: 0;
   }
   .choices.as-toggle .opt:has(input[value="Yes"]) span::after {
-    content: '';
-    position: absolute; top: 2px; left: 2px;
-    width: 18px; height: 18px; border-radius: 50%;
-    background: var(--a-knob);
-    transition: transform 0.2s;
+    content: ''; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%;
+    background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,0.18); transition: transform 150ms ease;
   }
   .choices.as-toggle .opt input[value="Yes"]:checked + span { background: var(--gold); }
-  .choices.as-toggle .opt input[value="Yes"]:checked + span::after { transform: translateX(16px); }
-  .choices.as-toggle.invalid .opt:has(input[value="Yes"]) span { box-shadow: 0 0 0 2px rgba(224,165,155,0.6); }
+  .choices.as-toggle .opt input[value="Yes"]:checked + span::after { transform: translateX(22px); }
+  .field:has(> .choices.as-toggle) > .field-error { flex-basis: 100%; margin-top: 0; }
 
-  /* ---- Free-text rows ----
-     The row-grouping rules above cover .choices, input and select but not
-     textarea, which is why the "if yes" boxes used to float outside the card
-     with their own label and margin. These give a textarea the same inset-card
-     treatment, with its label as a caption above rather than a heading. */
-  .field:has(> textarea) {
-    background: var(--a-s1);
-    border-radius: 12px;
-    padding: 0.5rem 0.85rem 0.6rem;
-    margin: 0 0 0.8rem;
+  /* Consent / acknowledgement switches */
+  .check-list { display: flex; flex-direction: column; gap: 12px; background: none; border-radius: 0; overflow: visible; outline: 0; }
+  .check-list.invalid { outline: 0; }
+  .check-item { display: flex; align-items: center; gap: 16px; min-height: 44px; padding: 14px 16px; background: var(--fill); border: 0; border-radius: 16px; cursor: pointer; font-size: 15px; line-height: 1.5; color: var(--ink); user-select: none; -webkit-tap-highlight-color: transparent; }
+  .check-list .check-item:last-child { border: 0; }
+  .check-item input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+  .check-item > span:not(.check-box) { order: 1; flex: 1; font-size: 15px; line-height: 1.5; color: var(--ink); }
+  .check-item .check-box {
+    order: 2; position: relative; flex: none; margin: 0 0 0 auto;
+    width: 52px; height: 30px; min-width: 52px; border: 0 !important; border-radius: 999px;
+    background: #D8D0BF; transition: background 150ms ease;
   }
-  .field:has(> textarea) > label.q {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 1.05rem;
-    line-height: 1.4;
-    color: var(--a-t1);
+  .check-item .check-box::after {
+    content: ''; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border: 0; border-radius: 50%;
+    background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,0.18); transform: none; transition: transform 150ms ease;
   }
-  .field:has(> textarea) > textarea {
-    width: 100%;
-    background: none !important;
-    border: none !important;
-    padding: 0 !important;
-    color: var(--a-t1);
-    font-family: inherit;
-    font-size: 1.05rem;
-    line-height: 1.5;
-    resize: none;
-    outline: none;
-    display: block;
-    height: 3em;      /* ~2 lines; the box shouldn't dwarf its answer */
-    min-height: 3em;
-  }
-  .field:has(> textarea) > textarea::placeholder { color: var(--a-t3); }
+  .check-item input:checked ~ .check-box { background: var(--gold); }
+  .check-item input:checked ~ .check-box::after { transform: translateX(22px); width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--card); }
+  .check-item input:focus-visible ~ .check-box { box-shadow: 0 0 0 3px var(--ring); }
+  /* a consent that is the whole card needs no second box inside the card */
+  .field:has(> .check-list > .check-item:only-child) .check-item { background: none; padding: 0; border-radius: 0; }
 
-  /* ---- Autofill ----
-     Safari and Chrome paint autofilled fields pale yellow and ignore
-     background-color and color. The inset shadow covers the fill and
-     -webkit-text-fill-color sets the text; the long transition stops the
-     yellow returning on re-render. The inset matches the row (--a-s1),
-     since these inputs are transparent and the row supplies the surface. */
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  select:-webkit-autofill,
-  textarea:-webkit-autofill {
-    -webkit-text-fill-color: var(--a-t1);
-    -webkit-box-shadow: 0 0 0 1000px var(--a-s1) inset;
-            box-shadow: 0 0 0 1000px var(--a-s1) inset;
-    caret-color: var(--a-t1);
-    transition: background-color 100000s ease 0s;
-  }
+  .consent-statement { font-size: 15px; line-height: 1.7; color: var(--muted); background: var(--card); border: 0; border-radius: 24px; padding: 20px; margin: 0 0 16px; box-shadow: var(--shadow); }
 
-  /* ---- Grouped inset list ----
-     The wrapper owns the card: one background, one radius, hairlines between
-     rows. Rows inside go flat, so a hidden .reveal between two questions can't
-     break the run the way the :has() adjacency chain did. This is the same
-     structure book.html uses, and what COMPONENTS.md documents. */
-  .group {
-    background: var(--a-s1);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 0.8rem;
-  }
-  .group > .field {
-    border-radius: 0 !important;
-    margin: 0 !important;
-    border-bottom: 1px solid var(--a-sep);
-  }
-  .group > .field:last-child { border-bottom: none; }
+  /* Draw-to-sign */
+  .sign-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; }
+  .sign-head label.q { margin: 0; }
+  .sign-clear { background: none; border: 0; padding: 0 4px; min-height: 44px; min-width: 44px; font: 400 15px 'Poppins', sans-serif; color: var(--gold-deep); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .sign-pad { position: relative; height: 160px; background: #FBF8F2; border-radius: 16px; overflow: hidden; touch-action: none; }
+  .sign-pad canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+  .sign-line { position: absolute; left: 16px; right: 16px; bottom: 40px; height: 1px; background: rgba(28,26,22,0.22); pointer-events: none; }
+  .sign-x { position: absolute; left: 16px; bottom: 44px; font-size: 18px; line-height: 1; color: var(--muted); pointer-events: none; }
+  .sign-ph { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-70%); text-align: center; font-size: 14px; color: #A59C89; pointer-events: none; }
+  .sign-pad.has-ink .sign-ph { display: none; }
+  .sign-pad:has(canvas.invalid) { box-shadow: inset 0 0 0 1.5px rgba(192,57,43,0.55); }
+  .sign-hint { margin: 12px 0 0; font-size: 14px; line-height: 1.45; color: var(--muted); font-style: italic; }
 
-  /* A three-option control (diabetes, blood-borne infection, blood pressure)
-     is too wide to sit beside its question on a phone. The label is flex:1
-     with min-width:0, so it used to collapse to a few pixels and render one
-     word per line. A floor on the label forces the control to wrap onto its
-     own row instead, which is what the flex-wrap above was always for. */
-  .field:has(> .choices) > label.q { min-width: 11rem; }
-  .field:has(> .choices) > .choices { margin-left: auto; }
-
-  /* ---- Segmented control ----
-     Match book.html's .segmented / .seg-option exactly. The legacy .opt span
-     rule above still puts a gold hairline round every option; the Apple
-     override never reset it, which is why the pills looked outlined. */
-  .choices .opt span { border: none !important; }
-  .field:has(> .choices) > .choices { background: var(--a-s3); }
-
-  /* ---- Progressive disclosure ----
-     A follow-up marked .reveal stays hidden until its question is answered
-     Yes, then opens as a sub-row welded to the card above. Only the three
-     genuinely conditional boxes carry .reveal — main_concern and safety_notes
-     follow a question row too, but are always shown. */
+  /* Progressive disclosure: a follow-up appears (as its own card) on Yes */
   .field.reveal { display: none; }
-
-  .field:has(> .choices input[value="Yes"]:checked) + .field.reveal {
-    display: block;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-  }
-  /* the question above squares off its foot so the pair reads as one card */
-  .field:has(> .choices input[value="Yes"]:checked):has(+ .field.reveal) {
-    border-bottom: 1px solid var(--a-sep);
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    margin-bottom: 0;
-  }
-
+  .field:has(> .choices input[value="Yes"]:checked) + .field.reveal { display: block; }
   @media (prefers-reduced-motion: no-preference) {
-    .field.reveal { animation: reveal-in 0.22s ease-out; }
-    @keyframes reveal-in {
-      from { opacity: 0; transform: translateY(-3px); }
-      to   { opacity: 1; transform: none; }
-    }
+    .field.reveal { animation: reveal-in 150ms ease-out; }
+    @keyframes reveal-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
   }
 
-  /* ---- Fit a step on one screen ----
-     This is a form, not a marketing page, so the space goes to the questions.
-     Reclaimed: the site footer (158px of links below the fold), the repeated
-     intro paragraph, and the section <h2> that just repeated the progress
-     label ("About you" was on screen twice). */
-  footer { display: none; }
-  .wrap { padding-top: 76px !important; padding-bottom: 28px !important; }
-  h1 { font-size: 1.5rem !important; }
-  .intro-head { margin-bottom: 16px !important; }
-  .intro-line { font-size: 1rem; line-height: 1.7; max-width: 62ch; }
-  .step > h2 { display: none; }
-  /* The welcome message is only needed on the first step — on steps 2-5 it was
-     costing ~130px of every screen for no new information. */
-  .intro-head { display: none; }
-  .wrap:has(.step[data-step="1"].active) .intro-head { display: block; }
-  /* free-text boxes don't need to be tall */
-  .step textarea { min-height: 3.4rem !important; height: 3.4rem; }
-  .section-intro { font-size: 0.92rem; line-height: 1.6; margin-bottom: 0.5rem; padding: 0.6rem 0.8rem; }
-  .progress { padding: 10px 0 12px !important; margin-bottom: 0 !important; }
-  .field:has(> .choices),
-  .field:has(> input[type]),
-  .field:has(> select) { padding-top: 0.45rem !important; padding-bottom: 0.45rem !important; }
-  .step-nav { margin-top: 0.8rem !important; padding-top: 0.9rem !important; }
+  /* Validation: under the field, quiet */
+  .field-error { display: none; margin-top: 12px; font-size: 13px; line-height: 1.45; color: var(--error); letter-spacing: 0; }
+  .field-error.visible { display: block; }
+  .field:has(.invalid) { box-shadow: 0 0 0 1.5px rgba(192,57,43,0.4), var(--shadow); }
 
-  /* Validation reads as a quiet footnote */
-  .field-error { font-size: 0.72rem; color: #E0A59B; letter-spacing: 0; }
+  /* Sticky action bar with a soft fade, so the buttons are always reachable
+     without covering the last card. The bar ignores taps; its buttons don't. */
+  .step-nav {
+    position: sticky; bottom: 0; z-index: 40;
+    display: flex; align-items: center; gap: 12px;
+    margin: 8px -16px 0; padding: 32px 16px calc(16px + env(safe-area-inset-bottom));
+    border: 0;
+    background: linear-gradient(to top, var(--page-bg) 52%, rgba(245,240,232,0));
+    pointer-events: none;
+  }
+  .step-nav .spacer { display: none; }
+  .step-nav .btn {
+    pointer-events: auto; height: 48px; padding: 0 28px; display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 500; letter-spacing: 0; text-transform: none;
+    border-radius: 999px; transition: background 150ms ease, border-color 150ms ease, opacity 150ms ease;
+  }
+  .step-nav .btn:hover { transform: none; box-shadow: none; }
+  .step-nav .btn-gold { flex: 1; background: var(--gold); color: var(--ink); border: 0; }
+  @media (hover: hover) { .step-nav .btn-gold:hover { background: var(--gold-light); } }
+  .step-nav .btn-outline { flex: 0 0 auto; min-width: 96px; background: rgba(245,240,232,0.85); border: 1.5px solid rgba(28,26,22,0.16); color: var(--muted); font-weight: 400; }
+  @media (hover: hover) { .step-nav .btn-outline:hover { border-color: rgba(28,26,22,0.32); background: rgba(245,240,232,0.85); color: var(--ink); } }
+  .step-nav .btn:focus-visible { outline: 0; box-shadow: 0 0 0 3px var(--ring); }
+
+  /* Confirmation / error screens */
+  .screen h2 { font-family: var(--serif); font-weight: normal; font-size: 26px; line-height: 1.2; }
+  .screen p { font-size: 15px; line-height: 1.7; }
+  .screen .btn { font-size: 15px; letter-spacing: 0; text-transform: none; padding: 0 28px; height: 48px; }
+
+  /* Autofill: paint over the pale yellow with the input's own fill */
+  input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, select:-webkit-autofill, textarea:-webkit-autofill {
+    -webkit-text-fill-color: var(--ink);
+    -webkit-box-shadow: 0 0 0 1000px var(--fill) inset; box-shadow: 0 0 0 1000px var(--fill) inset;
+    caret-color: var(--ink); transition: background-color 100000s ease 0s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .progress-dots i, .choices .opt span, .check-item .check-box, .check-item .check-box::after, .choices.as-toggle .opt span, .choices.as-toggle .opt span::after { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -802,6 +559,7 @@
     <!-- ===== STEP 1 · About you ===== -->
     <section class="step active" data-step="1">
       <h2>About you</h2>
+      <p class="step-lede">A few details so I know who to expect. About a minute.</p>
 
       <div class="field">
         <label class="q" for="full_name">Full name</label>
@@ -885,6 +643,7 @@
     <!-- ===== STEP 2 · Your health ===== -->
     <section class="step" data-step="2">
       <h2>Your health</h2>
+      <p class="step-lede">A little about your health and history. Half a minute.</p>
 
       <!-- One grouped inset list. The wrapper owns the card so the rows stay
            welded even when a hidden .reveal sits between two questions. -->
@@ -958,6 +717,7 @@
     <!-- ===== STEP 3 · Safety screening ===== -->
     <section class="step" data-step="3">
       <h2>Safety screening</h2>
+      <p class="step-lede">Some quick safety questions. About a minute.</p>
       <p class="section-intro">Please answer honestly — there are no wrong answers. Some answers simply mean we'll need to wait, adjust your treatment, or check with your GP before any wet cupping. Your safety always comes first.</p>
 
       <div class="field">
@@ -998,7 +758,7 @@
 
       <div class="field">
         <label class="q">Do you have diabetes?</label>
-        <div class="choices" data-group="diabetes_status">
+        <div class="choices stack" data-group="diabetes_status">
           <label class="opt"><input type="radio" name="diabetes_status" value="No"><span>No</span></label>
           <label class="opt"><input type="radio" name="diabetes_status" value="Yes — managed by diet/tablets"><span>Yes — managed by diet/tablets</span></label>
           <label class="opt"><input type="radio" name="diabetes_status" value="Yes — insulin-dependent (Type 1 or insulin pump)"><span>Yes — insulin-dependent (Type 1 or insulin pump)</span></label>
@@ -1026,7 +786,7 @@
 
       <div class="field">
         <label class="q">Do you have a blood-borne infection? <span class="opt-hint">(e.g. hepatitis B or C, HIV)</span></label>
-        <div class="choices" data-group="infectious_condition">
+        <div class="choices stack" data-group="infectious_condition">
           <label class="opt"><input type="radio" name="infectious_condition" value="Yes"><span>Yes</span></label>
           <label class="opt"><input type="radio" name="infectious_condition" value="No"><span>No</span></label>
           <label class="opt"><input type="radio" name="infectious_condition" value="Prefer to discuss privately"><span>Prefer to discuss privately</span></label>
@@ -1045,7 +805,7 @@
 
       <div class="field">
         <label class="q">Do you have very high or very low blood pressure?</label>
-        <div class="choices" data-group="blood_pressure">
+        <div class="choices wide" data-group="blood_pressure">
           <label class="opt"><input type="radio" name="blood_pressure" value="Yes"><span>Yes</span></label>
           <label class="opt"><input type="radio" name="blood_pressure" value="No"><span>No</span></label>
           <label class="opt"><input type="radio" name="blood_pressure" value="Not sure"><span>Not sure</span></label>
@@ -1086,7 +846,7 @@
     <!-- ===== STEP 4 · Before & after ===== -->
     <section class="step" data-step="4">
       <h2>Before &amp; after your session</h2>
-      <p class="section-intro">A few simple things help your session go smoothly and your body recover well.</p>
+      <p class="step-lede">Three simple things that help your session go well. Under a minute.</p>
 
       <div class="field">
         <label class="q">Please tick to confirm you understand:</label>
@@ -1120,6 +880,7 @@
     <!-- ===== STEP 5 · Consent & declaration ===== -->
     <section class="step" data-step="5">
       <h2>Consent &amp; declaration</h2>
+      <p class="step-lede">Read, agree and sign to finish. About a minute.</p>
 
       <div class="consent-statement">
         Please read before signing. Hijama (cupping) at haloe is a complementary wellness therapy. It is intended to support how you feel and to sit alongside your normal healthcare — it is not a substitute for medical advice, diagnosis or treatment, and it does not claim to cure any medical condition. Results vary from person to person. Wet cupping involves a few small, superficial skin incisions so that a little blood can be drawn into the cups. This can leave temporary circular marks that usually fade within one to two weeks. All equipment is single-use and sterile, and disposed of safely. By signing below you confirm you understand and accept the above, and that you have given accurate information about your health.
@@ -1182,17 +943,32 @@
 
       <div class="field">
         <label class="q">Photography <span class="opt-hint">(optional — your choice, not required)</span>: Are you happy for anonymised photos — e.g. cups in place, never your face — to be used for haloe's education and social media?</label>
-        <div class="choices" data-group="photo_consent">
+        <div class="choices stack" data-group="photo_consent">
           <label class="opt"><input type="radio" name="photo_consent" value="Yes"><span>Yes</span></label>
           <label class="opt"><input type="radio" name="photo_consent" value="No"><span>No</span></label>
           <label class="opt"><input type="radio" name="photo_consent" value="Please ask me each time"><span>Please ask me each time</span></label>
         </div>
       </div>
 
+      <div class="field sign-field">
+        <div class="sign-head">
+          <label class="q" id="signLabel">Draw your signature</label>
+          <button type="button" class="sign-clear" id="signClear">Clear</button>
+        </div>
+        <div class="sign-pad" id="signPad">
+          <canvas id="signature_canvas" role="img" aria-labelledby="signLabel"></canvas>
+          <span class="sign-ph" aria-hidden="true">Sign here</span>
+          <span class="sign-x" aria-hidden="true">&times;</span>
+          <span class="sign-line" aria-hidden="true"></span>
+        </div>
+        <div class="sign-hint">Use your finger or a stylus.</div>
+        <div class="field-error" data-for="signature_canvas">Please sign in the box.</div>
+      </div>
+
       <div class="field">
-        <label class="q" for="signature_name">Digital signature — type your full name to sign</label>
-        <input type="text" id="signature_name" autocomplete="name" placeholder="Type your full name">
-        <div class="field-error" data-for="signature_name">Please type your full name to sign.</div>
+        <label class="q" for="signature_name">Full name (printed)</label>
+        <input type="text" id="signature_name" autocomplete="name" placeholder="Your full name">
+        <div class="field-error" data-for="signature_name">Please type your full name.</div>
       </div>
 
       <div class="field">
@@ -1296,6 +1072,7 @@
       { key:'consent_treatment', type:'consent' },
       { key:'consent_notify_changes', type:'consent' },
       { key:'consent_data_storage', type:'consent' },
+      { key:'signature_canvas', type:'signature' },
       { key:'signature_name', type:'text' },
       { key:'signature_date', type:'text' }
     ]
@@ -1329,6 +1106,7 @@
       var c = document.getElementById(field.key);
       return !!(c && c.checked);
     }
+    if (field.type === 'signature') return sig.hasInk();
     if (field.type === 'allchecks') {
       var boxes = document.querySelectorAll('input[name="' + field.key + '"]');
       if (!boxes.length) return false;
@@ -1359,6 +1137,105 @@
     return !firstBad;
   }
 
+  // ---- Draw-to-sign pad ----
+  // Pointer events cover finger, stylus and mouse; touch-action:none stops the
+  // page scrolling while signing. Strokes are kept as points (CSS px) so the
+  // pad can be resized/rotated without losing the signature.
+  var sig = (function () {
+    var canvas = document.getElementById('signature_canvas');
+    var pad = document.getElementById('signPad');
+    var ctx = canvas.getContext('2d');
+    var H = 160, w = 0, dpr = 1, strokes = [], cur = null, inkLen = 0;
+
+    function paint(s) {
+      ctx.beginPath();
+      if (s.length === 1) {
+        ctx.arc(s[0].x, s[0].y, ctx.lineWidth / 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#1C1A16'; ctx.fill(); return;
+      }
+      ctx.moveTo(s[0].x, s[0].y);
+      for (var i = 1; i < s.length - 1; i++) {
+        var mx = (s[i].x + s[i + 1].x) / 2, my = (s[i].y + s[i + 1].y) / 2;
+        ctx.quadraticCurveTo(s[i].x, s[i].y, mx, my);
+      }
+      ctx.lineTo(s[s.length - 1].x, s[s.length - 1].y);
+      ctx.stroke();
+    }
+    function redraw() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, H);
+      ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#1C1A16';
+      for (var i = 0; i < strokes.length; i++) paint(strokes[i]);
+    }
+    function resize() {
+      var nw = Math.round(pad.getBoundingClientRect().width);
+      if (!nw || nw === w) return;
+      var ratio = w ? nw / w : 1;
+      for (var i = 0; i < strokes.length; i++) for (var j = 0; j < strokes[i].length; j++) strokes[i][j].x *= ratio;
+      w = nw; dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(w * dpr); canvas.height = Math.round(H * dpr);
+      redraw();
+    }
+    function pt(e) { var r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+
+    canvas.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      e.preventDefault();
+      resize();
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+      cur = [pt(e)]; strokes.push(cur);
+      canvas.classList.remove('invalid');
+      var er = $('.field-error[data-for="signature_canvas"]'); if (er) er.classList.remove('visible');
+      redraw();
+    });
+    canvas.addEventListener('pointermove', function (e) {
+      if (!cur) return;
+      e.preventDefault();
+      var p = pt(e), last = cur[cur.length - 1];
+      var dx = p.x - last.x, dy = p.y - last.y;
+      if (dx * dx + dy * dy < 1) return;
+      inkLen += Math.sqrt(dx * dx + dy * dy);
+      cur.push(p);
+      if (inkLen > 12) pad.classList.add('has-ink');
+      redraw();
+    });
+    function end() { cur = null; }
+    canvas.addEventListener('pointerup', end);
+    canvas.addEventListener('pointercancel', end);
+    canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    window.addEventListener('resize', resize);
+
+    document.getElementById('signClear').addEventListener('click', function () {
+      strokes = []; cur = null; inkLen = 0;
+      pad.classList.remove('has-ink');
+      redraw();
+    });
+
+    return {
+      resize: resize,
+      // a stray tap isn't a signature — require a real stroke
+      hasInk: function () { return inkLen > 12; },
+      // PNG on white (the pad itself is transparent), without the baseline guide
+      toPng: function () {
+        if (inkLen <= 12) return '';
+        var off = document.createElement('canvas');
+        off.width = canvas.width; off.height = canvas.height;
+        var c = off.getContext('2d');
+        c.fillStyle = '#FFFFFF'; c.fillRect(0, 0, off.width, off.height);
+        c.drawImage(canvas, 0, 0);
+        return off.toDataURL('image/png');
+      }
+    };
+  })();
+
+  // Today's date (local time), in the format <input type=date> wants. Editable.
+  (function () {
+    var d = document.getElementById('signature_date');
+    if (!d || d.value) return;
+    var n = new Date();
+    d.value = n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2) + '-' + ('0' + n.getDate()).slice(-2);
+  })();
+
   function render() {
     var steps = document.querySelectorAll('.step');
     for (var i = 0; i < steps.length; i++) {
@@ -1366,6 +1243,7 @@
     }
     $('#progressStep').textContent = 'Step ' + current + ' of ' + TOTAL;
     $('#progressName').textContent = SECTION_NAMES[current];
+    if (current === 5) sig.resize();
     var dots = document.querySelectorAll('#progressDots i');
     for (var d = 0; d < dots.length; d++) {
       dots[d].className = (d + 1 === current) ? 'on' : (d + 1 < current ? 'done' : '');
@@ -1471,7 +1349,8 @@
       consent_data_storage: checkVal('consent_data_storage'),
       photo_consent: radioVal('photo_consent'),
       signature_name: textVal('signature_name'),
-      signature_date: textVal('signature_date')
+      signature_date: textVal('signature_date'),
+      signature_png: sig.toPng()
     };
   }
 

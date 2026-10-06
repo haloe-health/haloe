@@ -31,6 +31,9 @@ const GUIDE_URL = 'https://haloe.health/before-your-session';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const SIGNATURE_BUCKET = 'signatures';
+const SIGNATURE_MAX_B64 = 700000; // ~500KB of PNG; a real signature is ~10-40KB
+
 export async function onRequestPost(context) {
   try {
     // --- Parse JSON body ---
@@ -135,12 +138,46 @@ export async function onRequestPost(context) {
       signature_name: orNull(data.signature_name),
       signature_date: orNull(data.signature_date),
     };
-    await sbRequest(context.env, {
+    const intakeRows = await sbRequest(context.env, {
       path: '/rest/v1/intake_forms',
       method: 'POST',
-      prefer: 'return=minimal',
+      prefer: 'return=representation',
       body: [intakeRow],
     });
+    const intakeId = Array.isArray(intakeRows) && intakeRows[0] && intakeRows[0].id;
+
+    // --- Drawn signature -> private Storage bucket (best effort) ---
+    // The intake row above is the legal record and is already saved, so a
+    // storage problem (or the signature_path migration not being applied yet)
+    // must never lose it. The typed name and date are stored regardless.
+    let signatureSaved = null;
+    const sigBytes = decodeSignaturePng(data.signature_png);
+    if (sigBytes && intakeId) {
+      try {
+        const objectPath = `${intakeId}.png`;
+        const up = await fetch(`${supabaseUrl}/storage/v1/object/${SIGNATURE_BUCKET}/${objectPath}`, {
+          method: 'POST',
+          headers: {
+            apikey: serviceKey,
+            Authorization: `Bearer ${serviceKey}`,
+            'Content-Type': 'image/png',
+            'x-upsert': 'true',
+          },
+          body: sigBytes,
+        });
+        if (!up.ok) throw new Error(`storage upload responded ${up.status}: ${await up.text()}`);
+        await sbRequest(context.env, {
+          path: `/rest/v1/intake_forms?id=eq.${intakeId}`,
+          method: 'PATCH',
+          prefer: 'return=minimal',
+          body: { signature_path: `${SIGNATURE_BUCKET}/${objectPath}` },
+        });
+        signatureSaved = true;
+      } catch (err) {
+        signatureSaved = false;
+        console.error(`intake-submit: signature for intake ${intakeId} NOT saved (record was saved):`, err);
+      }
+    }
 
     // --- The record is saved; the email is best-effort from here on. ---
     try {
@@ -160,7 +197,7 @@ export async function onRequestPost(context) {
       console.error('intake-submit: failed to send guide email (record was saved):', err);
     }
 
-    return json({ ok: true }, 200);
+    return json({ ok: true, signature_saved: signatureSaved }, 200);
   } catch (err) {
     console.error('intake-submit: unexpected error:', err);
     return json({ error: 'Something went wrong. Please try again.' }, 500);
@@ -188,6 +225,24 @@ function str(v) {
 function orNull(v) {
   const s = str(v);
   return s === '' ? null : s;
+}
+
+// A PNG data URL from the signature pad -> bytes, or null if it isn't a
+// sane, size-capped PNG. Never throws: a bad signature just isn't stored.
+function decodeSignaturePng(v) {
+  const prefix = 'data:image/png;base64,';
+  if (typeof v !== 'string' || !v.startsWith(prefix)) return null;
+  const b64 = v.slice(prefix.length);
+  if (!b64 || b64.length > SIGNATURE_MAX_B64) return null;
+  try {
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const magic = [0x89, 0x50, 0x4e, 0x47];
+    return magic.every((b, i) => bytes[i] === b) ? bytes : null;
+  } catch (e) {
+    return null;
+  }
 }
 
 // Accept 1 / '1' / true / 'Yes' as truthy (consent checkboxes + acks).
