@@ -77,6 +77,11 @@
 
   /* floating pill nav */
   .tabbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 30; width: min(calc(100% - 32px), 440px); display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px; background: color-mix(in srgb, var(--card) 92%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 999px; box-shadow: 0 8px 30px rgba(40,30,10,.16), 0 1px 2px rgba(40,30,10,.08); }
+  .tabbar.three { grid-template-columns: repeat(3, 1fr); }
+  a.listrow { text-decoration: none; color: inherit; }
+  a.btn.block { display: flex; }
+  .nx-date { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; margin-top: 10px; }
+  .nx-time { font-size: 20px; color: var(--gold-deep); font-weight: 500; margin-top: 2px; }
   .tabbar button { min-height: 52px; border: 0; background: transparent; border-radius: 999px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11.5px; font-weight: 500; color: var(--muted); }
   .tabbar button svg { width: 22px; height: 22px; }
   .tabbar button[aria-current="page"] { color: var(--gold-deep); font-weight: 600; }
@@ -299,6 +304,13 @@ const api = {
   },
   async markDone(id, done) { const { error } = await sb.from('bookings').update({ done_at: done ? new Date().toISOString() : null }).eq('id', id); if (error) throw error; },
   async setActive(id, active) { const { error } = await sb.from('discount_codes').update({ active }).eq('id', id); if (error) throw error; },
+  // Client area: row-level security returns only this person's own rows. session_notes is never touched.
+  async loadClient() {
+    const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
+    const [clients, bookings, checkins, intakes] = await Promise.all([q('clients'), q('bookings'), q('check_ins'), q('intake_forms', 'id,created_at')]);
+    return { client: clients[0] || null, bookings, checkins, intakes };
+  },
+  async linkMyClient() { const { data, error } = await sb.rpc('link_my_client'); return error ? null : data; },
   async addCheckIn(row) { const { data, error } = await sb.from('check_ins').insert(row).select().single(); if (error) throw error; return data; },
   async addNote(row) { const { data, error } = await sb.from('session_notes').insert(row).select().single(); if (error) throw error; return data; },
   async findOrCreateCollab(name, notes) {
@@ -387,6 +399,9 @@ const ICON = {
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
   moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>',
   out: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9M15 8l4 4-4 4M19 12H9"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v8.5a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 19.5z"/><path d="M9.5 21v-6h5v6"/></svg>',
+  progress: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17l5-6 4 3 7-8"/><path d="M3.5 21h17"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17M12 13.5v4M10 15.5h4"/></svg>',
   gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
 };
 
@@ -408,8 +423,8 @@ function pageHead(title) { return `<div class="eyebrow">haloe · ${esc(fmtDateLo
 
 function viewLogin(msg) {
   $root.innerHTML = headerHTML(false) + `<div class="gate"><div class="card">
-    <div class="section-label">Practitioner sign-in</div>
-    <p class="inwords" style="margin:10px 0 18px">We'll email you a one-time link.</p>
+    <div class="section-label">Sign in</div>
+    <p class="inwords" style="margin:10px 0 18px">We'll email you a one-time link. No password needed.</p>
     <form id="loginForm"><label class="f" for="em" style="text-align:left">Email</label>
       <input class="in" id="em" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com">
       <button class="btn block" style="margin-top:16px" type="submit">Send me a link</button></form>
@@ -419,23 +434,31 @@ function viewLogin(msg) {
     e.preventDefault();
     const email = document.getElementById('em').value.trim();
     const m = document.getElementById('loginMsg'); m.textContent = 'Sending…';
-    // shouldCreateUser:false — the admin is invited once from the Supabase dashboard; nobody can self-register.
-    await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: location.origin + '/app/' } });
-    // Same message whatever the result, so the form never reveals which emails exist.
-    m.textContent = 'If that address is authorised, a sign-in link is on its way.';
+    // Sign-ups stay ON: anyone can sign in with an email link. What a signed-in user can SEE is decided
+    // entirely by row-level security (admin → everything; client → only their own rows).
+    await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + '/app/' } });
+    m.textContent = 'A sign-in link is on its way. It can take a minute to arrive.';
   };
 }
-function viewDenied() {
-  $root.innerHTML = headerHTML(false) + `<div class="gate"><div class="card"><div class="section-label">Not authorised</div>
-    <p class="inwords" style="margin:10px 0 18px">This account doesn't have access to the haloe app.</p>
-    <button class="btn ghost block" id="denyOut">Sign out</button></div></div>`;
+/** Signed in, but no clients row matches this email — calm, no data shown. */
+function viewNoMatch() {
+  $root.innerHTML = headerHTML(false) + `<div class="gate"><div class="card">
+    <div class="section-label">Your details</div>
+    <p class="inwords" style="margin:10px 0 6px">We can’t find your details yet.</p>
+    <p class="muted" style="margin:0 0 18px">Please book or complete your intake form.</p>
+    <a class="btn block" href="/book">Book a session</a>
+    <a class="btn ghost block" style="margin-top:10px" href="/intake">Complete your intake form</a>
+    <button class="btn ghost block" id="relink" style="margin-top:10px" type="button">I’ve done this — check again</button>
+    <button class="btn ghost block" id="denyOut" style="margin-top:10px" type="button">Sign out</button>
+    <p class="small muted" style="margin:14px 0 0">Signed in as ${esc((S.session && S.session.user && S.session.user.email) || '')}</p></div></div>`;
   wireHeader();
   document.getElementById('denyOut').onclick = signOut;
+  document.getElementById('relink').onclick = () => enter(S.session);
 }
 
 function tabbarHTML() {
-  const items = [['today', 'Today'], ['clients', 'Clients'], ['codes', 'Codes'], ['stats', 'Stats']];
-  return `<div class="tabbar" role="navigation" aria-label="Main">${items.map(([k, l]) =>
+  const items = S.isClient ? [['home', 'Home'], ['progress', 'Progress'], ['book', 'Book']] : [['today', 'Today'], ['clients', 'Clients'], ['codes', 'Codes'], ['stats', 'Stats']];
+  return `<div class="tabbar${S.isClient ? ' three' : ''}" role="navigation" aria-label="Main">${items.map(([k, l]) =>
     `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span></button>`).join('')}</div>`;
 }
 
@@ -774,41 +797,102 @@ function viewSettings() {
       <p style="margin:10px 0 14px">${esc((S.session && S.session.user && S.session.user.email) || ADMIN_EMAIL)}</p>
       <button class="btn ghost block" id="signOutBtn">Sign out</button></div>
     <div class="card"><div class="section-label">About</div>
-      <p class="muted" style="margin:10px 0 0">haloe practitioner app · client details never leave your account and are not stored on this device.</p></div>`);
+      <p class="muted" style="margin:10px 0 0">${S.isClient ? 'haloe · your sessions and progress are private to you and are not stored on this device.' : 'haloe practitioner app · client details never leave your account and are not stored on this device.'}</p></div>`);
   document.querySelectorAll('[data-th]').forEach((b) => { b.onclick = () => { setTheme(b.dataset.th === 'system' ? null : b.dataset.th); render(); }; });
   document.getElementById('signOutBtn').onclick = signOut;
 }
 
 
+/* ---------- client area (role = 'client') ---------- */
+// Everything here is the client's OWN data, enforced by row-level security. Scores and their own
+// words only — no condition names, no practitioner notes (session_notes is never queried or readable).
+const firstName = (n) => { const w = String(n || '').trim().split(/\s+/)[0] || ''; return w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ''; };
+const placeOf = (b) => (b.location === 'clinic' ? 'Milton Hall, Deansgate' : 'Home visit' + (b.address ? ' · ' + b.address : ''));
+function viewHome() {
+  const d = S.cdata, t = todayISO();
+  const who = d.client ? d.client.full_name : (d.bookings[0] && d.bookings[0].customer_name);
+  const bs = d.bookings.filter(confirmed);
+  const upcoming = bs.filter((b) => b.booking_date >= t).sort((a, b) => (a.booking_date + String(a.start_min).padStart(4, '0')).localeCompare(b.booking_date + String(b.start_min).padStart(4, '0')));
+  const past = bs.filter((b) => b.booking_date < t).sort(byDateDesc);
+  const next = upcoming[0];
+  const nextCard = next
+    ? `<div class="card"><div class="section-label">Your next session</div>
+        <div class="nx-date">${esc(fmtDateLong(next.booking_date))}</div><div class="nx-time">${fmtTime(next.start_min)}</div>
+        <div class="kv" style="margin-top:16px"><div><div class="k">Treatment</div><div style="font-weight:500">${esc(next.treatment || '—')}</div></div>
+        <div><div class="k">Where</div><div style="font-weight:500;overflow-wrap:anywhere">${esc(placeOf(next))}</div></div></div>
+        ${upcoming.length > 1 ? `<p class="muted small" style="margin:14px 0 0">${upcoming.length - 1} more session${upcoming.length > 2 ? 's' : ''} booked.</p>` : ''}</div>`
+    : `<div class="card"><div class="section-label">Your next session</div><p class="muted" style="margin:10px 0 16px">There’s nothing booked at the moment.</p><a class="btn" href="/book">Book a session</a></div>`;
+  const noClient = !d.client ? `<div class="card"><div class="section-label">Your intake form</div><p class="muted" style="margin:10px 0 16px">We haven’t received your intake form yet. It only takes a few minutes.</p><a class="btn" href="/intake">Complete your intake form</a></div>` : '';
+  const intakeSub = d.intakes.length ? 'On file. You can send a fresh one if anything changes.' : 'A few minutes, ideally before your first visit.';
+  const links = `<a class="listrow" href="/before-your-session"><span><span class="nm">Before your session</span><br><span class="sb">A short, quiet guide to your visit.</span></span></a>
+    <a class="listrow" href="/intake"><span><span class="nm">Your intake form</span><br><span class="sb">${intakeSub}</span></span></a>`;
+  const pastCard = past.length ? `<h2 class="sub">Past sessions</h2><div class="card"><div class="hist" style="margin-top:0">${past.map((b) => `<div class="h"><b>${esc(fmtDate(b.booking_date))} · ${fmtTime(b.start_min)}</b><br>${esc(b.treatment || '—')}<br><span class="muted">${esc(placeOf(b))}</span></div>`).join('')}</div></div>` : '';
+  shell(`${pageHead(who ? 'Hello, ' + firstName(who) : 'Hello')}${nextCard}${noClient}<h2 class="sub">Good to have to hand</h2>${links}${pastCard}`);
+}
+function viewProgress() {
+  const list = S.cdata.checkins.slice().sort((a, b) => new Date(a.taken_at) - new Date(b.taken_at));
+  const body = list.length < 2
+    ? `<div class="card"><div class="section-label">Your progress</div><p class="muted" style="margin:10px 0 0">After your next session this will show your progress.</p></div>`
+    : `<div class="card"><div class="section-label">Your progress</div>
+        <div class="pmode"><button data-pm="concern" aria-pressed="true">Concern</button><button data-pm="energy" aria-pressed="false">Energy &amp; sleep</button></div>
+        <div id="progressBody">${progressBody(list, 'concern')}</div>
+        <p class="muted small" style="margin:12px 0 0">Concern: 0 none · 10 worst. Energy and sleep: 0 low · 10 high. These are the scores you gave at each visit.</p></div>`;
+  const words = list.slice().reverse().slice(0, 6).map((x) => `<div class="h"><b>${shortDate(new Date(x.taken_at).getTime())}</b> · ${[['Concern', x.concern_score], ['Energy', x.energy], ['Sleep', x.sleep]].filter((r) => r[1] != null).map((r) => r[0] + ' ' + r[1]).join(' · ') || 'No scores'}${x.pain_areas ? `<br><span class="muted">Pain areas:</span> ${esc(x.pain_areas)}` : ''}${x.note ? `<br><span class="muted">Your note:</span> ${esc(x.note)}` : ''}</div>`).join('');
+  shell(`${pageHead('Progress')}${body}${words ? `<h2 class="sub">In your words</h2><div class="card"><div class="hist" style="margin-top:0">${words}</div></div>` : ''}`);
+  wireProgress(list);
+}
+function viewBook() {
+  shell(`${pageHead('Book')}<div class="card"><div class="section-label">Your next visit</div>
+    <p style="margin:10px 0 16px">Tuesdays at Milton Hall, Deansgate — or a visit to your home across Greater Manchester.</p>
+    <a class="btn block" href="/book">Book a session</a></div>`);
+}
+
 /* ---------- router / boot ---------- */
+const ADMIN_VIEWS = ['today', 'clients', 'codes', 'stats', 'settings'], CLIENT_VIEWS = ['home', 'progress', 'book', 'settings'];
 function route() {
-  const h = (location.hash || '#/today').replace(/^#\//, '');
+  const h = (location.hash || (S.isClient ? '#/home' : '#/today')).replace(/^#\//, '');
   const [path, qs] = h.split('?');
   const parts = path.split('/');
-  if (parts[0] === 'brief') { S.view = 'brief'; S.briefKey = parts[1] + '/' + parts[2]; S.briefBid = new URLSearchParams(qs || '').get('b'); }
-  else S.view = ['today', 'clients', 'codes', 'stats', 'settings'].includes(parts[0]) ? parts[0] : 'today';
+  if (!S.isClient && parts[0] === 'brief') { S.view = 'brief'; S.briefKey = parts[1] + '/' + parts[2]; S.briefBid = new URLSearchParams(qs || '').get('b'); }
+  else if (S.isClient) S.view = CLIENT_VIEWS.includes(parts[0]) ? parts[0] : 'home';
+  else S.view = ADMIN_VIEWS.includes(parts[0]) ? parts[0] : 'today';
 }
 function render() {
   if (!S.session) return viewLogin();
-  if (!S.admin) return viewDenied();
-  if (!S.data) { shell('<div class="empty">' + (S.error ? 'Could not load: ' + esc(S.error) : 'Loading…') + '</div>', false); return; }
+  if (S.admin) {
+    if (!S.data) { shell('<div class="empty">' + (S.error ? 'Could not load: ' + esc(S.error) : 'Loading…') + '</div>', false); return; }
+    route();
+    window.scrollTo(0, 0);
+    ({ today: viewToday, clients: viewClients, codes: viewCodes, stats: viewStats, settings: viewSettings, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
+    return;
+  }
+  // client
+  if (!S.cdata) { shell('<div class="empty">' + (S.error ? 'Could not load: ' + esc(S.error) : 'Loading…') + '</div>', false); return; }
+  if (!S.cdata.client && !S.cdata.bookings.length) return viewNoMatch();      // nothing of theirs on file yet
   route();
   window.scrollTo(0, 0);
-  ({ today: viewToday, clients: viewClients, codes: viewCodes, stats: viewStats, settings: viewSettings, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
+  ({ home: viewHome, progress: viewProgress, book: viewBook, settings: viewSettings })[S.view]();
 }
 async function refreshData() { S.data = await api.load(); render(); }
 async function enter(session) {
   S.session = session;
-  if (!session) { S.admin = false; S.data = null; return render(); }
-  // Role gate: nothing is loaded and nothing is shown unless profiles.role = 'admin'.
-  const { data: prof } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
-  S.admin = !!(prof && prof.role === 'admin');
-  if (!S.admin) return render();
-  render();
-  try { S.data = await api.load(); S.error = null; } catch (e) { S.error = e.message; }
+  S.admin = false; S.isClient = false; S.data = null; S.cdata = null; S.error = null;
+  if (!session) return render();
+  const { data: prof } = await sb.from('profiles').select('role,client_id').eq('id', session.user.id).maybeSingle();
+  if (prof && prof.role === 'admin') {
+    // Admin app: nothing is loaded unless profiles.role = 'admin' (and RLS would refuse anyway).
+    S.admin = true; render();
+    try { S.data = await api.load(); } catch (e) { S.error = e.message; }
+    return render();
+  }
+  // Client: link to their clients row by email (case-insensitive) or phone — re-tried on every sign-in,
+  // since the intake form may have been submitted after their first visit here.
+  S.isClient = true; render();
+  if (!(prof && prof.client_id)) await api.linkMyClient();
+  try { S.cdata = await api.loadClient(); } catch (e) { S.error = e.message; }
   render();
 }
-window.addEventListener('hashchange', () => { if (S.admin && S.data) render(); });
+window.addEventListener('hashchange', () => { if ((S.admin && S.data) || (S.isClient && S.cdata)) render(); });
 sb.auth.onAuthStateChange((ev, session) => {
   if (ev === 'SIGNED_OUT') enter(null);
   else if (ev === 'SIGNED_IN' || ev === 'INITIAL_SESSION') { if (!S.session || S.session.user.id !== (session && session.user.id)) setTimeout(() => enter(session), 0); }

@@ -15,10 +15,11 @@
 -- anon gets nothing. The service-role key (Workers) bypasses RLS as before.
 --
 -- Manual steps in the Supabase dashboard (not SQL):
---   1. Authentication -> Users -> Invite user: iamhalimayasmin@gmail.com
---   2. Authentication -> URL configuration: Site URL https://haloe.health/app ;
+--   1. Authentication -> URL configuration: Site URL https://haloe.health/app ;
 --      add https://haloe.health/app/ (and http://localhost:8788/app/ for local) as redirect URLs
---   3. Authentication -> Providers -> Email: turn OFF "Allow new users to sign up"
+--   2. Sign-ups stay ON (clients sign in with the same email link). The admin is whoever signs in
+--      with iamhalimayasmin@gmail.com (handle_new_user). Consider custom SMTP (e.g. Resend):
+--      Supabase's built-in email sender is limited to a handful of emails per hour.
 
 -- profiles + role gate -------------------------------------------------
 create table if not exists public.profiles (
@@ -158,3 +159,82 @@ grant select, insert, update, delete on public.check_ins to authenticated;
 grant select, insert, update, delete on public.check_ins to service_role;
 create policy admin_checkins_all on public.check_ins for all to authenticated
   using (public.is_admin()) with check (public.is_admin());
+
+-- client login (phase 2) — migration "client_login", 7 Oct 2026 -----------
+-- profiles.client_id links a signed-in client to their clients row: case-insensitive email first,
+-- then phone (last 10 digits; only when the auth account itself has a phone). We deliberately do NOT
+-- link through bookings: a booking's phone->client link is unverified, so someone could book with a
+-- victim's number and then read the victim's intake. Email links only after the user proves the inbox.
+alter table public.profiles add column if not exists client_id bigint references public.clients(id) on delete set null;
+create index if not exists profiles_client_idx on public.profiles(client_id);
+
+create or replace function public.find_client_for(p_email text, p_phone text) returns bigint
+language sql stable security definer set search_path = public as $$
+  select coalesce(
+    (select id from public.clients where lower(email) = lower(p_email) order by id limit 1),
+    (select id from public.clients
+       where public.norm_phone(p_phone) is not null
+         and public.norm_phone(phone) = public.norm_phone(p_phone) order by id limit 1));
+$$;
+revoke all on function public.find_client_for(text, text) from public, anon, authenticated;
+
+create or replace function public.handle_new_user()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  insert into public.profiles (id, email, role, client_id)
+  values (new.id, new.email,
+          case when lower(new.email) = 'iamhalimayasmin@gmail.com' then 'admin' else 'client' end,
+          public.find_client_for(new.email, new.phone))
+  on conflict (id) do nothing;
+  return new;
+end $$;
+
+-- re-link on login (a client may submit their intake after their first sign-in)
+create or replace function public.link_my_client() returns bigint
+language plpgsql security definer set search_path = public as $$
+declare uid uuid := auth.uid(); em text; ph text; cid bigint;
+begin
+  if uid is null then return null; end if;
+  select client_id into cid from public.profiles where id = uid;
+  if cid is not null then return cid; end if;
+  select email, phone into em, ph from auth.users where id = uid;
+  cid := public.find_client_for(em, ph);
+  if cid is not null then update public.profiles set client_id = cid where id = uid; end if;
+  return cid;
+end $$;
+revoke all on function public.link_my_client() from public, anon;
+grant execute on function public.link_my_client() to authenticated;
+
+-- a new clients row (intake submitted) links any waiting profile with that email
+create or replace function public.link_client_profiles() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  update public.profiles set client_id = new.id where client_id is null and lower(email) = lower(new.email);
+  return new;
+end $$;
+drop trigger if exists clients_link_profiles on public.clients;
+create trigger clients_link_profiles after insert on public.clients
+  for each row execute function public.link_client_profiles();
+
+-- backfill existing profiles
+update public.profiles p set client_id = public.find_client_for(p.email, (select phone from auth.users u where u.id = p.id))
+where p.client_id is null;
+
+create or replace function public.my_client_id() returns bigint
+language sql stable security definer set search_path = public as $$
+  select client_id from public.profiles where id = auth.uid();
+$$;
+create or replace function public.my_email() returns text
+language sql stable security definer set search_path = public as $$
+  select lower(email) from public.profiles where id = auth.uid();
+$$;
+revoke all on function public.my_client_id(), public.my_email() from public, anon;
+grant execute on function public.my_client_id(), public.my_email() to authenticated;
+
+-- client policies: SELECT own rows only. No client policy exists on session_notes, discount_codes,
+-- collaborators, code_redemptions or the signatures bucket, and no client write policy anywhere.
+create policy client_read_own_client   on public.clients      for select to authenticated using (id = public.my_client_id());
+create policy client_read_own_intake   on public.intake_forms for select to authenticated using (client_id = public.my_client_id());
+create policy client_read_own_bookings on public.bookings     for select to authenticated
+  using (client_id = public.my_client_id() or lower(customer_email) = public.my_email());
+create policy client_read_own_checkins on public.check_ins    for select to authenticated using (client_id = public.my_client_id());
