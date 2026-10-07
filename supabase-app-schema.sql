@@ -136,3 +136,25 @@ create policy admin_notes_all     on public.session_notes    for all    to authe
 -- signatures bucket: admin can read objects
 create policy admin_read_signatures on storage.objects for select to authenticated
   using (bucket_id = 'signatures' and public.is_admin());
+
+-- check-ins (client progress) — migration "check_ins", 7 Oct 2026 --------
+-- Scores are 0-10 and nullable: an untouched slider saves NULL, never a default.
+-- Concern: 0 none, 10 worst. Energy / Sleep: 0 low/poor, 10 high/great.
+create table if not exists public.check_ins (
+  id            bigint generated always as identity primary key,
+  client_id     bigint not null references public.clients(id) on delete cascade,
+  booking_id    bigint references public.bookings(id) on delete set null,
+  taken_at      timestamptz not null default now(),
+  concern_score int check (concern_score between 0 and 10),
+  energy        int check (energy between 0 and 10),
+  sleep         int check (sleep between 0 and 10),
+  pain_areas    text,
+  note          text,
+  created_at    timestamptz not null default now()
+);
+create index if not exists check_ins_client_idx on public.check_ins(client_id, taken_at);
+alter table public.check_ins enable row level security;
+grant select, insert, update, delete on public.check_ins to authenticated;
+grant select, insert, update, delete on public.check_ins to service_role;
+create policy admin_checkins_all on public.check_ins for all to authenticated
+  using (public.is_admin()) with check (public.is_admin());
