@@ -352,7 +352,29 @@ const api = {
 };
 
 /* ---------- state ---------- */
-const S = { session: null, admin: false, data: null, view: 'today', chip: 'today', filter: '', showInactive: false, loading: false, error: null };
+const S = { raw: null, showTest: false, session: null, admin: false, data: null, view: 'today', chip: 'today', filter: '', showInactive: false, loading: false, error: null };
+
+/* ---------- test data ---------- */
+// Rows flagged is_test (a rehearsal client and her bookings) are hidden from Today, Clients, Codes and Stats —
+// and so from revenue and counts — unless "Show test data" is on. Delete them with supabase-delete-test-data.sql.
+try { S.showTest = localStorage.getItem('haloe_show_test') === '1'; } catch (e) {}
+function applyTest() {
+  const r = S.raw;
+  if (!r) { S.data = null; return; }
+  if (S.showTest) { S.data = r; return; }
+  const bad = new Set(r.clients.filter((c) => c.is_test).map((c) => c.id));
+  const badBk = new Set(r.bookings.filter((b) => b.is_test || (b.client_id && bad.has(b.client_id))).map((b) => b.id));
+  S.data = { ...r,
+    clients: r.clients.filter((c) => !c.is_test),
+    bookings: r.bookings.filter((b) => !badBk.has(b.id)),
+    intakes: r.intakes.filter((i) => !bad.has(i.client_id)),
+    checkins: r.checkins.filter((x) => !bad.has(x.client_id)),
+    notes: r.notes.filter((x) => !bad.has(x.client_id)),
+    redemptions: r.redemptions.filter((x) => !badBk.has(x.booking_id)) };
+}
+async function loadAdminData() { S.raw = await api.load(); applyTest(); }
+function setShowTest(on) { S.showTest = !!on; try { localStorage.setItem('haloe_show_test', on ? '1' : '0'); } catch (e) {} applyTest(); render(); }
+const testPill = (x) => (x && x.is_test ? '<span class="pill gold">Test</span>' : '');
 
 /* ---------- derived ---------- */
 function intakeOf(clientId) {
@@ -469,7 +491,7 @@ function headerHTML(withSettings) {
       ${withSettings ? `<button class="icon-btn" id="setBtn" aria-label="Settings">${ICON.gear}</button>` : ''}
     </div></header>`;
 }
-async function signOut() { await sb.auth.signOut(); S.data = null; S.admin = false; S.session = null; render(); }
+async function signOut() { await sb.auth.signOut(); S.data = null; S.raw = null; S.admin = false; S.session = null; render(); }
 function wireHeader() {
   const t = document.getElementById('themeBtn'); if (t) t.onclick = toggleTheme;
   const g = document.getElementById('setBtn'); if (g) g.onclick = () => { location.hash = '#/settings'; };
@@ -534,7 +556,7 @@ function sessionRow(b) {
       <span class="time">${fmtTime(b.start_min)}</span>
       <span class="name">${esc(b.customer_name)}</span>
       <span class="meta">${esc(treatmentLabel(b))}${isPending(b) ? `<br>New time: <b>${esc(fmtTs(b.proposed_starts_at))}</b>` : ''}</span>
-      <span class="row2">${tagHTML(pkgOf(b, b.client_id && (intakeOf(b.client_id) || {}).package))}${statusChip(b)}<span class="pill gold">${money(b.amount_pence)} paid</span>${b.discount_code ? `<span class="pill gold">${esc(b.discount_code)}</span>` : ''}${noIntake ? '<span class="pill red">No intake</span>' : ''}</span>
+      <span class="row2">${testPill(b)}${tagHTML(pkgOf(b, b.client_id && (intakeOf(b.client_id) || {}).package))}${statusChip(b)}<span class="pill gold">${money(b.amount_pence)} paid</span>${b.discount_code ? `<span class="pill gold">${esc(b.discount_code)}</span>` : ''}${noIntake ? '<span class="pill red">No intake</span>' : ''}</span>
     </button>
     <button class="tick" data-tick="${b.id}" aria-pressed="${done}" aria-label="Mark ${esc(b.customer_name)} done">${ICON.check}</button>
   </div>`;
@@ -588,9 +610,10 @@ function viewClients() {
   list.sort((a, b) => { const na = nextBookingDate(a), nb = nextBookingDate(b); if (na && nb) return na.localeCompare(nb) || lower(a.name).localeCompare(lower(b.name)); if (na) return -1; if (nb) return 1; return lower(a.name).localeCompare(lower(b.name)); });
   const rows = list.map((p) => {
     const nx = nextBookingDate(p);
-    return `<button class="listrow" data-brief="${p.key}"><span><span class="nm">${esc(p.name)}</span><br><span class="sb">${nx ? 'Next: ' + fmtDate(nx) : (p.bookings[0] ? 'Last: ' + fmtDate(p.bookings[0].booking_date) : 'No bookings')}</span></span>${p.client && intakeOf(p.client.id) ? '' : '<span class="pill red">No intake</span>'}</button>`;
+    return `<button class="listrow" data-brief="${p.key}"><span><span class="nm">${esc(p.name)}</span> ${testPill(p.client)}<br><span class="sb">${nx ? 'Next: ' + fmtDate(nx) : (p.bookings[0] ? 'Last: ' + fmtDate(p.bookings[0].booking_date) : 'No bookings')}</span></span>${p.client && intakeOf(p.client.id) ? '' : '<span class="pill red">No intake</span>'}</button>`;
   }).join('');
-  shell(`${pageHead('Clients')}<input class="search" id="q" type="search" placeholder="Search name, phone or email" value="${esc(S.filter)}" autocomplete="off">${rows || '<div class="card empty">No clients match.</div>'}`);
+  shell(`${pageHead('Clients')}<div class="toggle-line" style="margin-top:-8px"><span>Show test</span><button class="switch-wrap" id="testBtn" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div><input class="search" id="q" type="search" placeholder="Search name, phone or email" value="${esc(S.filter)}" autocomplete="off">${rows || '<div class="card empty">No clients match.</div>'}`);
+  document.getElementById('testBtn').onclick = () => setShowTest(!S.showTest);
   const qi = document.getElementById('q');
   qi.oninput = () => { S.filter = qi.value; const pos = qi.selectionStart; render(); const n = document.getElementById('q'); n.focus(); n.setSelectionRange(pos, pos); };
   document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief; }; });
@@ -714,12 +737,12 @@ function openReschedule(bookingId, p) {
       const dateISO = bg.querySelector('#rs-date').value, min = Number(bg.querySelector('#rs-time').value);
       if (!dateISO) { toastMsg('Choose a date'); return; }
       const btn = bg.querySelector('#rs-save'); btn.disabled = true;
-      try { await api.proposeReschedule(bookingId, dateISO, min); S.data = await api.load(); render(); cur.date = dateISO; cur.min = min; draw(); toastMsg('Saved — now send it on WhatsApp'); }
+      try { await api.proposeReschedule(bookingId, dateISO, min); await loadAdminData(); render(); cur.date = dateISO; cur.min = min; draw(); toastMsg('Saved — now send it on WhatsApp'); }
       catch (e) { toastMsg(/clash/.test(e.message) ? 'That time overlaps another booking' : 'Could not save: ' + e.message); btn.disabled = false; }
     };
     const cancel = bg.querySelector('#rs-cancel-resched');
     if (cancel) cancel.onclick = async () => {
-      try { await api.cancelReschedule(bookingId); S.data = await api.load(); render(); bg.remove(); toastMsg('Reschedule cancelled'); } catch (e) { toastMsg('Could not cancel: ' + e.message); }
+      try { await api.cancelReschedule(bookingId); await loadAdminData(); render(); bg.remove(); toastMsg('Reschedule cancelled'); } catch (e) { toastMsg('Could not cancel: ' + e.message); }
     };
   };
   bg.onclick = (e) => { if (e.target === bg) bg.remove(); };
@@ -761,7 +784,7 @@ function viewBrief(key, bid) {
   shell(`<button class="back" id="bk">${ICON.back}Back</button>
     <div class="card">
       <h1 class="brief-name">${esc(p.name)}</h1>
-      ${headPkg ? `<div style="margin:0 0 8px">${tagHTML(headPkg)}</div>` : ''}
+      ${headPkg || (c && c.is_test) ? `<div style="margin:0 0 8px">${testPill(c)} ${tagHTML(headPkg)}</div>` : ''}
       <div class="muted small">${age != null ? age + ' years old' : 'Age not given'}${p.email ? ' · ' + esc(p.email) : ''}</div>
       <div class="facts">
         <div class="fact"><div class="k">Phone</div><div class="v">${esc(p.phone || '—')}</div></div>
@@ -900,6 +923,7 @@ function viewSettings() {
   shell(`${pageHead('Settings')}
     <div class="card"><div class="section-label">Appearance</div>
       <div class="seg">${[['light', 'Light'], ['dark', 'Dark'], ['system', 'System']].map(([k, l]) => `<button data-th="${k}" aria-pressed="${th === k}">${l}</button>`).join('')}</div></div>
+    ${S.isClient ? '' : `<div class="card"><div class="section-label">Data</div><div class="toggle-line" style="margin:8px 0 0"><span>Show test data</span><button class="switch-wrap" id="testBtn2" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div><p class="muted small" style="margin:4px 0 0">Rehearsal clients and bookings. Hidden from Clients, Today, Codes and Stats (and so from revenue) unless this is on.</p></div>`}
     <div class="card"><div class="section-label">Account</div>
       <p style="margin:10px 0 14px">${esc((S.session && S.session.user && S.session.user.email) || ADMIN_EMAIL)}</p>
       <button class="btn ghost block" id="signOutBtn">Sign out</button></div>
@@ -907,6 +931,7 @@ function viewSettings() {
       <p class="muted" style="margin:10px 0 0">${S.isClient ? 'haloe · your sessions and progress are private to you and are not stored on this device.' : 'haloe practitioner app · client details never leave your account and are not stored on this device.'}</p></div>`);
   document.querySelectorAll('[data-th]').forEach((b) => { b.onclick = () => { setTheme(b.dataset.th === 'system' ? null : b.dataset.th); render(); }; });
   document.getElementById('signOutBtn').onclick = signOut;
+  const tb2 = document.getElementById('testBtn2'); if (tb2) tb2.onclick = () => setShowTest(!S.showTest);
 }
 
 
@@ -1006,16 +1031,16 @@ function render() {
   window.scrollTo(0, 0);
   ({ home: viewHome, progress: viewProgress, book: viewBook, settings: viewSettings })[S.view]();
 }
-async function refreshData() { S.data = await api.load(); render(); }
+async function refreshData() { await loadAdminData(); render(); }
 async function enter(session) {
   S.session = session;
-  S.admin = false; S.isClient = false; S.data = null; S.cdata = null; S.error = null;
+  S.admin = false; S.isClient = false; S.data = null; S.raw = null; S.cdata = null; S.error = null;
   if (!session) return render();
   const { data: prof } = await sb.from('profiles').select('role,client_id').eq('id', session.user.id).maybeSingle();
   if (prof && prof.role === 'admin') {
     // Admin app: nothing is loaded unless profiles.role = 'admin' (and RLS would refuse anyway).
     S.admin = true; render();
-    try { S.data = await api.load(); } catch (e) { S.error = e.message; }
+    try { await loadAdminData(); } catch (e) { S.error = e.message; }
     return render();
   }
   // Client: link to their clients row by email (case-insensitive) or phone — re-tried on every sign-in,

@@ -356,3 +356,15 @@ end $$;
 
 revoke all on function public.propose_reschedule(bigint, date, int), public.cancel_reschedule(bigint), public.accept_reschedule(bigint) from public, anon;
 grant execute on function public.propose_reschedule(bigint, date, int), public.cancel_reschedule(bigint), public.accept_reschedule(bigint) to authenticated;
+
+-- test-data marker — migration "test_data_marker", 7 Oct 2026 -------------
+-- Rehearsal rows are flagged is_test. The app hides them (Today, Clients, Codes, Stats, revenue) unless
+-- Settings -> "Show test data" is on; supabase-delete-test-data.sql removes them in one go.
+-- A booking linked to a test client is flagged automatically (link_booking_client), and test bookings
+-- never block a REAL client's reschedule (the clash checks in _propose_reschedule / accept_reschedule
+-- ignore test rows unless the booking being moved is itself a test row). Test bookings are created with
+-- NO code_redemptions row, so a real code such as GUEST-TEST is never left "used".
+alter table public.clients  add column if not exists is_test boolean not null default false;
+alter table public.bookings add column if not exists is_test boolean not null default false;
+-- (link_booking_client, _propose_reschedule and accept_reschedule were re-created with the is_test
+--  handling described above; their current definitions are in the live database.)
