@@ -29,6 +29,8 @@
     --red: #B3402F; --red-bg: #FBEAE6; --red-line: #E9B9AF;
     --green: #2F6B3F; --green-bg: #E7F1E8; --green-line: #B5D3B9;
     --nav-h: 84px;
+    --tagline: #8A6D2F;
+    --arr-muted: #6B5E4B;
   }
   :root[data-theme="dark"] {
     --page-bg: #16140F; --card: #211E17; --fill: #2C281F; --fill-hover: #353026;
@@ -36,6 +38,8 @@
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
     --red: #F0907F; --red-bg: #3A1F1A; --red-line: #6B3329;
     --green: #8CCB98; --green-bg: #1B2E20; --green-line: #34573B;
+    --tagline: #D7BC82;
+    --arr-muted: var(--muted);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
@@ -44,6 +48,8 @@
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
       --red: #F0907F; --red-bg: #3A1F1A; --red-line: #6B3329;
       --green: #8CCB98; --green-bg: #1B2E20; --green-line: #34573B;
+      --tagline: #D7BC82;
+      --arr-muted: var(--muted);
     }
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -54,6 +60,38 @@
   button, input, select, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; }
   [hidden] { display: none !important; }
+
+  /* sign-in: "Arrival" — centred mark + big wordmark, one calm column, no card */
+  .login-top { display: flex; justify-content: flex-end; padding: calc(10px + env(safe-area-inset-top)) 16px 0; }
+  .arrival, .arrival button, .arrival input { font-family: var(--font); }
+  .arrival { min-height: calc(100vh - 66px - env(safe-area-inset-top)); min-height: calc(100svh - 66px - env(safe-area-inset-top)); max-width: 480px; margin: 0 auto; padding: 0 24px calc(18px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; }
+  .arr-brand { text-align: center; margin-top: 4px; width: 100%; }
+  .arr-mark { width: 64px; height: 64px; display: block; margin: 0 auto; }
+  .arr-word { font-family: var(--font-wordmark); font-size: 72px; line-height: 1; color: #111; margin-top: 30px; letter-spacing: 0.005em; }
+  :root[data-theme="dark"] .arr-word { color: var(--ink); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .arr-word { color: var(--ink); } }
+  .arr-tag { font-size: 11px; font-weight: 500; letter-spacing: 0.28em; text-transform: uppercase; color: var(--tagline); margin: 12px 0 0; padding-left: 0.28em; white-space: nowrap; }
+  .arr-lower { width: 100%; margin-top: auto; padding-top: 32px; }
+  .arr-h { font-family: var(--font); font-weight: 500; font-size: 30px; line-height: 1.2; letter-spacing: -0.01em; color: var(--ink); margin: 0 0 10px; outline: none; }
+  .arr-sub { font-family: var(--font); font-weight: 400; font-size: 16px; line-height: 1.55; color: var(--arr-muted); margin: 0 0 26px; }
+  .arr-sub b { color: var(--ink); font-weight: 400; overflow-wrap: anywhere; }
+  .arr-label { display: block; font-size: 13px; font-weight: 500; letter-spacing: 0.06em; color: var(--muted); }
+  .arr-input { display: block; width: 100%; height: 52px; padding: 0; border: 0; border-bottom: 2px solid color-mix(in srgb, var(--ink) 40%, transparent); border-radius: 0; background: transparent; color: var(--ink); font: inherit; font-size: 18px; outline: none; -webkit-appearance: none; appearance: none; }
+  .arr-input::placeholder { color: color-mix(in srgb, var(--muted) 75%, transparent); }
+  .arr-input:focus { border-bottom-color: var(--gold); box-shadow: 0 2px 0 var(--gold); }
+  .arr-input:-webkit-autofill, .arr-input:-webkit-autofill:focus { -webkit-box-shadow: 0 0 0 100px var(--page-bg) inset; -webkit-text-fill-color: var(--ink); transition: background-color 100000s; }
+  .arr-btn { display: flex; align-items: center; justify-content: center; width: 100%; height: 56px; margin-top: 24px; border: 0; border-radius: 999px; background: var(--gold); color: #1C1A16; font: inherit; font-size: 17px; font-weight: 600; }
+  .arr-btn[disabled] { cursor: default; }
+  .arr-btn.ghost { background: var(--fill); color: var(--ink); margin-top: 16px; }
+  .arr-btn.ghost[disabled] { color: var(--muted); }
+  .arr-textbtn { display: block; margin: 6px auto 0; min-height: 48px; padding: 0 16px; border: 0; background: none; color: var(--gold-deep); font: inherit; font-size: 15px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
+  .arr-card { background: var(--card); border-radius: 24px; padding: 20px; box-shadow: var(--shadow); }
+  .arr-card p { margin: 0; }
+  .arr-card .t { font-size: 16px; font-weight: 600; line-height: 1.4; }
+  .arr-card .s { font-size: 14.5px; color: var(--muted); line-height: 1.5; margin-top: 6px; }
+  .arr-foot { width: 100%; margin-top: 22px; text-align: center; font-size: 14px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .arr-foot a, .arr-foot .arr-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; color: var(--gold-deep); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; font: inherit; font-size: 14px; font-weight: 500; }
+  .arr-foot span { line-height: 1.5; }
 
   /* header */
   .app-head { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: calc(10px + env(safe-area-inset-top)) 16px 10px; background: color-mix(in srgb, var(--page-bg) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
@@ -365,7 +403,7 @@ const api = {
 };
 
 /* ---------- state ---------- */
-const S = { raw: null, showTest: false, session: null, admin: false, data: null, view: 'today', chip: 'today', filter: '', showInactive: false, loading: false, error: null };
+const S = { loginStage: 'form', loginMode: 'client', loginEmail: '', resendAt: 0, loginTimer: null, raw: null, showTest: false, session: null, admin: false, data: null, view: 'today', chip: 'today', filter: '', showInactive: false, loading: false, error: null };
 
 /* ---------- admin alerts (web push) ---------- */
 const urlB64ToBytes = (b64) => { const t = (b64 + '='.repeat((4 - (b64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/'); return Uint8Array.from(atob(t), (c) => c.charCodeAt(0)); };
@@ -575,6 +613,7 @@ function headerHTML(withSettings) {
 function clearSession() {
   S.session = null; S.admin = false; S.isClient = false; S.profile = null;
   S.data = null; S.raw = null; S.cdata = null; S.error = null; S.filter = '';
+  S.loginStage = 'form'; S.loginMode = 'client'; S.loginEmail = '';   // back to a fresh sign-in screen
   try { Object.keys(localStorage).filter((k) => /^sb-.+-auth-token/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
   document.querySelectorAll('.sheet-bg, .toast').forEach((el) => el.remove());          // open sheets / toasts hold client names
   if (location.hash) history.replaceState(null, '', location.pathname + location.search); // so Back / reload can't land on a client page
@@ -592,24 +631,68 @@ function wireHeader() {
 /** Gold eyebrow line + big bold page title (shared by every screen). */
 function pageHead(title) { return `<div class="eyebrow">haloe · ${esc(fmtDateLong(todayISO()))}</div><h1 class="screen">${esc(title)}</h1>`; }
 
-function viewLogin(msg) {
-  $root.innerHTML = headerHTML(false) + `<div class="gate"><div class="card">
-    <div class="section-label">Sign in</div>
-    <p class="inwords" style="margin:10px 0 18px">We'll email you a one-time link. No password needed.</p>
-    <form id="loginForm"><label class="f" for="em" style="text-align:left">Email</label>
-      <input class="in" id="em" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com">
-      <button class="btn block" style="margin-top:16px" type="submit">Send me a link</button></form>
-    <p class="small muted" id="loginMsg" style="margin:14px 0 0;min-height:20px">${esc(msg || '')}</p></div></div>`;
+// Sign-in ("Arrival"). One screen for everyone; role routing happens AFTER sign-in. The practitioner variant
+// (footer link) has its own wording but the same layout and the same one-time-link call.
+const RESEND_SECONDS = 45;
+const loginHeaderHTML = () => `<header class="login-top"><button class="icon-btn" id="themeBtn" aria-label="Toggle light or dark">${ICON.moon}</button></header>`;
+const arrivalBrand = () => '<div class="arr-brand"><img class="arr-mark" src="/haloe-logo-flower.svg" alt=""><div class="arr-word" aria-label="haloe">haloe</div><div class="arr-tag">Hijama · Wellness · Manchester</div></div>';
+/** The one-time-link request — unchanged from before the redesign. */
+async function sendLink(email) {
+  // Sign-ups stay ON: anyone can sign in with an email link. What a signed-in user can SEE is decided
+  // entirely by row-level security (admin → everything; client → only their own rows).
+  await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + '/app/' } });
+}
+function viewLogin() {
+  clearInterval(S.loginTimer);
+  if (S.loginStage === 'sent') return viewLinkSent();
+  const prac = S.loginMode === 'practitioner';
+  $root.innerHTML = loginHeaderHTML() + `<main class="arrival">${arrivalBrand()}
+    <section class="arr-lower"><h1 class="arr-h">${prac ? 'Practitioner sign-in.' : 'Welcome back.'}</h1>
+      <p class="arr-sub">We'll email you a one-time link. No password needed.</p>
+      <form id="loginForm"><label class="arr-label" for="em">Email</label>
+        <input class="arr-input" id="em" type="email" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" required placeholder="you@example.com" value="${esc(S.loginEmail || '')}">
+        <button class="arr-btn" id="sendBtn" type="submit">Send me a link</button></form></section>
+    <footer class="arr-foot">${prac
+      ? '<button class="arr-link" id="toClient" type="button">Client sign-in</button>'
+      : '<span>Tuesdays at Milton Hall, Deansgate</span><span>New to haloe? <a href="/book">Book a session</a></span><button class="arr-link" id="toPrac" type="button">Practitioner sign-in</button>'}</footer></main>`;
   wireHeader();
+  const sw = (mode) => () => { S.loginMode = mode; S.loginEmail = (document.getElementById('em') || {}).value || ''; viewLogin(); };
+  const tp = document.getElementById('toPrac'); if (tp) tp.onclick = sw('practitioner');
+  const tc = document.getElementById('toClient'); if (tc) tc.onclick = sw('client');
   document.getElementById('loginForm').onsubmit = async (e) => {
     e.preventDefault();
     const email = document.getElementById('em').value.trim();
-    const m = document.getElementById('loginMsg'); m.textContent = 'Sending…';
-    // Sign-ups stay ON: anyone can sign in with an email link. What a signed-in user can SEE is decided
-    // entirely by row-level security (admin → everything; client → only their own rows).
-    await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + '/app/' } });
-    m.textContent = 'A sign-in link is on its way. It can take a minute to arrive.';
+    const btn = document.getElementById('sendBtn'); btn.disabled = true; btn.textContent = 'Sending…';
+    await sendLink(email);
+    S.loginEmail = email; S.loginStage = 'sent'; S.resendAt = Date.now() + RESEND_SECONDS * 1000;
+    viewLogin();
   };
+}
+function viewLinkSent() {
+  $root.innerHTML = loginHeaderHTML() + `<main class="arrival">${arrivalBrand()}
+    <section class="arr-lower"><h1 class="arr-h" tabindex="-1">Check your inbox.</h1>
+      <p class="arr-sub">We've sent a one-time link to <b>${esc(S.loginEmail)}</b></p>
+      <div class="arr-card"><p class="t">Tap the link in the email to sign in.</p><p class="s">It works once and expires shortly. Can't see it? Check your spam folder.</p></div>
+      <button class="arr-btn ghost" id="resendBtn" type="button" disabled>Send again in 0:${RESEND_SECONDS}</button>
+      <button class="arr-textbtn" id="otherEmail" type="button">Use a different email</button></section>
+    <footer class="arr-foot"><span>Need a hand? <a href="https://wa.me/${HALIMA_WA}" target="_blank" rel="noopener">Message Halima</a></span></footer></main>`;
+  wireHeader();
+  const h = document.querySelector('.arr-h'); if (h) h.focus({ preventScroll: true });
+  const btn = document.getElementById('resendBtn');
+  const tick = () => {
+    const el = document.getElementById('resendBtn'); if (!el) { clearInterval(S.loginTimer); return; }
+    const left = Math.max(0, Math.ceil((S.resendAt - Date.now()) / 1000));
+    if (left > 0) { el.disabled = true; el.textContent = 'Send again in ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0'); }
+    else { el.disabled = false; el.textContent = 'Send again'; clearInterval(S.loginTimer); }
+  };
+  S.loginTimer = setInterval(tick, 500); tick();
+  btn.onclick = async () => {
+    btn.disabled = true; btn.textContent = 'Sending…';
+    await sendLink(S.loginEmail);
+    S.resendAt = Date.now() + RESEND_SECONDS * 1000; toastMsg('Link sent again');
+    clearInterval(S.loginTimer); S.loginTimer = setInterval(tick, 500); tick();
+  };
+  document.getElementById('otherEmail').onclick = () => { S.loginStage = 'form'; S.loginEmail = ''; viewLogin(); };
 }
 /** Signed in, but no clients row matches this email — calm, no data shown. */
 function viewNoMatch() {
@@ -1119,6 +1202,7 @@ function route() {
 }
 function render() {
   if (!S.session) return viewLogin();
+  clearInterval(S.loginTimer);
   if (S.admin) {
     if (!S.data) { shell('<div class="empty">' + (S.error ? 'Could not load: ' + esc(S.error) : 'Loading…') + '</div>', false); return; }
     route();
@@ -1161,7 +1245,7 @@ sb.auth.onAuthStateChange((ev, session) => {
 if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', (e) => {
   if (e.data && e.data.type === 'open' && typeof e.data.url === 'string' && S.admin) { const h = new URL(e.data.url, location.origin).hash; if (h) location.hash = h; }
 });
-window.haloe = { api, S, render, pushApi };       // exposed for local testing; holds no data until an admin signs in
+window.haloe = { api, S, render, pushApi, sb };       // exposed for local testing; holds no data until an admin signs in
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' }).catch(() => {}));
 </script>
 </body>
