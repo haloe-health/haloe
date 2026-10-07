@@ -90,7 +90,7 @@
   .arr-card .t { font-size: 16px; font-weight: 600; line-height: 1.4; }
   .arr-card .s { font-size: 14.5px; color: var(--muted); line-height: 1.5; margin-top: 6px; }
   .arr-foot { width: 100%; margin-top: 22px; text-align: center; font-size: 14px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .arr-foot a, .arr-foot .arr-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; color: var(--gold-deep); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; font: inherit; font-size: 14px; font-weight: 500; }
+  .arr-foot a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; color: var(--gold-deep); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; font: inherit; font-size: 14px; font-weight: 500; }
   .arr-foot span { line-height: 1.5; }
 
   /* header */
@@ -403,7 +403,7 @@ const api = {
 };
 
 /* ---------- state ---------- */
-const S = { loginStage: 'form', loginMode: 'client', loginEmail: '', resendAt: 0, loginTimer: null, raw: null, showTest: false, session: null, admin: false, data: null, view: 'today', chip: 'today', filter: '', showInactive: false, loading: false, error: null };
+const S = { loginStage: 'form', loginEmail: '', resendAt: 0, loginTimer: null, raw: null, showTest: false, session: null, admin: false, data: null, view: 'today', chip: 'today', filter: '', showInactive: false, loading: false, error: null };
 
 /* ---------- admin alerts (web push) ---------- */
 const urlB64ToBytes = (b64) => { const t = (b64 + '='.repeat((4 - (b64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/'); return Uint8Array.from(atob(t), (c) => c.charCodeAt(0)); };
@@ -613,7 +613,7 @@ function headerHTML(withSettings) {
 function clearSession() {
   S.session = null; S.admin = false; S.isClient = false; S.profile = null;
   S.data = null; S.raw = null; S.cdata = null; S.error = null; S.filter = '';
-  S.loginStage = 'form'; S.loginMode = 'client'; S.loginEmail = '';   // back to a fresh sign-in screen
+  S.loginStage = 'form'; S.loginEmail = '';   // back to a fresh sign-in screen
   try { Object.keys(localStorage).filter((k) => /^sb-.+-auth-token/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
   document.querySelectorAll('.sheet-bg, .toast').forEach((el) => el.remove());          // open sheets / toasts hold client names
   if (location.hash) history.replaceState(null, '', location.pathname + location.search); // so Back / reload can't land on a client page
@@ -631,8 +631,7 @@ function wireHeader() {
 /** Gold eyebrow line + big bold page title (shared by every screen). */
 function pageHead(title) { return `<div class="eyebrow">haloe · ${esc(fmtDateLong(todayISO()))}</div><h1 class="screen">${esc(title)}</h1>`; }
 
-// Sign-in ("Arrival"). One screen for everyone; role routing happens AFTER sign-in. The practitioner variant
-// (footer link) has its own wording but the same layout and the same one-time-link call.
+// Sign-in ("Arrival"). One screen for everyone; role routing (admin → practitioner app, client → client area) happens AFTER sign-in.
 const RESEND_SECONDS = 45;
 const loginHeaderHTML = () => `<header class="login-top"><button class="icon-btn" id="themeBtn" aria-label="Toggle light or dark">${ICON.moon}</button></header>`;
 const arrivalBrand = () => '<div class="arr-brand"><img class="arr-mark" src="/haloe-logo-flower.svg" alt=""><div class="arr-word" aria-label="haloe">haloe</div><div class="arr-tag">Hijama · Wellness · Manchester</div></div>';
@@ -645,20 +644,14 @@ async function sendLink(email) {
 function viewLogin() {
   clearInterval(S.loginTimer);
   if (S.loginStage === 'sent') return viewLinkSent();
-  const prac = S.loginMode === 'practitioner';
   $root.innerHTML = loginHeaderHTML() + `<main class="arrival">${arrivalBrand()}
-    <section class="arr-lower"><h1 class="arr-h">${prac ? 'Practitioner sign-in.' : 'Welcome back.'}</h1>
+    <section class="arr-lower"><h1 class="arr-h">Welcome back.</h1>
       <p class="arr-sub">We'll email you a one-time link. No password needed.</p>
       <form id="loginForm"><label class="arr-label" for="em">Email</label>
         <input class="arr-input" id="em" type="email" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" required placeholder="you@example.com" value="${esc(S.loginEmail || '')}">
         <button class="arr-btn" id="sendBtn" type="submit">Send me a link</button></form></section>
-    <footer class="arr-foot">${prac
-      ? '<button class="arr-link" id="toClient" type="button">Client sign-in</button>'
-      : '<span>Tuesdays at Milton Hall, Deansgate</span><span>New to haloe? <a href="/book">Book a session</a></span><button class="arr-link" id="toPrac" type="button">Practitioner sign-in</button>'}</footer></main>`;
+    <footer class="arr-foot"><span>Tuesdays at Milton Hall, Deansgate</span><span>New to haloe? <a href="/book">Book a session</a></span></footer></main>`;
   wireHeader();
-  const sw = (mode) => () => { S.loginMode = mode; S.loginEmail = (document.getElementById('em') || {}).value || ''; viewLogin(); };
-  const tp = document.getElementById('toPrac'); if (tp) tp.onclick = sw('practitioner');
-  const tc = document.getElementById('toClient'); if (tc) tc.onclick = sw('client');
   document.getElementById('loginForm').onsubmit = async (e) => {
     e.preventDefault();
     const email = document.getElementById('em').value.trim();
