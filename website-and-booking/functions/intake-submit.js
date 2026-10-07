@@ -24,6 +24,7 @@ import {
   sendEmail, esc, emailButton, emailHeader, emailFooter, emailShell,
 } from './_email.js';
 import { sbRequest } from './_supabase.js';
+import { pushIntakeCompleted } from './_push.js';
 
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
@@ -177,6 +178,15 @@ export async function onRequestPost(context) {
         signatureSaved = false;
         console.error(`intake-submit: signature for intake ${intakeId} NOT saved (record was saved):`, err);
       }
+    }
+
+    // --- Lock-screen alert to the admin's devices (best effort). The form and signature are already saved, so a push
+    //     problem can never fail the submission or lose the client's data. The push says only that an intake arrived
+    //     (and "needs a look" if an Act-on-this rule fires) — never a name or any health detail. ---
+    try {
+      await pushIntakeCompleted(context.env, { clientId, intake: intakeRow, clientPhone: phone });
+    } catch (err) {
+      console.error('intake-submit: push alert failed (record was saved):', err);
     }
 
     // --- The record is saved; the email is best-effort from here on. ---

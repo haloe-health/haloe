@@ -382,7 +382,7 @@ const pushApi = {
 };
 function subRow(sub) {
   const j = sub.toJSON();
-  return { user_id: S.session.user.id, endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, user_agent: navigator.userAgent.slice(0, 200), notify_reschedule: true, notify_booking: true };
+  return { user_id: S.session.user.id, endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, user_agent: navigator.userAgent.slice(0, 200), notify_reschedule: true, notify_booking: true, notify_intake: true };
 }
 /** Fills the "Alerts on this device" card on Settings (admin only). */
 async function initPushCard() {
@@ -404,7 +404,7 @@ async function initPushCard() {
   } catch (e) { return draw('<p class="muted small" style="margin:8px 0 0">Couldn’t load alert settings: ' + esc(e.message) + '</p>'); }
   const sw = (id, label, on) => '<div class="toggle-line" style="margin:2px 0"><span>' + label + '</span><button class="switch-wrap" id="' + id + '" aria-label="' + label + '"><span class="switch" role="switch" aria-checked="' + on + '"></span></button></div>';
   draw(sw('pushMain', 'Alerts on this device', !!sub) +
-    (sub && row ? '<div style="margin:6px 0 0;padding-left:2px">' + sw('pushResch', 'Reschedule accepted', row.notify_reschedule) + sw('pushBook', 'New bookings', row.notify_booking) +
+    (sub && row ? '<div style="margin:6px 0 0;padding-left:2px">' + sw('pushResch', 'Reschedule accepted', row.notify_reschedule) + sw('pushBook', 'New bookings', row.notify_booking) + sw('pushIntake', 'Intake forms', row.notify_intake) +
       '<button class="btn ghost block" id="pushTest" type="button" style="margin-top:12px">Send test alert</button></div>' : '') +
     '<p class="muted small" style="margin:10px 0 0">Alerts show only the time — never a name or any detail.</p>');
 
@@ -422,7 +422,7 @@ async function initPushCard() {
   };
   if (sub && row) {
     const flip = (id, col) => { document.getElementById(id).onclick = async () => { try { await api.updatePushRow(row.endpoint, { [col]: !row[col] }); } catch (e) { toastMsg('Could not save: ' + e.message); } initPushCard(); }; };
-    flip('pushResch', 'notify_reschedule'); flip('pushBook', 'notify_booking');
+    flip('pushResch', 'notify_reschedule'); flip('pushBook', 'notify_booking'); flip('pushIntake', 'notify_intake');
     document.getElementById('pushTest').onclick = async (ev) => {
       const b = ev.currentTarget; b.disabled = true;
       try {
@@ -851,6 +851,12 @@ function bookingPerson(id) {
 }
 function viewBrief(key, bid) {
   const p = findPerson(key);
+  if (!p && S.briefRetried !== key) {   // e.g. a just-submitted intake opened from an alert: reload the data once per link, then try again
+    S.briefRetried = key; shell('<div class="empty">Loading…</div>');
+    loadAdminData().then(() => render()).catch(() => render());
+    return;
+  }
+  if (p) S.briefRetried = null;
   if (!p) { shell(`<button class="back" id="bk">${ICON.back}Back</button><div class="card empty">Client not found.</div>`); document.getElementById('bk').onclick = () => history.back(); return; }
   const c = p.client, intake = c ? intakeOf(c.id) : null;
   const ciList = checkinsOf(c);
@@ -1109,6 +1115,7 @@ function route() {
   if (!S.isClient && parts[0] === 'brief') { S.view = 'brief'; S.briefKey = parts[1] + '/' + parts[2]; S.briefBid = new URLSearchParams(qs || '').get('b'); }
   else if (S.isClient) S.view = CLIENT_VIEWS.includes(parts[0]) ? parts[0] : 'home';
   else S.view = ADMIN_VIEWS.includes(parts[0]) ? parts[0] : 'today';
+  if (S.view !== 'brief') S.briefRetried = null;
 }
 function render() {
   if (!S.session) return viewLogin();

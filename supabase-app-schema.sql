@@ -392,3 +392,6 @@ grant select, insert, update, delete on public.push_subscriptions to service_rol
 create policy admin_own_push on public.push_subscriptions for all to authenticated
   using (public.is_admin() and user_id = auth.uid())
   with check (public.is_admin() and user_id = auth.uid());
+
+-- push: third switch — migration "push_notify_intake", 7 Oct 2026
+alter table public.push_subscriptions add column if not exists notify_intake boolean not null default true;

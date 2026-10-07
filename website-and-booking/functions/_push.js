@@ -1,6 +1,7 @@
 // Web Push for admin alerts — Cloudflare-Workers-compatible: WebCrypto + fetch only, no Node APIs.
 //   * message encryption: RFC 8291 (aes128gcm content coding, RFC 8188)
 //   * sender identification: VAPID, RFC 8292 (ES256 JWT)
+// Events: reschedule accepted, new booking, intake form completed (+ a test alert).
 // The `_` prefix keeps this file from becoming a route.
 //
 // Env (Cloudflare Pages secrets — see CLAUDE.md "Push notifications"):
@@ -97,7 +98,7 @@ export function fmtWhen(isoDate, startMin) {
 
 /**
  * Send an alert to the admin's subscribed devices.
- *   kind: 'reschedule' | 'booking' (respects each device's switch) | 'test' (ignores the switches;
+ *   kind: 'reschedule' | 'booking' | 'intake' (respects each device's switch) | 'test' (ignores the switches;
  *         pass userId — and optionally endpoint — to target the caller's own device)
  * Dead subscriptions (push service answers 404/410) are deleted. Never throws.
  * Returns { sent, removed, failed } or { skipped: reason }.
@@ -115,6 +116,7 @@ export async function notifyAdmins(env, { kind, body, url, tag, userId, endpoint
     let q = `/rest/v1/push_subscriptions?select=id,endpoint,p256dh,auth&user_id=in.(${ids.join(',')})`;
     if (kind === 'reschedule') q += '&notify_reschedule=eq.true';
     if (kind === 'booking') q += '&notify_booking=eq.true';
+    if (kind === 'intake') q += '&notify_intake=eq.true';
     if (endpoint) q += `&endpoint=eq.${encodeURIComponent(endpoint)}`;
     const subs = await sbRequest(env, { path: q, method: 'GET' });
 
@@ -166,6 +168,45 @@ export async function pushNewBooking(env, bookingId) {
     return await notifyAdmins(env, { kind: 'booking', body: when ? `New booking · ${when}` : 'New booking', url, tag: bookingId ? `booking-${bookingId}` : 'booking' });
   } catch (err) {
     console.error('push: new-booking alert failed:', err);
+    return { skipped: 'error' };
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Intake form completed                                               */
+/* ------------------------------------------------------------------ */
+
+// MIRROR of the "Act on this" rules in app/index.html (buildFlags): the browser page can't be imported here,
+// so the lists are kept in step by hand — tools/test-push-parity.mjs-style checks compare them in the tests.
+// The rule decides ONLY whether the push says "· needs a look"; the reason is never put in the push.
+export const SAFETY_KEYS = ['is_pregnant', 'breastfeeding', 'takes_blood_thinners', 'bleeding_disorder', 'diabetes_status', 'chemo_or_radiotherapy', 'has_anaemia', 'infectious_condition', 'recent_surgery', 'blood_pressure', 'skin_condition', 'pacemaker_epilepsy'];
+export const CLOT_RE = /warfarin|apixaban|eliquis|rivaroxaban|xarelto|clopidogrel|plavix|aspirin|tranexamic(?: acid)?|cyklokapron/i;
+const last10 = (p) => { const d = String(p || '').replace(/\D/g, ''); return d.length >= 10 ? d.slice(-10) : ''; };
+const trim = (v) => (v == null ? '' : String(v).trim());
+
+/** Would this intake raise any "Act on this" flag in the admin brief? `intake` uses the intake_forms column names. */
+export function intakeNeedsLook(intake, clientPhone) {
+  if (SAFETY_KEYS.some((k) => { const v = trim(intake[k]); return v !== '' && v.toLowerCase() !== 'no'; })) return true;   // any screening answer other than "No"
+  if (trim(intake.current_medications) && CLOT_RE.test(intake.current_medications)) return true;                           // clotting-related medication
+  if (!trim(intake.main_concern)) return true;                                                                              // blank main concern
+  const own = last10(clientPhone), emer = last10(intake.emergency_contact_phone);
+  if (own && emer && own === emer) return true;                                                                             // emergency contact is their own number
+  return false;
+}
+
+/** A client completed the intake form. Opens that client's brief. Never throws. */
+export async function pushIntakeCompleted(env, { clientId, intake, clientPhone }) {
+  try {
+    let needs = false;
+    try { needs = intakeNeedsLook(intake || {}, clientPhone); } catch (e) { needs = false; }
+    return await notifyAdmins(env, {
+      kind: 'intake',
+      body: needs ? 'Intake form completed · needs a look' : 'Intake form completed',
+      url: clientId ? `/app/#/brief/c/${Number(clientId)}` : '/app/#/clients',
+      tag: clientId ? `intake-${Number(clientId)}` : 'intake',
+    });
+  } catch (err) {
+    console.error('push: intake alert failed:', err);
     return { skipped: 'error' };
   }
 }
