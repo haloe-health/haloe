@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>haloe</title>
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://thxunrygrrxcdjhgshjw.supabase.co; connect-src 'self' https://thxunrygrrxcdjhgshjw.supabase.co; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="theme-color" content="#F5F0E8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16140F" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="/app/manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="haloe">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="/app/icons/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="/fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/calm.css">
+<style>
+  /* haloe practitioner app. Tokens come from /calm.css; this file adds the
+     app shell (header, floating nav), the dark theme, and the screens. */
+  :root {
+    --font: 'Poppins', -apple-system, 'Segoe UI', Arial, sans-serif;
+    --font-wordmark: 'Tan Ashford', Georgia, serif;
+    --red: #B3402F; --red-bg: #FBEAE6; --red-line: #E9B9AF;
+    --green: #2F6B3F; --green-bg: #E7F1E8; --green-line: #B5D3B9;
+    --nav-h: 84px;
+  }
+  :root[data-theme="dark"] {
+    --page-bg: #16140F; --card: #211E17; --fill: #2C281F; --fill-hover: #353026;
+    --ink: #F3EEE3; --muted: #A89F8B; --gold-deep: #D7BC82;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+    --red: #F0907F; --red-bg: #3A1F1A; --red-line: #6B3329;
+    --green: #8CCB98; --green-bg: #1B2E20; --green-line: #34573B;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page-bg: #16140F; --card: #211E17; --fill: #2C281F; --fill-hover: #353026;
+      --ink: #F3EEE3; --muted: #A89F8B; --gold-deep: #D7BC82;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+      --red: #F0907F; --red-bg: #3A1F1A; --red-line: #6B3329;
+      --green: #8CCB98; --green-bg: #1B2E20; --green-line: #34573B;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { font-size: 78%; }
+  body { margin: 0; font-family: var(--font); background: var(--page-bg); color: var(--ink); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  [hidden] { display: none !important; }
+
+  /* header */
+  .app-head { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: calc(10px + env(safe-area-inset-top)) 16px 10px; background: color-mix(in srgb, var(--page-bg) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+  .brand img { width: 30px; height: 30px; display: block; }
+  .brand span { font-family: var(--font-wordmark); font-size: 28px; line-height: 1; color: #111; letter-spacing: 0.01em; }
+  :root[data-theme="dark"] .brand span { color: var(--ink); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .brand span { color: var(--ink); } }
+  .icon-btn { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--fill); display: grid; place-items: center; color: var(--ink); }
+  .icon-btn svg { width: 20px; height: 20px; }
+  .head-actions { display: flex; gap: 8px; }
+
+  .wrap { max-width: 600px; margin: 0 auto; padding: 8px 16px calc(var(--nav-h) + 28px + env(safe-area-inset-bottom)); }
+  h1.screen { font-family: var(--font-wordmark); font-weight: normal; font-size: 34px; line-height: 1.1; margin: 8px 0 14px; color: var(--ink); }
+  h2.sub { font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-deep); margin: 22px 4px 10px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 13px; }
+
+  /* floating pill nav */
+  .tabbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 30; width: min(calc(100% - 32px), 440px); display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px; background: color-mix(in srgb, var(--card) 92%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 999px; box-shadow: 0 8px 30px rgba(40,30,10,.16), 0 1px 2px rgba(40,30,10,.08); }
+  .tabbar button { min-height: 52px; border: 0; background: transparent; border-radius: 999px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 11.5px; font-weight: 500; color: var(--muted); }
+  .tabbar button svg { width: 21px; height: 21px; }
+  .tabbar button[aria-current="page"] { background: var(--gold); color: #1C1A16; }
+
+  /* cards + bits */
+  .card { background: var(--card); border-radius: 24px; padding: 20px; margin: 0 0 16px; box-shadow: var(--shadow); }
+  .card.tight { padding: 14px 16px; }
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 0 14px; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: 0 0 auto; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--fill); font-weight: 500; font-size: 14px; color: var(--ink); }
+  .chip[aria-pressed="true"] { background: var(--gold); color: #1C1A16; }
+  .pill { display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: 999px; font-size: 11.5px; font-weight: 500; white-space: nowrap; }
+  .pill.red { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-line); }
+  .pill.green { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-line); }
+  .pill.gold { background: var(--fill); color: var(--gold-deep); }
+  .day-label { font-size: 13px; font-weight: 500; color: var(--muted); margin: 18px 4px 8px; }
+  .empty { text-align: center; color: var(--muted); padding: 28px 12px; }
+
+  /* session rows (Today) */
+  .sess { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; padding: 14px 16px; }
+  .sess .who { display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left; background: none; border: 0; padding: 0; min-height: 44px; justify-content: center; }
+  .sess .name { font-weight: 600; font-size: 17px; overflow-wrap: anywhere; }
+  .sess .time { color: var(--gold-deep); font-weight: 500; font-size: 14px; }
+  .sess .meta { color: var(--muted); font-size: 13.5px; }
+  .sess .row2 { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .tick { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--fill-hover); background: transparent; display: grid; place-items: center; color: transparent; }
+  .tick svg { width: 20px; height: 20px; }
+  .tick[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
+  .sess.done .name, .sess.done .meta, .sess.done .time { opacity: .5; }
+
+  /* search + lists */
+  .search { width: 100%; min-height: 48px; border-radius: 16px; border: 1px solid var(--fill-hover); background: var(--card); padding: 0 16px; margin-bottom: 14px; font-size: 16px; }
+  .listrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 64px; padding: 12px 16px; border: 0; text-align: left; background: var(--card); border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 10px; }
+  .listrow .nm { font-weight: 600; overflow-wrap: anywhere; }
+  .listrow .sb { font-size: 13px; color: var(--muted); }
+
+  /* brief */
+  .back { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0 4px; color: var(--gold-deep); font-weight: 500; font-size: 15px; }
+  .back svg { width: 18px; height: 18px; }
+  .brief-name { font-family: var(--font-wordmark); font-weight: normal; font-size: 28px; line-height: 1.3; margin: 2px 0 6px; overflow-wrap: anywhere; }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; margin-top: 14px; }
+  .fact .k { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .fact .v { font-weight: 500; overflow-wrap: anywhere; }
+  .fact.wide { grid-column: 1 / -1; }
+  .contact { display: flex; gap: 8px; margin-top: 16px; }
+  .btn { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--gold); color: #1C1A16; font-weight: 600; font-size: 15px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .btn.ghost { background: var(--fill); color: var(--ink); }
+  .btn.block { width: 100%; }
+  .btn[disabled] { opacity: .45; cursor: not-allowed; }
+  .sig { margin-top: 14px; display: flex; align-items: center; gap: 12px; }
+  .sig .thumb { width: 120px; height: 54px; border-radius: 10px; background: #fff; border: 1px solid var(--fill-hover); object-fit: contain; }
+  .act { background: var(--red-bg); border: 1px solid var(--red-line); }
+  .act .section-label { color: var(--red); }
+  .act ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 12px; }
+  .act li { padding-left: 14px; position: relative; }
+  .act li::before { content: ''; position: absolute; left: 0; top: .6em; width: 6px; height: 6px; border-radius: 50%; background: var(--red); }
+  .act li b { display: block; color: var(--ink); font-weight: 600; }
+  .act li span { color: var(--ink); opacity: .85; }
+  .clear { background: var(--green-bg); border: 1px solid var(--green-line); color: var(--green); font-weight: 600; }
+  .inwords { font-family: var(--serif-text); font-size: 17px; line-height: 1.5; margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .inwords.none { color: var(--muted); font-style: italic; }
+  .kv { display: grid; gap: 14px; }
+  .kv .k { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .hist { display: grid; gap: 10px; margin-top: 10px; }
+  .hist .h { padding: 12px 14px; background: var(--fill); border-radius: 16px; font-size: 14px; }
+  .hist .h b { font-weight: 600; }
+  textarea.note { width: 100%; min-height: 110px; border-radius: 16px; border: 1px solid var(--fill-hover); background: var(--card); padding: 12px 14px; font-size: 16px; resize: vertical; }
+  .note-item { padding: 12px 14px; background: var(--fill); border-radius: 16px; margin-top: 10px; }
+  .note-item .when { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .note-item p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+  /* codes */
+  .codecard .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .codecard .code { font-weight: 600; font-size: 18px; letter-spacing: .02em; overflow-wrap: anywhere; }
+  .codecard .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .codecard .stats .k { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .codecard .stats .v { font-weight: 600; }
+  .switch { position: relative; width: 56px; height: 32px; border-radius: 999px; border: 0; background: var(--fill-hover); flex: 0 0 auto; }
+  .switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .15s; }
+  .switch[aria-checked="true"] { background: var(--gold); }
+  .switch[aria-checked="true"]::after { transform: translateX(24px); }
+  .switch-wrap { min-width: 44px; min-height: 44px; display: grid; place-items: center; background: none; border: 0; padding: 0; }
+  .toggle-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; margin: 4px 4px 14px; font-size: 14px; }
+  label.f { display: block; font-size: 12px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; }
+  .in { width: 100%; min-height: 48px; border-radius: 14px; border: 1px solid var(--fill-hover); background: var(--card); padding: 0 14px; font-size: 16px; }
+  .warn { background: var(--red-bg); border: 1px solid var(--red-line); color: var(--ink); border-radius: 16px; padding: 12px 14px; font-size: 14px; margin-top: 14px; }
+  .warn b { color: var(--red); }
+
+  /* stats */
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .tile { background: var(--card); border-radius: 20px; padding: 14px 12px; box-shadow: var(--shadow); }
+  .tile .k { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .tile .v { font-family: var(--font-wordmark); font-size: 26px; line-height: 1.15; margin-top: 2px; overflow-wrap: anywhere; }
+  .row-split { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--fill); }
+  .row-split:last-child { border-bottom: 0; }
+
+  /* login / gate */
+  .gate { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+  .gate .card { width: 100%; max-width: 420px; text-align: center; }
+  .gate .brand { justify-content: center; margin-bottom: 18px; }
+  .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-h) + 24px); background: #1C1A16; color: #F5F0E8; padding: 10px 18px; border-radius: 999px; font-size: 14px; z-index: 50; max-width: calc(100% - 32px); }
+  @media (min-width: 700px) { .wrap { padding-top: 16px; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+'use strict';
+/* ---------- config ---------- */
+const SB_URL = 'https://thxunrygrrxcdjhgshjw.supabase.co';
+// Public publishable key (designed to ship in the browser). Every table is
+// locked by row-level security to the admin role, so this key alone reads nothing.
+const SB_KEY = 'sb_publishable_PSpC5w-1CWnduinWbjdsfA_VSRx7mSG';
+const ADMIN_EMAIL = 'iamhalimayasmin@gmail.com';
+const CLINIC_WEEKDAY = 2;               // Tuesday
+// Flip to true once reserveDiscountCode() is fixed (CLAUDE.md "Open issues").
+const AUDIENCE_CODES_ENABLED = false;
+// Medications that matter for a cupping session (blood-thinning / clotting related).
+const CLOT_RE = /warfarin|apixaban|eliquis|rivaroxaban|xarelto|clopidogrel|plavix|aspirin|tranexamic(?: acid)?|cyklokapron/i;
+
+const SAFETY = [
+  ['is_pregnant', 'Pregnant, or a chance she could be'],
+  ['breastfeeding', 'Breastfeeding'],
+  ['takes_blood_thinners', 'Takes blood-thinning / anticoagulant medication'],
+  ['bleeding_disorder', 'Bleeding or clotting disorder'],
+  ['diabetes_status', 'Diabetes'],
+  ['chemo_or_radiotherapy', 'Chemotherapy, radiotherapy or cancer treatment'],
+  ['has_anaemia', 'Anaemia, low iron, or feels faint or dizzy easily'],
+  ['infectious_condition', 'Blood-borne infection'],
+  ['recent_surgery', 'Surgery in the last 6 months'],
+  ['blood_pressure', 'Very high or very low blood pressure'],
+  ['skin_condition', 'Skin issue, infection or broken skin in the treatment area'],
+  ['pacemaker_epilepsy', 'Pacemaker, epilepsy or another condition to know about'],
+];
+
+/* ---------- helpers ---------- */
+const $root = document.getElementById('root');
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = (p) => { const n = (Number(p) || 0) / 100; return '£' + (Number.isInteger(n) ? n : n.toFixed(2)); };
+const ldn = (d) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London' }).format(d);
+const todayISO = () => ldn(new Date());
+const addDays = (iso, n) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const dow = (iso) => new Date(iso + 'T12:00:00Z').getUTCDay();
+const fmtDate = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
+const fmtDateLong = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+const fmtTime = (m) => { const h = Math.floor(m / 60), mm = m % 60; return ((h + 11) % 12 + 1) + (mm ? ':' + String(mm).padStart(2, '0') : ':00') + (h < 12 ? 'am' : 'pm'); };
+const digits = (s) => String(s || '').replace(/\D/g, '');
+const norm10 = (s) => { const d = digits(s); return d.length >= 10 ? d.slice(-10) : ''; };
+const waNumber = (s) => { let d = digits(s); if (d.startsWith('00')) d = d.slice(2); if (d.startsWith('0')) d = '44' + d.slice(1); return d; };
+const ageFrom = (dob) => { if (!/^\d{4}-\d{2}-\d{2}$/.test(dob || '')) return null; const [y, m, d] = dob.split('-').map(Number); const t = new Date(); let a = t.getFullYear() - y; if (t.getMonth() + 1 < m || (t.getMonth() + 1 === m && t.getDate() < d)) a--; return a; };
+const trimStr = (s) => (s == null ? '' : String(s).trim());
+const treatmentLabel = (b) => b.treatment || '—';
+const toastMsg = (m) => { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); };
+
+/* ---------- theme ---------- */
+function applyTheme(t) { if (t) document.documentElement.setAttribute('data-theme', t); else document.documentElement.removeAttribute('data-theme'); }
+(function initTheme() { try { applyTheme(localStorage.getItem('haloe_theme')); } catch (e) {} })();
+function toggleTheme() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark' ||
+    (!document.documentElement.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+  const next = dark ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem('haloe_theme', next); } catch (e) {}
+}
+
+/* ---------- data layer (the only code that talks to Supabase) ---------- */
+const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+const api = {
+  async load() {
+    const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
+    const [clients, intakes, bookings, codes, collabs, redemptions, notes] = await Promise.all([
+      q('clients'), q('intake_forms'), q('bookings'), q('discount_codes'), q('collaborators'), q('code_redemptions'), q('session_notes'),
+    ]);
+    return { clients, intakes, bookings, codes, collabs, redemptions, notes };
+  },
+  async markDone(id, done) { const { error } = await sb.from('bookings').update({ done_at: done ? new Date().toISOString() : null }).eq('id', id); if (error) throw error; },
+  async setActive(id, active) { const { error } = await sb.from('discount_codes').update({ active }).eq('id', id); if (error) throw error; },
+  async addNote(row) { const { data, error } = await sb.from('session_notes').insert(row).select().single(); if (error) throw error; return data; },
+  async findOrCreateCollab(name, notes) {
+    const { data: found } = await sb.from('collaborators').select('id').ilike('name', name).limit(1);
+    if (found && found.length) return found[0].id;
+    const { data, error } = await sb.from('collaborators').insert({ name, type: 'influencer', notes, deliverables_agreed: false, created_at: Math.floor(Date.now() / 1000) }).select('id').single();
+    if (error) throw error; return data.id;
+  },
+  async createCode(row) { const { error } = await sb.from('discount_codes').insert(row); if (error) throw error; },
+  async signatureUrl(path) {
+    if (!path) return null;
+    const p = path.replace(/^signatures\//, '');
+    const { data, error } = await sb.storage.from('signatures').createSignedUrl(p, 300);
+    return error ? null : data.signedUrl;
+  },
+};
+
+/* ---------- state ---------- */
+const S = { session: null, admin: false, data: null, view: 'today', chip: 'today', filter: '', showInactive: false, loading: false, error: null };
+
+/* ---------- derived ---------- */
+function intakeOf(clientId) {
+  const rows = S.data.intakes.filter((i) => i.client_id === clientId).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+  return rows[0] || null;
+}
+function bookingsOfClient(c) {
+  return S.data.bookings.filter((b) => b.client_id === c.id || (!b.client_id && lower(b.customer_email) === lower(c.email))).sort(byDateDesc);
+}
+const lower = (s) => String(s || '').toLowerCase();
+const byDateDesc = (a, b) => (b.booking_date + String(b.start_min).padStart(4, '0')).localeCompare(a.booking_date + String(a.start_min).padStart(4, '0'));
+const confirmed = (b) => b.status === 'confirmed';
+const hasIntake = (b) => !!(b.client_id && intakeOf(b.client_id));
+
+/** The people list = every client + anyone who has booked but has no client record yet. */
+function people() {
+  const out = []; const seen = new Set();
+  for (const c of S.data.clients) {
+    seen.add(lower(c.email));
+    out.push({ key: 'c/' + c.id, name: c.full_name, phone: c.phone, email: c.email, client: c, bookings: bookingsOfClient(c) });
+  }
+  for (const b of S.data.bookings.filter(confirmed)) {
+    const em = lower(b.customer_email);
+    if (b.client_id || seen.has(em)) continue;
+    seen.add(em);
+    const bs = S.data.bookings.filter((x) => !x.client_id && lower(x.customer_email) === em).sort(byDateDesc);
+    out.push({ key: 'b/' + b.id, name: b.customer_name, phone: b.customer_phone, email: b.customer_email, client: null, bookings: bs });
+  }
+  return out;
+}
+function nextBookingDate(p) {
+  const t = todayISO();
+  const up = p.bookings.filter((b) => confirmed(b) && b.booking_date >= t).map((b) => b.booking_date).sort();
+  return up[0] || null;
+}
+
+/** Build the practitioner brief + the ACT ON THIS flags from the stored answers. */
+function buildFlags(client, intake) {
+  const flags = [];
+  if (!intake) { flags.push({ t: 'No intake form yet', d: 'Nothing on file for screening, medications, allergies, consent or signature. Ask in person before you start.' }); return flags; }
+  const yes = SAFETY.filter(([k]) => { const v = trimStr(intake[k]); return v && lower(v) !== 'no'; });
+  for (const [k, label] of yes) {
+    const v = trimStr(intake[k]);
+    flags.push({ t: label, d: lower(v) === 'yes' ? 'Answered Yes' : 'Answered: ' + v });
+  }
+  if (yes.length && trimStr(intake.safety_notes)) flags.push({ t: 'Their safety note', d: '“' + trimStr(intake.safety_notes) + '”' });
+  const meds = trimStr(intake.current_medications);
+  if (meds && CLOT_RE.test(meds)) {
+    const hit = meds.match(CLOT_RE)[0];
+    flags.push({ t: 'Medication on the clotting watch-list: ' + hit.toLowerCase(), d: 'As typed: “' + meds.replace(/\s+/g, ' ') + '”' });
+  }
+  if (lower(intake.is_pregnant) === 'yes' || lower(intake.breastfeeding) === 'yes') { /* already listed above */ }
+  if (!trimStr(intake.main_concern)) flags.push({ t: 'No main concern given', d: 'The main-concern box was left blank. Ask what they want from the session.' });
+  const own = norm10(client && client.phone), emer = norm10(intake.emergency_contact_phone);
+  if (own && emer && own === emer) flags.push({ t: 'Emergency contact is their own number', d: 'Ask for someone else.' });
+  if (!own && !emer) { /* nothing */ }
+  return flags;
+}
+
+/* ---------- views ---------- */
+const ICON = {
+  today: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>',
+  clients: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.6 3.8-5.5 7.5-5.5s6.7 1.9 7.5 5.5"/></svg>',
+  codes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12.5V5.5a2 2 0 0 1 2-2h7l8 8-9 9-8-8z"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>',
+  stats: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>',
+  back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>',
+  out: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9M15 8l4 4-4 4M19 12H9"/></svg>',
+};
+
+function headerHTML(withActions) {
+  return `<header class="app-head">
+    <a class="brand" href="#/today" aria-label="haloe"><img src="/haloe-logo-flower.svg" alt=""><span>haloe</span></a>
+    <div class="head-actions">
+      <button class="icon-btn" id="themeBtn" aria-label="Toggle light or dark">${ICON.moon}</button>
+      ${withActions ? `<button class="icon-btn" id="outBtn" aria-label="Sign out">${ICON.out}</button>` : ''}
+    </div></header>`;
+}
+function wireHeader() {
+  const t = document.getElementById('themeBtn'); if (t) t.onclick = toggleTheme;
+  const o = document.getElementById('outBtn'); if (o) o.onclick = async () => { await sb.auth.signOut(); S.data = null; S.admin = false; S.session = null; render(); };
+}
+
+function viewLogin(msg) {
+  $root.innerHTML = headerHTML(false) + `<div class="gate"><div class="card">
+    <div class="section-label">Practitioner sign-in</div>
+    <p class="inwords" style="margin:10px 0 18px">We'll email you a one-time link.</p>
+    <form id="loginForm"><label class="f" for="em" style="text-align:left">Email</label>
+      <input class="in" id="em" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com">
+      <button class="btn block" style="margin-top:16px" type="submit">Send me a link</button></form>
+    <p class="small muted" id="loginMsg" style="margin:14px 0 0;min-height:20px">${esc(msg || '')}</p></div></div>`;
+  wireHeader();
+  document.getElementById('loginForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('em').value.trim();
+    const m = document.getElementById('loginMsg'); m.textContent = 'Sending…';
+    // shouldCreateUser:false — the admin is invited once from the Supabase dashboard; nobody can self-register.
+    await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: location.origin + '/app/' } });
+    // Same message whatever the result, so the form never reveals which emails exist.
+    m.textContent = 'If that address is authorised, a sign-in link is on its way.';
+  };
+}
+function viewDenied() {
+  $root.innerHTML = headerHTML(true) + `<div class="gate"><div class="card"><div class="section-label">Not authorised</div>
+    <p class="inwords" style="margin:10px 0 0">This account doesn't have access to the haloe app.</p></div></div>`;
+  wireHeader();
+}
+
+function tabbarHTML() {
+  const items = [['today', 'Today'], ['clients', 'Clients'], ['codes', 'Codes'], ['stats', 'Stats']];
+  return `<div class="tabbar" role="navigation" aria-label="Main">${items.map(([k, l]) =>
+    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span></button>`).join('')}</div>`;
+}
+
+function shell(inner, withNav = true) {
+  $root.innerHTML = headerHTML(true) + `<main class="wrap">${inner}</main>` + (withNav ? tabbarHTML() : '');
+  wireHeader();
+  document.querySelectorAll('[data-go]').forEach((b) => { b.onclick = () => { location.hash = '#/' + b.dataset.go; }; });
+}
+
+/* ---- Today ---- */
+function sessionRow(b) {
+  const noIntake = !hasIntake(b);
+  const done = !!b.done_at;
+  const nextKey = b.client_id ? 'c/' + b.client_id : 'b/' + b.id;
+  return `<div class="card sess ${done ? 'done' : ''}">
+    <button class="who" data-brief="${nextKey}" data-bid="${b.id}">
+      <span class="time">${fmtTime(b.start_min)}</span>
+      <span class="name">${esc(b.customer_name)}</span>
+      <span class="meta">${esc(treatmentLabel(b))}</span>
+      <span class="row2"><span class="pill gold">${money(b.amount_pence)} paid</span>${b.discount_code ? `<span class="pill gold">${esc(b.discount_code)}</span>` : ''}${noIntake ? '<span class="pill red">No intake</span>' : ''}</span>
+    </button>
+    <button class="tick" data-tick="${b.id}" aria-pressed="${done}" aria-label="Mark ${esc(b.customer_name)} done">${ICON.check}</button>
+  </div>`;
+}
+function nextClinicDate() { let d = todayISO(); while (dow(d) !== CLINIC_WEEKDAY) d = addDays(d, 1); return d; }
+function viewToday() {
+  const t = todayISO();
+  let from = t, to = t, onlyClinic = false;
+  if (S.chip === 'week') { const back = (dow(t) + 6) % 7; from = addDays(t, -back); to = addDays(from, 6); }
+  if (S.chip === 'clinic') { from = to = nextClinicDate(); onlyClinic = true; }
+  const list = S.data.bookings.filter((b) => confirmed(b) && b.booking_date >= from && b.booking_date <= to && (!onlyClinic || b.location === 'clinic'))
+    .sort((a, b) => (a.booking_date + String(a.start_min).padStart(4, '0')).localeCompare(b.booking_date + String(b.start_min).padStart(4, '0')));
+  let body = '';
+  if (!list.length) body = `<div class="card empty">${S.chip === 'today' ? 'No sessions today.' : S.chip === 'week' ? 'No sessions this week.' : 'No clinic bookings yet for ' + fmtDateLong(from) + '.'}</div>`;
+  else {
+    let last = '';
+    for (const b of list) {
+      if (S.chip !== 'today' && b.booking_date !== last) { last = b.booking_date; body += `<div class="day-label">${fmtDate(b.booking_date)}</div>`; }
+      body += sessionRow(b);
+    }
+  }
+  const sub = S.chip === 'today' ? fmtDateLong(t) : S.chip === 'clinic' ? 'Clinic day · ' + fmtDateLong(from) : fmtDate(from) + ' – ' + fmtDate(to);
+  shell(`<h1 class="screen">Today</h1><p class="muted small" style="margin:-8px 4px 12px">${esc(sub)}</p>
+    <div class="chips">${[['today', 'Today'], ['week', 'This week'], ['clinic', 'Next clinic']].map(([k, l]) => `<button class="chip" data-chip="${k}" aria-pressed="${S.chip === k}">${l}</button>`).join('')}</div>${body}`);
+  document.querySelectorAll('[data-chip]').forEach((b) => { b.onclick = () => { S.chip = b.dataset.chip; render(); }; });
+  document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief + '?b=' + b.dataset.bid; }; });
+  document.querySelectorAll('[data-tick]').forEach((b) => {
+    b.onclick = async () => {
+      const id = Number(b.dataset.tick); const bk = S.data.bookings.find((x) => x.id === id);
+      const nowDone = !bk.done_at;
+      try { await api.markDone(id, nowDone); bk.done_at = nowDone ? new Date().toISOString() : null; render(); }
+      catch (e) { toastMsg('Could not save: ' + e.message); }
+    };
+  });
+}
+
+/* ---- Clients ---- */
+function viewClients() {
+  const q = lower(S.filter).trim();
+  let list = people();
+  if (q) list = list.filter((p) => lower(p.name).includes(q) || lower(p.email).includes(q) || digits(p.phone).includes(digits(q)) && digits(q).length > 2);
+  list.sort((a, b) => { const na = nextBookingDate(a), nb = nextBookingDate(b); if (na && nb) return na.localeCompare(nb) || lower(a.name).localeCompare(lower(b.name)); if (na) return -1; if (nb) return 1; return lower(a.name).localeCompare(lower(b.name)); });
+  const rows = list.map((p) => {
+    const nx = nextBookingDate(p);
+    return `<button class="listrow" data-brief="${p.key}"><span><span class="nm">${esc(p.name)}</span><br><span class="sb">${nx ? 'Next: ' + fmtDate(nx) : (p.bookings[0] ? 'Last: ' + fmtDate(p.bookings[0].booking_date) : 'No bookings')}</span></span>${p.client && intakeOf(p.client.id) ? '' : '<span class="pill red">No intake</span>'}</button>`;
+  }).join('');
+  shell(`<h1 class="screen">Clients</h1><input class="search" id="q" type="search" placeholder="Search name, phone or email" value="${esc(S.filter)}" autocomplete="off">${rows || '<div class="card empty">No clients match.</div>'}`);
+  const qi = document.getElementById('q');
+  qi.oninput = () => { S.filter = qi.value; const pos = qi.selectionStart; render(); const n = document.getElementById('q'); n.focus(); n.setSelectionRange(pos, pos); };
+  document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief; }; });
+}
+
+/* ---- Client brief ---- */
+function findPerson(key) { return people().find((p) => p.key === key) || (key.startsWith('b/') ? bookingPerson(Number(key.slice(2))) : null); }
+function bookingPerson(id) {
+  const b = S.data.bookings.find((x) => x.id === id); if (!b) return null;
+  if (b.client_id) { const c = S.data.clients.find((x) => x.id === b.client_id); if (c) return { key: 'c/' + c.id, name: c.full_name, phone: c.phone, email: c.email, client: c, bookings: bookingsOfClient(c) }; }
+  return { key: 'b/' + b.id, name: b.customer_name, phone: b.customer_phone, email: b.customer_email, client: null, bookings: [b] };
+}
+function viewBrief(key, bid) {
+  const p = findPerson(key);
+  if (!p) { shell(`<button class="back" id="bk">${ICON.back}Back</button><div class="card empty">Client not found.</div>`); document.getElementById('bk').onclick = () => history.back(); return; }
+  const c = p.client, intake = c ? intakeOf(c.id) : null;
+  const flags = buildFlags(c, intake);
+  const age = c ? ageFrom(c.date_of_birth) : null;
+  const wa = waNumber(p.phone);
+  const act = flags.length
+    ? `<div class="card act"><div class="section-label">Act on this</div><ul>${flags.map((f) => `<li><b>${esc(f.t)}</b><span>${esc(f.d)}</span></li>`).join('')}</ul></div>`
+    : `<div class="card clear">Clear screen — no safety flags.</div>`;
+  const words = (v) => trimStr(v) ? `<p class="inwords">${esc(trimStr(v))}</p>` : '<p class="inwords none">Nothing entered</p>';
+  const yn = (v) => esc(trimStr(v) || '—');
+  const hist = p.bookings.map((b) => `<div class="h"><b>${fmtDate(b.booking_date)} · ${fmtTime(b.start_min)}</b><br>${esc(treatmentLabel(b))}<br><span class="muted">${money(b.amount_pence)} paid${b.discount_code ? ' · ' + esc(b.discount_code) : ''}${confirmed(b) ? '' : ' · ' + esc(b.status)}${b.done_at ? ' · done' : ''}</span></div>`).join('') || '<p class="muted small">No bookings yet.</p>';
+  const notes = c ? S.data.notes.filter((n) => n.client_id === c.id).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))) : [];
+  const ctxBooking = bid ? p.bookings.find((b) => b.id === Number(bid)) : (p.bookings.find((b) => confirmed(b) && b.booking_date >= todayISO()) || p.bookings[0]);
+  const noteBlock = c
+    ? `<div class="card"><div class="section-label">Session notes</div>
+        <textarea class="note" id="noteText" placeholder="Add a note after the session…" style="margin-top:10px"></textarea>
+        <button class="btn block" id="noteSave" style="margin-top:10px">Save note</button>
+        ${notes.map((n) => `<div class="note-item"><div class="when">${new Date(n.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/London' })}</div><p>${esc(n.note)}</p></div>`).join('')}</div>`
+    : `<div class="card"><div class="section-label">Session notes</div><p class="muted small" style="margin:10px 0 0">Notes attach to a client record, which is created when they submit the intake form.</p></div>`;
+  shell(`<button class="back" id="bk">${ICON.back}Back</button>
+    <div class="card">
+      <h1 class="brief-name">${esc(p.name)}</h1>
+      <div class="muted small">${age != null ? age + ' years old' : 'Age not given'}${p.email ? ' · ' + esc(p.email) : ''}</div>
+      <div class="facts">
+        <div class="fact"><div class="k">Phone</div><div class="v">${esc(p.phone || '—')}</div></div>
+        <div class="fact"><div class="k">Hijama before</div><div class="v">${intake ? yn(intake.had_hijama_before) : '—'}</div></div>
+        <div class="fact"><div class="k">Photo consent</div><div class="v">${intake ? yn(intake.photo_consent) : '—'}</div></div>
+        <div class="fact"><div class="k">Signature</div><div class="v">${intake && intake.signature_path ? 'On file' : intake ? 'Not on file' : '—'}</div></div>
+      </div>
+      ${intake && intake.signature_path ? `<div class="sig"><img class="thumb" id="sigImg" alt="Signature" hidden><span class="small muted" id="sigNote">Loading signature…</span></div>` : ''}
+      ${p.phone ? `<div class="contact"><a class="btn" href="tel:${esc(p.phone.replace(/[^\d+]/g, ''))}">Call</a><a class="btn ghost" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a></div>` : ''}
+    </div>
+    ${act}
+    <div class="card"><div class="section-label">Conditions, medication, allergies</div><div class="kv" style="margin-top:12px">
+      <div><div class="k">Conditions (their words)</div>${intake ? (lower(intake.has_conditions) === 'yes' ? words(intake.medical_conditions) : '<p class="inwords none">None reported</p>') : words('')}</div>
+      <div><div class="k">Medication (their words)</div>${intake ? (lower(intake.takes_medication) === 'yes' ? words(intake.current_medications) : '<p class="inwords none">None reported</p>') : words('')}</div>
+      <div><div class="k">Allergies (their words)</div>${intake ? (lower(intake.has_allergies) === 'yes' ? words(intake.allergies) : '<p class="inwords none">None reported</p>') : words('')}</div></div></div>
+    <div class="card"><div class="section-label">Main concern and safety notes</div><div class="kv" style="margin-top:12px">
+      <div><div class="k">Main concern</div>${words(intake && intake.main_concern)}</div>
+      <div><div class="k">Safety notes</div>${words(intake && intake.safety_notes)}</div></div></div>
+    <div class="card"><div class="section-label">Package and bookings</div>
+      <div class="fact" style="margin-top:12px"><div class="k">Package chosen on intake</div><div class="v">${esc(intake && intake.package || '—')}</div></div>
+      <div class="hist">${hist}</div></div>
+    ${noteBlock}`);
+  document.getElementById('bk').onclick = () => { if (history.length > 1) history.back(); else location.hash = '#/clients'; };
+  if (intake && intake.signature_path) {
+    api.signatureUrl(intake.signature_path).then((url) => {
+      const img = document.getElementById('sigImg'), nt = document.getElementById('sigNote'); if (!img) return;
+      if (url) { img.src = url; img.hidden = false; nt.textContent = 'Signed ' + (intake.signature_date || ''); } else nt.textContent = 'Signature file could not be loaded';
+    });
+  }
+  const save = document.getElementById('noteSave');
+  if (save) save.onclick = async () => {
+    const txt = document.getElementById('noteText').value.trim(); if (!txt) return;
+    save.disabled = true;
+    try { const row = await api.addNote({ client_id: c.id, booking_id: ctxBooking ? ctxBooking.id : null, note: txt }); S.data.notes.push(row); render(); toastMsg('Note saved'); }
+    catch (e) { toastMsg('Could not save: ' + e.message); save.disabled = false; }
+  };
+}
+
+/* ---- Codes ---- */
+const isTestCode = (c, collabById) => /test/i.test(c.code) || /test/i.test((collabById[c.collaborator_id] || {}).name || '');
+function viewCodes() {
+  const collabById = Object.fromEntries(S.data.collabs.map((c) => [c.id, c]));
+  const rows = S.data.codes.filter((c) => S.showInactive || (c.active && !isTestCode(c, collabById))).sort((a, b) => b.id - a.id);
+  const cards = rows.map((c) => {
+    const uses = S.data.redemptions.filter((r) => r.code_id === c.id && (r.status === 'reserved' || r.status === 'confirmed')).length;
+    const rev = S.data.bookings.filter((b) => confirmed(b) && b.discount_code === c.code).reduce((s, b) => s + (b.amount_pence || 0), 0);
+    const col = collabById[c.collaborator_id];
+    return `<div class="card codecard"><div class="top"><div><div class="code">${esc(c.code)}</div><div class="muted small">${esc(c.type)} · ${c.percent_off}% off${col ? ' · ' + esc(col.name) : ''}</div></div>
+      <button class="switch-wrap" data-active="${c.id}" aria-label="Active"><span class="switch" role="switch" aria-checked="${c.active}"></span></button></div>
+      <div class="stats"><div><div class="k">Uses</div><div class="v">${uses} / ${c.max_uses_total == null ? '∞' : c.max_uses_total}</div></div><div><div class="k">Revenue</div><div class="v">${money(rev)}</div></div><div><div class="k">Expires</div><div class="v">${c.valid_until ? fmtDate(ldn(new Date(c.valid_until * 1000))) : 'Never'}</div></div></div></div>`;
+  }).join('');
+  shell(`<h1 class="screen">Codes</h1>
+    <div class="toggle-line"><span>Show inactive</span><button class="switch-wrap" id="inactiveBtn" aria-label="Show inactive codes"><span class="switch" role="switch" aria-checked="${S.showInactive}"></span></button></div>
+    ${cards || '<div class="card empty">No codes to show.</div>'}
+    <h2 class="sub">New code</h2>
+    <form class="card" id="codeForm">
+      <label class="f" style="margin-top:0" for="kind">Type</label>
+      <select class="in" id="kind"><option value="guest">GUEST-… · free gift, 1 use</option><option value="aud">…25 · audience, 25% off</option></select>
+      <label class="f" for="cname">Name</label><input class="in" id="cname" placeholder="e.g. Paloma" autocomplete="off" autocapitalize="characters" required>
+      <div class="muted small" id="preview" style="margin-top:8px"></div>
+      <div class="warn" id="audWarn" hidden><b>Not yet.</b> Audience (*25) codes can't be created until the second-redemption bug is fixed — only the first booking would work and the second would fail at checkout (CLAUDE.md, Open issues). Gift (GUEST-) codes are fine.</div>
+      <button class="btn block" id="codeSave" style="margin-top:16px" type="submit">Create code</button>
+    </form>`);
+  document.querySelectorAll('[data-active]').forEach((b) => {
+    b.onclick = async () => {
+      const c = S.data.codes.find((x) => x.id === Number(b.dataset.active));
+      try { await api.setActive(c.id, !c.active); c.active = !c.active; render(); } catch (e) { toastMsg('Could not save: ' + e.message); }
+    };
+  });
+  document.getElementById('inactiveBtn').onclick = () => { S.showInactive = !S.showInactive; render(); };
+  const kind = document.getElementById('kind'), name = document.getElementById('cname'), prev = document.getElementById('preview'), warn = document.getElementById('audWarn'), save = document.getElementById('codeSave');
+  const codeFor = () => { const n = name.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); if (!n) return ''; return kind.value === 'guest' ? 'GUEST-' + n : n + '25'; };
+  const refresh = () => { const c = codeFor(); prev.textContent = c ? 'Code: ' + c : ''; const blocked = kind.value === 'aud' && !AUDIENCE_CODES_ENABLED; warn.hidden = !blocked; save.disabled = blocked; };
+  kind.onchange = refresh; name.oninput = refresh; refresh();
+  document.getElementById('codeForm').onsubmit = async (e) => {
+    e.preventDefault();
+    if (kind.value === 'aud' && !AUDIENCE_CODES_ENABLED) return;
+    const code = codeFor(); if (!code) return;
+    if (S.data.codes.some((c) => c.code === code)) { toastMsg(code + ' already exists'); return; }
+    save.disabled = true;
+    try {
+      const display = name.value.trim().replace(/\s+/g, ' ');
+      const collabId = await api.findOrCreateCollab(display, 'Collaborator free treatment: ' + display);
+      const now = Math.floor(Date.now() / 1000);
+      // Same shape as GUEST-MADE (gift) and YASMZEE25 (audience).
+      const row = kind.value === 'guest'
+        ? { code, active: true, created_at: now, type: 'gift', percent_off: 100, collaborator_id: collabId, max_uses_total: 1, max_uses_per_customer: 1, first_time_only: false, valid_from: now, valid_until: null, period: null, allowed_email: null }
+        : { code, active: true, created_at: now, type: 'audience', percent_off: 25, collaborator_id: collabId, max_uses_total: null, max_uses_per_customer: 1, first_time_only: true, valid_from: now, valid_until: null, period: null, allowed_email: null };
+      await api.createCode(row);
+      await refreshData(); toastMsg(code + ' created');
+    } catch (err) { toastMsg('Could not create: ' + err.message); save.disabled = false; }
+  };
+}
+
+/* ---- Stats ---- */
+function viewStats() {
+  const t = todayISO(), back = (dow(t) + 6) % 7, weekStart = addDays(t, -back), monthStart = t.slice(0, 8) + '01';
+  const dateOfEpoch = (e) => ldn(new Date(e * 1000));
+  const bk = S.data.bookings.filter(confirmed).map((b) => ({ ...b, made: dateOfEpoch(b.created_at) }));
+  const cl = S.data.clients.map((c) => ({ ...c, made: ldn(new Date(c.created_at)) }));
+  const slice = (from) => ({ n: bk.filter((b) => b.made >= from).length, rev: bk.filter((b) => b.made >= from).reduce((s, b) => s + (b.amount_pence || 0), 0), cl: cl.filter((c) => c.made >= from).length });
+  const w = slice(weekStart), m = slice(monthStart), a = slice('0000-00-00');
+  const col = (k, f) => `<div class="tile"><div class="k">${k}</div><div class="v">${f}</div></div>`;
+  const block = (title, rows) => `<h2 class="sub">${title}</h2><div class="tiles">${rows.map(([k, v]) => col(k, v)).join('')}</div>`;
+  const byCode = {};
+  for (const b of bk) { const k = b.discount_code || 'No code'; (byCode[k] = byCode[k] || { n: 0, rev: 0 }); byCode[k].n++; byCode[k].rev += b.amount_pence || 0; }
+  const codeRows = Object.entries(byCode).sort((x, y) => y[1].n - x[1].n).map(([k, v]) => `<div class="row-split"><span>${esc(k)}</span><span class="muted">${v.n} booking${v.n === 1 ? '' : 's'} · ${money(v.rev)}</span></div>`).join('');
+  shell(`<h1 class="screen">Stats</h1><p class="muted small" style="margin:-8px 4px 0">By date booked. Revenue is total paid.</p>
+    ${block('This week', [['Bookings', w.n], ['Revenue', money(w.rev)], ['New clients', w.cl]])}
+    ${block('This month', [['Bookings', m.n], ['Revenue', money(m.rev)], ['New clients', m.cl]])}
+    ${block('All time', [['Bookings', a.n], ['Revenue', money(a.rev)], ['New clients', a.cl]])}
+    <h2 class="sub">Bookings by code</h2><div class="card">${codeRows || '<div class="empty">No bookings yet.</div>'}</div>`);
+}
+
+/* ---------- router / boot ---------- */
+function route() {
+  const h = (location.hash || '#/today').replace(/^#\//, '');
+  const [path, qs] = h.split('?');
+  const parts = path.split('/');
+  if (parts[0] === 'brief') { S.view = 'brief'; S.briefKey = parts[1] + '/' + parts[2]; S.briefBid = new URLSearchParams(qs || '').get('b'); }
+  else S.view = ['today', 'clients', 'codes', 'stats'].includes(parts[0]) ? parts[0] : 'today';
+}
+function render() {
+  if (!S.session) return viewLogin();
+  if (!S.admin) return viewDenied();
+  if (!S.data) { shell('<div class="empty">' + (S.error ? 'Could not load: ' + esc(S.error) : 'Loading…') + '</div>', false); return; }
+  route();
+  window.scrollTo(0, 0);
+  ({ today: viewToday, clients: viewClients, codes: viewCodes, stats: viewStats, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
+}
+async function refreshData() { S.data = await api.load(); render(); }
+async function enter(session) {
+  S.session = session;
+  if (!session) { S.admin = false; S.data = null; return render(); }
+  // Role gate: nothing is loaded and nothing is shown unless profiles.role = 'admin'.
+  const { data: prof } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+  S.admin = !!(prof && prof.role === 'admin');
+  if (!S.admin) return render();
+  render();
+  try { S.data = await api.load(); S.error = null; } catch (e) { S.error = e.message; }
+  render();
+}
+window.addEventListener('hashchange', () => { if (S.admin && S.data) render(); });
+sb.auth.onAuthStateChange((ev, session) => {
+  if (ev === 'SIGNED_OUT') enter(null);
+  else if (ev === 'SIGNED_IN' || ev === 'INITIAL_SESSION') { if (!S.session || S.session.user.id !== (session && session.user.id)) setTimeout(() => enter(session), 0); }
+});
+window.haloe = { api, S, render };       // exposed for local testing; holds no data until an admin signs in
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' }).catch(() => {}));
+</script>
+</body>
+</html>
