@@ -395,7 +395,7 @@ function statusChip(b) {
 const HALIMA_WA = '447474833643';
 /** WhatsApp link for a proposed reschedule. No clinical or period details, ever. */
 function rescheduleWA(b, phone, fullName) {
-  const msg = `Hi ${firstName(fullName)}, it's Halima from haloe. I've moved your session to ${fmtTs(b.proposed_starts_at)}. Please tap to see and accept it: https://haloe.health/app`;
+  const msg = `Hi ${firstName(fullName)}, it's Halima from haloe. I've moved your session to ${fmtTs(b.proposed_starts_at)}. Please sign in with the email you booked with to see and accept it: https://haloe.health/app`;
   return 'https://wa.me/' + waNumber(phone) + '?text=' + encodeURIComponent(msg);
 }
 const hasIntake = (b) => !!(b.client_id && intakeOf(b.client_id));
