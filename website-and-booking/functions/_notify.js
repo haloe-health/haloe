@@ -11,6 +11,7 @@ import {
   sendEmail, esc, emailHeader, emailFooter, emailShell, heroRow, infoCard,
 } from './_email.js';
 import { CLINIC_VENUE_ADDRESS } from './_clinic.js';
+import { pushNewBooking } from './_push.js';
 
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
@@ -66,6 +67,8 @@ function locationLabel(d) {
 // address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel,
 // discountLabel, travelLabel, travelZone, travelPence, slotConflict.
 export async function notifyBooking(env, d) {
+  // Lock-screen alert to the admin's devices, started now so it runs alongside the emails. It never throws.
+  const pushDone = pushNewBooking(env, d.bookingId).catch((err) => console.error('push alert failed:', err));
   try {
     await sendWhatsAppNotification(env, d);
   } catch (err) {
@@ -75,6 +78,7 @@ export async function notifyBooking(env, d) {
   const apiKey = env.RESEND_API_KEY;
   if (!apiKey) {
     console.error('RESEND_API_KEY is not configured; cannot send confirmation emails');
+    await pushDone;
     return;
   }
 
@@ -105,6 +109,7 @@ export async function notifyBooking(env, d) {
   } catch (err) {
     console.error('Failed to send Halima notification email:', err);
   }
+  await pushDone;
 }
 
 /* ------------------------------------------------------------------ */

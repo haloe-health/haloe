@@ -368,3 +368,27 @@ alter table public.clients  add column if not exists is_test boolean not null de
 alter table public.bookings add column if not exists is_test boolean not null default false;
 -- (link_booking_client, _propose_reschedule and accept_reschedule were re-created with the is_test
 --  handling described above; their current definitions are in the live database.)
+
+-- web push (admin alerts) — migration "push_subscriptions", 7 Oct 2026 ------------------------------
+-- One row per admin device. Admin-only, and an admin can only see / change / create their OWN rows
+-- (policy: is_admin() AND user_id = auth.uid(), for reads and writes). anon has no grant. The Functions
+-- read them with the service role and delete a row when the push service answers 404/410.
+create table if not exists public.push_subscriptions (
+  id                 bigint generated always as identity primary key,
+  user_id            uuid not null references auth.users(id) on delete cascade,
+  endpoint           text not null unique,
+  p256dh             text not null,
+  auth               text not null,
+  user_agent         text,
+  notify_reschedule  boolean not null default true,
+  notify_booking     boolean not null default true,
+  created_at         timestamptz not null default now(),
+  last_ok            timestamptz
+);
+create index if not exists push_subscriptions_user_idx on public.push_subscriptions(user_id);
+alter table public.push_subscriptions enable row level security;
+grant select, insert, update, delete on public.push_subscriptions to authenticated;
+grant select, insert, update, delete on public.push_subscriptions to service_role;
+create policy admin_own_push on public.push_subscriptions for all to authenticated
+  using (public.is_admin() and user_id = auth.uid())
+  with check (public.is_admin() and user_id = auth.uid());

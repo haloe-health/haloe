@@ -254,6 +254,8 @@ const SB_URL = 'https://thxunrygrrxcdjhgshjw.supabase.co';
 // locked by row-level security to the admin role, so this key alone reads nothing.
 const SB_KEY = 'sb_publishable_PSpC5w-1CWnduinWbjdsfA_VSRx7mSG';
 const ADMIN_EMAIL = 'iamhalimayasmin@gmail.com';
+// Public VAPID key for web push (admin alerts). Must equal the VAPID_PUBLIC_KEY Cloudflare secret.
+const VAPID_PUBLIC = 'BA7VZ5VkqUiurvtQpxQ_EgiHSmw-PdH2zZifIIVbu2Bg3zO0nXGaMMLXlQeJhWU6x2BpmN30MQUbxQsBoxpL278';
 const CLINIC_WEEKDAY = 2;               // Tuesday
 // Flip to true once reserveDiscountCode() is fixed (CLAUDE.md "Open issues").
 const AUDIENCE_CODES_ENABLED = false;
@@ -334,6 +336,17 @@ const api = {
     if (!res.ok) throw Object.assign(new Error(body.error || 'failed'), { code: body.error });
     return body;
   },
+  // Alerts on this device — admin only; row-level security also confines every admin to their own rows.
+  async getPushRow(endpoint) { const { data, error } = await sb.from('push_subscriptions').select('*').eq('endpoint', endpoint).maybeSingle(); if (error) throw error; return data; },
+  async savePushRow(row) { const { error } = await sb.from('push_subscriptions').insert(row); if (error) throw error; },
+  async updatePushRow(endpoint, patch) { const { error } = await sb.from('push_subscriptions').update(patch).eq('endpoint', endpoint); if (error) throw error; },
+  async deletePushRow(endpoint) { const { error } = await sb.from('push_subscriptions').delete().eq('endpoint', endpoint); if (error) throw error; },
+  async sendTestPush(endpoint) {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch('/push-test', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint }) });
+    const body = await res.json().catch(() => ({}));
+    return { status: res.status, ...body };
+  },
   async addCheckIn(row) { const { data, error } = await sb.from('check_ins').insert(row).select().single(); if (error) throw error; return data; },
   async addNote(row) { const { data, error } = await sb.from('session_notes').insert(row).select().single(); if (error) throw error; return data; },
   async findOrCreateCollab(name, notes) {
@@ -353,6 +366,73 @@ const api = {
 
 /* ---------- state ---------- */
 const S = { raw: null, showTest: false, session: null, admin: false, data: null, view: 'today', chip: 'today', filter: '', showInactive: false, loading: false, error: null };
+
+/* ---------- admin alerts (web push) ---------- */
+const urlB64ToBytes = (b64) => { const t = (b64 + '='.repeat((4 - (b64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/'); return Uint8Array.from(atob(t), (c) => c.charCodeAt(0)); };
+const isStandalone = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+// Thin wrapper over the browser APIs so it can be replaced in tests.
+const pushApi = {
+  supported: () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window,
+  isIOS: () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1),
+  permission: () => Notification.permission,
+  requestPermission: () => Notification.requestPermission(),
+  async getSub() { const reg = await navigator.serviceWorker.ready; return reg.pushManager.getSubscription(); },
+  async subscribe() { const reg = await navigator.serviceWorker.ready; return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToBytes(VAPID_PUBLIC) }); },
+  async unsubscribe(sub) { try { await sub.unsubscribe(); } catch (e) {} },
+};
+function subRow(sub) {
+  const j = sub.toJSON();
+  return { user_id: S.session.user.id, endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, user_agent: navigator.userAgent.slice(0, 200), notify_reschedule: true, notify_booking: true };
+}
+/** Fills the "Alerts on this device" card on Settings (admin only). */
+async function initPushCard() {
+  const box = document.getElementById('pushBody'); if (!box) return;
+  const draw = (html) => { if (document.getElementById('pushBody')) document.getElementById('pushBody').innerHTML = html; };
+  if (!pushApi.supported()) {
+    return draw(pushApi.isIOS() && !isStandalone()
+      ? '<p class="muted small" style="margin:8px 0 0">On iPhone, first add haloe to your Home Screen (Share → Add to Home Screen), then open it from there to turn alerts on.</p>'
+      : '<p class="muted small" style="margin:8px 0 0">This browser can’t show alerts. Try Chrome on Android, or the Home Screen app on iPhone.</p>');
+  }
+  if (pushApi.permission() === 'denied') return draw('<p class="muted small" style="margin:8px 0 0">Alerts are blocked for haloe on this device. Allow notifications in your browser or phone settings, then come back here.</p>');
+  let sub = null, row = null;
+  try {
+    sub = pushApi.permission() === 'granted' ? await pushApi.getSub() : null;
+    if (sub) {
+      row = await api.getPushRow(sub.toJSON().endpoint);
+      if (!row) { await api.savePushRow(subRow(sub)); row = await api.getPushRow(sub.toJSON().endpoint); }   // re-sync a subscription the database lost
+    }
+  } catch (e) { return draw('<p class="muted small" style="margin:8px 0 0">Couldn’t load alert settings: ' + esc(e.message) + '</p>'); }
+  const sw = (id, label, on) => '<div class="toggle-line" style="margin:2px 0"><span>' + label + '</span><button class="switch-wrap" id="' + id + '" aria-label="' + label + '"><span class="switch" role="switch" aria-checked="' + on + '"></span></button></div>';
+  draw(sw('pushMain', 'Alerts on this device', !!sub) +
+    (sub && row ? '<div style="margin:6px 0 0;padding-left:2px">' + sw('pushResch', 'Reschedule accepted', row.notify_reschedule) + sw('pushBook', 'New bookings', row.notify_booking) +
+      '<button class="btn ghost block" id="pushTest" type="button" style="margin-top:12px">Send test alert</button></div>' : '') +
+    '<p class="muted small" style="margin:10px 0 0">Alerts show only the time — never a name or any detail.</p>');
+
+  document.getElementById('pushMain').onclick = async () => {
+    try {
+      if (sub) {                                                    // turn off
+        const ep = sub.toJSON().endpoint; await pushApi.unsubscribe(sub); await api.deletePushRow(ep);
+      } else {                                                      // turn on: permission → subscribe → store
+        const perm = await pushApi.requestPermission();
+        if (perm !== 'granted') { toastMsg('Alerts weren’t allowed on this device'); return initPushCard(); }
+        const ns = await pushApi.subscribe(); await api.savePushRow(subRow(ns));
+      }
+    } catch (e) { toastMsg('Could not change alerts: ' + e.message); }
+    initPushCard();
+  };
+  if (sub && row) {
+    const flip = (id, col) => { document.getElementById(id).onclick = async () => { try { await api.updatePushRow(row.endpoint, { [col]: !row[col] }); } catch (e) { toastMsg('Could not save: ' + e.message); } initPushCard(); }; };
+    flip('pushResch', 'notify_reschedule'); flip('pushBook', 'notify_booking');
+    document.getElementById('pushTest').onclick = async (ev) => {
+      const b = ev.currentTarget; b.disabled = true;
+      try {
+        const r = await api.sendTestPush(row.endpoint);
+        toastMsg(r.status === 503 ? 'Alerts aren’t set up on the server yet (VAPID keys)' : r.status === 403 || r.status === 401 ? 'Not allowed' : r.sent > 0 ? 'Test alert sent — check your lock screen' : r.removed > 0 ? 'This device’s subscription had expired — switch alerts off and on again' : 'No alert could be sent');
+      } catch (e) { toastMsg('Could not send: ' + e.message); }
+      b.disabled = false;
+    };
+  }
+}
 
 /* ---------- test data ---------- */
 // Rows flagged is_test (a rehearsal client and her bookings) are hidden from Today, Clients, Codes and Stats —
@@ -936,6 +1016,7 @@ function viewSettings() {
   shell(`${pageHead('Settings')}
     <div class="card"><div class="section-label">Appearance</div>
       <div class="seg">${[['light', 'Light'], ['dark', 'Dark'], ['system', 'System']].map(([k, l]) => `<button data-th="${k}" aria-pressed="${th === k}">${l}</button>`).join('')}</div></div>
+    ${S.isClient ? '' : `<div class="card" id="pushCard"><div class="section-label">Alerts on this device</div><div id="pushBody" class="muted small" style="margin-top:8px">Checking…</div></div>`}
     ${S.isClient ? '' : `<div class="card"><div class="section-label">Data</div><div class="toggle-line" style="margin:8px 0 0"><span>Show test data</span><button class="switch-wrap" id="testBtn2" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div><p class="muted small" style="margin:4px 0 0">Rehearsal clients and bookings. Hidden from Clients, Today, Codes and Stats (and so from revenue) unless this is on.</p></div>`}
     <div class="card"><div class="section-label">Account</div>
       <p style="margin:10px 0 14px">${esc((S.session && S.session.user && S.session.user.email) || ADMIN_EMAIL)}</p>
@@ -945,6 +1026,7 @@ function viewSettings() {
   document.querySelectorAll('[data-th]').forEach((b) => { b.onclick = () => { setTheme(b.dataset.th === 'system' ? null : b.dataset.th); render(); }; });
   document.getElementById('signOutBtn').onclick = signOut;
   const tb2 = document.getElementById('testBtn2'); if (tb2) tb2.onclick = () => setShowTest(!S.showTest);
+  if (!S.isClient) initPushCard();
 }
 
 
@@ -1068,7 +1150,11 @@ sb.auth.onAuthStateChange((ev, session) => {
   if (ev === 'SIGNED_OUT') enter(null);
   else if (ev === 'SIGNED_IN' || ev === 'INITIAL_SESSION') { if (!S.session || S.session.user.id !== (session && session.user.id)) setTimeout(() => enter(session), 0); }
 });
-window.haloe = { api, S, render };       // exposed for local testing; holds no data until an admin signs in
+// A tapped alert asks the open app to move to that booking (the service worker posts this message).
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'open' && typeof e.data.url === 'string' && S.admin) { const h = new URL(e.data.url, location.origin).hash; if (h) location.hash = h; }
+});
+window.haloe = { api, S, render, pushApi };       // exposed for local testing; holds no data until an admin signs in
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' }).catch(() => {}));
 </script>
 </body>

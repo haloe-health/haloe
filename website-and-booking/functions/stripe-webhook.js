@@ -166,7 +166,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    const detail = { name, phone, email, treatment, treatments, durationLabel, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel, discountLabel, travelLabel, travelZone, travelPence, slotConflict };
+    const detail = { name, phone, email, treatment, treatments, durationLabel, date, time, location, venue, address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel, discountLabel, travelLabel, travelZone, travelPence, slotConflict, bookingId: bookingId ? Number(bookingId) : null };
     await notifyBooking(context.env, detail);
   } catch (err) {
     // Log, but still acknowledge so Stripe does not retry indefinitely

@@ -210,6 +210,7 @@ export async function onRequestPost(context) {
         travelZone: location === 'mobile' ? travelZone : '',
         travelPence: location === 'mobile' ? travelPence : 0,
         slotConflict,
+        bookingId,
       };
       await notifyBooking(context.env, detail);
 

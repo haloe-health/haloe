@@ -13,6 +13,7 @@
 // are what protect the data.
 import { sendEmail, esc, emailShell, emailHeader, emailFooter, heroRow, infoCard } from './_email.js';
 import { CLINIC_VENUE_NAME } from './_clinic.js';
+import { pushRescheduleAccepted } from './_push.js';
 
 const PUBLISHABLE_KEY = 'sb_publishable_PSpC5w-1CWnduinWbjdsfA_VSRx7mSG';
 const HALIMA_EMAIL = 'halima@haloe.health';
@@ -87,5 +88,8 @@ export async function onRequestPost(context) {
   } catch (err) {
     console.error('Failed to email Halima about the accepted reschedule:', err);
   }
-  return json({ ok: true, date: b.date, start_min: b.start_min, emailed });
+  // Lock-screen alert to the admin's devices (no names — see _push.js). Never affects the accept.
+  let pushed = 0;
+  try { const p = await pushRescheduleAccepted(env, b); pushed = (p && p.sent) || 0; } catch (err) { console.error('push after accept failed:', err); }
+  return json({ ok: true, date: b.date, start_min: b.start_min, emailed, pushed });
 }

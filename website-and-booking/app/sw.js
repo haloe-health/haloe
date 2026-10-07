@@ -2,7 +2,7 @@
 // icons, the Supabase client library). It never touches Supabase or any
 // cross-origin data request, so client health data is never written to disk
 // by the cache. Bump CACHE when the shell changes.
-const CACHE = 'haloe-app-v6';
+const CACHE = 'haloe-app-v7';
 const SHELL = [
   '/app/',
   '/app/manifest.webmanifest',
@@ -48,4 +48,40 @@ self.addEventListener('fetch', (e) => {
       })
     );
   }
+});
+
+// ---- Admin alerts (web push) -------------------------------------------------------------------------
+// The payload is only a fixed title + a short line like "Reschedule accepted · Tue 13 Oct, 6:30pm" + an in-app
+// URL — it shows on a lock screen, so it never carries a name, treatment or clinical detail. Nothing here
+// touches the cache, and nothing signed-in is ever stored.
+self.addEventListener('push', (e) => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (err) { d = {}; }
+  const title = (typeof d.title === 'string' && d.title.slice(0, 60)) || 'haloe';
+  const body = (typeof d.body === 'string' && d.body.slice(0, 120)) || 'You have an update';
+  const url = typeof d.url === 'string' && d.url.startsWith('/app/') ? d.url : '/app/';
+  e.waitUntil(self.registration.showNotification(title, {
+    body,
+    tag: typeof d.tag === 'string' ? d.tag.slice(0, 60) : 'haloe',
+    icon: '/app/icons/icon-192.png',
+    badge: '/app/icons/icon-192.png',
+    data: { url },
+  }));
+});
+
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || '/app/';
+  e.waitUntil((async () => {
+    const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const w of wins) {
+      const u = new URL(w.url);
+      if (u.origin === self.location.origin && u.pathname.startsWith('/app')) {
+        await w.focus();
+        w.postMessage({ type: 'open', url });      // the app moves to that booking without reloading
+        return;
+      }
+    }
+    await self.clients.openWindow(url);             // cold start: opens straight onto the booking
+  })());
 });
