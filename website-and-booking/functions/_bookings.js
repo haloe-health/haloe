@@ -77,10 +77,12 @@ export async function purgeExpiredHolds(env, now) {
   }
 }
 
-// PostgREST filter for "currently blocks the calendar": confirmed, or a
-// pending hold that hasn't lapsed. Cancelled rows never match.
+// PostgREST filter for "currently blocks the calendar": confirmed, a booking
+// whose reschedule is awaiting the client's reply (it keeps holding its
+// ORIGINAL slot until she accepts), or a pending hold that hasn't lapsed.
+// Cancelled rows never match.
 function activeFilter(now) {
-  return `or=(status.eq.confirmed,and(status.eq.pending,hold_expires_at.gt.${now}))`;
+  return `or=(status.eq.confirmed,status.eq.reschedule_pending,and(status.eq.pending,hold_expires_at.gt.${now}))`;
 }
 
 // Active (blocking) bookings for a date. Returns [{ s: startMin, e: endMin }].
@@ -156,7 +158,7 @@ export async function listBookings(env) {
     path: '/rest/v1/bookings?select=id,booking_date,start_min,end_min,treatment,customer_name,'
       + 'customer_email,customer_phone,location,address,amount_pence,status,hold_expires_at,created_at,'
       + 'discount_code,discount_pence,travel_zone,travel_pence,treatments'
-      + `&or=(status.eq.confirmed,status.eq.cancelled,and(status.eq.pending,hold_expires_at.gt.${now}))`
+      + `&or=(status.eq.confirmed,status.eq.reschedule_pending,status.eq.cancelled,and(status.eq.pending,hold_expires_at.gt.${now}))`
       + '&order=booking_date.asc,start_min.asc',
     method: 'GET',
   });

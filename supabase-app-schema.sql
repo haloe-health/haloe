@@ -238,3 +238,121 @@ create policy client_read_own_intake   on public.intake_forms for select to auth
 create policy client_read_own_bookings on public.bookings     for select to authenticated
   using (client_id = public.my_client_id() or lower(customer_email) = public.my_email());
 create policy client_read_own_checkins on public.check_ins    for select to authenticated using (client_id = public.my_client_id());
+
+-- reschedule — migration "reschedule", 7 Oct 2026 ---------------------------
+-- Admin proposes a new time; the booking goes to status 'reschedule_pending' and KEEPS HOLDING its
+-- original slot (booking_date/start_min/end_min are untouched, payment is untouched). The client
+-- accepts in her account (via /reschedule-accept, which also emails Halima); only then do
+-- booking_date/start_min/end_min move, status -> 'confirmed', confirmed_at is stamped.
+-- original_starts_at / proposed_starts_at are London-time instants kept for display and history.
+-- No reason for the move is stored anywhere.
+alter table public.bookings add column if not exists original_starts_at timestamptz;
+alter table public.bookings add column if not exists proposed_starts_at timestamptz;
+alter table public.bookings add column if not exists confirmed_at timestamptz;
+
+-- reserve_slot: identical to before except 'reschedule_pending' now also blocks the calendar.
+create or replace function public.reserve_slot(p_booking_date date, p_start_min integer, p_end_min integer, p_treatment text, p_customer_name text, p_customer_email text, p_customer_phone text, p_location text, p_address text, p_amount_pence integer, p_hold_expires_at bigint, p_now bigint, p_discount_code text default null, p_discount_pence integer default null, p_travel_zone text default null, p_travel_pence integer default null, p_treatments jsonb default null)
+returns bigint
+language plpgsql
+as $function$
+declare
+  v_id bigint;
+begin
+  perform pg_advisory_xact_lock(hashtextextended(p_booking_date::text, 0));
+
+  if exists (
+    select 1 from public.bookings
+    where booking_date = p_booking_date
+      and start_min < p_end_min
+      and end_min > p_start_min
+      and (status in ('confirmed', 'reschedule_pending') or (status = 'pending' and hold_expires_at > p_now))
+  ) then
+    return null;
+  end if;
+
+  insert into public.bookings
+    (booking_date, start_min, end_min, treatment, customer_name, customer_email,
+     customer_phone, location, address, amount_pence, status, hold_expires_at, created_at,
+     discount_code, discount_pence, travel_zone, travel_pence, treatments)
+  values
+    (p_booking_date, p_start_min, p_end_min, p_treatment, p_customer_name, p_customer_email,
+     p_customer_phone, p_location, p_address, p_amount_pence, 'pending', p_hold_expires_at, p_now,
+     p_discount_code, p_discount_pence, p_travel_zone, p_travel_pence, p_treatments)
+  returning id into v_id;
+
+  return v_id;
+end;
+$function$;
+
+-- internal: propose a new time (no auth check; only the admin wrapper and the service role reach it)
+create or replace function public._propose_reschedule(p_booking bigint, p_date date, p_start_min int)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare b public.bookings; dur int; new_end int; clash bigint; ts timestamptz; cur timestamptz;
+begin
+  select * into b from public.bookings where id = p_booking for update;
+  if not found then raise exception 'not_found'; end if;
+  if b.status not in ('confirmed', 'reschedule_pending') then raise exception 'bad_status'; end if;
+  dur := b.end_min - b.start_min; new_end := p_start_min + dur;
+  perform pg_advisory_xact_lock(hashtextextended(p_date::text, 0));
+  select id into clash from public.bookings
+   where id <> b.id and booking_date = p_date and start_min < new_end and end_min > p_start_min
+     and (status in ('confirmed', 'reschedule_pending')
+          or (status = 'pending' and hold_expires_at > extract(epoch from now())::bigint))
+   limit 1;
+  if clash is not null then raise exception 'clash'; end if;
+  ts  := (p_date + make_interval(mins => p_start_min)) at time zone 'Europe/London';
+  cur := (b.booking_date + make_interval(mins => b.start_min)) at time zone 'Europe/London';
+  update public.bookings
+     set original_starts_at = case when b.status = 'confirmed' then cur else coalesce(original_starts_at, cur) end,
+         proposed_starts_at = ts, status = 'reschedule_pending', done_at = null
+   where id = b.id;
+  return jsonb_build_object('id', b.id, 'proposed_starts_at', ts);
+end $$;
+revoke all on function public._propose_reschedule(bigint, date, int) from public, anon, authenticated;
+
+create or replace function public.propose_reschedule(p_booking bigint, p_date date, p_start_min int)
+returns jsonb language plpgsql security definer set search_path = public as $$
+begin
+  if not public.is_admin() then raise exception 'forbidden'; end if;
+  return public._propose_reschedule(p_booking, p_date, p_start_min);
+end $$;
+
+create or replace function public.cancel_reschedule(p_booking bigint)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not public.is_admin() then raise exception 'forbidden'; end if;
+  update public.bookings set status = 'confirmed', proposed_starts_at = null, original_starts_at = null
+   where id = p_booking and status = 'reschedule_pending';
+end $$;
+
+-- client accepts: only the booking's own client, only while pending, only if the time is still free
+create or replace function public.accept_reschedule(p_booking bigint)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare b public.bookings; loc timestamp; d date; m int; dur int; clash bigint;
+begin
+  if auth.uid() is null then raise exception 'forbidden'; end if;
+  select * into b from public.bookings where id = p_booking for update;
+  if not found or not coalesce(b.client_id = public.my_client_id() or lower(b.customer_email) = public.my_email(), false) then
+    raise exception 'not_found';
+  end if;
+  if b.status <> 'reschedule_pending' or b.proposed_starts_at is null then raise exception 'not_pending'; end if;
+  loc := b.proposed_starts_at at time zone 'Europe/London';
+  d := loc::date; m := extract(hour from loc)::int * 60 + extract(minute from loc)::int; dur := b.end_min - b.start_min;
+  perform pg_advisory_xact_lock(hashtextextended(d::text, 0));
+  select id into clash from public.bookings
+   where id <> b.id and booking_date = d and start_min < m + dur and end_min > m
+     and (status in ('confirmed', 'reschedule_pending')
+          or (status = 'pending' and hold_expires_at > extract(epoch from now())::bigint))
+   limit 1;
+  if clash is not null then raise exception 'time_taken'; end if;
+  update public.bookings
+     set booking_date = d, start_min = m, end_min = m + dur, status = 'confirmed',
+         confirmed_at = now(), proposed_starts_at = null
+   where id = b.id;
+  return jsonb_build_object('id', b.id, 'name', b.customer_name, 'email', b.customer_email, 'phone', b.customer_phone,
+    'treatment', b.treatment, 'location', b.location, 'date', d, 'start_min', m,
+    'original_starts_at', b.original_starts_at);
+end $$;
+
+revoke all on function public.propose_reschedule(bigint, date, int), public.cancel_reschedule(bigint), public.accept_reschedule(bigint) from public, anon;
+grant execute on function public.propose_reschedule(bigint, date, int), public.cancel_reschedule(bigint), public.accept_reschedule(bigint) to authenticated;

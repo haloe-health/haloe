@@ -99,6 +99,18 @@
   .pill.red { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-line); }
   .pill.green { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-line); }
   .pill.gold { background: var(--fill); color: var(--gold-deep); }
+  .pill.amber { background: #FBF0D7; color: #8A5A00; }
+  :root[data-theme="dark"] .pill.amber { background: #3A2E10; color: #E8B85A; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill.amber { background: #3A2E10; color: #E8B85A; } }
+  .tag { display: inline-flex; align-items: center; min-height: 24px; padding: 0 11px; border-radius: 999px; background: var(--gold); color: #1C1A16; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+  .gold-card { background: var(--gold); color: #1C1A16; }
+  .gold-card .section-label { color: rgba(28,26,22,.65); }
+  .gold-card .nx-time { color: #1C1A16; }
+  .gold-card .btn { background: #1C1A16; color: #F5F0E8; }
+  .gold-card .btn.ghost { background: rgba(28,26,22,.12); color: #1C1A16; }
+  .gold-card .tag { background: rgba(28,26,22,.12); }
+  .btn.sm { min-height: 40px; padding: 0 14px; font-size: 13.5px; }
+  .h .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .day-label { font-size: 13px; font-weight: 500; color: var(--muted); margin: 18px 4px 8px; }
   .empty { text-align: center; color: var(--muted); padding: 28px 12px; }
 
@@ -307,10 +319,21 @@ const api = {
   // Client area: row-level security returns only this person's own rows. session_notes is never touched.
   async loadClient() {
     const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
-    const [clients, bookings, checkins, intakes] = await Promise.all([q('clients'), q('bookings'), q('check_ins'), q('intake_forms', 'id,created_at')]);
+    const [clients, bookings, checkins, intakes] = await Promise.all([q('clients'), q('bookings'), q('check_ins'), q('intake_forms', 'id,created_at,package')]);
     return { client: clients[0] || null, bookings, checkins, intakes };
   },
   async linkMyClient() { const { data, error } = await sb.rpc('link_my_client'); return error ? null : data; },
+  // Reschedule: admin proposes (database checks the time is free and keeps the original slot held);
+  // the client accepts through /reschedule-accept, which also emails Halima.
+  async proposeReschedule(id, dateISO, startMin) { const { data, error } = await sb.rpc('propose_reschedule', { p_booking: id, p_date: dateISO, p_start_min: startMin }); if (error) throw error; return data; },
+  async cancelReschedule(id) { const { error } = await sb.rpc('cancel_reschedule', { p_booking: id }); if (error) throw error; },
+  async acceptReschedule(id) {
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch('/reschedule-accept', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ bookingId: id }) });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(body.error || 'failed'), { code: body.error });
+    return body;
+  },
   async addCheckIn(row) { const { data, error } = await sb.from('check_ins').insert(row).select().single(); if (error) throw error; return data; },
   async addNote(row) { const { data, error } = await sb.from('session_notes').insert(row).select().single(); if (error) throw error; return data; },
   async findOrCreateCollab(name, notes) {
@@ -341,7 +364,40 @@ function bookingsOfClient(c) {
 }
 const lower = (s) => String(s || '').toLowerCase();
 const byDateDesc = (a, b) => (b.booking_date + String(b.start_min).padStart(4, '0')).localeCompare(a.booking_date + String(a.start_min).padStart(4, '0'));
-const confirmed = (b) => b.status === 'confirmed';
+// "A real booking": paid/confirmed, including one whose reschedule is waiting for the client's reply
+// (it still holds its original slot until she accepts).
+const confirmed = (b) => b.status === 'confirmed' || b.status === 'reschedule_pending';
+const isPending = (b) => b.status === 'reschedule_pending' && !!b.proposed_starts_at;
+// Package names from services-data.js (keep in step). A booking made on one of these IS a package booking.
+const PACKAGE_NAMES = ['Pain & Mobility', 'Breathe & Reset', 'Cycle Comfort', 'Stress & Sleep', 'Headache & Tension', 'Digestion & Comfort', 'Circulation & Energy', "Women's Cycle Care"];
+const NO_PACKAGE = ['', 'not sure yet', 'single treatment'];
+/** Package tag: what checkout stored if it was a package; otherwise the package the client chose on her intake form. */
+function pkgOf(b, intakePackage) {
+  if (PACKAGE_NAMES.includes(b.treatment)) return b.treatment;
+  const p = trimStr(intakePackage);
+  return NO_PACKAGE.includes(p.toLowerCase()) ? '' : p;
+}
+const tagHTML = (p) => (p ? `<span class="tag">${esc(p)}</span>` : '');
+/** "Tue 13 Oct, 6:30pm" from a timestamptz, in London time. */
+function fmtTs(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  const day = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'Europe/London' });
+  const time = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: 'numeric', minute: '2-digit', hour12: true }).format(d).replace(' ', '').toLowerCase();
+  return `${day}, ${time}`;
+}
+/** Admin status chip: amber while she hasn't replied, green once she has accepted. */
+function statusChip(b) {
+  if (isPending(b)) return '<span class="pill amber">Awaiting reply</span>';
+  if (b.confirmed_at && b.status === 'confirmed') return '<span class="pill green">Confirmed</span>';
+  return '';
+}
+const HALIMA_WA = '447474833643';
+/** WhatsApp link for a proposed reschedule. No clinical or period details, ever. */
+function rescheduleWA(b, phone, fullName) {
+  const msg = `Hi ${firstName(fullName)}, it's Halima from haloe. I've moved your session to ${fmtTs(b.proposed_starts_at)}. Please tap to see and accept it: https://haloe.health/app`;
+  return 'https://wa.me/' + waNumber(phone) + '?text=' + encodeURIComponent(msg);
+}
 const hasIntake = (b) => !!(b.client_id && intakeOf(b.client_id));
 
 /** The people list = every client + anyone who has booked but has no client record yet. */
@@ -477,8 +533,8 @@ function sessionRow(b) {
     <button class="who" data-brief="${nextKey}" data-bid="${b.id}">
       <span class="time">${fmtTime(b.start_min)}</span>
       <span class="name">${esc(b.customer_name)}</span>
-      <span class="meta">${esc(treatmentLabel(b))}</span>
-      <span class="row2"><span class="pill gold">${money(b.amount_pence)} paid</span>${b.discount_code ? `<span class="pill gold">${esc(b.discount_code)}</span>` : ''}${noIntake ? '<span class="pill red">No intake</span>' : ''}</span>
+      <span class="meta">${esc(treatmentLabel(b))}${isPending(b) ? `<br>New time: <b>${esc(fmtTs(b.proposed_starts_at))}</b>` : ''}</span>
+      <span class="row2">${tagHTML(pkgOf(b, b.client_id && (intakeOf(b.client_id) || {}).package))}${statusChip(b)}<span class="pill gold">${money(b.amount_pence)} paid</span>${b.discount_code ? `<span class="pill gold">${esc(b.discount_code)}</span>` : ''}${noIntake ? '<span class="pill red">No intake</span>' : ''}</span>
     </button>
     <button class="tick" data-tick="${b.id}" aria-pressed="${done}" aria-label="Mark ${esc(b.customer_name)} done">${ICON.check}</button>
   </div>`;
@@ -624,6 +680,52 @@ function openCheckIn(c, booking) {
   };
 }
 
+/* ---- Reschedule (admin) ---- */
+function tsParts(ts) {
+  const f = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(ts));
+  const g = (t) => f.find((x) => x.type === t).value;
+  return { date: g('year') + '-' + g('month') + '-' + g('day'), min: Number(g('hour')) * 60 + Number(g('minute')) };
+}
+function openReschedule(bookingId, p) {
+  const b0 = S.data.bookings.find((x) => x.id === bookingId); if (!b0) return;
+  const pend = isPending(b0), cur = pend ? tsParts(b0.proposed_starts_at) : { date: nextClinicDate(), min: b0.start_min };
+  const times = []; for (let m = 7 * 60; m <= 21 * 60 + 45; m += 15) times.push(m);
+  const phone = p.phone || b0.customer_phone;
+  const bg = document.createElement('div'); bg.className = 'sheet-bg';
+  const body = () => {
+    const b = S.data.bookings.find((x) => x.id === bookingId);
+    const waBtn = isPending(b) && phone ? `<a class="btn block" id="rs-wa" target="_blank" rel="noopener" href="${esc(rescheduleWA(b, phone, p.name))}">Send on WhatsApp</a>` : '';
+    return `<div class="grab"></div><div class="lab">Reschedule</div>
+      <div style="font-weight:700;font-size:20px;letter-spacing:-.02em;margin-top:2px">${esc(p.name)}</div>
+      <p class="muted small" style="margin:6px 0 0">Now: ${esc(fmtDate(b.booking_date))} · ${fmtTime(b.start_min)} · ${esc(treatmentLabel(b))}. The current time stays held until she accepts. Payment isn't touched.</p>
+      ${isPending(b) ? `<div class="warn" style="background:var(--fill);border-color:transparent"><b style="color:var(--ink)">Awaiting reply</b> — proposed: ${esc(fmtTs(b.proposed_starts_at))}</div>` : ''}
+      <label class="f" for="rs-date">Date</label><input class="in" id="rs-date" type="date" value="${cur.date}" min="${todayISO()}">
+      <label class="f" for="rs-time">Time</label>
+      <select class="in" id="rs-time">${times.map((m) => `<option value="${m}" ${m === cur.min ? 'selected' : ''}>${fmtTime(m)}</option>`).join('')}</select>
+      <div class="sheet-actions" style="grid-template-columns:1fr">${waBtn}
+        <button class="btn ${waBtn ? 'ghost' : ''}" id="rs-save" type="button">${isPending(b) ? 'Update proposed time' : 'Save new time'}</button>
+        ${isPending(b) ? '<button class="btn ghost" id="rs-cancel-resched" type="button">Cancel the reschedule</button>' : ''}
+        <button class="btn ghost" id="rs-close" type="button">Close</button></div>`;
+  };
+  const draw = () => {
+    bg.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="Reschedule">${body()}</div>`;
+    bg.querySelector('#rs-close').onclick = () => bg.remove();
+    bg.querySelector('#rs-save').onclick = async () => {
+      const dateISO = bg.querySelector('#rs-date').value, min = Number(bg.querySelector('#rs-time').value);
+      if (!dateISO) { toastMsg('Choose a date'); return; }
+      const btn = bg.querySelector('#rs-save'); btn.disabled = true;
+      try { await api.proposeReschedule(bookingId, dateISO, min); S.data = await api.load(); render(); cur.date = dateISO; cur.min = min; draw(); toastMsg('Saved — now send it on WhatsApp'); }
+      catch (e) { toastMsg(/clash/.test(e.message) ? 'That time overlaps another booking' : 'Could not save: ' + e.message); btn.disabled = false; }
+    };
+    const cancel = bg.querySelector('#rs-cancel-resched');
+    if (cancel) cancel.onclick = async () => {
+      try { await api.cancelReschedule(bookingId); S.data = await api.load(); render(); bg.remove(); toastMsg('Reschedule cancelled'); } catch (e) { toastMsg('Could not cancel: ' + e.message); }
+    };
+  };
+  bg.onclick = (e) => { if (e.target === bg) bg.remove(); };
+  document.body.appendChild(bg); draw();
+}
+
 /* ---- Client brief ---- */
 function findPerson(key) { return people().find((p) => p.key === key) || (key.startsWith('b/') ? bookingPerson(Number(key.slice(2))) : null); }
 function bookingPerson(id) {
@@ -644,7 +746,10 @@ function viewBrief(key, bid) {
     : `<div class="card clear">Clear screen — no safety flags.</div>`;
   const words = (v) => trimStr(v) ? `<p class="inwords">${esc(trimStr(v))}</p>` : '<p class="inwords none">Nothing entered</p>';
   const yn = (v) => esc(trimStr(v) || '—');
-  const hist = p.bookings.map((b) => `<div class="h"><b>${fmtDate(b.booking_date)} · ${fmtTime(b.start_min)}</b><br>${esc(treatmentLabel(b))}<br><span class="muted">${money(b.amount_pence)} paid${b.discount_code ? ' · ' + esc(b.discount_code) : ''}${confirmed(b) ? '' : ' · ' + esc(b.status)}${b.done_at ? ' · done' : ''}</span></div>`).join('') || '<p class="muted small">No bookings yet.</p>';
+  const pk = (b) => pkgOf(b, intake && intake.package);
+  const headPkg = p.bookings.map(pk).find(Boolean) || '';
+  const bookedOn = (b) => fmtDate(ldn(new Date(b.created_at * 1000)));
+  const hist = p.bookings.map((b) => `<div class="h"><b>${fmtDate(b.booking_date)} · ${fmtTime(b.start_min)}</b> ${statusChip(b)}<br>${esc(treatmentLabel(b))} ${tagHTML(pk(b))}<br><span class="muted">${money(b.amount_pence)} paid${b.discount_code ? ' · ' + esc(b.discount_code) : ''}${confirmed(b) ? '' : ' · ' + esc(b.status)}${b.done_at ? ' · done' : ''} · booked ${bookedOn(b)}</span>${isPending(b) ? `<br>New time proposed: <b>${esc(fmtTs(b.proposed_starts_at))}</b>` : ''}${b.original_starts_at && b.status === 'confirmed' ? `<br><span class="muted">Moved from ${esc(fmtTs(b.original_starts_at))}</span>` : ''}${confirmed(b) ? `<div class="acts"><button class="btn sm ghost" data-resched="${b.id}" type="button">Reschedule</button>${isPending(b) && (p.phone || b.customer_phone) ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(rescheduleWA(b, p.phone || b.customer_phone, p.name))}">Send on WhatsApp</a>` : ''}</div>` : ''}</div>`).join('') || '<p class="muted small">No bookings yet.</p>';
   const notes = c ? S.data.notes.filter((n) => n.client_id === c.id).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))) : [];
   const ctxBooking = bid ? p.bookings.find((b) => b.id === Number(bid)) : (p.bookings.find((b) => confirmed(b) && b.booking_date >= todayISO()) || p.bookings[0]);
   const noteBlock = c
@@ -656,6 +761,7 @@ function viewBrief(key, bid) {
   shell(`<button class="back" id="bk">${ICON.back}Back</button>
     <div class="card">
       <h1 class="brief-name">${esc(p.name)}</h1>
+      ${headPkg ? `<div style="margin:0 0 8px">${tagHTML(headPkg)}</div>` : ''}
       <div class="muted small">${age != null ? age + ' years old' : 'Age not given'}${p.email ? ' · ' + esc(p.email) : ''}</div>
       <div class="facts">
         <div class="fact"><div class="k">Phone</div><div class="v">${esc(p.phone || '—')}</div></div>
@@ -688,6 +794,7 @@ function viewBrief(key, bid) {
     });
   }
   wireProgress(ciList);
+  document.querySelectorAll('[data-resched]').forEach((btn) => { btn.onclick = () => openReschedule(Number(btn.dataset.resched), p); });
   const ciBtn = document.getElementById('ciBtn');
   if (ciBtn) ciBtn.onclick = () => openCheckIn(c, p.bookings.find((b) => confirmed(b) && b.booking_date === todayISO()) || null);   // today's session, if any
   const save = document.getElementById('noteSave');
@@ -811,23 +918,49 @@ const placeOf = (b) => (b.location === 'clinic' ? 'Milton Hall, Deansgate' : 'Ho
 function viewHome() {
   const d = S.cdata, t = todayISO();
   const who = d.client ? d.client.full_name : (d.bookings[0] && d.bookings[0].customer_name);
+  const intakePkg = d.intakes.map((i) => i.package).find((p) => !NO_PACKAGE.includes(trimStr(p).toLowerCase())) || '';
+  const pk = (b) => pkgOf(b, intakePkg);
   const bs = d.bookings.filter(confirmed);
-  const upcoming = bs.filter((b) => b.booking_date >= t).sort((a, b) => (a.booking_date + String(a.start_min).padStart(4, '0')).localeCompare(b.booking_date + String(b.start_min).padStart(4, '0')));
-  const past = bs.filter((b) => b.booking_date < t).sort(byDateDesc);
+  const key = (x) => x.booking_date + String(x.start_min).padStart(4, '0');
+  const pending = bs.filter(isPending);
+  const settled = bs.filter((x) => !isPending(x));
+  const upcoming = settled.filter((x) => x.booking_date >= t).sort((x, y) => key(x).localeCompare(key(y)));
+  const past = settled.filter((x) => x.booking_date < t).sort(byDateDesc);
   const next = upcoming[0];
+  const bookedOn = (x) => fmtDate(ldn(new Date(x.created_at * 1000)));
+
+  // A proposed new time sits at the very top, in gold.
+  const newTime = pending.map((x) => `<div class="card gold-card" data-newtime="${x.id}"><div class="section-label">Your new time</div>
+      <div class="nx-date">${esc(fmtTs(x.proposed_starts_at).split(',')[0])}</div><div class="nx-time">${esc(fmtTs(x.proposed_starts_at).split(', ')[1] || '')}</div>
+      <div class="kv" style="margin-top:14px"><div><div style="font-weight:600">${esc(x.treatment || '—')}</div>${pk(x) ? `<div style="margin-top:6px">${tagHTML(pk(x))}</div>` : ''}</div>
+        <div style="font-weight:500">Milton Hall, Deansgate</div></div>
+      <div style="display:grid;gap:10px;margin-top:18px"><button class="btn" data-accept="${x.id}" type="button">Accept</button>
+        <a class="btn ghost" target="_blank" rel="noopener" href="https://wa.me/${HALIMA_WA}?text=${encodeURIComponent("Hi Halima, it's " + firstName(who) + ". Could we find a different time for my session?")}">Ask for a different time</a></div></div>`).join('');
+
   const nextCard = next
     ? `<div class="card"><div class="section-label">Your next session</div>
         <div class="nx-date">${esc(fmtDateLong(next.booking_date))}</div><div class="nx-time">${fmtTime(next.start_min)}</div>
-        <div class="kv" style="margin-top:16px"><div><div class="k">Treatment</div><div style="font-weight:500">${esc(next.treatment || '—')}</div></div>
-        <div><div class="k">Where</div><div style="font-weight:500;overflow-wrap:anywhere">${esc(placeOf(next))}</div></div></div>
+        <div class="kv" style="margin-top:16px"><div><div class="k">Treatment</div><div style="font-weight:500">${esc(next.treatment || '—')}</div>${pk(next) ? `<div style="margin-top:6px">${tagHTML(pk(next))}</div>` : ''}</div>
+        <div><div class="k">Where</div><div style="font-weight:500;overflow-wrap:anywhere">${esc(placeOf(next))}</div></div>
+        <div><div class="k">Booked</div><div style="font-weight:500">${esc(bookedOn(next))}</div></div></div>
         ${upcoming.length > 1 ? `<p class="muted small" style="margin:14px 0 0">${upcoming.length - 1} more session${upcoming.length > 2 ? 's' : ''} booked.</p>` : ''}</div>`
-    : `<div class="card"><div class="section-label">Your next session</div><p class="muted" style="margin:10px 0 16px">There’s nothing booked at the moment.</p><a class="btn" href="/book">Book a session</a></div>`;
+    : (pending.length ? '' : `<div class="card"><div class="section-label">Your next session</div><p class="muted" style="margin:10px 0 16px">There’s nothing booked at the moment.</p><a class="btn" href="/book">Book a session</a></div>`);
   const noClient = !d.client ? `<div class="card"><div class="section-label">Your intake form</div><p class="muted" style="margin:10px 0 16px">We haven’t received your intake form yet. It only takes a few minutes.</p><a class="btn" href="/intake">Complete your intake form</a></div>` : '';
   const intakeSub = d.intakes.length ? 'On file. You can send a fresh one if anything changes.' : 'A few minutes, ideally before your first visit.';
   const links = `<a class="listrow" href="/before-your-session"><span><span class="nm">Before your session</span><br><span class="sb">A short, quiet guide to your visit.</span></span></a>
     <a class="listrow" href="/intake"><span><span class="nm">Your intake form</span><br><span class="sb">${intakeSub}</span></span></a>`;
-  const pastCard = past.length ? `<h2 class="sub">Past sessions</h2><div class="card"><div class="hist" style="margin-top:0">${past.map((b) => `<div class="h"><b>${esc(fmtDate(b.booking_date))} · ${fmtTime(b.start_min)}</b><br>${esc(b.treatment || '—')}<br><span class="muted">${esc(placeOf(b))}</span></div>`).join('')}</div></div>` : '';
-  shell(`${pageHead(who ? 'Hello, ' + firstName(who) : 'Hello')}${nextCard}${noClient}<h2 class="sub">Good to have to hand</h2>${links}${pastCard}`);
+  const pastCard = past.length ? `<h2 class="sub">Past sessions</h2><div class="card"><div class="hist" style="margin-top:0">${past.map((x) => `<div class="h"><b>${esc(fmtDate(x.booking_date))} · ${fmtTime(x.start_min)}</b><br>${esc(x.treatment || '—')} ${tagHTML(pk(x))}<br><span class="muted">${esc(placeOf(x))} · booked ${esc(bookedOn(x))}</span></div>`).join('')}</div></div>` : '';
+  shell(`${pageHead(who ? 'Hello, ' + firstName(who) : 'Hello')}${newTime}${nextCard}${noClient}<h2 class="sub">Good to have to hand</h2>${links}${pastCard}`);
+  document.querySelectorAll('[data-accept]').forEach((btn) => {
+    btn.onclick = async () => {
+      btn.disabled = true; btn.textContent = 'Confirming…';
+      try { await api.acceptReschedule(Number(btn.dataset.accept)); S.cdata = await api.loadClient(); render(); toastMsg('Thank you — your new time is confirmed.'); }
+      catch (e) {
+        btn.disabled = false; btn.textContent = 'Accept';
+        toastMsg(e.code === 'time_taken' ? 'That time has just been taken — please ask for a different time.' : e.code === 'not_pending' ? 'This has already been confirmed.' : 'Something went wrong. Please try again, or message Halima.');
+      }
+    };
+  });
 }
 function viewProgress() {
   const list = S.cdata.checkins.slice().sort((a, b) => new Date(a.taken_at) - new Date(b.taken_at));
