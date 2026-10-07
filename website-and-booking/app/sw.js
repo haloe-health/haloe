@@ -2,7 +2,7 @@
 // icons, the Supabase client library). It never touches Supabase or any
 // cross-origin data request, so client health data is never written to disk
 // by the cache. Bump CACHE when the shell changes.
-const CACHE = 'haloe-app-v5';
+const CACHE = 'haloe-app-v6';
 const SHELL = [
   '/app/',
   '/app/manifest.webmanifest',
@@ -28,6 +28,7 @@ self.addEventListener('fetch', (e) => {
   const req = e.request;
   const url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin) return; // Supabase/CDN: network only
+  if (req.headers && req.headers.has('Authorization')) return;              // anything carrying a user token is never cached
   const path = url.pathname;
 
   // The page itself: network first, shell copy when offline.
@@ -40,7 +41,7 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(
       caches.match(req).then((hit) => {
         const net = fetch(req).then((res) => {
-          if (res.ok) caches.open(CACHE).then((c) => c.put(req, res.clone()));
+          if (res.ok && res.type !== 'opaque') caches.open(CACHE).then((c) => c.put(req, res.clone()));
           return res;
         }).catch(() => hit);
         return hit || net;

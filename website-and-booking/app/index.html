@@ -491,7 +491,20 @@ function headerHTML(withSettings) {
       ${withSettings ? `<button class="icon-btn" id="setBtn" aria-label="Settings">${ICON.gear}</button>` : ''}
     </div></header>`;
 }
-async function signOut() { await sb.auth.signOut(); S.data = null; S.raw = null; S.admin = false; S.session = null; render(); }
+/** Wipe every trace of the signed-in session from this page and this device. Never waits on the network. */
+function clearSession() {
+  S.session = null; S.admin = false; S.isClient = false; S.profile = null;
+  S.data = null; S.raw = null; S.cdata = null; S.error = null; S.filter = '';
+  try { Object.keys(localStorage).filter((k) => /^sb-.+-auth-token/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
+  document.querySelectorAll('.sheet-bg, .toast').forEach((el) => el.remove());          // open sheets / toasts hold client names
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search); // so Back / reload can't land on a client page
+  render();                                                                              // -> sign-in screen
+}
+/** Sign out: tell Supabase (this device only), but clear locally whether or not that call succeeds or hangs. */
+async function signOut() {
+  try { await Promise.race([sb.auth.signOut({ scope: 'local' }), new Promise((res) => setTimeout(res, 2500))]); } catch (e) { /* offline: cleared below anyway */ }
+  clearSession();
+}
 function wireHeader() {
   const t = document.getElementById('themeBtn'); if (t) t.onclick = toggleTheme;
   const g = document.getElementById('setBtn'); if (g) g.onclick = () => { location.hash = '#/settings'; };
@@ -849,7 +862,7 @@ function viewCodes() {
     <form class="card" id="codeForm">
       <label class="f" style="margin-top:0" for="kind">Type</label>
       <select class="in" id="kind"><option value="guest">GUEST-… · free gift, 1 use</option><option value="aud">…25 · audience, 25% off</option></select>
-      <label class="f" for="cname">Name</label><input class="in" id="cname" placeholder="e.g. Paloma" autocomplete="off" autocapitalize="characters" required>
+      <label class="f" for="cname">Name</label><input class="in" id="cname" placeholder="e.g. Jane" autocomplete="off" autocapitalize="characters" required>
       <div class="muted small" id="preview" style="margin-top:8px"></div>
       <div class="warn" id="audWarn" hidden><b>Not yet.</b> Audience (*25) codes can't be created until the second-redemption bug is fixed — only the first booking would work and the second would fail at checkout (CLAUDE.md, Open issues). Gift (GUEST-) codes are fine.</div>
       <button class="btn block" id="codeSave" style="margin-top:16px" type="submit">Create code</button>
@@ -1033,9 +1046,9 @@ function render() {
 }
 async function refreshData() { await loadAdminData(); render(); }
 async function enter(session) {
+  if (!session) return clearSession();
   S.session = session;
   S.admin = false; S.isClient = false; S.data = null; S.raw = null; S.cdata = null; S.error = null;
-  if (!session) return render();
   const { data: prof } = await sb.from('profiles').select('role,client_id').eq('id', session.user.id).maybeSingle();
   if (prof && prof.role === 'admin') {
     // Admin app: nothing is loaded unless profiles.role = 'admin' (and RLS would refuse anyway).
