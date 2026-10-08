@@ -32,19 +32,34 @@ export const londonHour = (d) => londonParts(new Date(d)).hour;
 export const daysBetween = (fromISO, toISO) => Math.round((Date.parse(toISO + 'T12:00:00Z') - Date.parse(fromISO + 'T12:00:00Z')) / 86400000);
 const firstName = (n) => { const w = String(n || '').trim().split(/\s+/)[0] || ''; return w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ''; };
 
-export function reminderEmail(name, day) {
-  const hi = firstName(name) ? `Hi ${firstName(name)},` : 'Hello,';
-  const eyebrow = day === 1 ? 'Aftercare · day 1' : 'Aftercare · day 7';
-  // The words are the app's: the stage for this day (Tomorrow / Day 7) plus the photo line, from /aftercare-cron's shared copy.
-  const step = AFTERCARE_COPY.steps.find((s2) => s2.at === day);
-  const line = step.text + ' ' + AFTERCARE_COPY.photoLine;
-  const html = emailShell(
+/** Email headlines (NOT the app's stage names, which stay Today / Tomorrow / Day 3 / Day 7 / Day 14). */
+const HEADLINE = { 1: 'The day after', 7: 'A week on' };
+
+/**
+ * ONE template for every aftercare reminder, so Day 1 and Day 7 cannot drift apart: the same logo, the same full-width
+ * centred heading card, the same spacing and the same button. Every row is a fixed-width (480px, max-width:100% on small
+ * screens) table cell — nothing is left to a mail client's shrink-to-fit.
+ */
+function reminderLayout({ eyebrow, headline, greeting, body }) {
+  const W = 480;
+  return emailShell(
     emailHeader() +
-    heroRow(eyebrow, day === 1 ? 'Tomorrow, today' : 'A week on', '') +
-    `<tr><td style="padding:4px 4px 18px;font-size:15px;line-height:1.6;color:#5a5247;">${esc(hi)}<br><br>${esc(line)}</td></tr>` +
-    `<tr><td align="center" style="padding:0 0 20px;">${emailButton(APP_URL, 'Open my aftercare')}</td></tr>` +
+    heroRow(eyebrow, headline, '') +
+    `<tr><td width="${W}" align="left" style="width:${W}px;max-width:100%;padding:4px 4px 18px;font-size:15px;line-height:1.6;color:#5a5247;">${esc(greeting)}<br><br>${esc(body)}</td></tr>` +
+    `<tr><td width="${W}" align="center" style="width:${W}px;max-width:100%;padding:0 0 20px;">${emailButton(APP_URL, 'Open my aftercare')}</td></tr>` +
     emailFooter(),
   );
+}
+
+export function reminderEmail(name, day) {
+  // The words are the app's: the stage for this day (Tomorrow / Day 7) plus the photo line, from the shared copy.
+  const step = AFTERCARE_COPY.steps.find((s2) => s2.at === day);
+  const html = reminderLayout({
+    eyebrow: day === 1 ? 'Aftercare · day 1' : 'Aftercare · day 7',
+    headline: HEADLINE[day],
+    greeting: firstName(name) ? `Hi ${firstName(name)},` : 'Hello,',
+    body: step.text + ' ' + AFTERCARE_COPY.photoLine,
+  });
   return { subject: day === 1 ? 'Your aftercare note · day 1' : 'Your aftercare note · day 7', html };
 }
 

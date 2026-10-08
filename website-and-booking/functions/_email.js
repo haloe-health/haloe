@@ -121,7 +121,7 @@ export function emailButton(href, label) {
 export function emailHeader() {
   return `<!-- Header -->
               <tr>
-                <td align="center" bgcolor="${CREAM}" style="padding:3px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
+                <td align="center" width="480" bgcolor="${CREAM}" style="width:480px;max-width:100%;padding:3px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
                   <img src="${LOGO_URL}" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="haloe" style="display:block;width:${LOGO_WIDTH}px;height:auto;max-width:100%;border:0;outline:none;">
                   <div style="font-family:${FONT};font-size:11px;letter-spacing:3px;color:${GOLD_DEEP};text-transform:uppercase;margin-top:10px;">Hijama &middot; Wellness &middot; Manchester</div>
                 </td>
@@ -132,7 +132,7 @@ export function emailHeader() {
 export function emailFooter() {
   return `<!-- Footer -->
               <tr>
-                <td align="center" bgcolor="${CREAM}" style="padding:26px 4px 8px;border-top:1px solid ${HAIRLINE};background:${CREAM};">
+                <td align="center" width="480" bgcolor="${CREAM}" style="width:480px;max-width:100%;padding:26px 4px 8px;border-top:1px solid ${HAIRLINE};background:${CREAM};">
                   <div style="color:${GOLD_DEEP};font-size:12px;letter-spacing:1px;font-weight:600;font-family:${FONT};">From haloe</div>
                   <div style="color:${BODY_TEXT};font-size:11px;margin-top:12px;font-family:${FONT};opacity:0.8;">Manchester</div>
                 </td>
@@ -144,8 +144,8 @@ export function emailFooter() {
 // into the 480px shell table.
 export function heroRow(eyebrow, big, sub) {
   return `<tr>
-                <td style="padding:0 0 14px;">
-                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${WHITE}" style="border-collapse:separate;border-radius:14px;background:${WHITE};border:1px solid ${HAIRLINE};">
+                <td width="480" style="width:480px;max-width:100%;padding:0 0 14px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${WHITE}" style="width:100%;border-collapse:separate;border-radius:14px;background:${WHITE};border:1px solid ${HAIRLINE};">
                     <tr>
                       <td align="center" style="padding:22px 16px;font-family:${FONT};">
                         <div style="color:${GOLD_DEEP};font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;">${esc(eyebrow)}</div>
