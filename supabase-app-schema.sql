@@ -577,3 +577,6 @@ begin
 end $$;
 revoke all on function public.claim_push_subscription(text, text, text, text) from public, anon;
 grant execute on function public.claim_push_subscription(text, text, text, text) to authenticated;
+
+-- session_notes: record which admin wrote each note (Oct 2026) -----------------
+alter table public.session_notes add column if not exists created_by uuid default auth.uid() references auth.users(id) on delete set null;

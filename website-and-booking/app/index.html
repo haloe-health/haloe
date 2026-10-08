@@ -213,6 +213,8 @@
   .hist .h { padding: 12px 14px; background: var(--fill); border-radius: 16px; font-size: 14px; }
   .hist .h b { font-weight: 600; }
   textarea.note { width: 100%; min-height: 110px; border-radius: 16px; border: 1px solid var(--fill-hover); background: var(--card); padding: 12px 14px; font-size: 16px; resize: vertical; }
+  textarea.note.dictate { min-height: 140px; font-size: 16px; line-height: 1.5; }
+  .note-saved { display: inline-block; margin-left: 12px; font-size: 14px; font-weight: 600; color: var(--gold-deep, #7A5F25); }
   .note-item { padding: 12px 14px; background: var(--fill); border-radius: 16px; margin-top: 10px; }
   .note-item .when { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
   .note-item p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -1076,7 +1078,7 @@ function clearSession() {
   S.session = null; S.admin = false; S.isClient = false; S.profile = null;
   S.data = null; S.raw = null; S.cdata = null; S.error = null; S.filter = '';
   S.loginStage = 'form'; S.loginPurpose = 'first'; S.loginEmail = '';   // back to a fresh sign-in screen
-  S.needPassword = false; S.forcePassword = false; S.passwordSkipped = null; S.todayTab = 'day';
+  S.needPassword = false; S.forcePassword = false; S.passwordSkipped = null; S.todayTab = 'day'; S.noteDraft = null;
   try { Object.keys(localStorage).filter((k) => /^sb-.+-auth-token/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
   document.querySelectorAll('.sheet-bg, .toast').forEach((el) => el.remove());          // open sheets / toasts hold client names
   if (location.hash) history.replaceState(null, '', location.pathname + location.search); // so Back / reload can't land on a client page
@@ -1961,7 +1963,8 @@ function viewBrief(key, bid) {
   const ctxBooking = bid ? p.bookings.find((b) => b.id === Number(bid)) : (p.bookings.find((b) => confirmed(b) && b.booking_date >= todayISO()) || p.bookings[0]);
   const noteBlock = c
     ? `<div class="card"><div class="section-label">Session notes</div>
-        <textarea class="note" id="noteText" placeholder="Add a note after the session…" style="margin-top:10px"></textarea>
+        <label class="f" for="noteText" style="margin-top:10px">New note <span class="muted small">· private to you</span></label>
+        <textarea class="note dictate" id="noteText" rows="5" placeholder="Type or dictate a note…" enterkeyhint="enter" autocapitalize="sentences" style="margin-top:6px">${esc(S.noteDraft && S.noteDraft.cid === c.id ? S.noteDraft.text : '')}</textarea>
         <button class="btn block" id="noteSave" style="margin-top:10px">Save note</button>
         ${notes.map((n) => `<div class="note-item"><div class="when">${new Date(n.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/London' })}</div><p>${esc(n.note)}</p></div>`).join('')}</div>`
     : `<div class="card"><div class="section-label">Session notes</div><p class="muted small" style="margin:10px 0 0">Notes attach to a client record, which is created when they submit the intake form.</p></div>`;
@@ -2008,11 +2011,16 @@ function viewBrief(key, bid) {
   const ciBtn = document.getElementById('ciBtn');
   if (ciBtn) ciBtn.onclick = () => openCheckIn(c, p.bookings.find((b) => confirmed(b) && b.booking_date === todayISO()) || null);   // today's session, if any
   const save = document.getElementById('noteSave');
+  const nt = document.getElementById('noteText');
+  // Keep an unsaved (dictated) note in memory so a re-render never loses it; it is cleared on save and on sign-out.
+  if (nt) nt.addEventListener('input', () => { S.noteDraft = { cid: c.id, text: nt.value }; });
   if (save) save.onclick = async () => {
-    const txt = document.getElementById('noteText').value.trim(); if (!txt) return;
+    const txt = nt.value.trim(); if (!txt) return;
     save.disabled = true;
-    try { const row = await api.addNote({ client_id: c.id, booking_id: ctxBooking ? ctxBooking.id : null, note: txt }); S.data.notes.push(row); render(); toastMsg('Note saved'); }
-    catch (e) { toastMsg(friendly(e, 'save')); save.disabled = false; }
+    try {
+      const row = await api.addNote({ client_id: c.id, booking_id: ctxBooking ? ctxBooking.id : null, note: txt });
+      S.data.notes.push(row); S.noteDraft = null; render(); toastMsg('Saved');
+    } catch (e) { toastMsg(friendly(e, 'save')); save.disabled = false; }
   };
 }
 
