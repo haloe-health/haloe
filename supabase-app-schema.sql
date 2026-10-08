@@ -522,3 +522,16 @@ begin
 end $$;
 revoke all on function public.admin_cancel_booking(bigint) from public, anon;
 grant execute on function public.admin_cancel_booking(bigint) to authenticated;
+
+-- admin tasks (Today → "For your clients") — migration "admin_tasks", 8 Oct 2026 ------------
+-- A ticked task is one row; un-ticking deletes it. Keys are derived from real data in the app, e.g. 'reminders:2026-10-13'.
+-- Shared by all admins; nobody else can read or write.
+create table if not exists public.admin_tasks (
+  task_key text primary key,
+  done_at  timestamptz not null default now(),
+  done_by  uuid references auth.users(id) on delete set null
+);
+alter table public.admin_tasks enable row level security;
+grant select, insert, delete on public.admin_tasks to authenticated;
+grant select, insert, update, delete on public.admin_tasks to service_role;
+create policy admin_tasks_all on public.admin_tasks for all to authenticated using (public.is_admin()) with check (public.is_admin());

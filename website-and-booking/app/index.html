@@ -318,6 +318,8 @@
   .glance .why[aria-expanded="true"] .wtxt { white-space: pre-wrap; overflow: visible; }
   .glance .med-text { display: block; padding: 6px 12px; border-radius: 14px; background: #FFE9A8; color: #3A2B00; font-weight: 500; white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: inset 0 0 0 2px #E8B84A; }
   .glance .med-in { display: block; }
+  .glance .med-sum { cursor: pointer; }
+  .glance .med-full { display: block; white-space: pre-wrap; }
   .glance .med-text.clamp .med-in { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
   :root[data-theme="dark"] .glance .med-text { background: #4A3A0E; color: #FFE9A8; box-shadow: inset 0 0 0 2px #B8892A; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .glance .med-text { background: #4A3A0E; color: #FFE9A8; box-shadow: inset 0 0 0 2px #B8892A; } }
@@ -380,6 +382,84 @@
   .lightbox { position: fixed; inset: 0; z-index: 80; background: rgba(10,8,4,.92); display: grid; place-items: center; padding: 16px; }
   .lightbox img { max-width: 100%; max-height: 86vh; border-radius: 12px; }
   .lightbox button { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 10px; width: 48px; height: 48px; border: 0; border-radius: 50%; background: rgba(255,255,255,.16); color: #fff; font-size: 24px; }
+  /* ============ "Tile home": the admin Today screen + the floating nav ============
+   * Spacing tokens only (4 · 8 · 12 · 16 · 24, defined above). Tile radius 28px. Tap targets >= 44px. */
+  :root { --th-page: linear-gradient(180deg, #F8F3EA 0%, #F2E6CE 100%); --th-ink: #1C1812; --th-muted: #6B5E4B; --th-gold: #C8A96E; --th-gold-text: #7A5F25; --th-sand: #EFE7D8; --th-dark: #2B2318;
+          --th-tile: #FFFFFF; --th-hero: linear-gradient(135deg, #FFFFFF 0%, #FBF1D6 100%); --th-fill: linear-gradient(135deg, #E2CB93 0%, #C8A96E 100%); --th-circle: rgba(200, 169, 110, .30);
+          --th-glass: rgba(255, 255, 255, .8); --th-pill: rgba(255, 255, 255, .5); --th-nav: rgba(255, 255, 255, .88); --th-shadow: 0 1px 2px rgba(60, 44, 12, .06), 0 8px 24px rgba(60, 44, 12, .08); --th-radius: 28px; }
+  :root[data-theme="dark"] { --th-page: linear-gradient(180deg, #1C1812 0%, #16140F 100%); --th-ink: #F3EEE3; --th-muted: #A89F8B; --th-gold-text: #D7BC82; --th-sand: #2E291F; --th-dark: #3A2E1C;
+          --th-tile: #211E17; --th-hero: linear-gradient(135deg, #211E17 0%, #30291A 100%); --th-fill: linear-gradient(135deg, #B89A5E 0%, #8F7442 100%); --th-circle: rgba(200, 169, 110, .22);
+          --th-glass: rgba(43, 38, 28, .8); --th-pill: rgba(255, 255, 255, .06); --th-nav: rgba(33, 30, 23, .9); --th-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --th-page: linear-gradient(180deg, #1C1812 0%, #16140F 100%); --th-ink: #F3EEE3; --th-muted: #A89F8B; --th-gold-text: #D7BC82; --th-sand: #2E291F; --th-dark: #3A2E1C;
+          --th-tile: #211E17; --th-hero: linear-gradient(135deg, #211E17 0%, #30291A 100%); --th-fill: linear-gradient(135deg, #B89A5E 0%, #8F7442 100%); --th-circle: rgba(200, 169, 110, .22);
+          --th-glass: rgba(43, 38, 28, .8); --th-pill: rgba(255, 255, 255, .06); --th-nav: rgba(33, 30, 23, .9); --th-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35); } }
+  body.tilebg { background: var(--th-page); background-attachment: fixed; }
+  body.tilebg .app-head { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  body.tilebg .icon-btn { background: var(--th-glass); }
+  .th-tabs { display: grid; grid-template-columns: repeat(3, 1fr); height: 52px; padding: var(--s1); margin: 0 0 var(--s3); border-radius: 999px; background: var(--th-pill); }
+  .th-tabs button { min-height: 44px; border: 0; border-radius: 999px; background: transparent; font: inherit; font-size: 15px; font-weight: 500; color: var(--th-muted); }
+  .th-tabs button[aria-selected="true"] { background: var(--th-tile); color: var(--th-ink); font-weight: 600; box-shadow: var(--th-shadow); }
+  .tile { position: relative; overflow: hidden; background: var(--th-tile); color: var(--th-ink); border-radius: var(--th-radius); padding: var(--s4); margin: 0 0 var(--s3); box-shadow: var(--th-shadow); }
+  .tile.th-hero { background: var(--th-hero); padding: var(--s5) var(--s4); }
+  .tile.th-hero::after { content: ''; position: absolute; right: -24px; top: -24px; width: 120px; height: 120px; border-radius: 50%; background: var(--th-circle); }
+  .tile.th-hero > * { position: relative; z-index: 1; }
+  .tile.th-hero .th-date { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--th-gold-text); }
+  .tile.th-hero h2 { margin: var(--s2) 0 var(--s1); font-size: 26px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
+  .tile.th-hero p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--th-muted); }
+  .th-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); margin: 0 0 var(--s2); }
+  .th-title { margin: 0; font-size: 17px; line-height: 1.3; font-weight: 600; }
+  .th-count { font-size: 14px; font-weight: 600; color: var(--th-gold-text); white-space: nowrap; }
+  .th-empty { margin: 0; font-size: 15px; color: var(--th-muted); }
+  .task { display: flex; align-items: center; gap: var(--s3); width: 100%; min-height: 52px; padding: var(--s2) 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+  .task .ck { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; border: 2px solid color-mix(in srgb, var(--th-muted) 50%, transparent); color: transparent; }
+  .task .ck svg { width: 16px; height: 16px; }
+  .task[aria-pressed="true"] .ck { background: var(--th-gold); border-color: var(--th-gold); color: #1C1812; }
+  .task .tx { display: grid; min-width: 0; }
+  .task .tt { font-size: 15px; font-weight: 500; line-height: 1.4; }
+  .task[aria-pressed="true"] .tt { text-decoration: line-through; color: var(--th-muted); }
+  .task .ts { font-size: 13px; line-height: 1.4; color: var(--th-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .th-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin: 0 0 var(--s3); }
+  .th-half { height: 148px; border-radius: var(--th-radius); padding: var(--s4); display: flex; flex-direction: column; justify-content: space-between; color: var(--th-ink); text-decoration: none; box-shadow: var(--th-shadow); overflow: hidden; }
+  .th-half .th-k { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+  .th-half .big { display: block; font-size: 44px; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
+  .th-half .big.sm { font-size: 26px; }
+  .th-half .sub { display: block; margin-top: var(--s1); font-size: 14px; line-height: 1.3; }
+  .th-fill { background: var(--th-fill); color: #1C1812; }
+  .th-fill .dots { display: flex; gap: var(--s1); }
+  .th-fill .dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(28, 24, 18, .5); }
+  .th-fill .dot.on { background: #1C1812; box-shadow: none; }
+  .th-milestone { background: var(--th-dark); color: #fff; }
+  .th-milestone .bar { display: block; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, .2); overflow: hidden; }
+  .th-milestone .bar i { display: block; height: 100%; border-radius: 999px; background: var(--th-gold); }
+  .dstrip { display: grid; grid-template-columns: repeat(7, 1fr); gap: var(--s1); }
+  .dcol { display: grid; justify-items: center; gap: var(--s1); }
+  .dl { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--th-muted); }
+  .dcirc { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; font-weight: 600; }
+  .dcirc.clinic { box-shadow: inset 0 0 0 2px var(--th-gold); }
+  .dcirc.today { background: var(--th-gold); color: #1C1812; }
+  .wrow { display: flex; align-items: center; gap: var(--s3); min-height: 52px; padding: var(--s2) 0; border-top: 1px solid color-mix(in srgb, var(--th-muted) 18%, transparent); }
+  .th-title + .wrow { border-top: 0; margin-top: var(--s1); }
+  .wd { flex: none; width: 64px; font-size: 15px; font-weight: 600; }
+  .wl { flex: 1; min-width: 0; font-size: 14px; color: var(--th-muted); }
+  .wp { flex: none; padding: var(--s1) var(--s3); border-radius: 999px; background: var(--th-sand); color: var(--th-gold-text); font-size: 12px; font-weight: 600; }
+  .mgrid { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: var(--s1); }
+  .mgrid.mh { margin: var(--s3) 0 var(--s1); }
+  .mgrid.mh span { text-align: center; font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--th-muted); }
+  .mcell { min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; }
+  .mcell .num { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; }
+  .mcell.out { color: color-mix(in srgb, var(--th-muted) 45%, transparent); }
+  .mcell.today .num { background: var(--th-gold); color: #1C1812; font-weight: 600; }
+  .mcell .dm { width: 5px; height: 5px; margin-top: 2px; border-radius: 50%; background: transparent; }
+  .mcell .dm.on { background: var(--th-gold); }
+  /* Today cards inside the tile home: tile look, same radius */
+  .tile-home .card { background: var(--th-tile); color: var(--th-ink); border-radius: var(--th-radius); box-shadow: var(--th-shadow); }
+  .tile-home .sess.feature { border: 0; }
+  .tile-home .nextup-label { color: var(--th-gold-text); }
+  /* floating nav: pill + round gold plus */
+  .navdock { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 30; width: min(calc(100% - 32px), 440px); display: flex; align-items: center; gap: var(--s3); }
+  .navdock .tabbar { position: static; transform: none; flex: 1; min-width: 0; width: auto; background: var(--th-nav); }
+  .navdock .tabbar button[aria-current="page"] { background: var(--th-sand); color: var(--th-gold-text); }
+  .navplus { flex: none; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--th-gold); color: #1C1812; font-size: 30px; line-height: 1; font-weight: 300; text-decoration: none; box-shadow: 0 8px 30px rgba(40, 30, 10, .18), 0 1px 2px rgba(40, 30, 10, .1); }
   @media (min-width: 700px) { .wrap { padding-top: 16px; } }
 </style>
 </head>
@@ -503,10 +583,15 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession
 const api = {
   async load() {
     const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
-    const [clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked] = await Promise.all([
-      q('clients'), q('intake_forms'), q('bookings'), q('discount_codes'), q('collaborators'), q('code_redemptions'), q('session_notes'), q('check_ins'), q('photo_submissions'), q('unlinked_signins'),
+    const [clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked, tasks] = await Promise.all([
+      q('clients'), q('intake_forms'), q('bookings'), q('discount_codes'), q('collaborators'), q('code_redemptions'), q('session_notes'), q('check_ins'), q('photo_submissions'), q('unlinked_signins'), q('admin_tasks'),
     ]);
-    return { clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked };
+    return { clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked, tasks };
+  },
+  // Today → "For your clients": a ticked task is a row in admin_tasks (admin-only), un-ticking deletes it.
+  async setTask(key, on) {
+    if (on) { const { error } = await sb.from('admin_tasks').insert({ task_key: key, done_by: S.session && S.session.user.id }); if (error && error.code !== '23505') throw error; }   // 23505 = already ticked (e.g. on another device)
+    else { const { error } = await sb.from('admin_tasks').delete().eq('task_key', key); if (error) throw error; }
   },
   async markDone(id, done) { const { error } = await sb.from('bookings').update({ done_at: done ? new Date().toISOString() : null }).eq('id', id); if (error) throw error; },
   async setActive(id, active) { const { error } = await sb.from('discount_codes').update({ active }).eq('id', id); if (error) throw error; },
@@ -838,7 +923,7 @@ function clearSession() {
   S.session = null; S.admin = false; S.isClient = false; S.profile = null;
   S.data = null; S.raw = null; S.cdata = null; S.error = null; S.filter = '';
   S.loginStage = 'form'; S.loginPurpose = 'first'; S.loginEmail = '';   // back to a fresh sign-in screen
-  S.needPassword = false; S.forcePassword = false; S.passwordSkipped = null;
+  S.needPassword = false; S.forcePassword = false; S.passwordSkipped = null; S.todayTab = 'day';
   try { Object.keys(localStorage).filter((k) => /^sb-.+-auth-token/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
   document.querySelectorAll('.sheet-bg, .toast').forEach((el) => el.remove());          // open sheets / toasts hold client names
   if (location.hash) history.replaceState(null, '', location.pathname + location.search); // so Back / reload can't land on a client page
@@ -1143,8 +1228,8 @@ function viewNoMatch() {
 
 function tabbarHTML() {
   const items = S.isClient ? [['home', 'Home'], ['progress', 'Progress'], ['book', 'Book']] : [['today', 'Today'], ['clients', 'Clients'], ['codes', 'Codes'], ['stats', 'Stats']];
-  return `<div class="tabbar${S.isClient ? ' three' : ''}" role="navigation" aria-label="Main">${items.map(([k, l]) =>
-    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') || (k === 'home' && S.view === 'aftercare') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span></button>`).join('')}</div>`;
+  return `<div class="navdock"><div class="tabbar${S.isClient ? ' three' : ''}" role="navigation" aria-label="Main">${items.map(([k, l]) =>
+    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') || (k === 'home' && S.view === 'aftercare') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span></button>`).join('')}</div>${S.isClient ? '' : '<a class="navplus" href="/book?location=clinic" target="_blank" rel="noopener" aria-label="Book a session">+</a>'}</div>`;
 }
 
 function shell(inner, withNav = true) {
@@ -1188,6 +1273,10 @@ function glanceHTML(b, feature) {
   const meds = intake ? trimStr(intake.current_medications) : '', takes = intake ? lower(trimStr(intake.takes_medication)) : '';
   let med;
   if (!intake) med = '<span class="no-intake">Intake not completed</span>';                              // not knowing ≠ nothing
+  else if (meds && feature) {                                                                            // the clinic-day card: a one-line heads-up first, her exact words one tap away
+    const n = meds.split(/[\n;]+|,(?=\s*[A-Za-z])/).map((x) => x.trim()).filter(Boolean).length || 1;
+    med = '<span class="med-text med-sum" role="button" tabindex="0" aria-expanded="false" data-medsum><span class="med-s">' + n + ' listed · read first</span><span class="med-full" hidden>' + esc(meds) + '</span></span>';
+  }
   else if (meds) med = '<span class="med-text clamp" data-med><span class="med-in">' + esc(meds) + '</span></span>';                  // exactly what she wrote
   else if (takes === 'yes') med = '<span class="med-yes">Medication: answered yes, none listed</span>';
   else med = '<span class="med-none">None stated</span>';
@@ -1199,6 +1288,10 @@ function glanceHTML(b, feature) {
 }
 /** After the cards are drawn: a medication note longer than 3 lines gets a "Tap to read all" (tap the note or the link). */
 function fitMeds() {
+  document.querySelectorAll('[data-medsum]').forEach((el) => {
+    const toggle = (e) => { e.stopPropagation(); const open = el.getAttribute('aria-expanded') !== 'true'; el.setAttribute('aria-expanded', String(open)); el.querySelector('.med-full').hidden = !open; el.querySelector('.med-s').hidden = open; };
+    el.onclick = toggle; el.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(e); } };
+  });
   document.querySelectorAll('.med-text.clamp').forEach((el) => {
     if (el.nextElementSibling && el.nextElementSibling.classList.contains('med-more')) return;
     const inner = el.querySelector('.med-in'); if (!inner || inner.scrollHeight <= inner.clientHeight + 1) return;
@@ -1217,7 +1310,7 @@ function sessionRow(b, feature) {
   return `<div class="card sess ${done ? 'done' : ''}${feature ? ' feature' : ''}">
     <button class="who" data-brief="${nextKey}" data-bid="${b.id}">
       <span class="time">${esc(when)}</span>
-      <span class="name">${esc(b.customer_name)}</span>
+      <span class="name">${esc(feature ? shortName(b.customer_name) : b.customer_name)}</span>
       <span class="meta">${esc(treatmentLabel(b))}${dmin ? ' · ' + esc(durLabel(dmin)) : ''}${isPending(b) ? `<br>New time: <b>${esc(fmtTs(b.proposed_starts_at))}</b>` : ''}</span>
       <span class="row2">${testPill(b)}${confirmChip(b)}<span class="pill gold">${money(b.amount_pence)} paid</span>${b.discount_code ? `<span class="pill gold">${esc(b.discount_code)}</span>` : ''}</span>
     </button>
@@ -1227,43 +1320,108 @@ function sessionRow(b, feature) {
   </div>`;
 }
 function nextClinicDate() { let d = todayISO(); while (dow(d) !== CLINIC_WEEKDAY) d = addDays(d, 1); return d; }
-function viewToday() {
-  const t = todayISO();
-  let from = t, to = t, onlyClinic = false;
-  if (S.chip === 'week') { const back = (dow(t) + 6) % 7; from = addDays(t, -back); to = addDays(from, 6); }
-  if (S.chip === 'clinic') { from = to = nextClinicDate(); onlyClinic = true; }
-  const list = S.data.bookings.filter((b) => confirmed(b) && b.booking_date >= from && b.booking_date <= to && (!onlyClinic || b.location === 'clinic'))
-    .sort((a, b) => (a.booking_date + String(a.start_min).padStart(4, '0')).localeCompare(b.booking_date + String(b.start_min).padStart(4, '0')));
-  // "Next up": the next session not yet marked done (today or later) gets a large card with all three lines fully visible.
-  const key = (x) => x.booking_date + String(x.start_min).padStart(4, '0');
-  const nextSession = S.data.bookings.filter((x) => confirmed(x) && !x.done_at && x.booking_date >= t && !isPending(x)).sort((x, y) => key(x).localeCompare(key(y)))[0] || null;
-  const featuredInRange = !!nextSession && list.some((x) => x.id === nextSession.id);
-  const rest = nextSession ? list.filter((x) => x.id !== nextSession.id) : list;
-  let body = '';
-  if (!rest.length && !featuredInRange) body = `<div class="card empty">${S.chip === 'today' ? 'No sessions today.' : S.chip === 'week' ? 'No sessions this week.' : 'No clinic bookings yet for ' + fmtDateLong(from) + '.'}</div>`;
-  else {
-    let last = '';
-    for (const b of rest) {
-      if (S.chip !== 'today' && b.booking_date !== last) { last = b.booking_date; body += `<div class="day-label">${fmtDate(b.booking_date)}</div>`; }
-      body += sessionRow(b, false);
-    }
+/* ---- Today: "Tile home" (Day · Week · Month) ----
+ * Counts only on any day with no sessions: no client name or detail is ever shown on a day with nothing booked.
+ * Mirrors of the Functions' clinic constants (browser code can't import them): see functions/_clinic.js. */
+const CLINIC_START_DATE = '2026-10-06';
+const CLINIC_SLOT_COUNT = 6;                       // CLINIC_SLOT_TEMPLATE.length
+const CLINIC_VENUE_SHORT = 'Milton Hall';
+const MILESTONES = [25, 50, 100, 250, 500, 1000];
+const isClinicDay = (d) => dow(d) === CLINIC_WEEKDAY && d >= CLINIC_START_DATE;
+const plural = (n, w) => w + (n === 1 ? '' : 's');
+const shortName = (n) => { const p = String(n || '').trim().split(/\s+/).filter(Boolean); if (!p.length) return ''; const f = p[0].charAt(0).toUpperCase() + p[0].slice(1).toLowerCase(); return p.length > 1 ? f + ' ' + p[p.length - 1].charAt(0).toUpperCase() + '.' : f; };
+const liveOn = (d) => S.data.bookings.filter((b) => confirmed(b) && b.booking_date === d).sort((a, b) => a.start_min - b.start_min);
+const mondayOf = (d) => addDays(d, -((dow(d) + 6) % 7));
+
+/** "For your clients": real tasks from real data — counts only, never names. Ticks are saved in admin_tasks. */
+function tasksFor(t) {
+  const out = [], bks = S.data.bookings.filter(confirmed);
+  const nc = nextClinicDate(), n = bks.filter((b) => b.booking_date === nc && b.location === 'clinic').length;
+  if (n) out.push({ key: 'reminders:' + nc, title: 'Send reminders for ' + fmtDate(nc), sub: n + ' ' + plural(n, 'client') + ' booked' });
+  for (let k = 2; k <= 6; k++) {                                   // check in with clients 2 days after their session (and until day 6)
+    const d = addDays(t, -k), c = bks.filter((b) => b.booking_date === d).length;
+    if (c) out.push({ key: 'checkin:' + d, title: 'Check in with ' + c + ' ' + plural(c, 'client'), sub: 'Seen ' + fmtDate(d) });
   }
-  const nextUpBlock = nextSession ? `<div class="nextup-label">Next up · ${nextSession.booking_date === t ? 'today' : esc(fmtDate(nextSession.booking_date))}</div>${sessionRow(nextSession, true)}` : '';
-  const sub = S.chip === 'today' ? '' : S.chip === 'clinic' ? 'Clinic day · ' + fmtDateLong(from) : fmtDate(from) + ' – ' + fmtDate(to);
-  // Hero: today's progress, whichever chip is open.
-  const todays = S.data.bookings.filter((b) => confirmed(b) && b.booking_date === t).sort((a, b) => a.start_min - b.start_min);
-  const seen = todays.filter((b) => b.done_at).length, total = todays.length;
-  const nextUp = todays.find((b) => !b.done_at);
-  const heroHead = `${seen} of ${total} seen`;
-  const heroSub = nextUp ? `Next: ${fmtTime(nextUp.start_min)} · ${nextUp.customer_name}` : 'All of today’s sessions are done.';
-  const C = 2 * Math.PI * 38, frac = total ? seen / total : 0;
-  const statusRow = `<div class="statusrow"><b>No sessions today</b><span>Next clinic ${esc(fmtDate(nextClinicDate()))}</span></div>`;
-  const hero = !total ? statusRow : `<div class="card hero"><div class="ring"><svg viewBox="0 0 92 92"><circle class="t" cx="46" cy="46" r="38"/><circle class="p" cx="46" cy="46" r="38" stroke-dasharray="${(C * frac).toFixed(1)} ${C.toFixed(1)}"/></svg><b>${seen}/${total}</b></div>
-    <div><h2>${esc(heroHead)}</h2><p>${esc(heroSub)}</p></div></div>`;
-  shell(`<div class="today"><div class="today-date">${esc(fmtDateLong(t))}</div>${hero}${nextUpBlock}
-    ${sub ? `<p class="muted small subline">${esc(sub)}</p>` : ''}<div class="chips">${[['today', 'Today'], ['week', 'This week'], ['clinic', 'Next clinic']].map(([k, l]) => `<button class="chip" data-chip="${k}" aria-pressed="${S.chip === k}">${l}</button>`).join('')}</div>${body}</div>`);
+  for (let k = 7; k <= 14; k++) {                                  // ask for a review in the second week
+    const d = addDays(t, -k), c = bks.filter((b) => b.booking_date === d).length;
+    if (c) out.push({ key: 'review:' + d, title: 'Ask ' + c + ' ' + plural(c, 'client') + ' for a review', sub: 'Seen ' + fmtDate(d) });
+  }
+  // rebook nudges: people whose last session was 14–35 days ago and who have nothing booked from today on
+  const lastBy = new Map(), upcoming = new Set();
+  for (const b of bks) {
+    const who = b.client_id ? 'c' + b.client_id : 'e' + lower(b.customer_email);
+    if (b.booking_date >= t) upcoming.add(who); else if (!lastBy.has(who) || lastBy.get(who) < b.booking_date) lastBy.set(who, b.booking_date);
+  }
+  const lo = addDays(t, -35), hi = addDays(t, -14);
+  const nudge = [...lastBy].filter(([who, d]) => !upcoming.has(who) && d >= lo && d <= hi).length;
+  if (nudge) out.push({ key: 'rebook:' + mondayOf(t), title: 'Send ' + nudge + ' rebook ' + plural(nudge, 'nudge'), sub: 'No next booking yet' });
+  return out.slice(0, 5);
+}
+function openSlotsFor(d) { const booked = Math.min(CLINIC_SLOT_COUNT, S.data.bookings.filter((b) => confirmed(b) && b.location === 'clinic' && b.booking_date === d).length); return { booked, open: CLINIC_SLOT_COUNT - booked }; }
+
+function tasksTile(t) {
+  const tasks = tasksFor(t), done = new Set((S.data.tasks || []).map((x) => x.task_key)), nDone = tasks.filter((x) => done.has(x.key)).length;
+  return `<section class="tile" id="tasksTile"><div class="th-head"><h2 class="th-title">For your clients</h2><span class="th-count" id="tasksCount">${nDone} of ${tasks.length} done</span></div>` +
+    (tasks.length ? tasks.map((x) => `<button class="task" type="button" data-task="${esc(x.key)}" aria-pressed="${done.has(x.key)}"><span class="ck">${ICON.check}</span><span class="tx"><span class="tt">${esc(x.title)}</span><span class="ts">${esc(x.sub)}</span></span></button>`).join('') : '<p class="th-empty">Nothing to do right now.</p>') + '</section>';
+}
+function pairTiles() {
+  const nc = nextClinicDate(), { booked, open } = openSlotsFor(nc);
+  const count = S.data.clients.length, goal = MILESTONES.find((m) => m > count) || Math.ceil((count + 1) / 500) * 500;
+  const dots = Array.from({ length: CLINIC_SLOT_COUNT }, (_, i) => `<i class="dot${i < booked ? ' on' : ''}"></i>`).join('');
+  return `<div class="th-pair">
+    <a class="th-half th-fill" href="/book?location=clinic" target="_blank" rel="noopener" aria-label="Fill ${esc(fmtDate(nc))}: ${open} slots to fill. Open the booking page"><span class="th-k">Fill ${esc(fmtDate(nc))}</span><span><span class="big">${open}</span><span class="sub">slots to fill</span></span><span class="dots" aria-hidden="true">${dots}</span></a>
+    <div class="th-half th-milestone"><span class="th-k">Next milestone</span><span><span class="big sm">${count} / ${goal}</span><span class="sub">clients</span></span><span class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${goal}" aria-valuenow="${count}"><i style="width:${Math.min(100, Math.round(count / goal * 100))}%"></i></span></div></div>`;
+}
+
+function dayView(t) {
+  const todays = liveOn(t), nextUp = todays.find((b) => !b.done_at && !isPending(b)) || null;
+  let top;
+  if (nextUp) top = `<div class="nextup-label">Next up · ${esc(fmtDateLong(t))}</div>${sessionRow(nextUp, true)}`;
+  else if (todays.length) top = `<section class="tile th-hero"><div class="th-date">${esc(fmtDateLong(t))}</div><h2>All of today’s sessions are done</h2><p>${todays.length} seen · Next clinic ${esc(fmtDate(nextClinicDate()))} · ${CLINIC_VENUE_SHORT}</p></section>`;
+  else top = `<section class="tile th-hero"><div class="th-date">${esc(fmtDateLong(t))}</div><h2>No sessions today</h2><p>Next clinic ${esc(fmtDate(nextClinicDate()))} · ${CLINIC_VENUE_SHORT}</p></section>`;
+  const later = todays.filter((b) => !nextUp || b.id !== nextUp.id);
+  return top + tasksTile(t) + pairTiles() + (later.length ? `<div class="nextup-label" style="margin-top:var(--s4)">${nextUp ? 'Later today' : 'Today’s sessions'}</div>${later.map((b) => sessionRow(b, false)).join('')}` : '');
+}
+function weekView(t) {
+  const mon = mondayOf(t), days = Array.from({ length: 7 }, (_, i) => addDays(mon, i));
+  const strip = days.map((d, i) => `<div class="dcol"><span class="dl">${'MTWTFSS'[i]}</span><span class="dcirc${d === t ? ' today' : ''}${isClinicDay(d) ? ' clinic' : ''}" aria-label="${esc(fmtDateLong(d))}${isClinicDay(d) ? ', clinic day' : ''}">${Number(d.slice(8))}</span></div>`).join('');
+  const rows = days.map((d) => {
+    const bs = liveOn(d), n = bs.length, seen = bs.filter((b) => b.done_at).length, clinic = isClinicDay(d);
+    if (!n && !clinic) return '';
+    const line = clinic ? (d <= t ? `Clinic · ${seen} seen` : (d === nextClinicDate() ? 'Next clinic' : 'Clinic') + ` · ${n} of ${CLINIC_SLOT_COUNT} booked`) : (d <= t ? `${n} ${plural(n, 'session')} · ${seen} seen` : `${n} ${plural(n, 'session')} booked`);
+    return `<div class="wrow"><span class="wd">${esc(fmtDate(d).replace(/ \w{3}$/, ''))}</span><span class="wl">${esc(line)}</span><span class="wp">${d < t ? 'Done' : d === t ? 'Today' : 'Upcoming'}</span></div>`;
+  }).join('');
+  return `<section class="tile"><div class="dstrip">${strip}</div></section><section class="tile"><h2 class="th-title">This week</h2>${rows || '<p class="th-empty">Nothing booked this week.</p>'}</section>` + pairTiles();
+}
+function monthView(t) {
+  const first = t.slice(0, 7) + '-01', ym = t.slice(0, 7);
+  const label = new Date(first + 'T12:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  let d = mondayOf(first), cells = '';
+  for (let i = 0; i < 42; i++, d = addDays(d, 1)) {
+    if (i >= 35 && d.slice(0, 7) !== ym) break;
+    const out = d.slice(0, 7) !== ym;
+    cells += `<div class="mcell${out ? ' out' : ''}${d === t ? ' today' : ''}"><span class="num">${Number(d.slice(8))}</span><i class="dm${isClinicDay(d) && !out ? ' on' : ''}"></i></div>`;
+  }
+  return `<section class="tile"><h2 class="th-title">${esc(label)}</h2><div class="mgrid mh">${'MTWTFSS'.split('').map((l) => `<span>${l}</span>`).join('')}</div><div class="mgrid">${cells}</div></section>` + pairTiles();
+}
+function viewToday() {
+  const t = todayISO(), tab = S.todayTab || 'day';
+  const tabs = [['day', 'Day'], ['week', 'Week'], ['month', 'Month']].map(([k, l]) => `<button type="button" role="tab" data-ttab="${k}" aria-selected="${tab === k}">${l}</button>`).join('');
+  shell(`<div class="tile-home today"><div class="th-tabs" role="tablist" aria-label="View">${tabs}</div>${tab === 'week' ? weekView(t) : tab === 'month' ? monthView(t) : dayView(t)}</div>`);
+  document.querySelectorAll('[data-ttab]').forEach((b) => { b.onclick = () => { S.todayTab = b.dataset.ttab; render(); }; });
+  document.querySelectorAll('[data-task]').forEach((b) => {
+    b.onclick = async () => {
+      const key = b.dataset.task, on = b.getAttribute('aria-pressed') !== 'true';
+      const list = S.data.tasks || (S.data.tasks = []), had = list.some((x) => x.task_key === key);
+      if (on && !had) list.push({ task_key: key }); if (!on) S.data.tasks = list.filter((x) => x.task_key !== key);
+      if (S.raw && S.raw !== S.data) S.raw.tasks = S.data.tasks;
+      b.setAttribute('aria-pressed', String(on));
+      const all = [...document.querySelectorAll('[data-task]')]; document.getElementById('tasksCount').textContent = all.filter((x) => x.getAttribute('aria-pressed') === 'true').length + ' of ' + all.length + ' done';
+      try { await api.setTask(key, on); }
+      catch (e) { toastMsg(friendly(e, 'save')); const l2 = S.data.tasks || []; S.data.tasks = on ? l2.filter((x) => x.task_key !== key) : l2.concat([{ task_key: key }]); if (S.raw && S.raw !== S.data) S.raw.tasks = S.data.tasks; render(); }
+    };
+  });
   fitMeds();
-  document.querySelectorAll('[data-chip]').forEach((b) => { b.onclick = () => { S.chip = b.dataset.chip; render(); }; });
   document.querySelectorAll('[data-why]').forEach((w) => {       // tap her concern to expand / collapse it (does not open the brief)
     w.onclick = (e) => { e.stopPropagation(); const open = w.getAttribute('aria-expanded') !== 'true'; w.setAttribute('aria-expanded', String(open)); w.querySelector('.wtxt').textContent = '“' + (open ? w.dataset.full : w.dataset.first) + '”'; };
   });
@@ -1934,12 +2092,14 @@ function route() {
   if (S.view !== 'brief') S.briefRetried = null;
 }
 function render() {
-  if (!S.session) return viewLogin();
+  if (!S.session) { document.body.classList.remove('tilebg'); return viewLogin(); }
   if (S.needPassword) return viewCreatePassword();
   clearInterval(S.loginTimer);
+  document.body.classList.remove('tilebg');
   if (S.admin) {
     if (!S.data) { shell('<div class="empty">' + (S.error ? loadErrorHTML() : 'Loading…') + '</div>', false); return; }
     route();
+    document.body.classList.toggle('tilebg', S.view === 'today');
     window.scrollTo(0, 0);
     ({ today: viewToday, clients: viewClients, codes: viewCodes, stats: viewStats, settings: viewSettings, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
     return;
