@@ -1548,10 +1548,11 @@ function viewAftercare() {
 
 /** Shrink a photo in the browser: longest side ≤ 1600px, JPEG ≤ ~1.5 MB. Re-encoding also drops EXIF (location etc.). */
 async function compressImage(file, maxBytes = 1.5 * 1024 * 1024, maxSide = 1600) {
-  if (!/^image\//.test(file.type || '')) throw new Error('not_image');
+  // Some browsers report an empty type for iPhone HEIC/HEIF files, so the extension counts too.
+  if (!/^image\//.test(file.type || '') && !/\.(jpe?g|png|webp|heic|heif)$/i.test(file.name || '')) throw new Error('not_image');
   let bmp;
   try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
-  catch (e) { bmp = await new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image(); im.onload = () => { URL.revokeObjectURL(u); res(im); }; im.onerror = () => rej(new Error('unreadable')); im.src = u; }); }
+  catch (e) { bmp = await new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image(); im.onload = () => { URL.revokeObjectURL(u); res(im); }; im.onerror = () => { URL.revokeObjectURL(u); rej(new Error(/hei[cf]/i.test((file.type || '') + (file.name || '')) ? 'heic_unsupported' : 'unreadable')); }; im.src = u; }); }
   const w0 = bmp.width || bmp.naturalWidth, h0 = bmp.height || bmp.naturalHeight;
   let scale = Math.min(1, maxSide / Math.max(w0, h0)), q = 0.86, blob = null;
   for (let i = 0; i < 12; i++) {
@@ -1594,7 +1595,7 @@ function openPhotoSheet() {
     for (const f of [...files]) {
       if (picked.length >= 3) { toastMsg('Up to 3 photos'); break; }
       try { const blob = await compressImage(f); picked.push({ blob, url: URL.createObjectURL(blob) }); }
-      catch (e) { toastMsg(e.message === 'not_image' ? 'That file isn’t a photo' : 'That photo couldn’t be used'); }
+      catch (e) { toastMsg(e.message === 'not_image' ? 'That file isn’t a photo' : e.message === 'heic_unsupported' ? 'This phone can’t open that photo type here. Please choose a JPEG or PNG, or take a new photo.' : 'That photo couldn’t be used'); }
     }
     draw();
   };
