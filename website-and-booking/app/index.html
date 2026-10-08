@@ -582,6 +582,43 @@
   .tile-home .tile.foot { background: var(--th-dark); color: #fff; }
   .foot .f1 { font-size: 14px; font-weight: 600; }
   .foot .f2 { margin-top: var(--s1); font-size: 13px; line-height: 1.5; color: #E8DCC2; }
+  /* ============ Stats: three rings (tile screen) ============ */
+  .tile-home.stats .th-titlerow span { font-size: 13px; color: var(--th-muted); }
+  .st-rings { display: flex; align-items: center; gap: var(--s4); }
+  .st-rings .rwrap { position: relative; flex: none; width: 148px; height: 148px; }
+  .st-rings .rings { display: block; }
+  .st-rings .trk { stroke: #EFE7D8; }
+  :root[data-theme="dark"] .st-rings .trk { stroke: #2E291F; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .st-rings .trk { stroke: #2E291F; } }
+  .st-rings .arc.rg1 { stroke: #C8A96E; } .st-rings .dotc.rg1 { background: #C8A96E; }
+  .st-rings .arc.rg2 { stroke: #2B2318; } .st-rings .dotc.rg2 { background: #2B2318; }
+  .st-rings .arc.rg3 { stroke: #7A5F25; } .st-rings .dotc.rg3 { background: #7A5F25; }
+  :root[data-theme="dark"] .st-rings .arc.rg2 { stroke: #D9CBAA; } :root[data-theme="dark"] .st-rings .dotc.rg2 { background: #D9CBAA; }
+  :root[data-theme="dark"] .st-rings .arc.rg3 { stroke: #A8884A; } :root[data-theme="dark"] .st-rings .dotc.rg3 { background: #A8884A; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .st-rings .arc.rg2 { stroke: #D9CBAA; } :root:not([data-theme="light"]) .st-rings .dotc.rg2 { background: #D9CBAA; } :root:not([data-theme="light"]) .st-rings .arc.rg3 { stroke: #A8884A; } :root:not([data-theme="light"]) .st-rings .dotc.rg3 { background: #A8884A; } }
+  .st-rings .rc { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .st-rings .rc b { font-size: 24px; font-weight: 600; line-height: 1.1; }
+  .st-rings .rc span { font-size: 12px; color: var(--th-muted); }
+  .st-rings .legend { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--s3); }
+  .st-rings .lg { display: flex; align-items: center; gap: var(--s2); min-width: 0; }
+  .st-rings .dotc { flex: none; width: 10px; height: 10px; border-radius: 50%; }
+  .st-rings .lgt { display: flex; flex-direction: column; min-width: 0; }
+  .st-rings .lgn { font-size: 13px; color: var(--th-muted); }
+  .st-rings .lgv { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+  .st-rings .lgg { font-weight: 400; color: var(--th-muted); }
+  .st-pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin: 0 0 var(--s3); }
+  .st-half { height: 96px; border-radius: var(--th-radius); padding: var(--s3) var(--s4); display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--th-shadow); min-width: 0; }
+  .st-half .th-k { font-size: 13px; font-weight: 600; }
+  .st-half .big { font-size: 28px; font-weight: 600; line-height: 1.1; }
+  .st-avg { background: linear-gradient(135deg, #E2CB93 0%, #C8A96E 100%); color: #1C1812; }
+  .st-dark { background: var(--th-dark); color: #fff; }
+  .st-checks { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin: 0 0 var(--s3); }
+  .st-mini { background: var(--th-tile); color: var(--th-ink); border-radius: var(--th-radius); padding: var(--s3) var(--s4); box-shadow: var(--th-shadow); min-width: 0; }
+  .st-mini .k { font-size: 12px; font-weight: 600; letter-spacing: .04em; color: var(--th-muted); }
+  .st-mini .v { margin: var(--s1) 0; font-size: 24px; font-weight: 600; }
+  .st-mini .s { font-size: 12px; line-height: 1.4; color: var(--th-muted); }
+  .tile-home.stats .row-split { display: flex; justify-content: space-between; gap: var(--s3); padding: var(--s2) 0; border-top: 1px solid color-mix(in srgb, var(--th-muted) 18%, transparent); font-size: 15px; }
+  .tile-home.stats .th-title + .row-split { border-top: 0; }
   @media (min-width: 700px) { .wrap { padding-top: 16px; } }
 </style>
 </head>
@@ -2143,27 +2180,52 @@ function progressStats() {
   return { n: diffs.length, lower: diffs.filter((d) => d < 0).length, avg: diffs.length ? diffs.reduce((s, d) => s + d, 0) / diffs.length : null };
 }
 const signed = (n) => (n === 0 ? '0' : (n < 0 ? '−' : '+') + String(Math.round(Math.abs(n) * 10) / 10));
-function viewStats() {
+/* One place for the goals (business actions, not clients): revenue in pence, bookings and new clients as counts. Edit here only. */
+const STATS_GOALS = {
+  week:  { rev: 25000,  bookings: 3,  clients: 3 },
+  month: { rev: 100000, bookings: 12, clients: 8 },
+  all:   { rev: 500000, bookings: 50, clients: 25 },
+};
+const STATS_RANGES = [['week', 'This week'], ['month', 'This month'], ['all', 'All time']];
+/** How full a ring is: value / goal, never below 0 and never over 1 (100%). */
+const ringFraction = (value, goal) => (goal > 0 && value > 0 ? Math.min(1, value / goal) : 0);
+/** The numbers per range — by date booked, revenue = total paid, cancelled and test bookings already excluded by confirmed() / applyTest(). */
+function statsSlices() {
   const t = todayISO(), back = (dow(t) + 6) % 7, weekStart = addDays(t, -back), monthStart = t.slice(0, 8) + '01';
   const dateOfEpoch = (e) => ldn(new Date(e * 1000));
   const bk = S.data.bookings.filter(confirmed).map((b) => ({ ...b, made: dateOfEpoch(b.created_at) }));
   const cl = S.data.clients.map((c) => ({ ...c, made: ldn(new Date(c.created_at)) }));
   const slice = (from) => {
     const b = bk.filter((x) => x.made >= from), rev = b.reduce((s, x) => s + (x.amount_pence || 0), 0);
-    return { n: b.length, clinic: b.filter((x) => x.location === 'clinic').length, mobile: b.filter((x) => x.location !== 'clinic').length, rev, avg: b.length ? rev / b.length : 0, cl: cl.filter((c) => c.made >= from).length };
+    const byCode = {};
+    for (const x of b) { const k = x.discount_code || 'No code'; (byCode[k] = byCode[k] || { n: 0, rev: 0 }); byCode[k].n++; byCode[k].rev += x.amount_pence || 0; }
+    return { n: b.length, clinic: b.filter((x) => x.location === 'clinic').length, mobile: b.filter((x) => x.location !== 'clinic').length, rev, avg: b.length ? rev / b.length : 0, cl: cl.filter((c) => c.made >= from).length, byCode };
   };
-  const tile = (k, v, s) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
-  const row = (title, d) => `<h2 class="sub">${title}</h2><div class="tiles">${tile('Bookings', d.n, `${d.clinic} clinic · ${d.mobile} mobile`)}${tile('Revenue', money(d.rev), `${money(d.avg)} average`)}${tile('New clients', d.cl, 'intake forms')}</div>`;
-  const byCode = {};
-  for (const b of bk) { const k = b.discount_code || 'No code'; (byCode[k] = byCode[k] || { n: 0, rev: 0 }); byCode[k].n++; byCode[k].rev += b.amount_pence || 0; }
-  const codeRows = Object.entries(byCode).sort((x, y) => y[1].n - x[1].n).map(([k, v]) => `<div class="row-split"><span>${esc(k)}</span><span class="muted">${v.n} booking${v.n === 1 ? '' : 's'} · ${money(v.rev)}</span></div>`).join('');
+  return { week: slice(weekStart), month: slice(monthStart), all: slice('0000-00-00') };
+}
+function viewStats() {
+  const range = S.statsRange || 'month', d = statsSlices()[range], g = STATS_GOALS[range];
+  const rings = [
+    { cls: 'rg1', label: 'Revenue', val: d.rev, goal: g.rev, show: money(d.rev), goalShow: money(g.rev), r: 69 },
+    { cls: 'rg2', label: 'Bookings', val: d.n, goal: g.bookings, show: String(d.n), goalShow: String(g.bookings), r: 53 },
+    { cls: 'rg3', label: 'New clients', val: d.cl, goal: g.clients, show: String(d.cl), goalShow: String(g.clients), r: 37 },
+  ];
+  const hit = rings.filter((x) => x.val >= x.goal).length;
+  const svg = `<svg class="rings" width="148" height="148" viewBox="0 0 148 148" role="img" aria-label="${rings.map((x) => `${x.label} ${x.show} of ${x.goalShow}`).join(', ')}">` +
+    rings.map((x) => { const c = 2 * Math.PI * x.r, f = ringFraction(x.val, x.goal);
+      return `<circle class="trk" cx="74" cy="74" r="${x.r}" fill="none" stroke-width="10"/>` + (f > 0 ? `<circle class="arc ${x.cls}" data-frac="${f}" cx="74" cy="74" r="${x.r}" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(c * f).toFixed(2)} ${c.toFixed(2)}" transform="rotate(-90 74 74)"/>` : ''); }).join('') + '</svg>';
+  const legend = rings.map((x) => `<div class="lg"><i class="dotc ${x.cls}"></i><div class="lgt"><span class="lgn">${x.label}</span><span class="lgv">${x.show} <span class="lgg">/ ${x.goalShow}</span></span></div></div>`).join('');
+  const tabs = STATS_RANGES.map(([k, l]) => `<button type="button" role="tab" data-srange="${k}" aria-selected="${range === k}">${l}</button>`).join('');
+  const codeRows = Object.entries(d.byCode).sort((x, y) => y[1].n - x[1].n).map(([k, v]) => `<div class="row-split"><span>${esc(k)}</span><span class="muted">${v.n} booking${v.n === 1 ? '' : 's'} · ${money(v.rev)}</span></div>`).join('');
   const ps = progressStats();
-  shell(`${pageHead('Stats')}<p class="muted small" style="margin:-8px 4px 0">By date booked. Revenue is total paid.</p>
-    ${row('This week', slice(weekStart))}${row('This month', slice(monthStart))}${row('All time', slice('0000-00-00'))}
-    <h2 class="sub">Check-in scores</h2><div class="tiles two">
-      ${tile('Clients improving', ps.n ? `${ps.lower} / ${ps.n}` : '—', ps.n ? 'latest concern score lower than first' : 'needs 2+ check-ins')}
-      ${tile('Average concern change', ps.avg == null ? '—' : signed(ps.avg), ps.n ? `latest vs first · ${ps.n} client${ps.n === 1 ? '' : 's'}` : 'needs 2+ check-ins')}</div>
-    <h2 class="sub">Bookings by code</h2><div class="card">${codeRows || '<div class="empty">No bookings yet.</div>'}</div>`);
+  const mini = (k, v, s) => `<div class="st-mini"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  shell(`<div class="tile-home stats"><div class="th-titlerow"><h1>Stats</h1><span>By date booked</span></div>
+    <div class="th-tabs" role="tablist" aria-label="Range">${tabs}</div>
+    <section class="tile st-rings"><div class="rwrap">${svg}<div class="rc"><b>${hit}/3</b><span>goals</span></div></div><div class="legend">${legend}</div></section>
+    <div class="st-pair"><div class="st-half st-avg"><span class="th-k">Average booking</span><span class="big">${d.n ? money(d.avg) : '—'}</span></div><div class="st-half st-dark"><span class="th-k">Clinic · Mobile</span><span class="big">${d.clinic} · ${d.mobile}</span></div></div>
+    <section class="tile"><h2 class="th-title">Bookings by code</h2>${codeRows || '<p class="th-empty">No bookings in this range.</p>'}</section>
+    <div class="st-checks">${mini('Clients improving', ps.n ? `${ps.lower} / ${ps.n}` : '—', ps.n ? 'latest concern score lower than first' : 'needs 2+ check-ins')}${mini('Average concern change', ps.avg == null ? '—' : signed(ps.avg), ps.n ? `latest vs first · ${ps.n} client${ps.n === 1 ? '' : 's'}` : 'needs 2+ check-ins')}</div></div>`);
+  document.querySelectorAll('[data-srange]').forEach((b) => { b.onclick = () => { S.statsRange = b.dataset.srange; render(); }; });
 }
 
 /* ---- Settings ---- */
@@ -2401,7 +2463,7 @@ function render() {
   if (S.admin) {
     if (!S.data) { shell('<div class="empty">' + (S.error ? loadErrorHTML() : 'Loading…') + '</div>', false); return; }
     route();
-    document.body.classList.toggle('tilebg', ['today', 'clients', 'codes', 'settings'].includes(S.view));
+    document.body.classList.toggle('tilebg', ['today', 'clients', 'codes', 'stats', 'settings'].includes(S.view));
     if (S.view !== 'codes') { S.codeReady = null; S.quickSel = null; }
     window.scrollTo(0, 0);
     ({ today: viewToday, clients: viewClients, codes: viewCodes, stats: viewStats, settings: viewSettings, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
