@@ -460,6 +460,51 @@
   .navdock .tabbar { position: static; transform: none; flex: 1; min-width: 0; width: auto; background: var(--th-nav); }
   .navdock .tabbar button[aria-current="page"] { background: var(--th-sand); color: var(--th-gold-text); }
   .navplus { flex: none; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--th-gold); color: #1C1812; font-size: 30px; line-height: 1; font-weight: 300; text-decoration: none; box-shadow: 0 8px 30px rgba(40, 30, 10, .18), 0 1px 2px rgba(40, 30, 10, .1); }
+  /* ============ Clients: tile screen ============ */
+  .th-titlerow { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); margin: var(--s1) var(--s1) var(--s3); }
+  .th-titlerow h1 { margin: 0; font-family: var(--font); font-size: 26px; line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; }
+  .th-titlerow span { font-size: 14px; color: var(--th-muted); text-align: right; }
+  .cf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); margin: 0 0 var(--s3); }
+  .cf-tile { height: 104px; padding: var(--s4); border: 2px solid transparent; border-radius: var(--th-radius); display: flex; flex-direction: column; justify-content: space-between; text-align: left; background: var(--th-tile); color: var(--th-ink); box-shadow: var(--th-shadow); font: inherit; cursor: pointer; }
+  .cf-tile .th-k { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+  .cf-tile .cf-n { font-size: 34px; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
+  .cf-tile.cf-dark { background: var(--th-dark); color: #fff; }
+  .cf-tile.cf-gold { background: var(--th-fill); color: #1C1812; }
+  .cf-tile[aria-pressed="true"] { border-color: var(--th-ink); }
+  .cl-tools { display: grid; gap: var(--s2); margin: 0 0 var(--s3); }
+  .cl-tools .toggle-line { margin: 0 var(--s1); }
+  .cl-sub { margin: var(--s4) var(--s1) var(--s2); font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--th-gold-text); }
+  .rb-goal { background: var(--th-dark); color: #fff; }
+  .rb-goal .th-k { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+  .rb-line { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); margin: var(--s2) 0; }
+  .rb-line .big { font-size: 34px; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
+  .rb-streak { padding: var(--s1) var(--s3); border-radius: 999px; background: rgba(255, 255, 255, .14); color: #E2CB93; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .rb-bars { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
+  .rb-bars i { display: block; height: 6px; border-radius: 999px; background: rgba(255, 255, 255, .2); }
+  .rb-bars i.on { background: var(--th-gold); }
+  .rb-row { display: flex; gap: var(--s3); overflow-x: auto; padding: var(--s1) var(--s1) var(--s2); margin: 0 calc(-1 * var(--s1)) var(--s2); scrollbar-width: none; }
+  .rb-row::-webkit-scrollbar { display: none; }
+  .rb-av { flex: none; width: 64px; display: grid; justify-items: center; gap: var(--s1); padding: 0; border: 0; background: none; color: var(--th-ink); font: inherit; cursor: pointer; }
+  .rb-av .av { width: 52px; height: 52px; font-size: 20px; }
+  .rb-av[aria-selected="true"] .av { box-shadow: 0 0 0 3px var(--th-gold); }
+  .rb-av .nm { font-size: 13px; max-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .av { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--th-sand); color: var(--th-gold-text); font-size: 15px; font-weight: 600; }
+  .rb-sel .rb-name { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .rb-sel .rb-meta { margin: var(--s1) 0 var(--s3); font-size: 14px; color: var(--th-muted); }
+  .rb-send { width: 100%; height: 48px; border: 0; border-radius: 999px; background: var(--th-gold); color: #1C1812; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .rb-send.sent { background: var(--th-sand); color: var(--th-gold-text); }
+  .rb-send[disabled] { opacity: .55; cursor: default; }
+  .cl-list .th-head { margin-bottom: var(--s1); }
+  .muted-count { color: var(--th-muted); font-weight: 500; }
+  .crow { display: flex; align-items: center; gap: var(--s3); width: 100%; min-height: 56px; padding: var(--s2) 0; border: 0; border-top: 1px solid color-mix(in srgb, var(--th-muted) 18%, transparent); background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+  .th-head + .crow { border-top: 0; }
+  .crow .ct { flex: 1; min-width: 0; display: grid; }
+  .crow .cn { font-size: 15px; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+  .crow .cs { font-size: 13px; line-height: 1.4; color: var(--th-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chip-intake { flex: none; padding: var(--s1) var(--s2); border-radius: 999px; background: #FCE8A8; color: #5A4210; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .chev { flex: none; width: 18px; height: 18px; color: var(--th-muted); }
+  :root[data-theme="dark"] .chip-intake { background: #4A3A0E; color: #FCE8A8; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip-intake { background: #4A3A0E; color: #FCE8A8; } }
   @media (min-width: 700px) { .wrap { padding-top: 16px; } }
 </style>
 </head>
@@ -583,12 +628,14 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession
 const api = {
   async load() {
     const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
-    const [clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked, tasks] = await Promise.all([
-      q('clients'), q('intake_forms'), q('bookings'), q('discount_codes'), q('collaborators'), q('code_redemptions'), q('session_notes'), q('check_ins'), q('photo_submissions'), q('unlinked_signins'), q('admin_tasks'),
+    const [clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked, tasks, nudges] = await Promise.all([
+      q('clients'), q('intake_forms'), q('bookings'), q('discount_codes'), q('collaborators'), q('code_redemptions'), q('session_notes'), q('check_ins'), q('photo_submissions'), q('unlinked_signins'), q('admin_tasks'), q('rebook_nudges'),
     ]);
-    return { clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked, tasks };
+    return { clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked, tasks, nudges };
   },
   // Today → "For your clients": a ticked task is a row in admin_tasks (admin-only), un-ticking deletes it.
+  // Rebook nudges: one log row per tap on "Send rebook nudge" (admin-only table). The weekly count and the streak come from this log.
+  async logNudge(row) { const { data, error } = await sb.from('rebook_nudges').insert({ ...row, sent_by: S.session && S.session.user.id }).select().single(); if (error) throw error; return data; },
   async setTask(key, on) {
     if (on) { const { error } = await sb.from('admin_tasks').insert({ task_key: key, done_by: S.session && S.session.user.id }); if (error && error.code !== '23505') throw error; }   // 23505 = already ticked (e.g. on another device)
     else { const { error } = await sb.from('admin_tasks').delete().eq('task_key', key); if (error) throw error; }
@@ -1342,19 +1389,13 @@ function tasksFor(t) {
     const d = addDays(t, -k), c = bks.filter((b) => b.booking_date === d).length;
     if (c) out.push({ key: 'checkin:' + d, title: 'Check in with ' + c + ' ' + plural(c, 'client'), sub: 'Seen ' + fmtDate(d) });
   }
-  for (let k = 7; k <= 14; k++) {                                  // ask for a review in the second week
+  for (let k = 7; k < REBOOK_AFTER_DAYS; k++) {                      // ask for a review 7–13 days after (nobody is in two tasks)
     const d = addDays(t, -k), c = bks.filter((b) => b.booking_date === d).length;
     if (c) out.push({ key: 'review:' + d, title: 'Ask ' + c + ' ' + plural(c, 'client') + ' for a review', sub: 'Seen ' + fmtDate(d) });
   }
-  // rebook nudges: people whose last session was 14–35 days ago and who have nothing booked from today on
-  const lastBy = new Map(), upcoming = new Set();
-  for (const b of bks) {
-    const who = b.client_id ? 'c' + b.client_id : 'e' + lower(b.customer_email);
-    if (b.booking_date >= t) upcoming.add(who); else if (!lastBy.has(who) || lastBy.get(who) < b.booking_date) lastBy.set(who, b.booking_date);
-  }
-  const lo = addDays(t, -35), hi = addDays(t, -14);
-  const nudge = [...lastBy].filter(([who, d]) => !upcoming.has(who) && d >= lo && d <= hi).length;
-  if (nudge) out.push({ key: 'rebook:' + mondayOf(t), title: 'Send ' + nudge + ' rebook ' + plural(nudge, 'nudge'), sub: 'No next booking yet' });
+  // rebook nudges: the SAME rule as the Clients "Due to rebook" tile (isDueToRebook: had a session, nothing booked, last session REBOOK_AFTER_DAYS or more ago)
+  const nDue = dueToRebook(t).length;
+  if (nDue) out.push({ key: 'rebook:' + mondayOf(t), title: 'Send ' + nDue + ' rebook ' + plural(nDue, 'nudge'), sub: 'No next booking yet' });
   return out.slice(0, 5);
 }
 function openSlotsFor(d) { const booked = Math.min(CLINIC_SLOT_COUNT, S.data.bookings.filter((b) => confirmed(b) && b.location === 'clinic' && b.booking_date === d).length); return { booked, open: CLINIC_SLOT_COUNT - booked }; }
@@ -1443,23 +1484,117 @@ function unlinkedCardHTML() {
   const known = new Set(((S.raw || S.data).clients || []).map((c) => lower(c.email)));
   const list = ((S.data && S.data.unlinked) || []).filter((u) => !known.has(lower(u.email))).sort((x, y) => String(y.last_seen_at).localeCompare(String(x.last_seen_at)));
   if (!list.length) return '';
-  return '<div class="card" id="unlinkedCard"><div class="section-label">Unlinked sign-ins</div><p class="muted small" style="margin:8px 0 6px">Signed in with an email that matches no client. Email and date only.</p>' +
+  return '<div class="tile" id="unlinkedCard"><div class="section-label">Unlinked sign-ins</div><p class="muted small" style="margin:8px 0 6px">Signed in with an email that matches no client. Email and date only.</p>' +
     list.map((u) => '<div class="toggle-line" style="margin:6px 0;gap:12px"><span class="mail">' + esc(u.email) + '</span><span class="muted small" style="white-space:nowrap">' + esc(fmtDate(ldn(new Date(u.last_seen_at)))) + '</span></div>').join('') + '</div>';
 }
+/* ---- Clients: tile screen ----
+ * First name + initial only. No medication, no health wording, no client levels or labels — the gamification is about the admin's own
+ * actions (rebook nudges, streak), never about clients. */
+const REBOOK_AFTER_DAYS = 14;        // a client is "due to rebook" when their last session was this many days ago or more, and nothing is booked
+const REBOOK_GOAL = 3;               // nudges per week (the week resets on Monday)
+/** The WhatsApp wording — one constant, edit it here. {first name} is filled in. Halima sends it herself from WhatsApp. */
+const REBOOK_MESSAGE = "Hi {first name}, it's Halima from haloe. It's been a little while since your last session. If you'd like to book your next one, you can do it here: https://haloe.health/book. Or just reply and I'll find a time that suits you.";
+const rebookWA = (p) => 'https://wa.me/' + waNumber(p.phone) + '?text=' + encodeURIComponent(REBOOK_MESSAGE.replace('{first name}', firstName(p.name)));
+
+const personKey = (p) => (p.client ? 'c/' + p.client.id : 'e/' + lower(p.email));
+const hasIntakeP = (p) => !!(p.client && intakeOf(p.client.id));
+const pastSessions = (p, t) => p.bookings.filter((b) => confirmed(b) && b.booking_date < t).map((b) => b.booking_date).sort();
+const lastSession = (p, t) => { const a = pastSessions(p, t); return a.length ? a[a.length - 1] : null; };
+/** THE rebook rule, shared by Today's task count and the Clients tile: has had a session, has nothing booked, and the last session was
+ *  REBOOK_AFTER_DAYS or more days ago. */
+function isDueToRebook(p, t) {
+  const last = lastSession(p, t);
+  return !!last && !nextBookingDate(p) && daysBetween(last, t) >= REBOOK_AFTER_DAYS;
+}
+const dueToRebook = (t) => people().filter((p) => isDueToRebook(p, t)).sort((a, b) => lastSession(a, t).localeCompare(lastSession(b, t)));
+
+/* nudge log (admin-only table rebook_nudges) */
+const nudgeKey = (n) => (n.client_id ? 'c/' + n.client_id : 'e/' + lower(n.client_email));
+const nudgeDay = (n) => ldn(new Date(n.sent_at));
+const mineNudges = () => (S.data.nudges || []).filter((n) => !n.sent_by || !S.session || n.sent_by === S.session.user.id);
+/** distinct people nudged in the Monday-to-Sunday week that starts on `mon` (this admin only) */
+const weekNudgeCount = (mon) => new Set(mineNudges().filter((n) => mondayOf(nudgeDay(n)) === mon).map(nudgeKey)).size;
+/** Consecutive weeks with the goal met. The current week counts if it is already met; if it is still in progress it doesn't break the streak. */
+function nudgeStreak(t) {
+  const cw = mondayOf(t); let w = weekNudgeCount(cw) >= REBOOK_GOAL ? cw : addDays(cw, -7), n = 0;
+  while (weekNudgeCount(w) >= REBOOK_GOAL) { n++; w = addDays(w, -7); }
+  return n;
+}
+/** the latest nudge sent (by anyone) to this person since their last session, or null */
+function nudgeSince(p, t) {
+  const last = lastSession(p, t) || '';
+  const k = personKey(p), hits = (S.data.nudges || []).filter((n) => nudgeKey(n) === k && nudgeDay(n) >= last).sort((a, b) => String(b.sent_at).localeCompare(String(a.sent_at)));
+  return hits[0] || null;
+}
+
+const initialOf = (name) => (String(name || '?').trim().charAt(0) || '?').toUpperCase();
+const CF_FILTERS = [['all', 'All clients', 'Everyone'], ['intake', 'Intake needed', 'Intake needed'], ['rebook', 'Due to rebook', 'Due to rebook'], ['next', 'Next up', 'Next up']];
+
+function clientStatus(p, t) {
+  const nx = nextBookingDate(p), last = lastSession(p, t) || (p.bookings[0] && p.bookings[0].booking_date);
+  if (nx) return 'Next: ' + fmtDate(nx);                                  // (the gold "Intake needed" chip on the right carries the intake status)
+  if (last) return 'Last: ' + fmtDate(last);
+  return 'No bookings yet';
+}
+function rebookSection(due, t) {
+  const sel = due.find((p) => personKey(p) === S.rebookSel) || due[0];
+  S.rebookSel = personKey(sel);
+  const mon = mondayOf(t), done = weekNudgeCount(mon), streak = nudgeStreak(t);
+  const bars = Array.from({ length: REBOOK_GOAL }, (_, i) => `<i class="${i < done ? 'on' : ''}"></i>`).join('');
+  const sent = nudgeSince(sel, t), visits = pastSessions(sel, t).length, last = lastSession(sel, t);
+  const label = !sel.phone ? 'No phone on file' : sent ? 'Nudge sent' : 'Send rebook nudge';
+  return `<section class="tile rb-goal"><div class="th-k">Rebook nudges this week</div>
+      <div class="rb-line"><span class="big">${done} / ${REBOOK_GOAL}</span><span class="rb-streak">${streak ? streak + '-week streak' : 'No streak yet'}</span></div>
+      <div class="rb-bars" role="progressbar" aria-valuemin="0" aria-valuemax="${REBOOK_GOAL}" aria-valuenow="${Math.min(done, REBOOK_GOAL)}">${bars}</div></section>
+    <div class="cl-sub">Due to rebook</div>
+    <div class="rb-row" role="listbox" aria-label="Due to rebook">${due.map((p) => `<button class="rb-av" type="button" role="option" data-rb="${esc(personKey(p))}" aria-selected="${personKey(p) === S.rebookSel}"><span class="av">${esc(initialOf(p.name))}</span><span class="nm">${esc(firstName(p.name))}</span></button>`).join('')}</div>
+    <section class="tile rb-sel"><div class="rb-name">${esc(shortName(sel.name))}</div><div class="rb-meta">Last seen ${esc(fmtDate(last))} · ${visits} ${plural(visits, 'visit')}</div>
+      <button class="rb-send${sent ? ' sent' : ''}" type="button" id="rbSend" ${sel.phone ? '' : 'disabled'}>${label}</button></section>`;
+}
 function viewClients() {
-  const q = lower(S.filter).trim();
-  let list = people();
+  const t = todayISO(), all = people(), q = lower(S.filter).trim(), fk = S.clientFilter || 'all';
+  const counts = { all: all.length, intake: all.filter((p) => !hasIntakeP(p)).length, rebook: all.filter((p) => isDueToRebook(p, t)).length, next: all.filter((p) => nextBookingDate(p)).length };
+  const pass = { all: () => true, intake: (p) => !hasIntakeP(p), rebook: (p) => isDueToRebook(p, t), next: (p) => !!nextBookingDate(p) }[fk];
+  let list = all.filter(pass);
   if (q) list = list.filter((p) => lower(p.name).includes(q) || lower(p.email).includes(q) || digits(p.phone).includes(digits(q)) && digits(q).length > 2);
-  list.sort((a, b) => { const na = nextBookingDate(a), nb = nextBookingDate(b); if (na && nb) return na.localeCompare(nb) || lower(a.name).localeCompare(lower(b.name)); if (na) return -1; if (nb) return 1; return lower(a.name).localeCompare(lower(b.name)); });
-  const rows = list.map((p) => {
-    const nx = nextBookingDate(p);
-    return `<button class="listrow" data-brief="${p.key}"><span><span class="nm">${esc(p.name)}</span> ${testPill(p.client)}<br><span class="sb">${nx ? 'Next: ' + fmtDate(nx) : (p.bookings[0] ? 'Last: ' + fmtDate(p.bookings[0].booking_date) : 'No bookings')}</span></span>${p.client && intakeOf(p.client.id) ? '' : '<span class="pill red">No intake</span>'}</button>`;
-  }).join('');
-  shell(`${pageHead('Clients')}<div class="toggle-line" style="margin-top:-8px"><span>Show test</span><button class="switch-wrap" id="testBtn" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div>${unlinkedCardHTML()}<input class="search" id="q" type="search" placeholder="Search name, phone or email" value="${esc(S.filter)}" autocomplete="off">${rows || '<div class="card empty">No clients match.</div>'}`);
+  list.sort((a, b) => { if (fk === 'rebook') return lastSession(a, t).localeCompare(lastSession(b, t)); const na = nextBookingDate(a), nb = nextBookingDate(b); if (na && nb) return na.localeCompare(nb) || lower(a.name).localeCompare(lower(b.name)); if (na) return -1; if (nb) return 1; return lower(a.name).localeCompare(lower(b.name)); });
+  const rows = list.map((p) => `<button class="crow" type="button" data-brief="${esc(p.key)}"><span class="av">${esc(initialOf(p.name))}</span><span class="ct"><span class="cn">${esc(shortName(p.name))} ${testPill(p.client)}</span><span class="cs">${esc(clientStatus(p, t))}</span></span>${hasIntakeP(p) ? '' : '<span class="chip-intake">Intake needed</span>'}<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>`).join('');
+  const due = dueToRebook(t);
+  const tiles = CF_FILTERS.map(([k, lab], i) => `<button class="cf-tile ${i === 0 ? 'cf-dark' : i === 1 ? 'cf-gold' : ''}" type="button" data-cf="${k}" aria-pressed="${fk === k}"><span class="th-k">${lab}</span><span class="cf-n">${counts[k]}</span></button>`).join('');
+  shell(`<div class="tile-home clients"><div class="th-titlerow"><h1>Clients</h1><span>${all.length} in your book</span></div>${unlinkedCardHTML()}
+    <div class="cf-grid">${tiles}</div>${due.length ? rebookSection(due, t) : ''}
+    <div class="cl-tools"><input class="search" id="q" type="search" placeholder="Search name, phone or email" value="${esc(S.filter)}" autocomplete="off"><div class="toggle-line"><span>Show test</span><button class="switch-wrap" id="testBtn" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div></div>
+    <section class="tile cl-list"><div class="th-head"><h2 class="th-title">${esc(CF_FILTERS.find((f) => f[0] === fk)[2])}</h2><span class="th-count muted-count">${list.length} shown</span></div>${rows || '<p class="th-empty">No clients match.</p>'}</section></div>`);
   document.getElementById('testBtn').onclick = () => setShowTest(!S.showTest);
   const qi = document.getElementById('q');
   qi.oninput = () => { S.filter = qi.value; const pos = qi.selectionStart; render(); const n = document.getElementById('q'); n.focus(); n.setSelectionRange(pos, pos); };
+  document.querySelectorAll('[data-cf]').forEach((b) => { b.onclick = () => { S.clientFilter = (S.clientFilter || 'all') === b.dataset.cf ? 'all' : b.dataset.cf; render(); }; });   // tapping the active tile returns to All
+  document.querySelectorAll('[data-rb]').forEach((b) => { b.onclick = () => { S.rebookSel = b.dataset.rb; render(); }; });
   document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief; }; });
+  const send = document.getElementById('rbSend');
+  if (send) send.onclick = () => nudgeClient(due.find((p) => personKey(p) === S.rebookSel), t);
+}
+/** Open the prefilled WhatsApp message and log it. A second nudge since the last session asks first. */
+function nudgeClient(p, t) {
+  if (!p || !p.phone) return;
+  const prior = nudgeSince(p, t);
+  const go = async () => {
+    window.open(rebookWA(p), '_blank', 'noopener');                         // inside the tap, so the phone lets it open
+    const row = { client_id: p.client ? p.client.id : null, client_email: p.client ? null : lower(p.email) };
+    try { const saved = await api.logNudge(row); (S.data.nudges || (S.data.nudges = [])).push(saved); if (S.raw && S.raw.nudges !== S.data.nudges) S.raw.nudges = S.data.nudges; toastMsg('Nudge sent'); }
+    catch (e) { toastMsg(friendly(e, 'save')); }
+    render();
+  };
+  if (!prior) return go();
+  const bg = document.createElement('div'); bg.className = 'sheet-bg';
+  bg.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="Send another nudge?"><div class="grab"></div><div class="lab">Rebook nudge</div>
+    <div style="font-weight:700;font-size:20px;letter-spacing:-.02em;margin-top:2px">Send another nudge?</div>
+    <p style="margin:var(--s3) 0 0">${esc(shortName(p.name))} was already nudged on ${esc(fmtDate(nudgeDay(prior)))}.</p>
+    <div class="sheet-actions" style="grid-template-columns:1fr 1fr"><button class="btn ghost" id="nd-no" type="button">Not now</button><button class="btn" id="nd-yes" type="button">Send again</button></div></div>`;
+  document.body.appendChild(bg);
+  bg.onclick = (e) => { if (e.target === bg) bg.remove(); };
+  bg.querySelector('#nd-no').onclick = () => bg.remove();
+  bg.querySelector('#nd-yes').onclick = () => { bg.remove(); go(); };
 }
 
 /* ---- Progress (check-ins) ---- */
@@ -2099,7 +2234,7 @@ function render() {
   if (S.admin) {
     if (!S.data) { shell('<div class="empty">' + (S.error ? loadErrorHTML() : 'Loading…') + '</div>', false); return; }
     route();
-    document.body.classList.toggle('tilebg', S.view === 'today');
+    document.body.classList.toggle('tilebg', S.view === 'today' || S.view === 'clients');
     window.scrollTo(0, 0);
     ({ today: viewToday, clients: viewClients, codes: viewCodes, stats: viewStats, settings: viewSettings, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
     return;

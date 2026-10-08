@@ -535,3 +535,20 @@ alter table public.admin_tasks enable row level security;
 grant select, insert, delete on public.admin_tasks to authenticated;
 grant select, insert, update, delete on public.admin_tasks to service_role;
 create policy admin_tasks_all on public.admin_tasks for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- rebook nudge log — migration "rebook_nudges", 8 Oct 2026 ----------------------------------
+-- One row each time the admin taps "Send rebook nudge" (the message itself goes out through WhatsApp, which the admin sends).
+-- The weekly count (goal 3, week resets Monday) and the streak are worked out from this log only. Admin-only.
+create table if not exists public.rebook_nudges (
+  id           bigint generated always as identity primary key,
+  client_id    bigint references public.clients(id) on delete cascade,
+  client_email text,
+  sent_at      timestamptz not null default now(),
+  sent_by      uuid references auth.users(id) on delete set null,
+  check (client_id is not null or client_email is not null)
+);
+create index if not exists rebook_nudges_sent_idx on public.rebook_nudges(sent_at);
+alter table public.rebook_nudges enable row level security;
+grant select, insert on public.rebook_nudges to authenticated;
+grant select, insert, update, delete on public.rebook_nudges to service_role;
+create policy rebook_nudges_admin on public.rebook_nudges for all to authenticated using (public.is_admin()) with check (public.is_admin());
