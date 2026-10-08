@@ -89,6 +89,8 @@
   .arr-card p { margin: 0; }
   .arr-card .t { font-size: 16px; font-weight: 600; line-height: 1.4; }
   .arr-card .s { font-size: 14.5px; color: var(--muted); line-height: 1.5; margin-top: 6px; }
+  .arr-err { margin: 12px 0 0; font-size: 14px; line-height: 1.45; color: var(--arr-muted); text-align: center; }
+  .arr-err:empty { display: none; }
   .arr-foot { width: 100%; margin-top: 22px; text-align: center; font-size: 14px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; }
   .arr-foot a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; color: var(--gold-deep); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; font: inherit; font-size: 14px; font-weight: 500; }
   .arr-foot span { line-height: 1.5; }
@@ -635,11 +637,16 @@ function pageHead(title) { return `<div class="eyebrow">haloe · ${esc(fmtDateLo
 const RESEND_SECONDS = 45;
 const loginHeaderHTML = () => `<header class="login-top"><button class="icon-btn" id="themeBtn" aria-label="Toggle light or dark">${ICON.moon}</button></header>`;
 const arrivalBrand = () => '<div class="arr-brand"><img class="arr-mark" src="/haloe-logo-flower.svg" alt=""><div class="arr-word" aria-label="haloe">haloe</div><div class="arr-tag">Hijama · Wellness · Manchester</div></div>';
-/** The one-time-link request — unchanged from before the redesign. */
+/** The one-time-link request. Resolves true if the link was sent, false for ANY failure (network down, rate limit, anything) —
+ *  the caller shows a calm message; technical error text is never shown to anyone. */
+const SEND_FAILED_MSG = "That didn't send. Please try again in a minute.";
 async function sendLink(email) {
   // Sign-ups stay ON: anyone can sign in with an email link. What a signed-in user can SEE is decided
   // entirely by row-level security (admin → everything; client → only their own rows).
-  await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + '/app/' } });
+  try {
+    const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + '/app/' } });
+    return !error;
+  } catch (e) { return false; }
 }
 function viewLogin() {
   clearInterval(S.loginTimer);
@@ -649,15 +656,17 @@ function viewLogin() {
       <p class="arr-sub">We'll email you a one-time link. No password needed.</p>
       <form id="loginForm"><label class="arr-label" for="em">Email</label>
         <input class="arr-input" id="em" type="email" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" required placeholder="you@example.com" value="${esc(S.loginEmail || '')}">
-        <button class="arr-btn" id="sendBtn" type="submit">Send me a link</button></form></section>
+        <button class="arr-btn" id="sendBtn" type="submit">Send me a link</button><p class="arr-err" id="loginMsg" role="status" aria-live="polite"></p></form></section>
     <footer class="arr-foot"><span>Tuesdays at Milton Hall, Deansgate</span><span>New to haloe? <a href="/book">Book a session</a></span></footer></main>`;
   wireHeader();
   document.getElementById('loginForm').onsubmit = async (e) => {
     e.preventDefault();
     const email = document.getElementById('em').value.trim();
-    const btn = document.getElementById('sendBtn'); btn.disabled = true; btn.textContent = 'Sending…';
-    await sendLink(email);
-    S.loginEmail = email; S.loginStage = 'sent'; S.resendAt = Date.now() + RESEND_SECONDS * 1000;
+    const btn = document.getElementById('sendBtn'), msg = document.getElementById('loginMsg'); btn.disabled = true; btn.textContent = 'Sending…'; msg.textContent = '';
+    S.loginEmail = email;                                    // keep what she typed, whatever happens
+    const sent = await sendLink(email);
+    if (!sent) { msg.textContent = SEND_FAILED_MSG; btn.disabled = false; btn.textContent = 'Send me a link'; return; }
+    S.loginStage = 'sent'; S.resendAt = Date.now() + RESEND_SECONDS * 1000;
     viewLogin();
   };
 }
@@ -666,7 +675,7 @@ function viewLinkSent() {
     <section class="arr-lower"><h1 class="arr-h" tabindex="-1">Check your inbox.</h1>
       <p class="arr-sub">We've sent a one-time link to <b>${esc(S.loginEmail)}</b></p>
       <div class="arr-card"><p class="t">Tap the link in the email to sign in.</p><p class="s">It works once and expires shortly. Can't see it? Check your spam folder.</p></div>
-      <button class="arr-btn ghost" id="resendBtn" type="button" disabled>Send again in 0:${RESEND_SECONDS}</button>
+      <button class="arr-btn ghost" id="resendBtn" type="button" disabled>Send again in 0:${RESEND_SECONDS}</button><p class="arr-err" id="resendMsg" role="status" aria-live="polite"></p>
       <button class="arr-textbtn" id="otherEmail" type="button">Use a different email</button></section>
     <footer class="arr-foot"><span>Need a hand? <a href="https://wa.me/${HALIMA_WA}" target="_blank" rel="noopener">Message Halima</a></span></footer></main>`;
   wireHeader();
@@ -680,8 +689,13 @@ function viewLinkSent() {
   };
   S.loginTimer = setInterval(tick, 500); tick();
   btn.onclick = async () => {
-    btn.disabled = true; btn.textContent = 'Sending…';
-    await sendLink(S.loginEmail);
+    btn.disabled = true; btn.textContent = 'Sending…'; document.getElementById('resendMsg').textContent = '';
+    const sent = await sendLink(S.loginEmail);
+    if (!sent) {                                              // keep the countdown as it was; just say it didn't go
+      document.getElementById('resendMsg').textContent = SEND_FAILED_MSG;
+      clearInterval(S.loginTimer); S.loginTimer = setInterval(tick, 500); tick();
+      return;
+    }
     S.resendAt = Date.now() + RESEND_SECONDS * 1000; toastMsg('Link sent again');
     clearInterval(S.loginTimer); S.loginTimer = setInterval(tick, 500); tick();
   };
