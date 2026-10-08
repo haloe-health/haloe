@@ -201,10 +201,10 @@
   .act li b { display: block; color: var(--ink); font-weight: 600; }
   .act li span { color: var(--ink); opacity: .85; }
   .clear { background: var(--green-bg); color: var(--green); font-weight: 600; }
-  .inwords { font-family: var(--serif-text); font-size: 17px; line-height: 1.5; margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .inwords { font-family: var(--serif-text); font-size: 17px; line-height: 1.5; margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }   /* inside the brief (.kv) the shared scale below takes over */
   .inwords.none { color: var(--muted); font-style: italic; }
   .kv { display: grid; gap: 14px; }
-  .kv .k { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  /* .kv .k label size/tracking come from the shared brief scale above */
   .hist { display: grid; gap: 10px; margin-top: 10px; }
   .hist .h { padding: 12px 14px; background: var(--fill); border-radius: 16px; font-size: 14px; }
   .hist .h b { font-weight: 600; }
@@ -293,28 +293,31 @@
   :root[data-theme="dark"] .toast { background: var(--fill); box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 36px rgba(0,0,0,.5); }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .toast { background: var(--fill); box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 36px rgba(0,0,0,.5); } }
   @media (prefers-reduced-motion: reduce) { .toast { transition: none; transform: none; } }
+  /* ---- ONE type scale for the intake brief, used everywhere it appears (Today cards, the Next-up card, the client profile) ----
+   * Visual only. Values are normal body-text size (like a phone mail list), not headlines. */
+  :root { --t-pkg: 17px; --t-pill: 14px; --t-label: 11px; --t-value: 15px; --t-value-lh: 1.5; --t-label-track: .12em; }
+  .t-label, .glance .gl-k, .kv .k { font-size: var(--t-label); letter-spacing: var(--t-label-track); text-transform: uppercase; color: var(--muted); }
+  .t-value, .glance .why, .glance .med-text, .glance .med-yes, .glance .med-none, .glance .dim, .kv .inwords { font-size: var(--t-value); line-height: var(--t-value-lh); font-weight: 400; }
+  .t-pill, .glance .flag, .glance .no-intake { font-size: var(--t-pill); font-weight: 500; line-height: 1.4; }
   /* glance lines on the session cards (admin home): package · why · medication — her words, verbatim */
-  .sess .glance { grid-column: 1 / -1; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--fill-hover); display: grid; gap: 10px; cursor: pointer; font-size: 17px; line-height: 1.4; }
+  .sess .glance { grid-column: 1 / -1; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--fill-hover); display: grid; gap: 10px; cursor: pointer; font-size: var(--t-value); line-height: var(--t-value-lh); }
   .glance .gl-pkg { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
-  .glance .pkg { font-weight: 700; font-size: 18px; overflow-wrap: anywhere; }
-  .glance .flag { display: inline-block; background: var(--gold); color: #1C1A16; font-weight: 600; font-size: 14.5px; line-height: 1.35; padding: 5px 12px; border-radius: 12px; overflow-wrap: anywhere; }
+  .glance .pkg { font-weight: 600; font-size: var(--t-pkg); line-height: 1.35; overflow-wrap: anywhere; }
+  .glance .flag { display: inline-block; background: var(--gold); color: #1C1A16; padding: 4px 11px; border-radius: 12px; overflow-wrap: anywhere; }
   .glance .gl-row { display: grid; gap: 4px; }
-  .glance .gl-k { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-  .glance .why { display: block; width: 100%; min-height: 44px; margin: 0; padding: 8px 12px; border: 0; border-radius: 14px; background: var(--fill); color: var(--ink); font: inherit; font-size: 17px; line-height: 1.4; text-align: left; overflow-wrap: anywhere; cursor: pointer; }
+  .glance .gl-k { font-weight: 600; }
+  .glance .why { display: block; width: 100%; min-height: 44px; margin: 0; padding: 8px 12px; border: 0; border-radius: 14px; background: var(--fill); color: var(--ink); font-family: inherit; text-align: left; overflow-wrap: anywhere; cursor: pointer; }
   .glance .why .wtxt { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .glance .why[aria-expanded="true"] .wtxt { white-space: pre-wrap; overflow: visible; }
-  .glance .med-text { display: inline-block; padding: 7px 14px; border-radius: 14px; background: #FFE9A8; color: #3A2B00; font-weight: 600; white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: inset 0 0 0 2px #E8B84A; }
+  .glance .med-text { display: inline-block; padding: 6px 12px; border-radius: 14px; background: #FFE9A8; color: #3A2B00; font-weight: 500; white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: inset 0 0 0 2px #E8B84A; }
   :root[data-theme="dark"] .glance .med-text { background: #4A3A0E; color: #FFE9A8; box-shadow: inset 0 0 0 2px #B8892A; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .glance .med-text { background: #4A3A0E; color: #FFE9A8; box-shadow: inset 0 0 0 2px #B8892A; } }
   .glance .med-none { color: var(--muted); }
-  .glance .med-yes { display: inline-block; padding: 6px 12px; border-radius: 14px; box-shadow: inset 0 0 0 2px #E8B84A; font-weight: 600; }
-  .glance .no-intake { display: inline-block; padding: 7px 16px; border-radius: 999px; background: var(--gold); color: #1C1A16; font-weight: 700; }
+  .glance .med-yes { display: inline-block; padding: 5px 12px; border-radius: 14px; box-shadow: inset 0 0 0 2px #E8B84A; font-weight: 500; }
+  .glance .no-intake { display: inline-block; padding: 5px 14px; border-radius: 999px; background: var(--gold); color: #1C1A16; }
   .glance .dim { color: var(--muted); }
   .sess.feature { padding: 22px 20px; border: 2px solid var(--gold); }
-  .sess.feature .glance { font-size: 20px; gap: 14px; }
-  .sess.feature .glance .pkg { font-size: 22px; }
-  .sess.feature .glance .flag { font-size: 16.5px; }
-  .sess.feature .glance .why, .sess.feature .glance .med-text, .sess.feature .glance .med-yes { font-size: 20px; }
+  .sess.feature .glance { gap: 14px; }
   .sess.feature .name { font-size: 22px; }
   .nextup-label { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-deep); margin: 6px 4px 8px; }
 
