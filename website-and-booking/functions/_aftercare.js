@@ -92,15 +92,19 @@ ${cell(`<div class="gold-text" style="font-family:${FONT};font-size:12px;line-he
 </html>`;
 }
 
-export function reminderEmail(name, day) {
-  // The words are the app's: the stage for this day (Tomorrow / Day 7) plus the photo line, from the shared copy.
-  const step = AFTERCARE_COPY.steps.find((s2) => s2.at === day);
+export function reminderEmail(name, day, treatment) {
+  // The words are the app's, from the shared copy: the stage for this day (Tomorrow / Day 7) of the set that matches the booked
+  // treatment (massage -> the massage set + its safety line; cupping -> the original wording + photo line; a package -> both).
+  // A name nothing matches keeps the original hijama wording. A massage booking never gets hijama wording.
+  const found = AFTERCARE_COPY.kindsOf(treatment), kinds = found.length ? found : ['hijama'];
+  const text = kinds.map((k) => AFTERCARE_COPY.sets[k].steps.find((s2) => s2.at === day).text).join(' ');
+  const noteLine = kinds.map((k) => (k === 'hijama' ? AFTERCARE_COPY.photoLine : AFTERCARE_COPY.sets[k].safety)).join(' ');
   const html = reminderLayout({
     eyebrow: day === 1 ? 'Aftercare · day 1' : 'Aftercare · day 7',
     headline: HEADLINE[day],
     greeting: firstName(name) ? `Hi ${firstName(name)},` : 'Hello,',
-    body: step.text,
-    note: AFTERCARE_COPY.photoLine,
+    body: text,
+    note: noteLine,
   });
   return { subject: day === 1 ? 'Your aftercare note · day 1' : 'Your aftercare note · day 7', html };
 }
@@ -136,7 +140,7 @@ export async function runAftercare(env, now = new Date()) {
 async function sendReminders(env, now, today, out) {
   const since = new Date(now.getTime() - 9 * 86400000).toISOString();
   const rows = await sbRequest(env, {
-    path: `/rest/v1/bookings?select=id,client_id,customer_name,customer_email,done_at&status=eq.confirmed&is_test=eq.false&done_at=gte.${encodeURIComponent(since)}`,
+    path: `/rest/v1/bookings?select=id,client_id,customer_name,customer_email,treatment,done_at&status=eq.confirmed&is_test=eq.false&done_at=gte.${encodeURIComponent(since)}`,
     method: 'GET',
   });
   const due = (rows || []).map((b) => ({ b, day: daysBetween(londonDate(b.done_at), today) })).filter((x) => REMINDER_DAYS.includes(x.day));
@@ -161,7 +165,7 @@ async function sendReminders(env, now, today, out) {
     const release = async () => { out.released++; await sbRequest(env, { path: `/rest/v1/aftercare_reminders?booking_id=eq.${b.id}&day=eq.${day}`, method: 'DELETE', prefer: 'return=minimal' }).catch(() => {}); };
     if (!env.RESEND_API_KEY) { await release(); continue; }
     try {
-      const m = reminderEmail(b.customer_name, day);
+      const m = reminderEmail(b.customer_name, day, b.treatment);
       await sendEmail(env.RESEND_API_KEY, { from: FROM, to: [b.customer_email], reply_to: HALIMA_EMAIL, subject: m.subject, html: m.html });
       out.emailed++;
     } catch (err) {

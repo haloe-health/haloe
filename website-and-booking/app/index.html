@@ -365,6 +365,9 @@
   .tl .body { margin-top: 6px; display: grid; gap: 8px; font-size: 14.5px; line-height: 1.5; }
   .tl .body p { margin: 0; }
   .tl-photo { margin: 14px 0 0; }
+  .tl-kind { margin: 18px 0 0; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .tl .safe { margin-top: 2px; }
+  .tl-book { margin-top: 14px; min-height: 44px; }
   .tl li.future .body, .tl li.past .body { display: none; }
   .tl.all li .body { display: grid; }
   .tl.all li.future, .tl.all li.past { opacity: .72; }
@@ -1097,6 +1100,7 @@ const ICON = {
   sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/></svg>',
   moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>',
   out: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5.5A1.5 1.5 0 0 0 4 5.5v13A1.5 1.5 0 0 0 5.5 20H9M15 8l4 4-4 4M19 12H9"/></svg>',
+  aftercare: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s6 6.2 6 10.5a6 6 0 0 1-12 0C6 9.2 12 3 12 3z"/></svg>',
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v8.5a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 19.5z"/><path d="M9.5 21v-6h5v6"/></svg>',
   progress: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17l5-6 4 3 7-8"/><path d="M3.5 21h17"/></svg>',
   book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17M12 13.5v4M10 15.5h4"/></svg>',
@@ -1420,9 +1424,9 @@ function viewNoMatch() {
 }
 
 function tabbarHTML() {
-  const items = S.isClient ? [['home', 'Home'], ['progress', 'Progress'], ['book', 'Book']] : [['today', 'Today'], ['clients', 'Clients'], ['codes', 'Codes'], ['stats', 'Stats']];
-  return `<div class="navdock"><div class="tabbar${S.isClient ? ' three' : ''}" role="navigation" aria-label="Main">${items.map(([k, l]) =>
-    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') || (k === 'home' && S.view === 'aftercare') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span></button>`).join('')}</div>${S.isClient ? '' : '<a class="navplus" href="/book?location=clinic" target="_blank" rel="noopener" aria-label="Book a session">+</a>'}</div>`;
+  const items = S.isClient ? [['home', 'Home'], ['aftercare', 'Aftercare'], ['progress', 'Progress'], ['book', 'Book']] : [['today', 'Today'], ['clients', 'Clients'], ['codes', 'Codes'], ['stats', 'Stats']];
+  return `<div class="navdock"><div class="tabbar" role="navigation" aria-label="Main">${items.map(([k, l]) =>
+    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span></button>`).join('')}</div>${S.isClient ? '' : '<a class="navplus" href="/book?location=clinic" target="_blank" rel="noopener" aria-label="Book a session">+</a>'}</div>`;
 }
 
 function shell(inner, withNav = true) {
@@ -2290,7 +2294,7 @@ function viewHome() {
     <a class="listrow" href="/intake"><span><span class="nm">Your intake form</span><br><span class="sb">${intakeSub}</span></span></a>`;
   const pastCard = past.length ? `<h2 class="sub">Past sessions</h2><div class="card"><div class="hist" style="margin-top:0">${past.map((x) => `<div class="h"><b>${esc(fmtDate(x.booking_date))} · ${fmtTime(x.start_min)}</b><br>${esc(x.treatment || '—')} ${tagHTML(pk(x))}<br><span class="muted">${esc(placeOf(x))} · booked ${esc(bookedOn(x))}</span></div>`).join('')}</div></div>` : '';
   const ac = aftercareState(d.bookings);
-  const photoRow = d.client && !ac ? `<button class="listrow" id="photoBtnHome" type="button"><span><span class="nm">Worried about a mark?</span><br><span class="sb">Send Halima a photo</span></span></button>` : '';
+  const photoRow = d.client && !ac && aftercareKinds(d.bookings).includes('hijama') ? `<button class="listrow" id="photoBtnHome" type="button"><span><span class="nm">Worried about a mark?</span><br><span class="sb">Send Halima a photo</span></span></button>` : '';
   shell(`${pageHead(who ? 'Hello, ' + firstName(who) : 'Hello')}${newTime}${ac ? aftercareCardHTML(ac) : ''}${nextCard}${noClient}<h2 class="sub">Good to have to hand</h2>${photoRow}${links}${pastCard}`);
   const pbc = document.getElementById('photoBtnCard'); if (pbc) pbc.onclick = openPhotoSheet;
   const pbh = document.getElementById('photoBtnHome'); if (pbh) pbh.onclick = openPhotoSheet;
@@ -2326,40 +2330,58 @@ function viewBook() {
 /* ---------- client: aftercare timeline + photos for Halima ---------- */
 // ALL the wording lives in /aftercare-copy.js (also used by the Day 1 / Day 7 reminder emails) — never type it here.
 // Symptom language only; one short paragraph per stage; the photo line is shown once under the timeline.
-const AFTERCARE_STEPS = AFTERCARE_COPY.steps, AFTERCARE_PHOTO_LINE = AFTERCARE_COPY.photoLine;
+// The hijama and massage sets and the choice between them live in /aftercare-copy.js. The five steps (at: 0,1,3,7,14) are the same in both.
+const AFTERCARE_PHOTO_LINE = AFTERCARE_COPY.photoLine;
 const BLISTER_GUIDANCE = AFTERCARE_COPY.blister;
 const daysBetween = (fromISO, toISO) => Math.round((Date.parse(toISO + 'T12:00:00Z') - Date.parse(fromISO + 'T12:00:00Z')) / 86400000);
+/** Which set(s) apply to a booking: from the treatment she booked; a name nothing matches keeps the original hijama wording. */
+const kindsForBooking = (b) => { const k = AFTERCARE_COPY.kindsOf(b && b.treatment); return k.length ? k : ['hijama']; };
+/** Set(s) for the guide when nothing is current: her most recent session (done, else booked); hijama if there is none. */
+function aftercareKinds(bookings) {
+  const live = bookings.filter((b) => b.status === 'confirmed');
+  const done = live.filter((b) => b.done_at).sort((x, y) => String(y.done_at).localeCompare(String(x.done_at)));
+  const latest = done[0] || live.sort((x, y) => String(y.booking_date).localeCompare(String(x.booking_date)))[0];
+  return latest ? kindsForBooking(latest) : ['hijama'];
+}
 /** Where she is in the 14 days after her most recent session marked done; null when there's nothing to show. */
 function aftercareState(bookings) {
   const done = bookings.filter((b) => b.done_at && (b.status === 'confirmed')).sort((a, b) => String(b.done_at).localeCompare(String(a.done_at)));
   if (!done.length) return null;
   const day = daysBetween(ldn(new Date(done[0].done_at)), todayISO());
   if (day < 0 || day > 14) return null;
-  let idx = 0; AFTERCARE_STEPS.forEach((st, i) => { if (st.at <= day) idx = i; });
-  return { booking: done[0], day, idx };
+  const kinds = kindsForBooking(done[0]);
+  let idx = 0; AFTERCARE_COPY.sets[kinds[0]].steps.forEach((st, i) => { if (st.at <= day) idx = i; });
+  return { booking: done[0], day, idx, kinds };
 }
-function timelineHTML(state, all) {
-  return '<ul class="tl' + (all ? ' all' : '') + '">' + AFTERCARE_STEPS.map((st, i) => {
-    const cls = state ? (i === state.idx ? 'now' : i < state.idx ? 'past' : 'future') : 'future';
-    return '<li class="' + cls + '"' + (cls === 'now' ? ' aria-current="step"' : '') + '><span class="dot"></span><div class="hd"><b>' + esc(st.label) + '</b><span>' + esc(st.sub) + '</span></div>' +
-      '<div class="body"><p>' + esc(st.text) + '</p></div></li>';
-  }).join('') + '</ul><p class="muted small tl-photo">' + esc(AFTERCARE_PHOTO_LINE) + '</p>';
+const KIND_TITLE = { hijama: 'Cupping', massage: 'Massage' };
+function timelineHTML(state, all, kinds) {
+  const ks = state ? state.kinds : (kinds || ['hijama']);
+  return ks.map((k) => {
+    const set = AFTERCARE_COPY.sets[k];
+    return (ks.length > 1 ? '<h3 class="tl-kind">' + KIND_TITLE[k] + '</h3>' : '') + '<ul class="tl' + (all ? ' all' : '') + '" data-kind="' + k + '">' + set.steps.map((st, i) => {
+      const cls = state ? (i === state.idx ? 'now' : i < state.idx ? 'past' : 'future') : 'future';
+      return '<li class="' + cls + '"' + (cls === 'now' ? ' aria-current="step"' : '') + '><span class="dot"></span><div class="hd"><b>' + esc(st.label) + '</b><span>' + esc(st.sub) + '</span></div>' +
+        '<div class="body"><p>' + esc(st.text) + '</p>' + (set.safety ? '<p class="safe muted small">' + esc(set.safety) + '</p>' : '') + '</div></li>';
+    }).join('') + '</ul>' +
+      (k === 'hijama' ? '<p class="muted small tl-photo">' + esc(AFTERCARE_PHOTO_LINE) + '</p>' : '<a class="btn ghost block tl-book" href="/book">Book a session</a>');
+  }).join('');
 }
 const photoCtaHTML = (id, gold) => gold
   ? '<button class="btn block multi" style="margin-top:14px" id="' + id + '" type="button">Worried about a mark? Send Halima a photo</button>'   // the same gold .btn as Book a session
   : '<button class="photo-cta" id="' + id + '" type="button">Worried about a mark? Send Halima a photo</button>';
+const introFor = (kinds) => kinds.map((k) => AFTERCARE_COPY.sets[k].intro).filter(Boolean).join(' ');
 function aftercareCardHTML(state) {
+  const intro = introFor(state.kinds);
   return '<div class="card" id="aftercareCard"><div class="section-label">Aftercare</div>' +
-    '<p class="muted small" style="margin:8px 0 0">' + (state.day === 0 ? 'Your session was today.' : state.day === 1 ? 'Your session was yesterday.' : 'Your session was ' + state.day + ' days ago.') + ' ' + esc(AFTERCARE_COPY.intro) + '</p>' +
+    '<p class="muted small" style="margin:8px 0 0">' + (state.day === 0 ? 'Your session was today.' : state.day === 1 ? 'Your session was yesterday.' : 'Your session was ' + state.day + ' days ago.') + (intro ? ' ' + esc(intro) : '') + '</p>' +
     timelineHTML(state, false) +
-    '<a class="btn block" style="margin-top:16px" href="#/aftercare">See the full aftercare guide</a>' + photoCtaHTML('photoBtnCard', true) + '</div>';
+    '<a class="btn block" style="margin-top:16px" href="#/aftercare">See the full aftercare guide</a>' + (state.kinds.includes('hijama') ? photoCtaHTML('photoBtnCard', true) : '') + '</div>';
 }
 function viewAftercare() {
-  const state = aftercareState(S.cdata.bookings);
-  shell('<button class="back" id="bk">' + ICON.back + 'Home</button>' + pageHead('Aftercare') +
-    '<div class="card"><div class="section-label">Your timeline</div><p class="muted small" style="margin:8px 0 0">' + (state ? AFTERCARE_COPY.intro + ' You are on the highlighted step.' : 'This guide follows your marks over the 14 days after a session. It lights up once your session is done. ' + AFTERCARE_COPY.intro) + '</p>' + timelineHTML(state, true) + '</div>' +
-    '<div class="card blister"><div class="section-label">A small blister?</div><p style="margin:10px 0 0">' + esc(BLISTER_GUIDANCE) + '</p>' + (S.cdata.client ? photoCtaHTML('photoBtnPage', true) : '') + '</div>');
-  document.getElementById('bk').onclick = () => { location.hash = '#/home'; };
+  const state = aftercareState(S.cdata.bookings), kinds = state ? state.kinds : aftercareKinds(S.cdata.bookings), intro = introFor(kinds);
+  shell(pageHead('Aftercare') +
+    '<div class="card"><div class="section-label">Your timeline</div><p class="muted small" style="margin:8px 0 0">' + (state ? esc((intro ? intro + ' ' : '') + 'You are on the highlighted step.') : 'Nothing to follow right now. This guide shows what to expect over the 14 days after a session.') + '</p>' + timelineHTML(state, true, kinds) + '</div>' +
+    (kinds.includes('hijama') ? '<div class="card blister"><div class="section-label">A small blister?</div><p style="margin:10px 0 0">' + esc(BLISTER_GUIDANCE) + '</p>' + (S.cdata.client ? photoCtaHTML('photoBtnPage', true) : '') + '</div>' : ''));
   const pb = document.getElementById('photoBtnPage'); if (pb) pb.onclick = openPhotoSheet;
 }
 
