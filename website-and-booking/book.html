@@ -1155,6 +1155,14 @@
   .pay-secondary { background: none; color: var(--cream); border: 1px solid rgba(13,13,13,0.16); }
   .pay-secondary:hover:not(:disabled) { background: rgba(13,13,13,0.06); }
   .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  /* Modesty and care — part of the review step, never a pop-up. Sand card, gold edge, no red/green/warning icons. */
+  .care-card { position: relative; display: flex; gap: 12px; align-items: flex-start; box-sizing: border-box; width: 100%; margin: 1rem 0 0; padding: 16px 16px 16px 19px; background: #EFE7D8; border-radius: 28px; overflow: hidden; color: #4A3F2E; }
+  .care-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #C8A96E; }
+  .care-ico { flex: none; width: 40px; height: 40px; border-radius: 50%; background: #FFFFFF; display: grid; place-items: center; }
+  .care-txt { min-width: 0; }
+  .care-h { margin: 0 0 4px; font-size: 15px; font-weight: 600; line-height: 1.4; color: #4A3F2E; }
+  .care-b { margin: 0; font-size: 14px; line-height: 1.5; color: #4A3F2E; overflow-wrap: anywhere; }
+  .care-pay-hint { font-size: 0.78rem; color: var(--text-muted); text-align: center; margin: 0.6rem 0 0; line-height: 1.5; }
   .pay-note {
     font-size: 0.72rem; color: var(--text-muted); text-align: center;
     margin-top: 0.7rem; line-height: 1.6;
@@ -1894,9 +1902,15 @@
       </label>
     </div>
 
+    <div class="care-card" id="care-card" role="note">
+      <span class="care-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="4" rx="2"/><rect x="3" y="10" width="18" height="4" rx="2"/><rect x="4" y="16" width="16" height="4" rx="2"/></svg></span>
+      <div class="care-txt"><p class="care-h" id="care-h"></p><p class="care-b" id="care-b"></p></div>
+    </div>
+
     <div class="pay-actions">
       <button class="pay-btn pay-primary" id="btn-full" onclick="handlePayment()" disabled>Pay in full</button>
     </div>
+    <p class="care-pay-hint" id="care-pay-hint"></p>
     <p class="pay-note">Halima confirms by WhatsApp after payment — please check your number is right.</p>
   </div>
 
@@ -1918,6 +1932,8 @@
 
 <script src="services-data.js"></script>
 <script src="clinic-rules.js"></script>
+<script src="/care-copy.js"></script>
+<script>(function(){var C=window.CARE_COPY||{};document.getElementById('care-h').textContent=C.heading||'';document.getElementById('care-b').textContent=C.body||'';document.getElementById('care-pay-hint').textContent=C.payHint||'';})();</script>
 <script>
 // SERVICES, PROMO_DISCOUNT and netPrice() come from services-data.js — the
 // same file hijama-manchester.html loads, so the two price lists can't

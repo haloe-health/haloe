@@ -72,6 +72,10 @@ export async function onRequestPost(context) {
         return json({ error: 'Please tick all required consent boxes.' }, 400);
       }
     }
+    // Modesty and care (care-copy.js): required on every NEW submission. Old rows keep null and are never backfilled.
+    if (!truthy(data.consent_modesty)) {
+      return json({ error: 'Please tick all required consent boxes.' }, 400);
+    }
 
     const supabaseUrl = str(context.env.SUPABASE_URL).replace(/\/$/, '');
     const serviceKey = context.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -135,6 +139,8 @@ export async function onRequestPost(context) {
       consent_treatment: truthy(data.consent_treatment),
       consent_notify_changes: truthy(data.consent_notify_changes),
       consent_data_storage: truthy(data.consent_data_storage),
+      consent_modesty: true,
+      consent_modesty_at: new Date().toISOString(),   // set here on the server, never taken from the browser
       photo_consent: orNull(data.photo_consent),
       signature_name: orNull(data.signature_name),
       signature_date: orNull(data.signature_date),

@@ -13,6 +13,7 @@ import {
 import { CLINIC_VENUE_ADDRESS } from './_clinic.js';
 import { pushNewBooking } from './_push.js';
 import { VENUE_COPY } from './_venue-copy.js';
+import { CARE_COPY } from './_care-copy.js';
 
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
@@ -197,6 +198,8 @@ function clientEmailHtml(d) {
                 { label: 'Travel', value: d.travelLabel },
                 { label: 'Total paid', value: d.amount, gold: true },
               ])}
+              <!-- Modesty and care (shared wording, same muted body style as the other paragraphs) -->
+              <tr><td style="padding:0 4px 14px;"><p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0;font-family:${FONT};">${esc(CARE_COPY.emailLine)}</p></td></tr>
               <!-- Clinic venue note -->
               ${clinicNote ? `<tr><td style="padding:4px 4px 14px;">${clinicNote}</td></tr>` : ''}
               <!-- Personal note + compliance -->

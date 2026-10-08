@@ -98,3 +98,8 @@ alter table public.intake_forms enable row level security;
 -- ------------------------------------------------------------------ --
 grant select, insert, update, delete on public.clients      to service_role;
 grant select, insert, update, delete on public.intake_forms to service_role;
+
+-- "Modesty and care" consent (Oct 2026): required on every NEW intake submission; null on older rows (never backfilled).
+-- consent_modesty_at is stamped by the Function (server time), not by the browser.
+alter table public.intake_forms add column if not exists consent_modesty boolean;
+alter table public.intake_forms add column if not exists consent_modesty_at timestamptz;

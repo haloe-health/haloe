@@ -408,6 +408,17 @@
   .check-item input:checked ~ .check-box { background: var(--gold); }
   .check-item input:checked ~ .check-box::after { transform: translateX(22px); width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--card); }
   .check-item input:focus-visible ~ .check-box { box-shadow: 0 0 0 3px var(--ring); }
+  /* Modesty and care: a real tick box (28px) on a 56px row, not a switch */
+  .care-field .care-head { font-size: 15px; font-weight: 600; color: var(--ink); margin: 0 0 6px; }
+  .care-field .care-body { font-size: 15px; line-height: 1.5; color: var(--ink); margin: 0 0 14px; }
+  .care-field .check-item { min-height: 56px; padding: 0 16px; }
+  .care-field .check-item .check-box { width: 28px; height: 28px; min-width: 28px; border-radius: 8px; background: transparent; border: 2px solid var(--gold) !important; box-sizing: border-box; order: 0; margin: 0; }
+  .care-field .check-item > span:not(.check-box) { order: 1; }
+  .care-field .check-item .check-box::after { top: 3px; left: 8px; width: 7px; height: 13px; border: solid var(--card); border-width: 0 2.5px 2.5px 0; border-radius: 0; background: none; box-shadow: none; transform: rotate(45deg) scale(0); transition: transform 120ms ease; }
+  .care-field .check-item input:checked ~ .check-box { background: var(--gold); }
+  .care-field .check-item input:checked ~ .check-box::after { transform: rotate(45deg) scale(1); width: 7px; height: 13px; border: solid var(--card); border-width: 0 2.5px 2.5px 0; border-radius: 0; background: none; }
+  .care-hint { font-size: 13px; color: var(--ink-soft, #6B5E4B); margin: 10px 0 0; text-align: right; }
+  .care-hint[hidden] { display: none; }
   /* a consent that is the whole card needs no second box inside the card */
   .field:has(> .check-list > .check-item:only-child) .check-item { background: none; padding: 0; border-radius: 0; }
 
@@ -482,6 +493,7 @@
     .progress-dots i, .choices .opt span, .check-item .check-box, .check-item .check-box::after, .choices.as-toggle .opt span, .choices.as-toggle .opt span::after { transition: none; }
   }
 </style>
+<script src="/care-copy.js"></script>
 </head>
 <body>
 <!-- Branded loading screen — fades on window load; CSS failsafe hides it if JS fails -->
@@ -937,6 +949,19 @@
         <div class="field-error" data-for="consent_data_storage">Please tick to consent.</div>
       </div>
 
+      <div class="field care-field">
+        <p class="care-head" id="careHead"></p>
+        <p class="care-body" id="careBody"></p>
+        <div class="check-list" data-group="consent_modesty">
+          <label class="check-item">
+            <input type="checkbox" id="consent_modesty">
+            <span class="check-box"></span>
+            <span id="careTick"></span>
+          </label>
+        </div>
+        <div class="field-error" data-for="consent_modesty">Please tick to continue.</div>
+      </div>
+
       <div class="field">
         <label class="q">Photography <span class="opt-hint">(optional — your choice, not required)</span>: Are you happy for anonymised photos — e.g. cups in place, never your face — to be used for haloe's education and social media?</label>
         <div class="choices stack" data-group="photo_consent">
@@ -976,8 +1001,9 @@
       <div class="step-nav">
         <button type="button" class="btn btn-outline" data-back>Back</button>
         <div class="spacer"></div>
-        <button type="button" class="btn btn-gold" id="submitBtn">Submit form</button>
+        <button type="button" class="btn btn-gold" id="submitBtn" disabled>Submit form</button>
       </div>
+      <p class="care-hint" id="careHint"></p>
     </section>
 
   </form>
@@ -1068,6 +1094,7 @@
       { key:'consent_treatment', type:'consent' },
       { key:'consent_notify_changes', type:'consent' },
       { key:'consent_data_storage', type:'consent' },
+      { key:'consent_modesty', type:'consent' },
       { key:'signature_canvas', type:'signature' },
       { key:'signature_name', type:'text' },
       { key:'signature_date', type:'text' }
@@ -1343,6 +1370,7 @@
       consent_treatment: checkVal('consent_treatment'),
       consent_notify_changes: checkVal('consent_notify_changes'),
       consent_data_storage: checkVal('consent_data_storage'),
+      consent_modesty: checkVal('consent_modesty'),
       photo_consent: radioVal('photo_consent'),
       signature_name: textVal('signature_name'),
       signature_date: textVal('signature_date'),
@@ -1351,6 +1379,18 @@
   }
 
   var submitBtn = document.getElementById('submitBtn');
+  // The shared wording (care-copy.js) fills the Modesty and care block; Submit stays greyed until the box is ticked (never pre-ticked).
+  (function () {
+    var C = window.CARE_COPY || {};
+    document.getElementById('careHead').textContent = C.heading || '';
+    document.getElementById('careBody').textContent = C.body || '';
+    document.getElementById('careTick').textContent = C.tick || '';
+    var box = document.getElementById('consent_modesty'), hint = document.getElementById('careHint');
+    box.checked = false;
+    function sync() { submitBtn.disabled = !box.checked; hint.textContent = box.checked ? '' : (C.hint || ''); hint.hidden = box.checked; }
+    box.addEventListener('change', sync); sync();
+    window.__careSync = sync;
+  })();
   submitBtn.addEventListener('click', function () {
     if (!validateStep(5)) return;
     submitBtn.disabled = true;
