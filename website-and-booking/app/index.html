@@ -409,7 +409,31 @@ function toggleTheme() {
 }
 
 /* ---------- data layer (the only code that talks to Supabase) ---------- */
-const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+/* ---------- network safety ----------
+ * Nothing in the app may wait forever. Every request goes through timedFetch: offline → fails at once, no answer in 12 s
+ * (40 s for a photo upload) → aborted. The error carries .net = 'offline' | 'timeout'; friendly() turns any failure into
+ * calm wording — technical error text is never shown to anyone. */
+const OFFLINE_MSG = 'You appear to be offline. Please check your connection and try again.';
+const TIMEOUT_MS = 12000, UPLOAD_TIMEOUT_MS = 40000;
+const netError = (kind) => { const e = new Error(kind); e.net = kind; return e; };
+function timedFetch(input, init) {
+  init = init || {};
+  if (navigator.onLine === false) return Promise.reject(netError('offline'));
+  const url = typeof input === 'string' ? input : (input && input.url) || '';
+  const ms = /\/storage\/v1\/object\//.test(url) && String(init.method || 'GET').toUpperCase() !== 'GET' ? UPLOAD_TIMEOUT_MS : TIMEOUT_MS;
+  const ac = new AbortController(); let timedOut = false;
+  const timer = setTimeout(() => { timedOut = true; ac.abort(); }, ms);
+  if (init.signal) { if (init.signal.aborted) ac.abort(); else init.signal.addEventListener('abort', () => ac.abort()); }
+  return fetch(input, Object.assign({}, init, { signal: ac.signal }))
+    .catch((e) => { throw timedOut ? netError('timeout') : (navigator.onLine === false ? netError('offline') : e); })
+    .finally(() => clearTimeout(timer));
+}
+/** Calm wording for any failed action. verb: 'save' | 'send' | 'delete' | 'change' … — never e.message. */
+function friendly(e, verb) {
+  if (e && e.net === 'offline' || navigator.onLine === false) return OFFLINE_MSG;
+  return "That didn't " + (verb || 'save') + '. Please try again in a minute.';
+}
+const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }, global: { fetch: timedFetch } });
 const api = {
   async load() {
     const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
@@ -433,7 +457,7 @@ const api = {
   async cancelReschedule(id) { const { error } = await sb.rpc('cancel_reschedule', { p_booking: id }); if (error) throw error; },
   async acceptReschedule(id) {
     const { data: { session } } = await sb.auth.getSession();
-    const res = await fetch('/reschedule-accept', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ bookingId: id }) });
+    const res = await timedFetch('/reschedule-accept', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ bookingId: id }) });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) throw Object.assign(new Error(body.error || 'failed'), { code: body.error });
     return body;
@@ -445,7 +469,7 @@ const api = {
   async deletePushRow(endpoint) { const { error } = await sb.from('push_subscriptions').delete().eq('endpoint', endpoint); if (error) throw error; },
   async sendTestPush(endpoint) {
     const { data: { session } } = await sb.auth.getSession();
-    const res = await fetch('/push-test', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint }) });
+    const res = await timedFetch('/push-test', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint }) });
     const body = await res.json().catch(() => ({}));
     return { status: res.status, ...body };
   },
@@ -468,7 +492,7 @@ const api = {
   },
   async alertPhoto(id) {
     const { data: { session } } = await sb.auth.getSession();
-    await fetch('/photo-alert', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ submissionId: id }) });
+    await timedFetch('/photo-alert', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ submissionId: id }) });
   },
   async addCheckIn(row) { const { data, error } = await sb.from('check_ins').insert(row).select().single(); if (error) throw error; return data; },
   async addNote(row) { const { data, error } = await sb.from('session_notes').insert(row).select().single(); if (error) throw error; return data; },
@@ -518,7 +542,7 @@ async function initClientPhotoCard() {
   btn.onclick = async () => {
     if (!armed) { btn.textContent = 'Tap again to delete all my photos'; armed = setTimeout(() => { armed = null; label(); }, 4000); return; }
     clearTimeout(armed); armed = null; btn.disabled = true; btn.textContent = 'Deleting…';
-    try { await api.deleteMyPhotos(); n = 0; toastMsg('Your photos have been deleted'); } catch (e) { toastMsg('Could not delete just now. Please try again.'); }
+    try { await api.deleteMyPhotos(); n = 0; toastMsg('Your photos have been deleted'); } catch (e) { toastMsg(friendly(e, 'delete')); }
     label();
   };
 }
@@ -541,7 +565,7 @@ async function initClientPushCard() {
         if (perm !== 'granted') { toastMsg('Reminders weren’t allowed on this device'); return initClientPushCard(); }
         const ns = sub || await pushApi.subscribe(); if (!row) await api.savePushRow(subRow(ns));
       }
-    } catch (e) { toastMsg('Could not change reminders: ' + e.message); }
+    } catch (e) { toastMsg(friendly(e, 'change')); }
     initClientPushCard();
   };
 }
@@ -563,7 +587,7 @@ async function initPushCard() {
       row = await api.getPushRow(sub.toJSON().endpoint);
       if (!row) { await api.savePushRow(subRow(sub)); row = await api.getPushRow(sub.toJSON().endpoint); }   // re-sync a subscription the database lost
     }
-  } catch (e) { return draw('<p class="muted small" style="margin:8px 0 0">Couldn’t load alert settings: ' + esc(e.message) + '</p>'); }
+  } catch (e) { return draw('<p class="muted small" style="margin:8px 0 0">Couldn’t load alert settings just now.</p>'); }
   const sw = (id, label, on) => '<div class="toggle-line" style="margin:2px 0"><span>' + label + '</span><button class="switch-wrap" id="' + id + '" aria-label="' + label + '"><span class="switch" role="switch" aria-checked="' + on + '"></span></button></div>';
   draw(sw('pushMain', 'Alerts on this device', !!sub) +
     (sub && row ? '<div style="margin:6px 0 0;padding-left:2px">' + sw('pushResch', 'Reschedule accepted', row.notify_reschedule) + sw('pushBook', 'New bookings', row.notify_booking) + sw('pushIntake', 'Intake forms', row.notify_intake) + sw('pushPhoto', 'Photos', row.notify_photo) +
@@ -579,18 +603,18 @@ async function initPushCard() {
         if (perm !== 'granted') { toastMsg('Alerts weren’t allowed on this device'); return initPushCard(); }
         const ns = await pushApi.subscribe(); await api.savePushRow(subRow(ns));
       }
-    } catch (e) { toastMsg('Could not change alerts: ' + e.message); }
+    } catch (e) { toastMsg(friendly(e, 'change')); }
     initPushCard();
   };
   if (sub && row) {
-    const flip = (id, col) => { document.getElementById(id).onclick = async () => { try { await api.updatePushRow(row.endpoint, { [col]: !row[col] }); } catch (e) { toastMsg('Could not save: ' + e.message); } initPushCard(); }; };
+    const flip = (id, col) => { document.getElementById(id).onclick = async () => { try { await api.updatePushRow(row.endpoint, { [col]: !row[col] }); } catch (e) { toastMsg(friendly(e, 'save')); } initPushCard(); }; };
     flip('pushResch', 'notify_reschedule'); flip('pushBook', 'notify_booking'); flip('pushIntake', 'notify_intake'); flip('pushPhoto', 'notify_photo');
     document.getElementById('pushTest').onclick = async (ev) => {
       const b = ev.currentTarget; b.disabled = true;
       try {
         const r = await api.sendTestPush(row.endpoint);
         toastMsg(r.status === 503 ? 'Alerts aren’t set up on the server yet (VAPID keys)' : r.status === 403 || r.status === 401 ? 'Not allowed' : r.sent > 0 ? 'Test alert sent — check your lock screen' : r.removed > 0 ? 'This device’s subscription had expired — switch alerts off and on again' : 'No alert could be sent');
-      } catch (e) { toastMsg('Could not send: ' + e.message); }
+      } catch (e) { toastMsg(friendly(e, 'send')); }
       b.disabled = false;
     };
   }
@@ -764,13 +788,15 @@ const arrivalBrand = () => '<div class="arr-brand"><img class="arr-mark" src="/h
  *  the caller shows a calm message; technical error text is never shown to anyone. */
 const SEND_FAILED_MSG = "That didn't send. Please try again in a minute.";
 async function sendLink(email) {
+  if (navigator.onLine === false) return 'offline';                  // don't even try
   // Sign-ups stay ON: anyone can sign in with an email link. What a signed-in user can SEE is decided
   // entirely by row-level security (admin → everything; client → only their own rows).
-  try {
-    const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + '/app/' } });
-    return !error;
-  } catch (e) { return false; }
+  const attempt = sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + '/app/' } })
+    .then(({ error }) => (error ? 'failed' : 'sent'), () => (navigator.onLine === false ? 'offline' : 'failed'));
+  const giveUp = new Promise((res) => setTimeout(() => res('failed'), TIMEOUT_MS + 500));   // belt and braces: a late answer is ignored
+  return Promise.race([attempt, giveUp]);
 }
+const sendMsg = (r) => (r === 'offline' ? OFFLINE_MSG : SEND_FAILED_MSG);
 function viewLogin() {
   clearInterval(S.loginTimer);
   if (S.loginStage === 'sent') return viewLinkSent();
@@ -785,10 +811,14 @@ function viewLogin() {
   document.getElementById('loginForm').onsubmit = async (e) => {
     e.preventDefault();
     const email = document.getElementById('em').value.trim();
-    const btn = document.getElementById('sendBtn'), msg = document.getElementById('loginMsg'); btn.disabled = true; btn.textContent = 'Sending…'; msg.textContent = '';
+    const btn = document.getElementById('sendBtn'), msg = document.getElementById('loginMsg'); msg.textContent = '';
     S.loginEmail = email;                                    // keep what she typed, whatever happens
-    const sent = await sendLink(email);
-    if (!sent) { msg.textContent = SEND_FAILED_MSG; btn.disabled = false; btn.textContent = 'Send me a link'; return; }
+    if (navigator.onLine === false) { msg.textContent = OFFLINE_MSG; return; }   // offline: say so at once, button stays usable
+    btn.disabled = true; btn.textContent = 'Sending…';
+    const seq = S.sendSeq = (S.sendSeq || 0) + 1;
+    const r = await sendLink(email);
+    if (seq !== S.sendSeq) return;                           // superseded: a late answer never changes the screen
+    if (r !== 'sent') { const m2 = document.getElementById('loginMsg'), b2 = document.getElementById('sendBtn'); if (m2) m2.textContent = sendMsg(r); if (b2) { b2.disabled = false; b2.textContent = 'Send me a link'; } return; }
     S.loginStage = 'sent'; S.resendAt = Date.now() + RESEND_SECONDS * 1000;
     viewLogin();
   };
@@ -812,17 +842,21 @@ function viewLinkSent() {
   };
   S.loginTimer = setInterval(tick, 500); tick();
   btn.onclick = async () => {
-    btn.disabled = true; btn.textContent = 'Sending…'; document.getElementById('resendMsg').textContent = '';
-    const sent = await sendLink(S.loginEmail);
-    if (!sent) {                                              // keep the countdown as it was; just say it didn't go
-      document.getElementById('resendMsg').textContent = SEND_FAILED_MSG;
+    document.getElementById('resendMsg').textContent = '';
+    if (navigator.onLine === false) { document.getElementById('resendMsg').textContent = OFFLINE_MSG; return; }
+    btn.disabled = true; btn.textContent = 'Sending…';
+    const seq = S.sendSeq = (S.sendSeq || 0) + 1;
+    const r = await sendLink(S.loginEmail);
+    if (seq !== S.sendSeq || !document.getElementById('resendBtn')) return;   // superseded / screen changed: ignore the late answer
+    if (r !== 'sent') {                                       // keep the countdown as it was; just say it didn't go
+      document.getElementById('resendMsg').textContent = sendMsg(r);
       clearInterval(S.loginTimer); S.loginTimer = setInterval(tick, 500); tick();
       return;
     }
     S.resendAt = Date.now() + RESEND_SECONDS * 1000; toastMsg('Link sent again');
     clearInterval(S.loginTimer); S.loginTimer = setInterval(tick, 500); tick();
   };
-  document.getElementById('otherEmail').onclick = () => { S.loginStage = 'form'; S.loginEmail = ''; viewLogin(); };
+  document.getElementById('otherEmail').onclick = () => { S.sendSeq = (S.sendSeq || 0) + 1; S.loginStage = 'form'; S.loginEmail = ''; viewLogin(); };
 }
 /** Signed in, but no clients row matches this email — calm, no data shown. */
 function viewNoMatch() {
@@ -952,7 +986,7 @@ function viewToday() {
       const id = Number(b.dataset.tick); const bk = S.data.bookings.find((x) => x.id === id);
       const nowDone = !bk.done_at;
       try { await api.markDone(id, nowDone); bk.done_at = nowDone ? new Date().toISOString() : null; render(); }
-      catch (e) { toastMsg('Could not save: ' + e.message); }
+      catch (e) { toastMsg(friendly(e, 'save')); }
     };
   });
 }
@@ -1054,7 +1088,7 @@ function openCheckIn(c, booking) {
     try {
       const saved = await api.addCheckIn({ client_id: c.id, booking_id: booking ? booking.id : null, taken_at: new Date().toISOString(), concern_score: v('concern_score'), energy: v('energy'), sleep: v('sleep'), pain_areas: pain || null, note: note || null });
       S.data.checkins.push(saved); close(); render(); toastMsg('Check-in saved');
-    } catch (e) { toastMsg('Could not save: ' + e.message); btn.disabled = false; }
+    } catch (e) { toastMsg(friendly(e, 'save')); btn.disabled = false; }
   };
 }
 
@@ -1136,13 +1170,13 @@ function openReschedule(bookingId, p) {
       }
       btn.disabled = true;
       try { await api.proposeReschedule(bookingId, dateISO, min); await loadAdminData(); render(); cur.date = dateISO; cur.min = min; draw(); toastMsg('Saved — now send it on WhatsApp'); }
-      catch (e) { toastMsg(/clash/.test(e.message) ? 'That time overlaps another booking' : 'Could not save: ' + e.message); btn.disabled = false; }
+      catch (e) { toastMsg(/clash/.test(String(e && e.message)) ? 'That time overlaps another booking' : friendly(e, 'save')); btn.disabled = false; }
     };
     const resetOverride = () => { delete bg.dataset.override; bg.querySelector('#rs-warn').innerHTML = ''; const sb2 = bg.querySelector('#rs-save'); sb2.textContent = isPending(S.data.bookings.find((x) => x.id === bookingId)) ? 'Update proposed time' : 'Save new time'; };
     bg.querySelector('#rs-date').onchange = resetOverride; bg.querySelector('#rs-time').onchange = resetOverride;
     const cancel = bg.querySelector('#rs-cancel-resched');
     if (cancel) cancel.onclick = async () => {
-      try { await api.cancelReschedule(bookingId); await loadAdminData(); render(); bg.remove(); toastMsg('Reschedule cancelled'); } catch (e) { toastMsg('Could not cancel: ' + e.message); }
+      try { await api.cancelReschedule(bookingId); await loadAdminData(); render(); bg.remove(); toastMsg('Reschedule cancelled'); } catch (e) { toastMsg(friendly(e, 'cancel')); }
     };
   };
   bg.onclick = (e) => { if (e.target === bg) bg.remove(); };
@@ -1263,7 +1297,7 @@ function viewBrief(key, bid) {
     const txt = document.getElementById('noteText').value.trim(); if (!txt) return;
     save.disabled = true;
     try { const row = await api.addNote({ client_id: c.id, booking_id: ctxBooking ? ctxBooking.id : null, note: txt }); S.data.notes.push(row); render(); toastMsg('Note saved'); }
-    catch (e) { toastMsg('Could not save: ' + e.message); save.disabled = false; }
+    catch (e) { toastMsg(friendly(e, 'save')); save.disabled = false; }
   };
 }
 
@@ -1295,7 +1329,7 @@ function viewCodes() {
   document.querySelectorAll('[data-active]').forEach((b) => {
     b.onclick = async () => {
       const c = S.data.codes.find((x) => x.id === Number(b.dataset.active));
-      try { await api.setActive(c.id, !c.active); c.active = !c.active; render(); } catch (e) { toastMsg('Could not save: ' + e.message); }
+      try { await api.setActive(c.id, !c.active); c.active = !c.active; render(); } catch (e) { toastMsg(friendly(e, 'save')); }
     };
   });
   document.getElementById('inactiveBtn').onclick = () => { S.showInactive = !S.showInactive; render(); };
@@ -1319,7 +1353,7 @@ function viewCodes() {
         : { code, active: true, created_at: now, type: 'audience', percent_off: 25, collaborator_id: collabId, max_uses_total: null, max_uses_per_customer: 1, first_time_only: true, valid_from: now, valid_until: null, period: null, allowed_email: null };
       await api.createCode(row);
       await refreshData(); toastMsg(code + ' created');
-    } catch (err) { toastMsg('Could not create: ' + err.message); save.disabled = false; }
+    } catch (err) { toastMsg(friendly(err, 'save')); save.disabled = false; }
   };
 }
 
@@ -1428,7 +1462,7 @@ function viewHome() {
       try { await api.acceptReschedule(Number(btn.dataset.accept)); S.cdata = await api.loadClient(); render(); toastMsg('Thank you — your new time is confirmed.'); }
       catch (e) {
         btn.disabled = false; btn.textContent = 'Accept';
-        toastMsg(e.code === 'time_taken' ? 'That time has just been taken — please ask for a different time.' : e.code === 'not_pending' ? 'This has already been confirmed.' : 'Something went wrong. Please try again, or message Halima.');
+        toastMsg(e.code === 'time_taken' ? 'That time has just been taken — please ask for a different time.' : e.code === 'not_pending' ? 'This has already been confirmed.' : e.net === 'offline' || navigator.onLine === false ? OFFLINE_MSG : "That didn't go through. Please try again in a minute, or message Halima.");
       }
     };
   });
@@ -1569,7 +1603,8 @@ function openPhotoSheet() {
   $('phCancel').onclick = close;
   bg.onclick = (e) => { if (e.target === bg) close(); };
   $('phSend').onclick = async () => {
-    const btn = $('phSend'); btn.disabled = true; btn.textContent = 'Sending…';
+    const btn = $('phSend'); if (navigator.onLine === false) { toastMsg(OFFLINE_MSG); return; }     // keep the photos and note; nothing is lost
+    btn.disabled = true; btn.textContent = 'Sending…';
     const done = [];
     try {
       const stamp = Date.now();
@@ -1582,10 +1617,14 @@ function openPhotoSheet() {
       close(); toastMsg('Sent. Halima will take a look.');
     } catch (e) {
       try { await api.removePhotos(done); } catch (x) {}       // don't leave orphaned files behind
-      toastMsg('Couldn’t send that just now. Please try again.'); btn.disabled = false; btn.textContent = 'Send to Halima';
+      toastMsg(friendly(e, 'send')); btn.disabled = false; btn.textContent = 'Send to Halima';
     }
   };
 }
+
+/* A failed first load: one calm line and a way to try again (the session is kept). */
+function loadErrorHTML() { return '<p style="margin:0 0 14px">' + esc(S.error) + '</p><button class="btn ghost" id="retryLoad" type="button">Try again</button>'; }
+document.addEventListener('click', (ev) => { if (ev.target && ev.target.id === 'retryLoad' && S.session) { S.error = null; const sess = S.session; S.session = null; enter(sess); } });
 
 /* ---------- router / boot ---------- */
 const ADMIN_VIEWS = ['today', 'clients', 'codes', 'stats', 'settings'], CLIENT_VIEWS = ['home', 'progress', 'book', 'aftercare', 'settings'];
@@ -1602,14 +1641,14 @@ function render() {
   if (!S.session) return viewLogin();
   clearInterval(S.loginTimer);
   if (S.admin) {
-    if (!S.data) { shell('<div class="empty">' + (S.error ? 'Could not load: ' + esc(S.error) : 'Loading…') + '</div>', false); return; }
+    if (!S.data) { shell('<div class="empty">' + (S.error ? loadErrorHTML() : 'Loading…') + '</div>', false); return; }
     route();
     window.scrollTo(0, 0);
     ({ today: viewToday, clients: viewClients, codes: viewCodes, stats: viewStats, settings: viewSettings, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
     return;
   }
   // client
-  if (!S.cdata) { shell('<div class="empty">' + (S.error ? 'Could not load: ' + esc(S.error) : 'Loading…') + '</div>', false); return; }
+  if (!S.cdata) { shell('<div class="empty">' + (S.error ? loadErrorHTML() : 'Loading…') + '</div>', false); return; }
   if (!S.cdata.client && !S.cdata.bookings.length) return viewNoMatch();      // nothing of theirs on file yet
   route();
   window.scrollTo(0, 0);
@@ -1624,14 +1663,14 @@ async function enter(session) {
   if (prof && prof.role === 'admin') {
     // Admin app: nothing is loaded unless profiles.role = 'admin' (and RLS would refuse anyway).
     S.admin = true; render();
-    try { await loadAdminData(); } catch (e) { S.error = e.message; }
+    try { await loadAdminData(); } catch (e) { S.error = friendly(e, 'load').replace("That didn't load.", "That didn't load just now."); }
     return render();
   }
   // Client: link to their clients row by email (case-insensitive) or phone — re-tried on every sign-in,
   // since the intake form may have been submitted after their first visit here.
   S.isClient = true; render();
   if (!(prof && prof.client_id)) await api.linkMyClient();
-  try { S.cdata = await api.loadClient(); } catch (e) { S.error = e.message; }
+  try { S.cdata = await api.loadClient(); } catch (e) { S.error = friendly(e, 'load').replace("That didn't load.", "That didn't load just now."); }
   render();
 }
 window.addEventListener('hashchange', () => { if ((S.admin && S.data) || (S.isClient && S.cdata)) render(); });
