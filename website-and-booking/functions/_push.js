@@ -177,18 +177,18 @@ export async function pushNewBooking(env, bookingId) {
 /* ------------------------------------------------------------------ */
 
 // MIRROR of the "Act on this" rules in app/index.html (buildFlags): the browser page can't be imported here,
-// so the lists are kept in step by hand — tools/test-push-parity.mjs-style checks compare them in the tests.
+// so the lists are kept in step by hand — the tests compare them. ONE DELIBERATE DIFFERENCE: the app's card also flags a
+// blank main concern, but the PUSH does not — a blank concern on its own never raises an alert.
 // The rule decides ONLY whether the push says "· needs a look"; the reason is never put in the push.
 export const SAFETY_KEYS = ['is_pregnant', 'breastfeeding', 'takes_blood_thinners', 'bleeding_disorder', 'diabetes_status', 'chemo_or_radiotherapy', 'has_anaemia', 'infectious_condition', 'recent_surgery', 'blood_pressure', 'skin_condition', 'pacemaker_epilepsy'];
 export const CLOT_RE = /warfarin|apixaban|eliquis|rivaroxaban|xarelto|clopidogrel|plavix|aspirin|tranexamic(?: acid)?|cyklokapron/i;
 const last10 = (p) => { const d = String(p || '').replace(/\D/g, ''); return d.length >= 10 ? d.slice(-10) : ''; };
 const trim = (v) => (v == null ? '' : String(v).trim());
 
-/** Would this intake raise any "Act on this" flag in the admin brief? `intake` uses the intake_forms column names. */
+/** Would this intake raise an "Act on this" alert? (Safety answers, clotting medication, emergency contact = own number.) `intake` uses the intake_forms column names. */
 export function intakeNeedsLook(intake, clientPhone) {
   if (SAFETY_KEYS.some((k) => { const v = trim(intake[k]); return v !== '' && v.toLowerCase() !== 'no'; })) return true;   // any screening answer other than "No"
   if (trim(intake.current_medications) && CLOT_RE.test(intake.current_medications)) return true;                           // clotting-related medication
-  if (!trim(intake.main_concern)) return true;                                                                              // blank main concern
   const own = last10(clientPhone), emer = last10(intake.emergency_contact_phone);
   if (own && emer && own === emer) return true;                                                                             // emergency contact is their own number
   return false;
