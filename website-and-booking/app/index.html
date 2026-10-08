@@ -1452,7 +1452,7 @@ function viewHome() {
     <a class="listrow" href="/intake"><span><span class="nm">Your intake form</span><br><span class="sb">${intakeSub}</span></span></a>`;
   const pastCard = past.length ? `<h2 class="sub">Past sessions</h2><div class="card"><div class="hist" style="margin-top:0">${past.map((x) => `<div class="h"><b>${esc(fmtDate(x.booking_date))} · ${fmtTime(x.start_min)}</b><br>${esc(x.treatment || '—')} ${tagHTML(pk(x))}<br><span class="muted">${esc(placeOf(x))} · booked ${esc(bookedOn(x))}</span></div>`).join('')}</div></div>` : '';
   const ac = aftercareState(d.bookings);
-  const photoRow = d.client ? `<button class="listrow" id="photoBtnHome" type="button"><span><span class="nm">Worried about a mark?</span><br><span class="sb">Send Halima a photo</span></span></button>` : '';
+  const photoRow = d.client && !ac ? `<button class="listrow" id="photoBtnHome" type="button"><span><span class="nm">Worried about a mark?</span><br><span class="sb">Send Halima a photo</span></span></button>` : '';
   shell(`${pageHead(who ? 'Hello, ' + firstName(who) : 'Hello')}${newTime}${ac ? aftercareCardHTML(ac) : ''}${nextCard}${noClient}<h2 class="sub">Good to have to hand</h2>${photoRow}${links}${pastCard}`);
   const pbc = document.getElementById('photoBtnCard'); if (pbc) pbc.onclick = openPhotoSheet;
   const pbh = document.getElementById('photoBtnHome'); if (pbh) pbh.onclick = openPhotoSheet;
@@ -1530,12 +1530,14 @@ function timelineHTML(state, all) {
       '<div class="body"><div><i>What is normal</i>' + esc(st.normal) + '</div><div><i>What to do</i>' + esc(st.todo) + '</div><div><i>When to message Halima</i>' + esc(st.ask) + '</div></div></li>';
   }).join('') + '</ul>';
 }
-const photoCtaHTML = (id) => '<button class="photo-cta" id="' + id + '" type="button">Worried about a mark? Send Halima a photo</button>';
+const photoCtaHTML = (id, gold) => gold
+  ? '<button class="btn block" style="margin-top:14px;line-height:22px" id="' + id + '" type="button">Worried about a mark? Send Halima a photo</button>'   // the same gold .btn as Book a session
+  : '<button class="photo-cta" id="' + id + '" type="button">Worried about a mark? Send Halima a photo</button>';
 function aftercareCardHTML(state) {
   return '<div class="card" id="aftercareCard"><div class="section-label">Aftercare</div>' +
     '<p class="muted small" style="margin:8px 0 0">' + (state.day === 0 ? 'Your session was today.' : state.day === 1 ? 'Your session was yesterday.' : 'Your session was ' + state.day + ' days ago.') + ' Marks usually fade within 14 days at most.</p>' +
     timelineHTML(state, false) +
-    '<a class="btn ghost block" style="margin-top:16px" href="#/aftercare">See the full aftercare guide</a>' + photoCtaHTML('photoBtnCard') + '</div>';
+    '<a class="btn block" style="margin-top:16px" href="#/aftercare">See the full aftercare guide</a>' + photoCtaHTML('photoBtnCard', true) + '</div>';
 }
 function viewAftercare() {
   const state = aftercareState(S.cdata.bookings);
