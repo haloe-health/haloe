@@ -81,7 +81,14 @@
   .arr-input:focus { border-bottom-color: var(--gold); box-shadow: 0 2px 0 var(--gold); }
   .arr-input:-webkit-autofill, .arr-input:-webkit-autofill:focus { -webkit-box-shadow: 0 0 0 100px var(--page-bg) inset; -webkit-text-fill-color: var(--ink); transition: background-color 100000s; }
   .arr-btn { display: flex; align-items: center; justify-content: center; width: 100%; height: 56px; margin-top: 24px; border: 0; border-radius: 999px; background: var(--gold); color: #1C1A16; font: inherit; font-size: 17px; font-weight: 600; }
-  .arr-btn[disabled] { cursor: default; }
+  .arr-btn[disabled] { cursor: default; opacity: .6; }
+  .arr-field { position: relative; }
+  .arr-field .arr-input { padding-right: 52px; }
+  .arr-eye { position: absolute; right: 0; top: 4px; width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: none; color: var(--muted); cursor: pointer; }
+  .arr-eye svg { width: 22px; height: 22px; }
+  .arr-eye[aria-pressed="true"] { color: var(--gold-deep); }
+  .arr-code { text-align: center; font-size: 30px; letter-spacing: .5em; padding-left: .5em; font-variant-numeric: tabular-nums; }
+  .arr-hidden-user { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
   .arr-btn.ghost { background: var(--fill); color: var(--ink); margin-top: 16px; }
   .arr-btn.ghost[disabled] { color: var(--muted); }
   .arr-textbtn { display: block; margin: 6px auto 0; min-height: 48px; padding: 0 16px; border: 0; background: none; color: var(--gold-deep); font: inherit; font-size: 15px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; }
@@ -449,6 +456,9 @@ function currentTheme() { return document.documentElement.getAttribute('data-the
 function toggleTheme() { setTheme(isDarkNow() ? 'light' : 'dark'); }       // always an explicit Light or Dark choice
 
 /* ---------- data layer (the only code that talks to Supabase) ---------- */
+/** True when this page load came from a sign-in link in an email (the address carries the token). Captured before the Supabase
+ *  client below reads and clears it. Such a visit must still end in "Create your password" (see needsPassword). */
+const ARRIVED_BY_LINK = /[#?&](access_token|refresh_token|token_hash|code)=|[#?&]type=(magiclink|signup|recovery|email)/.test(location.hash + location.search);
 /* ---------- network safety ----------
  * Nothing in the app may wait forever. Every request goes through timedFetch: offline → fails at once, no answer in 12 s
  * (40 s for a photo upload) → aborted. The error carries .net = 'offline' | 'timeout'; friendly() turns any failure into
@@ -559,7 +569,7 @@ const api = {
 };
 
 /* ---------- state ---------- */
-const S = { loginStage: 'form', loginEmail: '', resendAt: 0, loginTimer: null, raw: null, showTest: false, session: null, admin: false, data: null, view: 'today', chip: 'today', filter: '', showInactive: false, loading: false, error: null };
+const S = { loginStage: 'form', loginPurpose: 'first', needPassword: false, forcePassword: ARRIVED_BY_LINK, passwordSkipped: null, loginEmail: '', resendAt: 0, loginTimer: null, raw: null, showTest: false, session: null, admin: false, data: null, view: 'today', chip: 'today', filter: '', showInactive: false, loading: false, error: null };
 
 /* ---------- admin alerts (web push) ---------- */
 const urlB64ToBytes = (b64) => { const t = (b64 + '='.repeat((4 - (b64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/'); return Uint8Array.from(atob(t), (c) => c.charCodeAt(0)); };
@@ -811,7 +821,8 @@ function headerHTML(withSettings) {
 function clearSession() {
   S.session = null; S.admin = false; S.isClient = false; S.profile = null;
   S.data = null; S.raw = null; S.cdata = null; S.error = null; S.filter = '';
-  S.loginStage = 'form'; S.loginEmail = '';   // back to a fresh sign-in screen
+  S.loginStage = 'form'; S.loginPurpose = 'first'; S.loginEmail = '';   // back to a fresh sign-in screen
+  S.needPassword = false; S.forcePassword = false; S.passwordSkipped = null;
   try { Object.keys(localStorage).filter((k) => /^sb-.+-auth-token/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
   document.querySelectorAll('.sheet-bg, .toast').forEach((el) => el.remove());          // open sheets / toasts hold client names
   if (location.hash) history.replaceState(null, '', location.pathname + location.search); // so Back / reload can't land on a client page
@@ -829,60 +840,185 @@ function wireHeader() {
 /** Gold eyebrow line + big bold page title (shared by every screen). */
 function pageHead(title) { return `<div class="eyebrow">haloe · ${esc(fmtDateLong(todayISO()))}</div><h1 class="screen">${esc(title)}</h1>`; }
 
-// Sign-in ("Arrival"). One screen for everyone; role routing (admin → practitioner app, client → client area) happens AFTER sign-in.
-const RESEND_SECONDS = 45;
+// Sign-in ("Arrival"). One screen for everyone; role routing (admin → practitioner app, client → client area) happens AFTER sign-in
+// from profiles.role — nothing on any screen says whether an email belongs to an admin or a client.
+//
+// Email + password for returning visits. First time, or "Forgot password?": Supabase emails a 6-digit code (signInWithOtp →
+// verifyOtp type 'email'); after a code the person MUST create a password before anything else (updateUser). Passwords are
+// only ever handed to Supabase Auth — never stored, logged or sent anywhere else.
+//
+// LEGACY_EMAIL_LINK_SIGNIN: while true, (1) a sign-in link in the email still signs you in (the page still reads the link),
+// and (2) "Create your password" has a "Not now" so nobody can be locked out while password sign-in is being proven.
+// Set it to false (and delete the "Not now" / link wording) only after the admin has signed in with a password on a phone and a
+// computer — see CLAUDE.md "Password sign-in".
+const LEGACY_EMAIL_LINK_SIGNIN = true;
+let CODE_LENGTH = 6;           // must equal Supabase → Authentication → Email → "Email OTP length" (see CLAUDE.md)
+const RESEND_SECONDS = 45, MIN_PASSWORD = 10;
+const MSG_CREDS = "That email and password don't match.";
+const MSG_RATE = 'Too many attempts. Try again in a few minutes.';
+const MSG_CODE = "That code isn't right or has expired. Please ask for a new one.";
+const MSG_GENERIC = "That didn't work. Please try again in a minute.";
 const loginHeaderHTML = () => `<header class="login-top"><button class="icon-btn" id="themeBtn" aria-label="Toggle light or dark">${themeIcon()}</button></header>`;
 const arrivalBrand = () => '<div class="arr-brand"><img class="arr-mark" src="/haloe-logo-flower.svg" alt=""><div class="arr-word" aria-label="haloe">haloe</div><div class="arr-tag">Hijama · Wellness · Manchester</div></div>';
-/** The one-time-link request. Resolves true if the link was sent, false for ANY failure (network down, rate limit, anything) —
- *  the caller shows a calm message; technical error text is never shown to anyone. */
 const SEND_FAILED_MSG = "That didn't send. Please try again in a minute.";
-async function sendLink(email) {
-  if (navigator.onLine === false) return 'offline';                  // don't even try
-  // Sign-ups stay ON: anyone can sign in with an email link. What a signed-in user can SEE is decided
-  // entirely by row-level security (admin → everything; client → only their own rows).
-  const attempt = sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + '/app/' } })
-    .then(({ error }) => (error ? 'failed' : 'sent'), () => (navigator.onLine === false ? 'offline' : 'failed'));
-  const giveUp = new Promise((res) => setTimeout(() => res('failed'), TIMEOUT_MS + 500));   // belt and braces: a late answer is ignored
-  return Promise.race([attempt, giveUp]);
+const EYE_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 5.1A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6A17 17 0 0 0 2 12s3.6 7 10 7a10.5 10.5 0 0 0 4.2-.9M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+
+/** Classify a Supabase Auth error without ever exposing its text. 'rejected' = wrong password / unknown email / bad or expired
+ *  code — deliberately ONE bucket, so no screen can reveal which it was. */
+function authKind(error) {
+  if (!error) return 'ok';
+  if (navigator.onLine === false) return 'offline';
+  const st = error.status, code = String(error.code || ''), msg = String(error.message || ''), name = String(error.name || '');
+  if (st === 429 || /rate_limit|over_.*_rate/i.test(code) || /rate limit|too many/i.test(msg)) return 'rate';
+  if (st === 0 || /RetryableFetch/i.test(name) || /failed to fetch|network|load failed|aborted/i.test(msg)) return 'network';
+  if (st === 400 || st === 401 || st === 403 || st === 422) return 'rejected';
+  return 'failed';
 }
-const sendMsg = (r) => (r === 'offline' ? OFFLINE_MSG : SEND_FAILED_MSG);
+/** Run one Auth call with the offline pre-check and the 12 s limit. Resolves { kind, data, error } — never throws. */
+async function authRun(fn) {
+  if (navigator.onLine === false) return { kind: 'offline' };
+  const giveUp = new Promise((res) => setTimeout(() => res({ kind: 'timeout' }), TIMEOUT_MS + 500));
+  const call = Promise.resolve().then(fn).then((r) => ({ kind: authKind(r && r.error), data: r && r.data, error: r && r.error }), () => ({ kind: navigator.onLine === false ? 'offline' : 'network' }));
+  return Promise.race([call, giveUp]);
+}
+/** The calm line for a failed attempt. `rejectedMsg` says what 'rejected' means on this screen. */
+function authMsg(kind, rejectedMsg) {
+  if (kind === 'offline') return OFFLINE_MSG;
+  if (kind === 'rate') return MSG_RATE;
+  if (kind === 'rejected') return rejectedMsg;
+  return MSG_GENERIC;
+}
+/** Email a 6-digit code (also used by "Forgot password?"). Sign-ups stay ON so anyone can start; what a signed-in user can SEE is
+ *  decided entirely by row-level security (admin → everything; client → only their own rows). */
+const sendCode = (email) => authRun(() => sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: location.origin + '/app/' } }));
+const sendMsg = (r) => (r.kind === 'offline' ? OFFLINE_MSG : r.kind === 'rate' ? MSG_RATE : SEND_FAILED_MSG);   // any other failure sending a code: the calm "didn't send" line
+
+const arrivalFoot = (kind) => kind === 'help'
+  ? `<footer class="arr-foot"><span>Need a hand? <a href="https://wa.me/${HALIMA_WA}" target="_blank" rel="noopener">Message Halima</a></span></footer>`
+  : `<footer class="arr-foot"><span>Tuesdays at Milton Hall, Deansgate</span><span>New to haloe? <a href="/book">Book a session</a></span></footer>`;
+
 function viewLogin() {
   clearInterval(S.loginTimer);
-  if (S.loginStage === 'sent') return viewLinkSent();
+  if (S.session && S.needPassword) return viewCreatePassword();
+  if (S.loginStage === 'code') return viewEnterCode();
+  if (S.loginStage === 'email') return viewCodeEmail();
+  return viewPasswordSignIn();
+}
+
+/** 1. Returning visit: email + password. */
+function viewPasswordSignIn() {
   $root.innerHTML = loginHeaderHTML() + `<main class="arrival">${arrivalBrand()}
-    <section class="arr-lower"><h1 class="arr-h">Welcome back.</h1>
-      <p class="arr-sub">We'll email you a one-time link. No password needed.</p>
-      <form id="loginForm"><label class="arr-label" for="em">Email</label>
-        <input class="arr-input" id="em" type="email" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" required placeholder="you@example.com" value="${esc(S.loginEmail || '')}">
-        <button class="arr-btn" id="sendBtn" type="submit">Send me a link</button><p class="arr-err" id="loginMsg" role="status" aria-live="polite"></p></form></section>
-    <footer class="arr-foot"><span>Tuesdays at Milton Hall, Deansgate</span><span>New to haloe? <a href="/book">Book a session</a></span></footer></main>`;
+    <section class="arr-lower"><h1 class="arr-h" tabindex="-1">Welcome back.</h1>
+      <p class="arr-sub">Sign in with your email and password.</p>
+      <form id="loginForm" novalidate><label class="arr-label" for="em">Email</label>
+        <input class="arr-input" id="em" name="email" type="email" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required placeholder="you@example.com" value="${esc(S.loginEmail || '')}">
+        <label class="arr-label" for="pw" style="margin-top:18px">Password</label>
+        <div class="arr-field"><input class="arr-input" id="pw" name="password" type="password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" required placeholder="Your password"><button class="arr-eye" id="pwEye" type="button" aria-label="Show password" aria-pressed="false">${EYE_ON}</button></div>
+        <button class="arr-btn" id="sendBtn" type="submit">Sign in</button><p class="arr-err" id="loginMsg" role="status" aria-live="polite"></p></form>
+      <button class="arr-textbtn" id="forgotBtn" type="button">Forgot password?</button>
+      <button class="arr-textbtn" id="firstBtn" type="button">First time here? Get a sign-in code</button></section>
+    ${arrivalFoot()}</main>`;
   wireHeader();
+  wireEye('pw', 'pwEye');
+  const go = (purpose) => { S.loginEmail = document.getElementById('em').value.trim(); S.loginPurpose = purpose; S.loginStage = 'email'; viewLogin(); };
+  document.getElementById('forgotBtn').onclick = () => go('reset');
+  document.getElementById('firstBtn').onclick = () => go('first');
   document.getElementById('loginForm').onsubmit = async (e) => {
     e.preventDefault();
-    const email = document.getElementById('em').value.trim();
-    const btn = document.getElementById('sendBtn'), msg = document.getElementById('loginMsg'); msg.textContent = '';
-    S.loginEmail = email;                                    // keep what she typed, whatever happens
+    const em = document.getElementById('em'), pw = document.getElementById('pw'), btn = document.getElementById('sendBtn'), msg = document.getElementById('loginMsg');
+    const email = em.value.trim(), password = pw.value; msg.textContent = '';
+    S.loginEmail = email;                                    // keep the typed email, whatever happens
+    if (!email || !password) { msg.textContent = MSG_CREDS; return; }
     if (navigator.onLine === false) { msg.textContent = OFFLINE_MSG; return; }   // offline: say so at once, button stays usable
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    const seq = S.sendSeq = (S.sendSeq || 0) + 1;
+    const r = await authRun(() => sb.auth.signInWithPassword({ email, password }));
+    if (seq !== S.sendSeq) return;                           // a late answer never changes the screen
+    if (r.kind === 'ok') return;                             // the SIGNED_IN event takes it from here (role routing)
+    const m2 = document.getElementById('loginMsg'), b2 = document.getElementById('sendBtn'), p2 = document.getElementById('pw');
+    if (m2) m2.textContent = authMsg(r.kind, MSG_CREDS);
+    if (b2) { b2.disabled = false; b2.textContent = 'Sign in'; }
+    if (p2 && r.kind === 'rejected') { p2.value = ''; p2.focus(); }
+  };
+}
+
+/** Show / hide toggle for a password field (aria-pressed, 44px target). */
+function wireEye(inputId, btnId, otherId) {
+  const b = document.getElementById(btnId); if (!b) return;
+  b.onclick = () => {
+    const show = b.getAttribute('aria-pressed') !== 'true';
+    [inputId, otherId].filter(Boolean).forEach((id) => { const i = document.getElementById(id); if (i) i.type = show ? 'text' : 'password'; });
+    b.setAttribute('aria-pressed', String(show)); b.setAttribute('aria-label', show ? 'Hide password' : 'Show password'); b.innerHTML = show ? EYE_OFF : EYE_ON;
+  };
+}
+
+/** 2a. First time / forgot password: ask for the email to send the code to. */
+function viewCodeEmail() {
+  const reset = S.loginPurpose === 'reset';
+  $root.innerHTML = loginHeaderHTML() + `<main class="arrival">${arrivalBrand()}
+    <section class="arr-lower"><h1 class="arr-h" tabindex="-1">${reset ? 'Reset your password.' : 'Get a sign-in code.'}</h1>
+      <p class="arr-sub">${reset ? "We'll email you a 6-digit code, then you can choose a new password." : "We'll email you a 6-digit code. It takes a minute."}</p>
+      <form id="loginForm" novalidate><label class="arr-label" for="em">Email</label>
+        <input class="arr-input" id="em" name="email" type="email" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required placeholder="you@example.com" value="${esc(S.loginEmail || '')}">
+        <button class="arr-btn" id="sendBtn" type="submit">Send me a code</button><p class="arr-err" id="loginMsg" role="status" aria-live="polite"></p></form>
+      <button class="arr-textbtn" id="backBtn" type="button">Back to sign in</button></section>
+    ${arrivalFoot()}</main>`;
+  wireHeader();
+  document.getElementById('backBtn').onclick = () => { S.sendSeq = (S.sendSeq || 0) + 1; S.loginEmail = document.getElementById('em').value.trim(); S.loginStage = 'form'; viewLogin(); };
+  document.getElementById('loginForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('em').value.trim(), btn = document.getElementById('sendBtn'), msg = document.getElementById('loginMsg'); msg.textContent = '';
+    S.loginEmail = email;
+    if (!email) { msg.textContent = 'Please enter your email.'; return; }
+    if (navigator.onLine === false) { msg.textContent = OFFLINE_MSG; return; }
     btn.disabled = true; btn.textContent = 'Sending…';
     const seq = S.sendSeq = (S.sendSeq || 0) + 1;
-    const r = await sendLink(email);
-    if (seq !== S.sendSeq) return;                           // superseded: a late answer never changes the screen
-    if (r !== 'sent') { const m2 = document.getElementById('loginMsg'), b2 = document.getElementById('sendBtn'); if (m2) m2.textContent = sendMsg(r); if (b2) { b2.disabled = false; b2.textContent = 'Send me a link'; } return; }
-    S.loginStage = 'sent'; S.resendAt = Date.now() + RESEND_SECONDS * 1000;
+    const r = await sendCode(email);
+    if (seq !== S.sendSeq) return;
+    if (r.kind !== 'ok') { const m2 = document.getElementById('loginMsg'), b2 = document.getElementById('sendBtn'); if (m2) m2.textContent = sendMsg(r); if (b2) { b2.disabled = false; b2.textContent = 'Send me a code'; } return; }
+    S.loginStage = 'code'; S.resendAt = Date.now() + RESEND_SECONDS * 1000;
     viewLogin();
   };
 }
-function viewLinkSent() {
+
+/** 2b. Type the 6-digit code (auto-submits on the 6th digit). */
+function viewEnterCode() {
   $root.innerHTML = loginHeaderHTML() + `<main class="arrival">${arrivalBrand()}
-    <section class="arr-lower"><h1 class="arr-h" tabindex="-1">Check your inbox.</h1>
-      <p class="arr-sub">We've sent a one-time link to <b>${esc(S.loginEmail)}</b></p>
-      <div class="arr-card"><p class="t">Tap the link in the email to sign in.</p><p class="s">It works once and expires shortly. Can't see it? Check your spam folder.</p></div>
+    <section class="arr-lower"><h1 class="arr-h" tabindex="-1">Enter your code.</h1>
+      <p class="arr-sub">We've sent a 6-digit code to <b>${esc(S.loginEmail)}</b></p>
+      <form id="codeForm" novalidate><label class="arr-label" for="code">6-digit code</label>
+        <input class="arr-input arr-code" id="code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="${CODE_LENGTH}" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="${'·'.repeat(CODE_LENGTH)}">
+        <button class="arr-btn" id="codeBtn" type="submit" disabled>Confirm code</button><p class="arr-err" id="codeMsg" role="status" aria-live="polite"></p></form>
+      <div class="arr-card" style="margin-top:18px"><p class="t">Check your inbox.</p><p class="s">The code expires in 10 minutes. Can't see it? Check your spam folder.${LEGACY_EMAIL_LINK_SIGNIN ? ' You can also tap the link in the email.' : ''}</p></div>
       <button class="arr-btn ghost" id="resendBtn" type="button" disabled>Send again in 0:${RESEND_SECONDS}</button><p class="arr-err" id="resendMsg" role="status" aria-live="polite"></p>
       <button class="arr-textbtn" id="otherEmail" type="button">Use a different email</button></section>
-    <footer class="arr-foot"><span>Need a hand? <a href="https://wa.me/${HALIMA_WA}" target="_blank" rel="noopener">Message Halima</a></span></footer></main>`;
+    ${arrivalFoot('help')}</main>`;
   wireHeader();
   const h = document.querySelector('.arr-h'); if (h) h.focus({ preventScroll: true });
-  const btn = document.getElementById('resendBtn');
+  const input = document.getElementById('code'), btn = document.getElementById('codeBtn');
+  let busy = false;
+  const submit = async () => {
+    const token = input.value.replace(/\D/g, '');
+    if (token.length !== CODE_LENGTH || busy) return;
+    const msg = document.getElementById('codeMsg'); msg.textContent = '';
+    if (navigator.onLine === false) { msg.textContent = OFFLINE_MSG; return; }
+    busy = true; btn.disabled = true; btn.textContent = 'Checking…';
+    const prevForce = S.forcePassword; S.forcePassword = true;   // a code sign-in ALWAYS ends in "Create your password" (see needsPassword)
+    const seq = S.sendSeq = (S.sendSeq || 0) + 1;
+    const r = await authRun(() => sb.auth.verifyOtp({ email: S.loginEmail, token, type: 'email' }));
+    if (seq !== S.sendSeq) return;
+    busy = false;
+    if (r.kind === 'ok') return;                             // SIGNED_IN → enter() → "Create your password"
+    S.forcePassword = prevForce;
+    const m2 = document.getElementById('codeMsg'), b2 = document.getElementById('codeBtn'), i2 = document.getElementById('code');
+    if (m2) m2.textContent = authMsg(r.kind, MSG_CODE);
+    if (b2) { b2.textContent = 'Confirm code'; b2.disabled = !i2 || i2.value.replace(/\D/g, '').length !== CODE_LENGTH; }
+    if (i2 && r.kind === 'rejected') { i2.value = ''; if (b2) b2.disabled = true; i2.focus(); }
+  };
+  input.oninput = () => { const d = input.value.replace(/\D/g, '').slice(0, CODE_LENGTH); if (input.value !== d) input.value = d; btn.disabled = d.length !== CODE_LENGTH || busy; if (d.length === CODE_LENGTH) submit(); };
+  document.getElementById('codeForm').onsubmit = (e) => { e.preventDefault(); submit(); };
+  const rbtn = document.getElementById('resendBtn');
   const tick = () => {
     const el = document.getElementById('resendBtn'); if (!el) { clearInterval(S.loginTimer); return; }
     const left = Math.max(0, Math.ceil((S.resendAt - Date.now()) / 1000));
@@ -890,23 +1026,76 @@ function viewLinkSent() {
     else { el.disabled = false; el.textContent = 'Send again'; clearInterval(S.loginTimer); }
   };
   S.loginTimer = setInterval(tick, 500); tick();
-  btn.onclick = async () => {
-    document.getElementById('resendMsg').textContent = '';
-    if (navigator.onLine === false) { document.getElementById('resendMsg').textContent = OFFLINE_MSG; return; }
-    btn.disabled = true; btn.textContent = 'Sending…';
+  rbtn.onclick = async () => {
+    const rm = document.getElementById('resendMsg'); rm.textContent = '';
+    if (navigator.onLine === false) { rm.textContent = OFFLINE_MSG; return; }
+    rbtn.disabled = true; rbtn.textContent = 'Sending…';
     const seq = S.sendSeq = (S.sendSeq || 0) + 1;
-    const r = await sendLink(S.loginEmail);
-    if (seq !== S.sendSeq || !document.getElementById('resendBtn')) return;   // superseded / screen changed: ignore the late answer
-    if (r !== 'sent') {                                       // keep the countdown as it was; just say it didn't go
-      document.getElementById('resendMsg').textContent = sendMsg(r);
-      clearInterval(S.loginTimer); S.loginTimer = setInterval(tick, 500); tick();
-      return;
-    }
-    S.resendAt = Date.now() + RESEND_SECONDS * 1000; toastMsg('Link sent again');
+    const r = await sendCode(S.loginEmail);
+    if (seq !== S.sendSeq || !document.getElementById('resendBtn')) return;
+    if (r.kind !== 'ok') { document.getElementById('resendMsg').textContent = sendMsg(r); clearInterval(S.loginTimer); S.loginTimer = setInterval(tick, 500); tick(); return; }
+    S.resendAt = Date.now() + RESEND_SECONDS * 1000; toastMsg('Code sent again');
     clearInterval(S.loginTimer); S.loginTimer = setInterval(tick, 500); tick();
   };
-  document.getElementById('otherEmail').onclick = () => { S.sendSeq = (S.sendSeq || 0) + 1; S.loginStage = 'form'; S.loginEmail = ''; viewLogin(); };
+  document.getElementById('otherEmail').onclick = () => { S.sendSeq = (S.sendSeq || 0) + 1; S.loginStage = 'email'; S.loginEmail = ''; viewLogin(); };
 }
+
+/** Must this signed-in person create a password before anything else? Yes if none is recorded on the account (user_metadata
+ *  .password_set — this covers every existing account, admin included), OR they got in by a code / a sign-in link in this visit.
+ *  The second rule matters: user_metadata can be written by whoever first registers an email, so a code or link sign-in can never
+ *  be trusted to mean "this person already chose their own password". */
+function needsPassword(session) {
+  if (!session || !session.user) return false;
+  if (S.passwordSkipped === session.user.id) return false;      // "Not now" (only offered while LEGACY_EMAIL_LINK_SIGNIN)
+  const meta = session.user.user_metadata || {};
+  return meta.password_set !== true || !!S.forcePassword;
+}
+
+/** 3. Create your password (after a code, or when none is set yet). */
+function viewCreatePassword() {
+  const email = (S.session && S.session.user && S.session.user.email) || '';
+  $root.innerHTML = loginHeaderHTML() + `<main class="arrival">${arrivalBrand()}
+    <section class="arr-lower"><h1 class="arr-h" tabindex="-1">Create your password.</h1>
+      <p class="arr-sub">Choose at least ${MIN_PASSWORD} characters. You'll use it with your email next time you sign in.</p>
+      <form id="npForm" novalidate>
+        <input type="email" id="npUser" name="email" autocomplete="username" value="${esc(email)}" readonly tabindex="-1" aria-hidden="true" class="arr-hidden-user">
+        <label class="arr-label" for="np">New password</label>
+        <div class="arr-field"><input class="arr-input" id="np" name="new-password" type="password" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" minlength="${MIN_PASSWORD}" required><button class="arr-eye" id="npEye" type="button" aria-label="Show password" aria-pressed="false">${EYE_ON}</button></div>
+        <label class="arr-label" for="np2" style="margin-top:18px">Confirm password</label>
+        <input class="arr-input" id="np2" name="confirm-password" type="password" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" minlength="${MIN_PASSWORD}" required>
+        <button class="arr-btn" id="npBtn" type="submit">Save password</button><p class="arr-err" id="npMsg" role="status" aria-live="polite"></p></form>
+      ${LEGACY_EMAIL_LINK_SIGNIN ? '<button class="arr-textbtn" id="npLater" type="button">Not now</button>' : ''}
+      <button class="arr-textbtn" id="npOut" type="button">Use a different email</button></section>
+    ${arrivalFoot('help')}</main>`;
+  wireHeader();
+  const h = document.querySelector('.arr-h'); if (h) h.focus({ preventScroll: true });
+  wireEye('np', 'npEye', 'np2');
+  document.getElementById('npOut').onclick = signOut;
+  const later = document.getElementById('npLater');
+  if (later) later.onclick = () => { const s = S.session; S.passwordSkipped = s.user.id; S.needPassword = false; enter(s); };
+  document.getElementById('npForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const a = document.getElementById('np'), b = document.getElementById('np2'), btn = document.getElementById('npBtn'), msg = document.getElementById('npMsg'); msg.textContent = '';
+    if (a.value.length < MIN_PASSWORD) { msg.textContent = `Use at least ${MIN_PASSWORD} characters.`; a.focus(); return; }
+    if (a.value !== b.value) { msg.textContent = "The two passwords don't match."; b.focus(); return; }
+    if (navigator.onLine === false) { msg.textContent = OFFLINE_MSG; return; }
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const seq = S.sendSeq = (S.sendSeq || 0) + 1;
+    const r = await authRun(() => sb.auth.updateUser({ password: a.value, data: { password_set: true } }));
+    if (seq !== S.sendSeq) return;
+    if (r.kind === 'ok') {
+      S.needPassword = false; S.forcePassword = false; S.passwordSkipped = null;
+      const s = { ...S.session, user: (r.data && r.data.user) || { ...S.session.user, user_metadata: { ...(S.session.user.user_metadata || {}), password_set: true } } };
+      await enter(s); toastMsg('Password saved');
+      return;
+    }
+    const m2 = document.getElementById('npMsg'), b2 = document.getElementById('npBtn');
+    const code = String((r.error && r.error.code) || '');
+    if (m2) m2.textContent = r.kind === 'rejected' ? (code === 'same_password' ? 'Please choose a password you have not used here before.' : 'Please choose a different password.') : authMsg(r.kind, MSG_GENERIC);
+    if (b2) { b2.disabled = false; b2.textContent = 'Save password'; }
+  };
+}
+
 /** Signed in, but no clients row matches this email — calm, no data shown, never a dead end: the gear (Settings → sign out) stays,
  *  we say which email they're signed in with (and nothing about any other account), and offer the ways forward. */
 function viewNoMatch() {
@@ -1707,6 +1896,7 @@ function route() {
 }
 function render() {
   if (!S.session) return viewLogin();
+  if (S.needPassword) return viewCreatePassword();
   clearInterval(S.loginTimer);
   if (S.admin) {
     if (!S.data) { shell('<div class="empty">' + (S.error ? loadErrorHTML() : 'Loading…') + '</div>', false); return; }
@@ -1727,6 +1917,9 @@ async function enter(session) {
   if (!session) return clearSession();
   S.session = session;
   S.admin = false; S.isClient = false; S.data = null; S.raw = null; S.cdata = null; S.error = null;
+  // Before anything else: a password must exist (and be freshly chosen after any code / link sign-in).
+  if (needsPassword(session)) { S.needPassword = true; return viewCreatePassword(); }
+  S.needPassword = false;
   const { data: prof } = await sb.from('profiles').select('role,client_id').eq('id', session.user.id).maybeSingle();
   if (prof && prof.role === 'admin') {
     // Admin app: nothing is loaded unless profiles.role = 'admin' (and RLS would refuse anyway).
