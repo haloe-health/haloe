@@ -28,7 +28,7 @@
     --font-wordmark: 'Tan Ashford', Georgia, serif;
     --red: #B3402F; --red-bg: #FBEAE6; --red-line: #E9B9AF;
     --green: #2F6B3F; --green-bg: #E7F1E8; --green-line: #B5D3B9;
-    --nav-h: 84px;
+    --nav-h: 88px;
     --tagline: #7A5F25;
     --arr-muted: #6B5E4B;
   }
@@ -104,7 +104,7 @@
   .arr-foot span { line-height: 1.5; }
 
   /* header */
-  .app-head { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: calc(10px + env(safe-area-inset-top)) 16px 10px; background: color-mix(in srgb, var(--page-bg) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .app-head { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: calc(6px + env(safe-area-inset-top)) 16px 6px; background: color-mix(in srgb, var(--page-bg) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
   .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
   .brand img { width: 30px; height: 30px; display: block; }
   .brand span { font-family: var(--font-wordmark); font-size: 28px; line-height: 1; color: #111; letter-spacing: 0.01em; }
@@ -114,7 +114,7 @@
   .icon-btn svg { width: 20px; height: 20px; }
   .head-actions { display: flex; gap: 8px; }
 
-  .wrap { max-width: 600px; margin: 0 auto; padding: 8px 16px calc(var(--nav-h) + 28px + env(safe-area-inset-bottom)); }
+  .wrap { max-width: 600px; margin: 0 auto; padding: 8px 16px calc(var(--nav-h) + env(safe-area-inset-bottom)); }
   .eyebrow { font-size: 14px; font-weight: 500; color: var(--gold-deep); margin: 10px 4px 2px; }
   h1.screen { font-family: var(--font); font-weight: 700; font-size: 36px; line-height: 1.12; letter-spacing: -0.02em; margin: 0 4px 18px; color: var(--ink); }
   h2.sub { font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 24px 4px 12px; }
@@ -163,12 +163,9 @@
   .empty { text-align: center; color: var(--muted); padding: 28px 12px; }
 
   /* session rows (Today) */
-  .sess { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; padding: 14px 16px; }
-  .sess .who { display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left; background: none; border: 0; padding: 0; min-height: 44px; justify-content: center; }
   .sess .name { font-weight: 600; font-size: 17px; overflow-wrap: anywhere; }
   .sess .time { color: var(--gold-deep); font-weight: 500; font-size: 14px; }
   .sess .meta { color: var(--muted); font-size: 13.5px; }
-  .sess .row2 { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
   .tick { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--fill-hover); background: transparent; display: grid; place-items: center; color: transparent; }
   .tick svg { width: 20px; height: 20px; }
   .tick[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
@@ -194,7 +191,6 @@
   .btn.block { width: 100%; }
   .btn.danger { background: var(--red); color: var(--card); }
   .h.cancelled { opacity: .62; }
-  .sess .acts { grid-column: 1 / -1; margin-top: 10px; }
   .mail { overflow-wrap: anywhere; word-break: break-word; }
   /* A button whose label may wrap to two lines ("Worried about a mark? Send Halima a photo"): grows with its text, never a fixed height. One-line gold buttons keep the plain .btn height. */
   .btn.multi { height: auto; min-height: 44px; padding: 14px 20px; line-height: 1.3; border-radius: 28px; text-align: center; }
@@ -301,33 +297,52 @@
   :root[data-theme="dark"] .toast { background: var(--fill); box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 36px rgba(0,0,0,.5); }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .toast { background: var(--fill); box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 36px rgba(0,0,0,.5); } }
   @media (prefers-reduced-motion: reduce) { .toast { transition: none; transform: none; } }
-  /* ---- ONE type scale for the intake brief, used everywhere it appears (Today cards, the Next-up card, the client profile) ----
-   * Visual only. Values are normal body-text size (like a phone mail list), not headlines. */
-  :root { --t-pkg: 17px; --t-pill: 14px; --t-label: 11px; --t-value: 15px; --t-value-lh: 1.5; --t-label-track: .12em; }
-  .t-label, .glance .gl-k, .kv .k { font-size: var(--t-label); letter-spacing: var(--t-label-track); text-transform: uppercase; color: var(--muted); }
-  .t-value, .glance .why, .glance .med-text, .glance .med-yes, .glance .med-none, .glance .dim, .kv .inwords { font-size: var(--t-value); line-height: var(--t-value-lh); font-weight: 400; }
-  .t-pill, .glance .flag, .glance .no-intake { font-size: var(--t-pill); font-weight: 500; line-height: 1.4; }
-  /* glance lines on the session cards (admin home): package · why · medication — her words, verbatim */
-  .sess .glance { grid-column: 1 / -1; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--fill-hover); display: grid; gap: 10px; cursor: pointer; font-size: var(--t-value); line-height: var(--t-value-lh); }
-  .glance .gl-pkg { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
-  .glance .pkg { font-weight: 600; font-size: var(--t-pkg); line-height: 1.35; overflow-wrap: anywhere; }
-  .glance .flag { display: inline-block; background: var(--gold); color: #1C1A16; padding: 4px 11px; border-radius: 12px; overflow-wrap: anywhere; }
-  .glance .gl-row { display: grid; gap: 4px; }
-  .glance .gl-k { font-weight: 600; }
-  .glance .why { display: block; width: 100%; min-height: 44px; margin: 0; padding: 8px 12px; border: 0; border-radius: 14px; background: var(--fill); color: var(--ink); font-family: inherit; text-align: left; overflow-wrap: anywhere; cursor: pointer; }
+  /* ---- ONE spacing scale (4 · 8 · 12 · 16 · 24) and ONE type scale for the intake brief ----
+   * The label/value grid below is used by the Today cards AND the client profile brief, so both look identical. */
+  :root { --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --label-col: 88px;
+          --t-label: 11px; --t-label-track: .12em; --t-value: 15px; --t-value-lh: 1.5; --t-pill: 14px; --t-tag: 12px; }
+  .bgrid, .facts, .kv.rows > div { display: grid; grid-template-columns: var(--label-col) minmax(0, 1fr); gap: var(--s2); align-items: start; }
+  .bgrid .gl-k, .fact .k, .kv.rows .k { font-size: var(--t-label); letter-spacing: var(--t-label-track); text-transform: uppercase; color: var(--muted); font-weight: 600; line-height: 1.4; padding-top: 4px; overflow-wrap: anywhere; }
+  .bgrid .gl-v, .fact .v, .kv.rows .inwords { min-width: 0; margin: 0; font-size: var(--t-value); line-height: var(--t-value-lh); font-weight: 400; overflow-wrap: anywhere; }
+  .fact { display: contents; }
+  .facts { margin-top: var(--s3); }
+  .kv.rows { display: grid; gap: var(--s2); }
+  /* glance block on the session cards (admin home): chose · booked · why · medication — her words, verbatim */
+  .sess .glance { grid-column: 1 / -1; margin-top: var(--s3); padding-top: var(--s3); border-top: 1px solid var(--fill-hover); cursor: pointer; }
+  .glance .pkg { font-weight: 600; }
+  .glance .booked { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1) var(--s2); }
+  .glance .flag { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--gold); color: #1C1A16; font-size: var(--t-tag); font-weight: 600; line-height: 1.4; }
+  .glance .dim, .glance .med-none { color: var(--muted); }
+  .glance .why { display: block; width: 100%; margin: -11px 0; padding: 11px 0; border: 0; background: none; color: var(--ink); font: inherit; font-size: var(--t-value); line-height: var(--t-value-lh); text-align: left; overflow-wrap: anywhere; cursor: pointer; }
   .glance .why .wtxt { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .glance .why[aria-expanded="true"] .wtxt { white-space: pre-wrap; overflow: visible; }
-  .glance .med-text { display: inline-block; padding: 6px 12px; border-radius: 14px; background: #FFE9A8; color: #3A2B00; font-weight: 500; white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: inset 0 0 0 2px #E8B84A; }
+  .glance .med-text { display: block; padding: 6px 12px; border-radius: 14px; background: #FFE9A8; color: #3A2B00; font-weight: 500; white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: inset 0 0 0 2px #E8B84A; }
+  .glance .med-in { display: block; }
+  .glance .med-text.clamp .med-in { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
   :root[data-theme="dark"] .glance .med-text { background: #4A3A0E; color: #FFE9A8; box-shadow: inset 0 0 0 2px #B8892A; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .glance .med-text { background: #4A3A0E; color: #FFE9A8; box-shadow: inset 0 0 0 2px #B8892A; } }
-  .glance .med-none { color: var(--muted); }
-  .glance .med-yes { display: inline-block; padding: 5px 12px; border-radius: 14px; box-shadow: inset 0 0 0 2px #E8B84A; font-weight: 500; }
-  .glance .no-intake { display: inline-block; padding: 5px 14px; border-radius: 999px; background: var(--gold); color: #1C1A16; }
-  .glance .dim { color: var(--muted); }
-  .sess.feature { padding: 22px 20px; border: 2px solid var(--gold); }
-  .sess.feature .glance { gap: 14px; }
-  .sess.feature .name { font-size: 22px; }
-  .nextup-label { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-deep); margin: 6px 4px 8px; }
+  .glance .med-more { display: block; margin: -9px 0 -13px; padding: 13px 0; border: 0; background: none; color: var(--gold-deep); font: inherit; font-size: 13px; font-weight: 500; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .glance .med-yes { display: inline-block; padding: 4px 12px; border-radius: 14px; box-shadow: inset 0 0 0 2px #E8B84A; font-weight: 500; }
+  .glance .no-intake { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--gold); color: #1C1A16; font-size: var(--t-pill); font-weight: 500; line-height: 1.4; }
+  /* Today: one rhythm — card padding 16, 12 between blocks, 8 between grid rows */
+  .today .card { margin: 0 0 var(--s3); padding: var(--s4); }
+  .today-date { margin: 0 var(--s1) var(--s2); font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-deep); }
+  .statusrow { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); margin: 0 var(--s1) var(--s3); }
+  .statusrow b { font-size: 17px; font-weight: 600; }
+  .statusrow span { font-size: 14px; color: var(--muted); text-align: right; }
+  .today .hero { gap: var(--s4); }
+  .today .chips { padding: 0; margin: 0 0 var(--s3); }
+  .today .subline { margin: 0 var(--s1) var(--s2); }
+  .today .day-label { margin: var(--s3) var(--s1) var(--s2); }
+  .sess { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--s3); row-gap: 0; align-items: start; padding: var(--s4); }
+  .sess .who { display: flex; flex-direction: column; gap: var(--s1); min-width: 0; text-align: left; background: none; border: 0; padding: 0; min-height: 44px; justify-content: flex-start; }
+  .sess .row2 { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s2); }
+  .sess .acts { grid-column: 1 / -1; display: flex; gap: var(--s2); margin-top: var(--s3); }
+  .sess .acts .btn { min-height: 44px; padding: 0 var(--s4); white-space: nowrap; }
+  .sess .acts .btn.grow { flex: 1; min-width: 0; }
+  .sess.feature { padding: var(--s4); border: 2px solid var(--gold); }
+  .sess.feature .name { font-size: 22px; line-height: 1.2; }
+  .nextup-label { font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-deep); margin: 0 var(--s1) var(--s2); }
 
   /* aftercare timeline + photos */
   .tl { list-style: none; margin: 14px 0 0; padding: 0; position: relative; }
@@ -1153,45 +1168,62 @@ function packageDiffers(chosen, bookedTreatment) {
   return c !== bk;
 }
 const firstLineOf = (t) => String(t).split(/\r?\n/)[0];
+const durLabel = (min) => { const h = Math.floor(min / 60), m = min % 60; return h && m ? h + ' hr ' + m + ' min' : h ? (h === 1 ? '1 hour' : h + ' hours') : m + ' min'; };
+/** The four-row grid, always in this order: CHOSE · BOOKED · WHY · MEDICATION (same look on the client profile brief). */
 function glanceHTML(b, feature) {
   const intake = b.client_id ? intakeOf(b.client_id) : null;
   const key = b.client_id ? 'c/' + b.client_id : 'b/' + b.id;
-  // 1. PACKAGE — what she chose on the intake, bold; a gold flag with both if it differs from the booking
+  // CHOSE — what she chose on the intake; BOOKED — what she booked, with a small gold "Differs" tag if they don't match
   const chosen = intake ? trimStr(intake.package) : '';
-  let pkg;
-  if (chosen) pkg = '<b class="pkg">' + esc(chosen) + '</b>' + (packageDiffers(chosen, b.treatment) ? '<span class="flag">Chose: ' + esc(chosen) + ' · Booked: ' + esc(b.treatment || '—') + '</span>' : '');
-  else pkg = '<b class="pkg">' + esc(b.treatment || '—') + '</b><span class="dim">booked' + (intake ? ' · no package chosen' : '') + '</span>';
-  // 2. WHY — her main concern, first line, tap to expand (the featured card is already expanded)
+  const chose = chosen ? '<b class="pkg">' + esc(chosen) + '</b>' : '<span class="dim">—</span>';
+  const booked = '<span class="booked"><span>' + esc(b.treatment || '—') + '</span>' + (chosen && packageDiffers(chosen, b.treatment) ? '<span class="flag">Differs</span>' : '') + '</span>';
+  // WHY — her main concern, first line, tap to expand (the featured card is already expanded)
   const concern = intake ? trimStr(intake.main_concern) : '';
   let why;
   if (concern) {
     const open = !!feature;
     why = '<button class="why" type="button" data-why aria-expanded="' + open + '" data-full="' + esc(concern) + '" data-first="' + esc(firstLineOf(concern)) + '" aria-label="Her main concern — tap to expand"><span class="wtxt">“' + esc(open ? concern : firstLineOf(concern)) + '”</span></button>';
-  } else why = '<span class="dim">' + (intake ? 'nothing written' : '—') + '</span>';
-  // 3. MEDICATION — three different states, never merged
+  } else why = '<span class="dim">' + (intake ? 'Nothing written' : '—') + '</span>';
+  // MEDICATION — four different states, never merged; the callout shows up to 3 lines, then "Tap to read all"
   const meds = intake ? trimStr(intake.current_medications) : '', takes = intake ? lower(trimStr(intake.takes_medication)) : '';
   let med;
   if (!intake) med = '<span class="no-intake">Intake not completed</span>';                              // not knowing ≠ nothing
-  else if (meds) med = '<span class="med-text">' + esc(meds) + '</span>';                                // exactly what she wrote
+  else if (meds) med = '<span class="med-text clamp" data-med><span class="med-in">' + esc(meds) + '</span></span>';                  // exactly what she wrote
   else if (takes === 'yes') med = '<span class="med-yes">Medication: answered yes, none listed</span>';
-  else med = '<span class="med-none">Medication: none stated</span>';
-  return '<div class="glance" data-brief="' + key + '" data-bid="' + b.id + '"><div class="gl-pkg">' + pkg + '</div>' +
-    '<div class="gl-row"><span class="gl-k">Why</span>' + why + '</div>' +
-    '<div class="gl-row"><span class="gl-k">Medication</span>' + med + '</div></div>';
+  else med = '<span class="med-none">None stated</span>';
+  return '<div class="glance" data-brief="' + key + '" data-bid="' + b.id + '"><div class="bgrid">' +
+    '<span class="gl-k">Chose</span><div class="gl-v">' + chose + '</div>' +
+    '<span class="gl-k">Booked</span><div class="gl-v">' + booked + '</div>' +
+    '<span class="gl-k">Why</span><div class="gl-v">' + why + '</div>' +
+    '<span class="gl-k">Medication</span><div class="gl-v">' + med + '</div></div></div>';
 }
+/** After the cards are drawn: a medication note longer than 3 lines gets a "Tap to read all" (tap the note or the link). */
+function fitMeds() {
+  document.querySelectorAll('.med-text.clamp').forEach((el) => {
+    if (el.nextElementSibling && el.nextElementSibling.classList.contains('med-more')) return;
+    const inner = el.querySelector('.med-in'); if (!inner || inner.scrollHeight <= inner.clientHeight + 1) return;
+    const more = document.createElement('button'); more.type = 'button'; more.className = 'med-more'; more.textContent = 'Tap to read all';
+    el.after(more);
+    const toggle = (e) => { e.stopPropagation(); const open = el.classList.toggle('clamp') === false; more.textContent = open ? 'Show less' : 'Tap to read all'; };
+    more.onclick = toggle; el.onclick = toggle;
+  });
+}
+const confirmChip = (b) => (isPending(b) ? '<span class="pill amber">Awaiting reply</span>' : '<span class="pill green">Confirmed</span>');
 function sessionRow(b, feature) {
   const done = !!b.done_at;
   const nextKey = b.client_id ? 'c/' + b.client_id : 'b/' + b.id;
+  const dmin = bookingDurationMin(b);
+  const when = feature ? fmtTime(b.start_min) + ' · ' + (b.booking_date === todayISO() ? 'Today' : fmtDate(b.booking_date)) : fmtTime(b.start_min);
   return `<div class="card sess ${done ? 'done' : ''}${feature ? ' feature' : ''}">
     <button class="who" data-brief="${nextKey}" data-bid="${b.id}">
-      <span class="time">${fmtTime(b.start_min)}</span>
+      <span class="time">${esc(when)}</span>
       <span class="name">${esc(b.customer_name)}</span>
-      <span class="meta">${esc(treatmentLabel(b))}${isPending(b) ? `<br>New time: <b>${esc(fmtTs(b.proposed_starts_at))}</b>` : ''}</span>
-      <span class="row2">${testPill(b)}${statusChip(b)}<span class="pill gold">${money(b.amount_pence)} paid</span>${b.discount_code ? `<span class="pill gold">${esc(b.discount_code)}</span>` : ''}</span>
+      <span class="meta">${esc(treatmentLabel(b))}${dmin ? ' · ' + esc(durLabel(dmin)) : ''}${isPending(b) ? `<br>New time: <b>${esc(fmtTs(b.proposed_starts_at))}</b>` : ''}</span>
+      <span class="row2">${testPill(b)}${confirmChip(b)}<span class="pill gold">${money(b.amount_pence)} paid</span>${b.discount_code ? `<span class="pill gold">${esc(b.discount_code)}</span>` : ''}</span>
     </button>
     <button class="tick" data-tick="${b.id}" aria-pressed="${done}" aria-label="Mark ${esc(b.customer_name)} done">${ICON.check}</button>
     ${glanceHTML(b, feature)}
-    ${done ? '' : `<div class="acts"><button class="btn sm ghost" data-cancel="${b.id}" type="button">Cancel booking</button></div>`}
+    ${done ? '' : `<div class="acts">${feature ? `<button class="btn grow" type="button" data-brief="${nextKey}" data-bid="${b.id}">Open brief</button>` : ''}<button class="btn ghost" data-cancel="${b.id}" type="button">Cancel booking</button></div>`}
   </div>`;
 }
 function nextClinicDate() { let d = todayISO(); while (dow(d) !== CLINIC_WEEKDAY) d = addDays(d, 1); return d; }
@@ -1222,13 +1254,15 @@ function viewToday() {
   const todays = S.data.bookings.filter((b) => confirmed(b) && b.booking_date === t).sort((a, b) => a.start_min - b.start_min);
   const seen = todays.filter((b) => b.done_at).length, total = todays.length;
   const nextUp = todays.find((b) => !b.done_at);
-  const heroHead = total ? `${seen} of ${total} seen` : 'No sessions today';
-  const heroSub = !total ? 'Next clinic: ' + fmtDate(nextClinicDate()) : nextUp ? `Next: ${fmtTime(nextUp.start_min)} · ${nextUp.customer_name}` : 'All of today’s sessions are done.';
+  const heroHead = `${seen} of ${total} seen`;
+  const heroSub = nextUp ? `Next: ${fmtTime(nextUp.start_min)} · ${nextUp.customer_name}` : 'All of today’s sessions are done.';
   const C = 2 * Math.PI * 38, frac = total ? seen / total : 0;
-  const hero = `<div class="card hero"><div class="ring"><svg viewBox="0 0 92 92"><circle class="t" cx="46" cy="46" r="38"/><circle class="p" cx="46" cy="46" r="38" stroke-dasharray="${(C * frac).toFixed(1)} ${C.toFixed(1)}"/></svg><b>${seen}/${total}</b></div>
+  const statusRow = `<div class="statusrow"><b>No sessions today</b><span>Next clinic ${esc(fmtDate(nextClinicDate()))}</span></div>`;
+  const hero = !total ? statusRow : `<div class="card hero"><div class="ring"><svg viewBox="0 0 92 92"><circle class="t" cx="46" cy="46" r="38"/><circle class="p" cx="46" cy="46" r="38" stroke-dasharray="${(C * frac).toFixed(1)} ${C.toFixed(1)}"/></svg><b>${seen}/${total}</b></div>
     <div><h2>${esc(heroHead)}</h2><p>${esc(heroSub)}</p></div></div>`;
-  shell(`${pageHead('Today')}${hero}${nextUpBlock}
-    ${sub ? `<p class="muted small" style="margin:0 4px 10px">${esc(sub)}</p>` : ''}<div class="chips">${[['today', 'Today'], ['week', 'This week'], ['clinic', 'Next clinic']].map(([k, l]) => `<button class="chip" data-chip="${k}" aria-pressed="${S.chip === k}">${l}</button>`).join('')}</div>${body}`);
+  shell(`<div class="today"><div class="today-date">${esc(fmtDateLong(t))}</div>${hero}${nextUpBlock}
+    ${sub ? `<p class="muted small subline">${esc(sub)}</p>` : ''}<div class="chips">${[['today', 'Today'], ['week', 'This week'], ['clinic', 'Next clinic']].map(([k, l]) => `<button class="chip" data-chip="${k}" aria-pressed="${S.chip === k}">${l}</button>`).join('')}</div>${body}</div>`);
+  fitMeds();
   document.querySelectorAll('[data-chip]').forEach((b) => { b.onclick = () => { S.chip = b.dataset.chip; render(); }; });
   document.querySelectorAll('[data-why]').forEach((w) => {       // tap her concern to expand / collapse it (does not open the brief)
     w.onclick = (e) => { e.stopPropagation(); const open = w.getAttribute('aria-expanded') !== 'true'; w.setAttribute('aria-expanded', String(open)); w.querySelector('.wtxt').textContent = '“' + (open ? w.dataset.full : w.dataset.first) + '”'; };
@@ -1547,18 +1581,18 @@ function viewBrief(key, bid) {
       <div class="contact" style="flex-wrap:wrap">${p.phone ? `<a class="btn" href="tel:${esc(p.phone.replace(/[^\d+]/g, ''))}">Call</a><a class="btn ghost" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}${c ? '<button class="btn ghost" id="ciBtn" type="button">Check-in</button>' : ''}</div>
     </div>
     ${act}
-    <div class="card"><div class="section-label">Conditions, medication, allergies</div><div class="kv" style="margin-top:12px">
+    <div class="card"><div class="section-label">Conditions, medication, allergies</div><div class="kv rows" style="margin-top:12px">
       <div><div class="k">Conditions (their words)</div>${intake ? (lower(intake.has_conditions) === 'yes' ? words(intake.medical_conditions) : '<p class="inwords none">None reported</p>') : words('')}</div>
       <div><div class="k">Medication (their words)</div>${intake ? (lower(intake.takes_medication) === 'yes' ? words(intake.current_medications) : '<p class="inwords none">None reported</p>') : words('')}</div>
       <div><div class="k">Allergies (their words)</div>${intake ? (lower(intake.has_allergies) === 'yes' ? words(intake.allergies) : '<p class="inwords none">None reported</p>') : words('')}</div></div></div>
-    <div class="card"><div class="section-label">Main concern and safety notes</div><div class="kv" style="margin-top:12px">
+    <div class="card"><div class="section-label">Main concern and safety notes</div><div class="kv rows" style="margin-top:12px">
       <div><div class="k">Main concern</div>${words(intake && intake.main_concern)}</div>
       <div><div class="k">Safety notes</div>${words(intake && intake.safety_notes)}</div></div></div>
     ${c ? progressCard(ciList) : ''}
     ${c ? photosCard(c, p) : ''}
     ${ciList.length ? `<div class="card"><div class="section-label">Check-ins</div><div class="hist">${ciList.slice().reverse().slice(0, 4).map((x) => `<div class="h"><b>${shortDate(new Date(x.taken_at).getTime())}</b> · ${[['Concern', x.concern_score], ['Energy', x.energy], ['Sleep', x.sleep]].filter((r) => r[1] != null).map((r) => r[0] + ' ' + r[1]).join(' · ') || 'No scores'}${x.pain_areas ? `<br><span class="muted">Pain areas:</span> ${esc(x.pain_areas)}` : ''}${x.note ? `<br><span class="muted">Note:</span> ${esc(x.note)}` : ''}</div>`).join('')}</div></div>` : ''}
     <div class="card"><div class="section-label">Package and bookings</div>
-      <div class="fact" style="margin-top:12px"><div class="k">Package chosen on intake</div><div class="v">${esc(intake && intake.package || '—')}</div></div>
+      <div class="facts"><div class="fact"><div class="k">Package chosen on intake</div><div class="v">${esc(intake && intake.package || '—')}</div></div></div>
       <div class="hist">${hist}</div></div>
     ${noteBlock}`);
   document.getElementById('bk').onclick = () => { if (history.length > 1) history.back(); else location.hash = '#/clients'; };
