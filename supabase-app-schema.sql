@@ -501,3 +501,24 @@ grant select on public.unlinked_signins to authenticated;
 grant select, insert, update, delete on public.unlinked_signins to service_role;
 create policy admin_read_unlinked on public.unlinked_signins for select to authenticated using (public.is_admin());
 alter table public.push_subscriptions add column if not exists notify_unlinked boolean not null default true;
+
+-- admin cancel booking — migration "admin_cancel_booking", 8 Oct 2026 ---------
+-- Admin-only. Marks the booking 'cancelled' (frees the slot: reserve_slot and the availability filter only count
+-- confirmed / reschedule_pending / unexpired pending), clears any proposed reschedule time and releases its discount-code
+-- redemption so a code is not counted as used. It never touches Stripe — refunds are made in Stripe by hand.
+create or replace function public.admin_cancel_booking(p_booking bigint) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare b public.bookings; n int := 0;
+begin
+  if not public.is_admin() then raise exception 'not_allowed'; end if;
+  update public.bookings
+     set status = 'cancelled', proposed_starts_at = null
+   where id = p_booking and status in ('confirmed', 'reschedule_pending', 'pending')
+  returning * into b;
+  if not found then raise exception 'not_cancellable'; end if;
+  update public.code_redemptions set status = 'released' where booking_id = p_booking and status in ('reserved', 'confirmed');
+  get diagnostics n = row_count;
+  return jsonb_build_object('id', b.id, 'redemption_released', n > 0);
+end $$;
+revoke all on function public.admin_cancel_booking(bigint) from public, anon;
+grant execute on function public.admin_cancel_booking(bigint) to authenticated;

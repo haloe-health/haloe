@@ -184,6 +184,9 @@
   .btn { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--gold); color: #1C1A16; font-weight: 600; font-size: 15px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
   .btn.ghost { background: var(--fill); color: var(--ink); }
   .btn.block { width: 100%; }
+  .btn.danger { background: var(--red); color: var(--card); }
+  .h.cancelled { opacity: .62; }
+  .sess .acts { grid-column: 1 / -1; margin-top: 10px; }
   .mail { overflow-wrap: anywhere; word-break: break-word; }
   /* A button whose label may wrap to two lines ("Worried about a mark? Send Halima a photo"): grows with its text, never a fixed height. One-line gold buttons keep the plain .btn height. */
   .btn.multi { height: auto; min-height: 44px; padding: 14px 20px; line-height: 1.3; border-radius: 28px; text-align: center; }
@@ -493,6 +496,8 @@ const api = {
   // Reschedule: admin proposes (database checks the time is free and keeps the original slot held);
   // the client accepts through /reschedule-accept, which also emails Halima.
   async proposeReschedule(id, dateISO, startMin) { const { data, error } = await sb.rpc('propose_reschedule', { p_booking: id, p_date: dateISO, p_start_min: startMin }); if (error) throw error; return data; },
+  // Admin-only (the database checks): marks the booking cancelled, frees the slot, releases its discount-code use. Never touches Stripe.
+  async cancelBooking(id) { const { data, error } = await sb.rpc('admin_cancel_booking', { p_booking: id }); if (error) throw error; return data; },
   async cancelReschedule(id) { const { error } = await sb.rpc('cancel_reschedule', { p_booking: id }); if (error) throw error; },
   async acceptReschedule(id) {
     const { data: { session } } = await sb.auth.getSession();
@@ -717,6 +722,7 @@ function fmtTs(ts) {
 /** Admin status chip: amber while she hasn't replied, green once she has accepted. */
 function statusChip(b) {
   if (isPending(b)) return '<span class="pill amber">Awaiting reply</span>';
+  if (b.status === 'cancelled') return '<span class="pill">Cancelled</span>';
   if (b.confirmed_at && b.status === 'confirmed') return '<span class="pill green">Confirmed</span>';
   return '';
 }
@@ -988,6 +994,7 @@ function sessionRow(b, feature) {
     </button>
     <button class="tick" data-tick="${b.id}" aria-pressed="${done}" aria-label="Mark ${esc(b.customer_name)} done">${ICON.check}</button>
     ${glanceHTML(b, feature)}
+    ${done ? '' : `<div class="acts"><button class="btn sm ghost" data-cancel="${b.id}" type="button">Cancel booking</button></div>`}
   </div>`;
 }
 function nextClinicDate() { let d = todayISO(); while (dow(d) !== CLINIC_WEEKDAY) d = addDays(d, 1); return d; }
@@ -1030,6 +1037,7 @@ function viewToday() {
     w.onclick = (e) => { e.stopPropagation(); const open = w.getAttribute('aria-expanded') !== 'true'; w.setAttribute('aria-expanded', String(open)); w.querySelector('.wtxt').textContent = '“' + (open ? w.dataset.full : w.dataset.first) + '”'; };
   });
   document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief + '?b=' + b.dataset.bid; }; });
+  document.querySelectorAll('[data-cancel]').forEach((b) => { b.onclick = () => openCancelBooking(Number(b.dataset.cancel)); });
   document.querySelectorAll('[data-tick]').forEach((b) => {
     b.onclick = async () => {
       const id = Number(b.dataset.tick); const bk = S.data.bookings.find((x) => x.id === id);
@@ -1187,6 +1195,25 @@ function tsParts(ts) {
   const g = (t) => f.find((x) => x.type === t).value;
   return { date: g('year') + '-' + g('month') + '-' + g('day'), min: Number(g('hour')) * 60 + Number(g('minute')) };
 }
+/** Admin: "Cancel this booking?" — a clear confirm. Frees the slot and releases any discount-code use; refunds are made in Stripe. */
+function openCancelBooking(bookingId) {
+  const b = S.data.bookings.find((x) => x.id === bookingId); if (!b) return;
+  const bg = document.createElement('div'); bg.className = 'sheet-bg';
+  bg.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="Cancel this booking?"><div class="grab"></div><div class="lab">Cancel booking</div>
+    <div style="font-weight:700;font-size:20px;letter-spacing:-.02em;margin-top:2px">Cancel this booking?</div>
+    <p style="margin:10px 0 0">${esc(b.customer_name)} · ${esc(fmtDate(b.booking_date))} · ${fmtTime(b.start_min)}<br>${esc(treatmentLabel(b))}${b.discount_code ? ' · ' + esc(b.discount_code) : ''}</p>
+    <p class="muted small" style="margin:10px 0 0">The time is freed on the public booking page${b.discount_code ? ' and the ' + esc(b.discount_code) + ' use is released' : ''}. Refunds are made in Stripe — nothing is refunded here.</p>
+    <div class="sheet-actions" style="grid-template-columns:1fr 1fr"><button class="btn ghost" id="cb-keep" type="button">Keep booking</button><button class="btn danger" id="cb-yes" type="button">Cancel booking</button></div></div>`;
+  document.body.appendChild(bg);
+  const close = () => bg.remove();
+  bg.onclick = (e) => { if (e.target === bg) close(); };
+  bg.querySelector('#cb-keep').onclick = close;
+  bg.querySelector('#cb-yes').onclick = async () => {
+    const yes = bg.querySelector('#cb-yes'); yes.disabled = true; yes.textContent = 'Cancelling…';
+    try { await api.cancelBooking(bookingId); await loadAdminData(); close(); render(); toastMsg('Booking cancelled'); }
+    catch (e) { toastMsg(friendly(e, 'cancel')); yes.disabled = false; yes.textContent = 'Cancel booking'; }
+  };
+}
 function openReschedule(bookingId, p) {
   const b0 = S.data.bookings.find((x) => x.id === bookingId); if (!b0) return;
   const pend = isPending(b0), cur = pend ? tsParts(b0.proposed_starts_at) : { date: nextClinicDate(), min: b0.start_min };
@@ -1299,7 +1326,7 @@ function viewBrief(key, bid) {
   const pk = (b) => pkgOf(b, intake && intake.package);
   const headPkg = p.bookings.map(pk).find(Boolean) || '';
   const bookedOn = (b) => fmtDate(ldn(new Date(b.created_at * 1000)));
-  const hist = p.bookings.map((b) => `<div class="h"><b>${fmtDate(b.booking_date)} · ${fmtTime(b.start_min)}</b> ${statusChip(b)}<br>${esc(treatmentLabel(b))} ${tagHTML(pk(b))}<br><span class="muted">${money(b.amount_pence)} paid${b.discount_code ? ' · ' + esc(b.discount_code) : ''}${confirmed(b) ? '' : ' · ' + esc(b.status)}${b.done_at ? ' · done' : ''} · booked ${bookedOn(b)}</span>${isPending(b) ? `<br>New time proposed: <b>${esc(fmtTs(b.proposed_starts_at))}</b>` : ''}${b.original_starts_at && b.status === 'confirmed' ? `<br><span class="muted">Moved from ${esc(fmtTs(b.original_starts_at))}</span>` : ''}${confirmed(b) ? `<div class="acts"><button class="btn sm ghost" data-resched="${b.id}" type="button">Reschedule</button>${isPending(b) && (p.phone || b.customer_phone) ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(rescheduleWA(b, p.phone || b.customer_phone, p.name))}">Send on WhatsApp</a>` : ''}</div>` : ''}</div>`).join('') || '<p class="muted small">No bookings yet.</p>';
+  const hist = p.bookings.map((b) => `<div class="h${b.status === 'cancelled' ? ' cancelled' : ''}"><b>${fmtDate(b.booking_date)} · ${fmtTime(b.start_min)}</b> ${statusChip(b)}<br>${esc(treatmentLabel(b))} ${tagHTML(pk(b))}<br><span class="muted">${money(b.amount_pence)} paid${b.discount_code ? ' · ' + esc(b.discount_code) : ''}${confirmed(b) ? '' : ' · ' + esc(b.status)}${b.done_at ? ' · done' : ''} · booked ${bookedOn(b)}</span>${b.status === 'cancelled' ? '<br><span class="muted small">Cancelled. Refunds are made in Stripe.</span>' : ''}${isPending(b) ? `<br>New time proposed: <b>${esc(fmtTs(b.proposed_starts_at))}</b>` : ''}${b.original_starts_at && b.status === 'confirmed' ? `<br><span class="muted">Moved from ${esc(fmtTs(b.original_starts_at))}</span>` : ''}${confirmed(b) ? `<div class="acts"><button class="btn sm ghost" data-resched="${b.id}" type="button">Reschedule</button><button class="btn sm ghost" data-cancel="${b.id}" type="button">Cancel booking</button>${isPending(b) && (p.phone || b.customer_phone) ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(rescheduleWA(b, p.phone || b.customer_phone, p.name))}">Send on WhatsApp</a>` : ''}</div>` : ''}</div>`).join('') || '<p class="muted small">No bookings yet.</p>';
   const notes = c ? S.data.notes.filter((n) => n.client_id === c.id).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))) : [];
   const ctxBooking = bid ? p.bookings.find((b) => b.id === Number(bid)) : (p.bookings.find((b) => confirmed(b) && b.booking_date >= todayISO()) || p.bookings[0]);
   const noteBlock = c
@@ -1347,6 +1374,7 @@ function viewBrief(key, bid) {
   wireProgress(ciList);
   if (c) loadPhotoThumbs();
   document.querySelectorAll('[data-resched]').forEach((btn) => { btn.onclick = () => openReschedule(Number(btn.dataset.resched), p); });
+  document.querySelectorAll('[data-cancel]').forEach((btn) => { btn.onclick = () => openCancelBooking(Number(btn.dataset.cancel)); });
   const ciBtn = document.getElementById('ciBtn');
   if (ciBtn) ciBtn.onclick = () => openCheckIn(c, p.bookings.find((b) => confirmed(b) && b.booking_date === todayISO()) || null);   // today's session, if any
   const save = document.getElementById('noteSave');
