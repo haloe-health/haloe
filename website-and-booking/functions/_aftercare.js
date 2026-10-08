@@ -47,6 +47,22 @@ export function reminderEmail(name, day) {
   return { subject: day === 1 ? 'Your aftercare note · day 1' : 'Your aftercare note · day 7', html };
 }
 
+/**
+ * Send one reminder email on demand, ONLY to a client flagged is_test (so it can't be used to mail a real client).
+ * Used by tools/send-test-reminder.mjs through /aftercare-cron. Does not touch aftercare_reminders.
+ */
+export async function sendTestReminder(env, email, day) {
+  if (!REMINDER_DAYS.includes(day)) return { ok: false, error: 'bad_day' };
+  if (!env.RESEND_API_KEY) return { ok: false, error: 'email_not_configured' };
+  const e = String(email || '').trim().toLowerCase();
+  if (!e) return { ok: false, error: 'no_email' };
+  const rows = await sbRequest(env, { path: `/rest/v1/clients?select=full_name,email,is_test&email=ilike.${encodeURIComponent(e)}&is_test=eq.true&limit=1`, method: 'GET' });
+  if (!Array.isArray(rows) || !rows.length) return { ok: false, error: 'not_a_test_client' };
+  const m = reminderEmail(rows[0].full_name, day);
+  await sendEmail(env.RESEND_API_KEY, { from: FROM, to: [rows[0].email], reply_to: HALIMA_EMAIL, subject: m.subject, html: m.html });
+  return { ok: true, sent_to: rows[0].email, day };
+}
+
 /** One hourly pass. Returns a summary; never throws. */
 export async function runAftercare(env, now = new Date()) {
   const out = { window: false, considered: 0, emailed: 0, pushed: 0, released: 0, skipped: 0, purged: 0, errors: 0 };
