@@ -280,6 +280,31 @@
   .gate .card { width: 100%; max-width: 420px; text-align: center; }
   .gate .brand { justify-content: center; margin-bottom: 18px; }
   .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-h) + 24px); background: #1C1A16; color: #F5F0E8; padding: 10px 18px; border-radius: 999px; font-size: 14px; z-index: 50; max-width: calc(100% - 32px); }
+  /* glance lines on the session cards (admin home): package · why · medication — her words, verbatim */
+  .sess .glance { grid-column: 1 / -1; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--fill-hover); display: grid; gap: 10px; cursor: pointer; font-size: 17px; line-height: 1.4; }
+  .glance .gl-pkg { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+  .glance .pkg { font-weight: 700; font-size: 18px; overflow-wrap: anywhere; }
+  .glance .flag { display: inline-block; background: var(--gold); color: #1C1A16; font-weight: 600; font-size: 14.5px; line-height: 1.35; padding: 5px 12px; border-radius: 12px; overflow-wrap: anywhere; }
+  .glance .gl-row { display: grid; gap: 4px; }
+  .glance .gl-k { font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .glance .why { display: block; width: 100%; min-height: 44px; margin: 0; padding: 8px 12px; border: 0; border-radius: 14px; background: var(--fill); color: var(--ink); font: inherit; font-size: 17px; line-height: 1.4; text-align: left; overflow-wrap: anywhere; cursor: pointer; }
+  .glance .why .wtxt { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .glance .why[aria-expanded="true"] .wtxt { white-space: pre-wrap; overflow: visible; }
+  .glance .med-text { display: inline-block; padding: 7px 14px; border-radius: 14px; background: #FFE9A8; color: #3A2B00; font-weight: 600; white-space: pre-wrap; overflow-wrap: anywhere; box-shadow: inset 0 0 0 2px #E8B84A; }
+  :root[data-theme="dark"] .glance .med-text { background: #4A3A0E; color: #FFE9A8; box-shadow: inset 0 0 0 2px #B8892A; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .glance .med-text { background: #4A3A0E; color: #FFE9A8; box-shadow: inset 0 0 0 2px #B8892A; } }
+  .glance .med-none { color: var(--muted); }
+  .glance .med-yes { display: inline-block; padding: 6px 12px; border-radius: 14px; box-shadow: inset 0 0 0 2px #E8B84A; font-weight: 600; }
+  .glance .no-intake { display: inline-block; padding: 7px 16px; border-radius: 999px; background: var(--gold); color: #1C1A16; font-weight: 700; }
+  .glance .dim { color: var(--muted); }
+  .sess.feature { padding: 22px 20px; border: 2px solid var(--gold); }
+  .sess.feature .glance { font-size: 20px; gap: 14px; }
+  .sess.feature .glance .pkg { font-size: 22px; }
+  .sess.feature .glance .flag { font-size: 16.5px; }
+  .sess.feature .glance .why, .sess.feature .glance .med-text, .sess.feature .glance .med-yes { font-size: 20px; }
+  .sess.feature .name { font-size: 22px; }
+  .nextup-label { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-deep); margin: 6px 4px 8px; }
+
   /* aftercare timeline + photos */
   .tl { list-style: none; margin: 14px 0 0; padding: 0; position: relative; }
   .tl li { position: relative; padding: 0 0 18px 34px; }
@@ -826,18 +851,58 @@ function shell(inner, withNav = true) {
 }
 
 /* ---- Today ---- */
-function sessionRow(b) {
-  const noIntake = !hasIntake(b);
+/* ---- the three glance lines on a session card (admin only; her intake words, verbatim, no interpretation) ----
+ * Real intake fields:  package  ("Which package or treatment are you booking?")
+ *                      main_concern  ("What would you most like help with?")
+ *                      takes_medication ("Are you currently taking any medication or supplements?" Yes/No) + current_medications ("Please list them")
+ * Nothing here is ever sent in a push, an email or shown on a client-facing page. */
+const normPkg = (t) => String(t || '').split(' — ')[0].trim().toLowerCase();
+/** Does what she chose on the intake differ from what was booked? Only a real mismatch is flagged. */
+function packageDiffers(chosen, bookedTreatment) {
+  const c = normPkg(chosen), bk = String(bookedTreatment || '').trim().toLowerCase();
+  if (!c || c === 'not sure yet') return false;
+  if (c === 'single treatment') return PACKAGE_NAMES.some((p) => p.toLowerCase() === bk);   // she said single treatment but a package was booked
+  return c !== bk;
+}
+const firstLineOf = (t) => String(t).split(/\r?\n/)[0];
+function glanceHTML(b, feature) {
+  const intake = b.client_id ? intakeOf(b.client_id) : null;
+  const key = b.client_id ? 'c/' + b.client_id : 'b/' + b.id;
+  // 1. PACKAGE — what she chose on the intake, bold; a gold flag with both if it differs from the booking
+  const chosen = intake ? trimStr(intake.package) : '';
+  let pkg;
+  if (chosen) pkg = '<b class="pkg">' + esc(chosen) + '</b>' + (packageDiffers(chosen, b.treatment) ? '<span class="flag">Chose: ' + esc(chosen) + ' · Booked: ' + esc(b.treatment || '—') + '</span>' : '');
+  else pkg = '<b class="pkg">' + esc(b.treatment || '—') + '</b><span class="dim">booked' + (intake ? ' · no package chosen' : '') + '</span>';
+  // 2. WHY — her main concern, first line, tap to expand (the featured card is already expanded)
+  const concern = intake ? trimStr(intake.main_concern) : '';
+  let why;
+  if (concern) {
+    const open = !!feature;
+    why = '<button class="why" type="button" data-why aria-expanded="' + open + '" data-full="' + esc(concern) + '" data-first="' + esc(firstLineOf(concern)) + '" aria-label="Her main concern — tap to expand"><span class="wtxt">“' + esc(open ? concern : firstLineOf(concern)) + '”</span></button>';
+  } else why = '<span class="dim">' + (intake ? 'nothing written' : '—') + '</span>';
+  // 3. MEDICATION — three different states, never merged
+  const meds = intake ? trimStr(intake.current_medications) : '', takes = intake ? lower(trimStr(intake.takes_medication)) : '';
+  let med;
+  if (!intake) med = '<span class="no-intake">Intake not completed</span>';                              // not knowing ≠ nothing
+  else if (meds) med = '<span class="med-text">' + esc(meds) + '</span>';                                // exactly what she wrote
+  else if (takes === 'yes') med = '<span class="med-yes">Medication: answered yes, none listed</span>';
+  else med = '<span class="med-none">Medication: none stated</span>';
+  return '<div class="glance" data-brief="' + key + '" data-bid="' + b.id + '"><div class="gl-pkg">' + pkg + '</div>' +
+    '<div class="gl-row"><span class="gl-k">Why</span>' + why + '</div>' +
+    '<div class="gl-row"><span class="gl-k">Medication</span>' + med + '</div></div>';
+}
+function sessionRow(b, feature) {
   const done = !!b.done_at;
   const nextKey = b.client_id ? 'c/' + b.client_id : 'b/' + b.id;
-  return `<div class="card sess ${done ? 'done' : ''}">
+  return `<div class="card sess ${done ? 'done' : ''}${feature ? ' feature' : ''}">
     <button class="who" data-brief="${nextKey}" data-bid="${b.id}">
       <span class="time">${fmtTime(b.start_min)}</span>
       <span class="name">${esc(b.customer_name)}</span>
       <span class="meta">${esc(treatmentLabel(b))}${isPending(b) ? `<br>New time: <b>${esc(fmtTs(b.proposed_starts_at))}</b>` : ''}</span>
-      <span class="row2">${testPill(b)}${tagHTML(pkgOf(b, b.client_id && (intakeOf(b.client_id) || {}).package))}${statusChip(b)}<span class="pill gold">${money(b.amount_pence)} paid</span>${b.discount_code ? `<span class="pill gold">${esc(b.discount_code)}</span>` : ''}${noIntake ? '<span class="pill red">No intake</span>' : ''}</span>
+      <span class="row2">${testPill(b)}${statusChip(b)}<span class="pill gold">${money(b.amount_pence)} paid</span>${b.discount_code ? `<span class="pill gold">${esc(b.discount_code)}</span>` : ''}</span>
     </button>
     <button class="tick" data-tick="${b.id}" aria-pressed="${done}" aria-label="Mark ${esc(b.customer_name)} done">${ICON.check}</button>
+    ${glanceHTML(b, feature)}
   </div>`;
 }
 function nextClinicDate() { let d = todayISO(); while (dow(d) !== CLINIC_WEEKDAY) d = addDays(d, 1); return d; }
@@ -848,15 +913,21 @@ function viewToday() {
   if (S.chip === 'clinic') { from = to = nextClinicDate(); onlyClinic = true; }
   const list = S.data.bookings.filter((b) => confirmed(b) && b.booking_date >= from && b.booking_date <= to && (!onlyClinic || b.location === 'clinic'))
     .sort((a, b) => (a.booking_date + String(a.start_min).padStart(4, '0')).localeCompare(b.booking_date + String(b.start_min).padStart(4, '0')));
+  // "Next up": the next session not yet marked done (today or later) gets a large card with all three lines fully visible.
+  const key = (x) => x.booking_date + String(x.start_min).padStart(4, '0');
+  const nextSession = S.data.bookings.filter((x) => confirmed(x) && !x.done_at && x.booking_date >= t && !isPending(x)).sort((x, y) => key(x).localeCompare(key(y)))[0] || null;
+  const featuredInRange = !!nextSession && list.some((x) => x.id === nextSession.id);
+  const rest = nextSession ? list.filter((x) => x.id !== nextSession.id) : list;
   let body = '';
-  if (!list.length) body = `<div class="card empty">${S.chip === 'today' ? 'No sessions today.' : S.chip === 'week' ? 'No sessions this week.' : 'No clinic bookings yet for ' + fmtDateLong(from) + '.'}</div>`;
+  if (!rest.length && !featuredInRange) body = `<div class="card empty">${S.chip === 'today' ? 'No sessions today.' : S.chip === 'week' ? 'No sessions this week.' : 'No clinic bookings yet for ' + fmtDateLong(from) + '.'}</div>`;
   else {
     let last = '';
-    for (const b of list) {
+    for (const b of rest) {
       if (S.chip !== 'today' && b.booking_date !== last) { last = b.booking_date; body += `<div class="day-label">${fmtDate(b.booking_date)}</div>`; }
-      body += sessionRow(b);
+      body += sessionRow(b, false);
     }
   }
+  const nextUpBlock = nextSession ? `<div class="nextup-label">Next up · ${nextSession.booking_date === t ? 'today' : esc(fmtDate(nextSession.booking_date))}</div>${sessionRow(nextSession, true)}` : '';
   const sub = S.chip === 'today' ? '' : S.chip === 'clinic' ? 'Clinic day · ' + fmtDateLong(from) : fmtDate(from) + ' – ' + fmtDate(to);
   // Hero: today's progress, whichever chip is open.
   const todays = S.data.bookings.filter((b) => confirmed(b) && b.booking_date === t).sort((a, b) => a.start_min - b.start_min);
@@ -867,9 +938,12 @@ function viewToday() {
   const C = 2 * Math.PI * 38, frac = total ? seen / total : 0;
   const hero = `<div class="card hero"><div class="ring"><svg viewBox="0 0 92 92"><circle class="t" cx="46" cy="46" r="38"/><circle class="p" cx="46" cy="46" r="38" stroke-dasharray="${(C * frac).toFixed(1)} ${C.toFixed(1)}"/></svg><b>${seen}/${total}</b></div>
     <div><h2>${esc(heroHead)}</h2><p>${esc(heroSub)}</p></div></div>`;
-  shell(`${pageHead('Today')}${hero}
+  shell(`${pageHead('Today')}${hero}${nextUpBlock}
     ${sub ? `<p class="muted small" style="margin:0 4px 10px">${esc(sub)}</p>` : ''}<div class="chips">${[['today', 'Today'], ['week', 'This week'], ['clinic', 'Next clinic']].map(([k, l]) => `<button class="chip" data-chip="${k}" aria-pressed="${S.chip === k}">${l}</button>`).join('')}</div>${body}`);
   document.querySelectorAll('[data-chip]').forEach((b) => { b.onclick = () => { S.chip = b.dataset.chip; render(); }; });
+  document.querySelectorAll('[data-why]').forEach((w) => {       // tap her concern to expand / collapse it (does not open the brief)
+    w.onclick = (e) => { e.stopPropagation(); const open = w.getAttribute('aria-expanded') !== 'true'; w.setAttribute('aria-expanded', String(open)); w.querySelector('.wtxt').textContent = '“' + (open ? w.dataset.full : w.dataset.first) + '”'; };
+  });
   document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief + '?b=' + b.dataset.bid; }; });
   document.querySelectorAll('[data-tick]').forEach((b) => {
     b.onclick = async () => {
