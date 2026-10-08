@@ -7,6 +7,8 @@ import vm from 'node:vm';
 import { generateSlots, startGrid, groupSlots, TURNAROUND_MIN, minutesToLabel } from '../functions/_slots.js';
 import { resolveCart, formatDuration, SERVICES as SERVER_SERVICES } from '../functions/_services.js';
 import { applyDiscount } from '../functions/_discounts.js';
+import { CLINIC_RULES } from '../functions/_clinic.js';
+import { onRequestPost as createCheckout } from '../functions/create-checkout.js';
 
 let pass = 0, fail = 0;
 function ok(label, expr) {
@@ -65,8 +67,8 @@ ok('9:30 removed (1h30)', !slots2.includes(570));
 ok('10:00 removed (1h30)', !slots2.includes(600));
 ok('10:30 removed (1h30)', !slots2.includes(630));
 ok('11:00 available (1h30)', slots2.includes(660));
-ok('19:30 still available (1h30)', slots2.includes(1170));
-eq('18 slots remain (1h30)', slots2.length, 18);
+ok('19:30 NOT offered for 1h30 (19:30 + 90 + 15 = 21:15 would overrun the 9pm lock-up)', !slots2.includes(1170));
+eq('17 slots remain (1h30)', slots2.length, 17);
 
 console.log('\nSame-day minimum notice');
 // Pretend nowMin = 570 (09:30); notice = 120 min → cutoff 690 (11:30)
@@ -194,11 +196,44 @@ ok('60 min at 10:45 would not exist on the grid; 10:30 (ends 11:30 + 15 = 11:45)
 ok('60 min at 11:00 (ends 12:00 + 15 buffer) runs into the 12:00 booking → removed', !s60.includes(660));
 ok('45 min at 11:00 (ends 11:45 + 15 = 12:00) fits exactly', generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: 45, busy: noonBlock }).includes(660));
 
-console.log('\nTurnaround buffer: never removes the last slot (it may run past closing)');
+console.log('\nTurnaround buffer vs the Milton Hall closing rule: late clinic starts depend on the treatment; home visits are unaffected');
 for (const len of [45, 75, 105, 120]) {
-  ok(`${len} min: 19:30 clinic start still offered on an empty day`, generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: len }).includes(1170));
+  const fits1930 = len <= 75;   // 19:30 + len + 15 <= 21:00
+  ok(`${len} min: 19:30 clinic start ${fits1930 ? 'is offered' : 'is NOT offered (would overrun the 9pm lock-up)'}`, generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: len }).includes(1170) === fits1930);
   ok(`${len} min: 20:00 mobile start still offered on an empty day`, generateSlots({ location: 'mobile', weekday: MOBILE_DAY, durationMin: len }).includes(1200));
 }
+
+console.log('\nMilton Hall closing rule (clinic-rules.js: closing 21:00, tidy-up 15 min)');
+eq('closing time is 21:00 (1260 min)', CLINIC_RULES.closingMin, 1260);
+eq('tidy-up buffer is 15 minutes', CLINIC_RULES.TIDY_UP_MIN, 15);
+ok('fits exactly at the boundary: 19:30 + 75 + 15 = 21:00', CLINIC_RULES.fits(1170, 75));
+ok('one minute over does not fit', !CLINIC_RULES.fits(1171, 75));
+eq('latest start for a 105 min treatment is 19:00', CLINIC_RULES.latestStart(105), 1140);
+const lastStart = (d) => Math.max(...generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: d }));
+for (const [name, cat] of [['Full Body', 'wet'], ['Head, Scalp & Full Body', 'wet'], ['Face Cupping', 'dry'], ['Full Body Massage', 'massage'], ['Pain & Mobility', 'packages']]) {
+  const svc = SERVER_SERVICES[cat].find((x) => x.name === name);
+  const slots = generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: svc.min });
+  ok(`${name} (${cat}, ${svc.min} min): every offered clinic start finishes by 9pm`, slots.length > 0 && slots.every((t) => t + svc.min + 15 <= 1260));
+  ok(`${name} (${cat}, ${svc.min} min): the next half-hour start after the last one offered would overrun (or is past the last grid start)`, !CLINIC_RULES.fits(lastStart(svc.min) + 30, svc.min) || lastStart(svc.min) + 30 > 1170);
+}
+ok('every treatment in the catalogue has a real duration (none missing)', Object.values(SERVER_SERVICES).every((l) => l.every((x) => Number(x.min) > 0)));
+ok('a long multi-treatment cart (195 min) pushes the last clinic start back to 17:30', lastStart(195) === 1050);
+ok('slots that would overrun are simply absent (nothing greyed, nothing to explain)', !generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: 105 }).includes(1170));
+ok('home visits ignore the closing rule (a 195 min mobile visit still starts at 20:00)', generateSlots({ location: 'mobile', weekday: MOBILE_DAY, durationMin: 195 }).includes(1200));
+
+console.log('\nCheckout rejects a Milton Hall start that breaks the rule (tampered or stale request)');
+globalThis.fetch = async () => { throw new Error('offline (test)'); };   // never reach the network
+const checkout = async (time, location = 'clinic') => {
+  const res = await createCheckout({ request: new Request('https://x.invalid/create-checkout', { method: 'POST', body: JSON.stringify({ treatments: [{ name: 'Head, Scalp & Full Body', category: 'wet' }], customerEmail: 'a@example.invalid', customerName: 'Test', customerPhone: '07000000000', date: 'x', time, location, bookingDate: '2099-12-29', travelPostcode: 'M1 1AA', customerAddress: 'x' }) }), env: {} });
+  let body = {}; try { body = await res.json(); } catch (e) {}
+  return { status: res.status, error: body.error };
+};
+const bad = await checkout('7:30 pm');
+ok('105 min at 19:30 on a Tuesday → 400 slot_invalid', bad.status === 400 && bad.error === 'slot_invalid');
+const good = await checkout('7:00 pm');
+ok('105 min at 19:00 (finishes exactly 9pm) is NOT rejected for the rule', good.error !== 'slot_invalid');
+const mob = await checkout('7:30 pm', 'mobile');
+ok('the same time as a home visit is not rejected for the rule', mob.error !== 'slot_invalid');
 
 console.log('\nDurations: server (_services.js) and browser (services-data.js) agree for EVERY treatment');
 const ctx = {}; vm.createContext(ctx);

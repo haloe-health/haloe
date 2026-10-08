@@ -345,6 +345,8 @@
 </head>
 <body>
 <div id="root"></div>
+<script src="/services-data.js"></script>
+<script src="/clinic-rules.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 'use strict';
@@ -1056,6 +1058,38 @@ function openCheckIn(c, booking) {
   };
 }
 
+/* ---- Milton Hall lock-up rule (admin side) ----
+ * start + the treatment's REAL duration + tidy-up must be <= closing time (CLINIC_RULES in /clinic-rules.js — the one place to change it).
+ * Durations come from the catalogue (/services-data.js), never guessed. Home visits are exempt. */
+function svcMinutes(svc) {
+  if (Number(svc.sessionMin) > 0) return Number(svc.sessionMin);
+  const hr = /(\d+)\s*(?:hours?|hrs?|hr)\b/i.exec(svc.time || ''), mn = /(\d+)\s*min/i.exec(svc.time || '');
+  const total = (hr ? parseInt(hr[1], 10) * 60 : 0) + (mn ? parseInt(mn[1], 10) : 0);
+  return total > 0 ? total : null;                                    // null = no duration stored
+}
+/** The booking's real treatment length in minutes, or null if it can't be determined from the data. */
+function bookingDurationMin(b) {
+  if (Array.isArray(b.treatments) && b.treatments.length) {            // multi-treatment booking: the stored list carries each real length
+    const sum = b.treatments.reduce((n, t) => n + (Number(t.min) || 0), 0);
+    if (sum > 0) return sum;
+  }
+  const blocked = (b.end_min || 0) - (b.start_min || 0);
+  const cands = [];
+  for (const list of Object.values(SERVICES)) for (const svc of list) if (lower(svc.name) === lower(b.treatment)) { const m = svcMinutes(svc); if (m) cands.push(m); }
+  if (!cands.length) return null;
+  // the same name exists as dry AND wet cupping at different lengths: pick the one the stored blocked interval agrees with
+  return cands.find((d) => blocked === d || blocked === d + 15) || Math.max(...cands);
+}
+const closingLabel = (min) => { const h = Math.floor(min / 60), m = min % 60; return ((h + 11) % 12 + 1) + (m ? ':' + String(m).padStart(2, '0') : '') + (h < 12 ? 'am' : 'pm'); };
+/** null if the time is fine (or not Milton Hall); otherwise the calm explanation. */
+function clinicOverrunMessage(b, startMin) {
+  if (!b || b.location !== 'clinic' || !window.CLINIC_RULES) return null;
+  const dur = bookingDurationMin(b); if (!dur) return null;
+  const R = CLINIC_RULES;
+  if (R.fits(startMin, dur)) return null;
+  return 'This would finish at ' + fmtTime(R.finishMin(startMin, dur)) + '. The clinic closes at ' + closingLabel(R.closingMin) + '. Latest start for this treatment is ' + fmtTime(R.latestStart(dur)) + '.';
+}
+
 /* ---- Reschedule (admin) ---- */
 function tsParts(ts) {
   const f = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(ts));
@@ -1078,6 +1112,7 @@ function openReschedule(bookingId, p) {
       <label class="f" for="rs-date">Date</label><input class="in" id="rs-date" type="date" value="${cur.date}" min="${todayISO()}">
       <label class="f" for="rs-time">Time</label>
       <select class="in" id="rs-time">${times.map((m) => `<option value="${m}" ${m === cur.min ? 'selected' : ''}>${fmtTime(m)}</option>`).join('')}</select>
+      <div id="rs-warn" aria-live="polite"></div>
       <div class="sheet-actions" style="grid-template-columns:1fr">${waBtn}
         <button class="btn ${waBtn ? 'ghost' : ''}" id="rs-save" type="button">${isPending(b) ? 'Update proposed time' : 'Save new time'}</button>
         ${isPending(b) ? '<button class="btn ghost" id="rs-cancel-resched" type="button">Cancel the reschedule</button>' : ''}
@@ -1089,10 +1124,22 @@ function openReschedule(bookingId, p) {
     bg.querySelector('#rs-save').onclick = async () => {
       const dateISO = bg.querySelector('#rs-date').value, min = Number(bg.querySelector('#rs-time').value);
       if (!dateISO) { toastMsg('Choose a date'); return; }
-      const btn = bg.querySelector('#rs-save'); btn.disabled = true;
+      const btn = bg.querySelector('#rs-save');
+      // Milton Hall lock-up: block a time that would overrun closing, with a clear confirm to override (Halima knows her own day).
+      const bk = S.data.bookings.find((x) => x.id === bookingId);
+      const over = clinicOverrunMessage(bk, min), keyNow = dateISO + '|' + min;
+      if (over && bg.dataset.override !== keyNow) {
+        bg.dataset.override = keyNow;
+        bg.querySelector('#rs-warn').innerHTML = '<div class="warn"><b>Past closing time.</b> ' + esc(over) + '<br><span class="muted small">That includes ' + CLINIC_RULES.TIDY_UP_MIN + ' minutes to tidy up. Choose another time, or save it anyway if you know your day.</span></div>';
+        btn.textContent = 'Save anyway — I know this runs past closing';
+        return;
+      }
+      btn.disabled = true;
       try { await api.proposeReschedule(bookingId, dateISO, min); await loadAdminData(); render(); cur.date = dateISO; cur.min = min; draw(); toastMsg('Saved — now send it on WhatsApp'); }
       catch (e) { toastMsg(/clash/.test(e.message) ? 'That time overlaps another booking' : 'Could not save: ' + e.message); btn.disabled = false; }
     };
+    const resetOverride = () => { delete bg.dataset.override; bg.querySelector('#rs-warn').innerHTML = ''; const sb2 = bg.querySelector('#rs-save'); sb2.textContent = isPending(S.data.bookings.find((x) => x.id === bookingId)) ? 'Update proposed time' : 'Save new time'; };
+    bg.querySelector('#rs-date').onchange = resetOverride; bg.querySelector('#rs-time').onchange = resetOverride;
     const cancel = bg.querySelector('#rs-cancel-resched');
     if (cancel) cancel.onclick = async () => {
       try { await api.cancelReschedule(bookingId); await loadAdminData(); render(); bg.remove(); toastMsg('Reschedule cancelled'); } catch (e) { toastMsg('Could not cancel: ' + e.message); }

@@ -1,6 +1,6 @@
 import { reserveSlot, confirmBooking, releaseBooking, slotToMinutes, STRIPE_SESSION_SECONDS } from './_bookings.js';
 import { isOfferableStart, TURNAROUND_MIN } from './_slots.js';
-import { CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
+import { CLINIC_RULES, CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
 import { resolveCart, formatDuration } from './_services.js';
 import { validateDiscountCode, applyDiscount, reserveDiscountCode, confirmDiscountRedemption, releaseDiscountReservation } from './_discounts.js';
 import { travelZoneFor, travelFeeFor } from './_travel.js';
@@ -116,7 +116,9 @@ export async function onRequestPost(context) {
     // come from a tampered or stale request. Rejected outright — this is
     // static config, so there's nothing to fail open over.
     const startMin = slotToMinutes(time);
-    if (startMin === null || !isOfferableStart({ location: location === 'clinic' ? 'clinic' : 'mobile', dateISO: bookingDate, startMin })) {
+    // Milton Hall must be fully out by closing time: start + real treatment length + tidy-up. The wizard never offers a
+    // start that breaks this, so a request that does is tampered or stale.
+    if (startMin === null || !isOfferableStart({ location: location === 'clinic' ? 'clinic' : 'mobile', dateISO: bookingDate, startMin }) || (location === 'clinic' && !CLINIC_RULES.fits(startMin, totalDurationMin))) {
       if (discountRedemptionId !== null) {
         try { await releaseDiscountReservation(context.env, discountRedemptionId); } catch (e) { console.error('releaseDiscountReservation failed:', e); }
       }

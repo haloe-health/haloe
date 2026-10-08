@@ -6,8 +6,10 @@
 //
 // Rules:
 //   • Start times every SLOT_STEP_MIN from `first` to `last` inclusive.
-//     The last start is bookable for ANY duration — there is no
-//     "must finish by closing" rule.
+//     MILTON HALL ONLY: a start is offered only if it finishes — treatment
+//     plus the tidy-up buffer — by the clinic's closing time (CLINIC_RULES in
+//     ../clinic-rules.js). So a long treatment simply isn't offered late.
+//     Home visits have no closing rule.
 //   • A start is offered only if [start, start + duration) doesn't overlap
 //     an existing active booking that day.
 //   • Every booking blocks its treatment length PLUS TURNAROUND_MIN (below)
@@ -15,6 +17,8 @@
 //     client. It is stored in the booking's end_min (see create-checkout.js),
 //     so a booking's end_min means "blocked until", not "treatment ends".
 //   • Same-day starts need at least MIN_NOTICE_MIN of notice.
+
+import { CLINIC_RULES } from './_clinic.js';
 
 // ---- Editable config -------------------------------------------------- //
 // Per venue, per weekday (0 = Sunday … 6 = Saturday). `null` = closed.
@@ -43,10 +47,10 @@ export const HOURS = {
 
 export const SLOT_STEP_MIN = 30;
 // Turnaround gap after every booking, clinic and mobile. A booking blocks
-// start → start + treatment length + TURNAROUND_MIN. It may run past closing;
-// the last start of the day is still offered for any treatment (no closing
-// rule — see below). Mirrored nowhere else: browser code only ever sends the
-// real treatment length, and the server adds this.
+// start → start + treatment length + TURNAROUND_MIN (what the calendar blocks).
+// Separate from the Milton Hall closing rule, which has its OWN tidy-up setting
+// (CLINIC_RULES.TIDY_UP_MIN). Mirrored nowhere else: browser code only ever
+// sends the real treatment length, and the server adds this.
 export const TURNAROUND_MIN = 15;
 export const MIN_NOTICE_MIN = 120;       // same-day bookings need 2 h notice
 
@@ -105,6 +109,7 @@ export function generateSlots({ location, weekday, durationMin, busy = [], nowMi
   const dur = Number(durationMin) > 0 ? Number(durationMin) : 60;
   return startGrid(location, weekday).filter((start) => {
     if (nowMin !== null && start < nowMin + minNoticeMin) return false;
+    if (location === 'clinic' && !CLINIC_RULES.fits(start, dur)) return false;   // would overrun Milton Hall's lock-up
     const end = start + dur + turnaroundMin; // blocked until — real length + turnaround
     return !busy.some((b) => start < b.e && end > b.s);
   });

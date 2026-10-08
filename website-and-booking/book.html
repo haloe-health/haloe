@@ -1917,6 +1917,7 @@
 </div><!-- /book-shell -->
 
 <script src="services-data.js"></script>
+<script src="clinic-rules.js"></script>
 <script>
 // SERVICES, PROMO_DISCOUNT and netPrice() come from services-data.js — the
 // same file hijama-manchester.html loads, so the two price lists can't
@@ -2659,6 +2660,8 @@ function localSlotsFor(date) {
   const out = [];
   for (let t = first; t <= last; t += SLOT_STEP_MIN) {
     if (isToday && t < cutoff) continue;
+    // Milton Hall locks up at a fixed time: only starts that finish (treatment + tidy-up) by then (clinic-rules.js).
+    if (state.location === 'clinic' && window.CLINIC_RULES && !CLINIC_RULES.fits(t, selectedDurationMin())) continue;
     out.push(t);
   }
   return out;
