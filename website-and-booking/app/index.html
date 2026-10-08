@@ -184,6 +184,8 @@
   .btn { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--gold); color: #1C1A16; font-weight: 600; font-size: 15px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
   .btn.ghost { background: var(--fill); color: var(--ink); }
   .btn.block { width: 100%; }
+  /* A button whose label may wrap to two lines ("Worried about a mark? Send Halima a photo"): grows with its text, never a fixed height. One-line gold buttons keep the plain .btn height. */
+  .btn.multi { height: auto; min-height: 44px; padding: 14px 20px; line-height: 1.3; border-radius: 28px; text-align: center; }
   .btn[disabled] { opacity: .45; cursor: not-allowed; }
   .sig { margin-top: 14px; display: flex; align-items: center; gap: 12px; }
   .sig .thumb { width: 120px; height: 54px; border-radius: 10px; background: #fff; border: 1px solid var(--fill-hover); object-fit: contain; }
@@ -320,14 +322,15 @@
   .tl li.now .hd b { color: var(--gold-deep); }
   :root[data-theme="dark"] .tl li.now .hd b { color: var(--gold); }
   .tl .body { margin-top: 6px; display: grid; gap: 8px; font-size: 14.5px; line-height: 1.5; }
-  .tl .body div > i { display: block; font-style: normal; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .tl .body p { margin: 0; }
+  .tl-photo { margin: 14px 0 0; }
   .tl li.future .body, .tl li.past .body { display: none; }
   .tl.all li .body { display: grid; }
   .tl.all li.future, .tl.all li.past { opacity: .72; }
   .blister { background: var(--fill); }
   .photo-cta { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; margin-top: 14px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); font: inherit; font-weight: 600; font-size: 14.5px; }
   .picks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
-  .picks .btn { min-height: 48px; }
+  .picks .btn { cursor: pointer; padding: 0 10px; text-align: center; }
   .thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
   .thumbs .th { position: relative; aspect-ratio: 1; border-radius: 16px; overflow: hidden; background: var(--fill); }
   .thumbs .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -347,6 +350,7 @@
 <div id="root"></div>
 <script src="/services-data.js"></script>
 <script src="/clinic-rules.js"></script>
+<script src="/aftercare-copy.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 'use strict';
@@ -1486,33 +1490,11 @@ function viewBook() {
 }
 
 /* ---------- client: aftercare timeline + photos for Halima ---------- */
-// Wording comes from the site's /before-your-session page ("After" and "The marks"). Nothing medical is invented here:
-// the marks timeline is the site's (Day 0 just after · Days 1–3 settling · Days 4–7 fading · Days 7–14 nearly gone ·
-// Day 14+ gone). Symptom language only; marks usually fade within 14 days at most.
-const AFTERCARE_STEPS = [
-  { at: 0, label: 'Today', sub: 'just after',
-    normal: 'Round marks that look like light bruising. They are not scars and fade on their own.',
-    todo: 'Keep the area clean and dry for 24–48 hours. No swimming or saunas. Apply the black seed oil you were given, as shown. Take it easy for the rest of the day: eat well, drink water, sleep.',
-    ask: 'Worried about a mark? Send me a photo.' },
-  { at: 1, label: 'Tomorrow', sub: 'settling',
-    normal: 'The marks are settling. Some tenderness for a day or two is normal.',
-    todo: 'Keep the area clean and dry (24–48 hours). No swimming or saunas. Keep applying the black seed oil as shown.',
-    ask: 'If something about a mark worries you, send me a photo.' },
-  { at: 3, label: 'Day 3', sub: 'settling',
-    normal: 'The marks are still settling and will start to fade over the next few days.',
-    todo: 'Keep eating well, drinking water and sleeping.',
-    ask: 'If something about a mark worries you, send me a photo.' },
-  { at: 7, label: 'Day 7', sub: 'fading',
-    normal: 'The marks are fading. They are not scars and fade on their own.',
-    todo: 'Nothing special — let them fade.',
-    ask: 'If a mark is not fading as you would expect, send me a photo.' },
-  { at: 14, label: 'Day 14', sub: 'nearly gone',
-    normal: 'Marks usually fade within 14 days at most.',
-    todo: 'Nothing special — they should be gone or nearly gone.',
-    ask: 'If a mark is still there, send me a photo and I will take a look.' },
-];
-// DRAFT — Halima must approve this wording before it is relied on.
-const BLISTER_GUIDANCE_DRAFT = "A small blister can appear on or near a mark. It is usually harmless. Please don't pop it. Keep it clean and lightly covered, and send me a photo. If you notice spreading redness, increasing pain, or you feel unwell, speak to your GP or NHS 111.";
+// ALL the wording lives in /aftercare-copy.js (also used by the Day 1 / Day 7 reminder emails) — never type it here.
+// Symptom language only; one short paragraph per stage; the photo line is shown once under the timeline.
+const AFTERCARE_STEPS = AFTERCARE_COPY.steps, AFTERCARE_PHOTO_LINE = AFTERCARE_COPY.photoLine;
+// DRAFT — Halima must approve this wording before it is relied on (marker stays until she says approved).
+const BLISTER_GUIDANCE_DRAFT = AFTERCARE_COPY.blisterDraft;
 const daysBetween = (fromISO, toISO) => Math.round((Date.parse(toISO + 'T12:00:00Z') - Date.parse(fromISO + 'T12:00:00Z')) / 86400000);
 /** Where she is in the 14 days after her most recent session marked done; null when there's nothing to show. */
 function aftercareState(bookings) {
@@ -1527,23 +1509,23 @@ function timelineHTML(state, all) {
   return '<ul class="tl' + (all ? ' all' : '') + '">' + AFTERCARE_STEPS.map((st, i) => {
     const cls = state ? (i === state.idx ? 'now' : i < state.idx ? 'past' : 'future') : 'future';
     return '<li class="' + cls + '"' + (cls === 'now' ? ' aria-current="step"' : '') + '><span class="dot"></span><div class="hd"><b>' + esc(st.label) + '</b><span>' + esc(st.sub) + '</span></div>' +
-      '<div class="body"><div><i>What is normal</i>' + esc(st.normal) + '</div><div><i>What to do</i>' + esc(st.todo) + '</div><div><i>When to message Halima</i>' + esc(st.ask) + '</div></div></li>';
-  }).join('') + '</ul>';
+      '<div class="body"><p>' + esc(st.text) + '</p></div></li>';
+  }).join('') + '</ul><p class="muted small tl-photo">' + esc(AFTERCARE_PHOTO_LINE) + '</p>';
 }
 const photoCtaHTML = (id, gold) => gold
-  ? '<button class="btn block" style="margin-top:14px;line-height:22px" id="' + id + '" type="button">Worried about a mark? Send Halima a photo</button>'   // the same gold .btn as Book a session
+  ? '<button class="btn block multi" style="margin-top:14px" id="' + id + '" type="button">Worried about a mark? Send Halima a photo</button>'   // the same gold .btn as Book a session
   : '<button class="photo-cta" id="' + id + '" type="button">Worried about a mark? Send Halima a photo</button>';
 function aftercareCardHTML(state) {
   return '<div class="card" id="aftercareCard"><div class="section-label">Aftercare</div>' +
-    '<p class="muted small" style="margin:8px 0 0">' + (state.day === 0 ? 'Your session was today.' : state.day === 1 ? 'Your session was yesterday.' : 'Your session was ' + state.day + ' days ago.') + ' Marks usually fade within 14 days at most.</p>' +
+    '<p class="muted small" style="margin:8px 0 0">' + (state.day === 0 ? 'Your session was today.' : state.day === 1 ? 'Your session was yesterday.' : 'Your session was ' + state.day + ' days ago.') + ' ' + esc(AFTERCARE_COPY.intro) + '</p>' +
     timelineHTML(state, false) +
     '<a class="btn block" style="margin-top:16px" href="#/aftercare">See the full aftercare guide</a>' + photoCtaHTML('photoBtnCard', true) + '</div>';
 }
 function viewAftercare() {
   const state = aftercareState(S.cdata.bookings);
   shell('<button class="back" id="bk">' + ICON.back + 'Home</button>' + pageHead('Aftercare') +
-    '<div class="card"><div class="section-label">Your timeline</div><p class="muted small" style="margin:8px 0 0">' + (state ? 'Marks usually fade within 14 days at most. You are on the highlighted step.' : 'This guide follows your marks over the 14 days after a session. It lights up once your session is done. Marks usually fade within 14 days at most.') + '</p>' + timelineHTML(state, true) + '</div>' +
-    '<div class="card blister"><div class="section-label">A small blister?</div><p style="margin:10px 0 0">' + esc(BLISTER_GUIDANCE_DRAFT) + '</p>' + (S.cdata.client ? photoCtaHTML('photoBtnPage') : '') + '</div>');
+    '<div class="card"><div class="section-label">Your timeline</div><p class="muted small" style="margin:8px 0 0">' + (state ? AFTERCARE_COPY.intro + ' You are on the highlighted step.' : 'This guide follows your marks over the 14 days after a session. It lights up once your session is done. ' + AFTERCARE_COPY.intro) + '</p>' + timelineHTML(state, true) + '</div>' +
+    '<div class="card blister"><div class="section-label">A small blister?</div><p style="margin:10px 0 0">' + esc(BLISTER_GUIDANCE_DRAFT) + '</p>' + (S.cdata.client ? photoCtaHTML('photoBtnPage', true) : '') + '</div>');
   document.getElementById('bk').onclick = () => { location.hash = '#/home'; };
   const pb = document.getElementById('photoBtnPage'); if (pb) pb.onclick = openPhotoSheet;
 }
@@ -1578,7 +1560,7 @@ function openPhotoSheet() {
   const bg = document.createElement('div'); bg.className = 'sheet-bg';
   bg.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-label="Send Halima a photo"><div class="grab"></div>' +
     '<div class="lab">Send Halima a photo</div>' +
-    '<div class="picks"><label class="btn" for="phCam">Take a photo</label><label class="btn ghost" for="phPick">Choose photos</label></div>' +
+    '<div class="picks"><label class="btn" for="phCam">Take a photo</label><label class="btn" for="phPick">Choose photos</label></div>' +
     '<input id="phCam" type="file" accept="image/*" capture="environment" hidden><input id="phPick" type="file" accept="image/*" multiple hidden>' +
     '<div class="thumbs" id="phThumbs"></div><p class="muted small" id="phCount" style="margin:8px 0 0">Up to 3 photos.</p>' +
     '<label class="f" for="phNote">Add a note (optional)</label><textarea class="note" id="phNote" maxlength="1000" style="min-height:84px" placeholder="In your own words"></textarea>' +

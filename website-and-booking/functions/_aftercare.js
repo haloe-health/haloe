@@ -9,11 +9,12 @@
 //   * Photos older than their expires_at (90 days) are deleted through the Storage API (deleting storage rows with SQL
 //     leaves the files behind), then the submission rows are removed.
 //
-// PRIVACY: reminders carry no health detail — the email says an aftercare note is waiting and links to the app; the
-// push is a fixed generic line. Wording is the site's: marks usually fade within 14 days at most.
+// PRIVACY: reminders carry no personal health detail — the email is the generic aftercare wording for that day (shared
+// with the app, see ../aftercare-copy.js) and links to the app; the push is a fixed generic line.
 import { sbRequest } from './_supabase.js';
 import { sendEmail, esc, emailShell, emailHeader, emailFooter, emailButton, heroRow } from './_email.js';
 import { notifyClient } from './_push.js';
+import { AFTERCARE_COPY } from './_aftercare-copy.js';
 
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
@@ -34,9 +35,9 @@ const firstName = (n) => { const w = String(n || '').trim().split(/\s+/)[0] || '
 export function reminderEmail(name, day) {
   const hi = firstName(name) ? `Hi ${firstName(name)},` : 'Hello,';
   const eyebrow = day === 1 ? 'Aftercare · day 1' : 'Aftercare · day 7';
-  const line = day === 1
-    ? 'A quiet note from haloe, the morning after your session. Your aftercare guide for today is waiting in your haloe account. If a mark worries you at any point, you can send Halima a photo there.'
-    : 'A week on from your session. Your aftercare note for day 7 is in your haloe account. Marks usually fade within 14 days at most. If a mark worries you, you can send Halima a photo there.';
+  // The words are the app's: the stage for this day (Tomorrow / Day 7) plus the photo line, from /aftercare-cron's shared copy.
+  const step = AFTERCARE_COPY.steps.find((s2) => s2.at === day);
+  const line = step.text + ' ' + AFTERCARE_COPY.photoLine;
   const html = emailShell(
     emailHeader() +
     heroRow(eyebrow, day === 1 ? 'Tomorrow, today' : 'A week on', '') +
