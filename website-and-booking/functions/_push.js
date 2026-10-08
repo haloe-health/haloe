@@ -144,6 +144,7 @@ export async function notifyAdmins(env, { kind, body, url, tag, userId, endpoint
     if (kind === 'booking') q += '&notify_booking=eq.true';
     if (kind === 'intake') q += '&notify_intake=eq.true';
     if (kind === 'photo') q += '&notify_photo=eq.true';
+    if (kind === 'unlinked') q += '&notify_unlinked=eq.true';
     if (endpoint) q += `&endpoint=eq.${encodeURIComponent(endpoint)}`;
     const subs = await sbRequest(env, { path: q, method: 'GET' });
     return await deliver(env, subs, { title: 'haloe', body, url, tag });
@@ -245,4 +246,9 @@ export function pushPhotoSent(env, clientId) {
     url: clientId ? `/app/#/brief/c/${Number(clientId)}` : '/app/#/clients',
     tag: clientId ? `photo-${Number(clientId)}` : 'photo',
   });
+}
+
+/** Someone signed in with an email that matches no client. Lock-screen safe: no email, no name — taps through to Clients. */
+export function pushUnlinkedSignIn(env) {
+  return notifyAdmins(env, { kind: 'unlinked', body: 'A sign-in needs matching', url: '/app/#/clients', tag: 'unlinked' });
 }

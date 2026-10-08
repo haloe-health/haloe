@@ -485,3 +485,19 @@ begin
 end $$;
 revoke all on function public.run_aftercare_cron() from public, anon, authenticated;
 select cron.schedule('aftercare-hourly', '0 * * * *', $cron$select public.run_aftercare_cron()$cron$);
+
+-- unlinked sign-ins — migration "unlinked_signins", 8 Oct 2026 ----------------
+-- Someone signed in with an email that matches no client record. The /signin-unmatched Function (service role) records the
+-- email and date ONLY and sends the admin one quiet push per email per day (last_alert_on is the rate limit).
+-- Admin can read; nobody else can read or write (no client policy exists).
+create table if not exists public.unlinked_signins (
+  email         text primary key,                       -- lower-cased
+  first_seen_at timestamptz not null default now(),
+  last_seen_at  timestamptz not null default now(),
+  last_alert_on date
+);
+alter table public.unlinked_signins enable row level security;
+grant select on public.unlinked_signins to authenticated;
+grant select, insert, update, delete on public.unlinked_signins to service_role;
+create policy admin_read_unlinked on public.unlinked_signins for select to authenticated using (public.is_admin());
+alter table public.push_subscriptions add column if not exists notify_unlinked boolean not null default true;

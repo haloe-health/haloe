@@ -184,6 +184,7 @@
   .btn { min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--gold); color: #1C1A16; font-weight: 600; font-size: 15px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
   .btn.ghost { background: var(--fill); color: var(--ink); }
   .btn.block { width: 100%; }
+  .mail { overflow-wrap: anywhere; word-break: break-word; }
   /* A button whose label may wrap to two lines ("Worried about a mark? Send Halima a photo"): grows with its text, never a fixed height. One-line gold buttons keep the plain .btn height. */
   .btn.multi { height: auto; min-height: 44px; padding: 14px 20px; line-height: 1.3; border-radius: 28px; text-align: center; }
   .btn[disabled] { opacity: .45; cursor: not-allowed; }
@@ -441,10 +442,10 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession
 const api = {
   async load() {
     const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
-    const [clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos] = await Promise.all([
-      q('clients'), q('intake_forms'), q('bookings'), q('discount_codes'), q('collaborators'), q('code_redemptions'), q('session_notes'), q('check_ins'), q('photo_submissions'),
+    const [clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked] = await Promise.all([
+      q('clients'), q('intake_forms'), q('bookings'), q('discount_codes'), q('collaborators'), q('code_redemptions'), q('session_notes'), q('check_ins'), q('photo_submissions'), q('unlinked_signins'),
     ]);
-    return { clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos };
+    return { clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked };
   },
   async markDone(id, done) { const { error } = await sb.from('bookings').update({ done_at: done ? new Date().toISOString() : null }).eq('id', id); if (error) throw error; },
   async setActive(id, active) { const { error } = await sb.from('discount_codes').update({ active }).eq('id', id); if (error) throw error; },
@@ -453,6 +454,11 @@ const api = {
     const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
     const [clients, bookings, checkins, intakes] = await Promise.all([q('clients'), q('bookings'), q('check_ins'), q('intake_forms', 'id,created_at,package')]);
     return { client: clients[0] || null, bookings, checkins, intakes };
+  },
+  // A signed-in person with no client record: tell the server (it records email + date only and sends the admin one quiet alert a day).
+  async reportUnmatched() {
+    const { data: { session } } = await sb.auth.getSession(); if (!session) return;
+    await timedFetch('/signin-unmatched', { method: 'POST', headers: { Authorization: 'Bearer ' + session.access_token, 'Content-Type': 'application/json' }, body: '{}' });
   },
   async linkMyClient() { const { data, error } = await sb.rpc('link_my_client'); return error ? null : data; },
   // Reschedule: admin proposes (database checks the time is free and keeps the original slot held);
@@ -594,7 +600,7 @@ async function initPushCard() {
   } catch (e) { return draw('<p class="muted small" style="margin:8px 0 0">Couldn’t load alert settings just now.</p>'); }
   const sw = (id, label, on) => '<div class="toggle-line" style="margin:2px 0"><span>' + label + '</span><button class="switch-wrap" id="' + id + '" aria-label="' + label + '"><span class="switch" role="switch" aria-checked="' + on + '"></span></button></div>';
   draw(sw('pushMain', 'Alerts on this device', !!sub) +
-    (sub && row ? '<div style="margin:6px 0 0;padding-left:2px">' + sw('pushResch', 'Reschedule accepted', row.notify_reschedule) + sw('pushBook', 'New bookings', row.notify_booking) + sw('pushIntake', 'Intake forms', row.notify_intake) + sw('pushPhoto', 'Photos', row.notify_photo) +
+    (sub && row ? '<div style="margin:6px 0 0;padding-left:2px">' + sw('pushResch', 'Reschedule accepted', row.notify_reschedule) + sw('pushBook', 'New bookings', row.notify_booking) + sw('pushIntake', 'Intake forms', row.notify_intake) + sw('pushPhoto', 'Photos', row.notify_photo) + sw('pushUnl', 'Sign-ins to match', row.notify_unlinked) +
       '<button class="btn ghost block" id="pushTest" type="button" style="margin-top:12px">Send test alert</button></div>' : '') +
     '<p class="muted small" style="margin:10px 0 0">Alerts show only the time — never a name or any detail.</p>');
 
@@ -612,7 +618,7 @@ async function initPushCard() {
   };
   if (sub && row) {
     const flip = (id, col) => { document.getElementById(id).onclick = async () => { try { await api.updatePushRow(row.endpoint, { [col]: !row[col] }); } catch (e) { toastMsg(friendly(e, 'save')); } initPushCard(); }; };
-    flip('pushResch', 'notify_reschedule'); flip('pushBook', 'notify_booking'); flip('pushIntake', 'notify_intake'); flip('pushPhoto', 'notify_photo');
+    flip('pushResch', 'notify_reschedule'); flip('pushBook', 'notify_booking'); flip('pushIntake', 'notify_intake'); flip('pushPhoto', 'notify_photo'); flip('pushUnl', 'notify_unlinked');
     document.getElementById('pushTest').onclick = async (ev) => {
       const b = ev.currentTarget; b.disabled = true;
       try {
@@ -862,20 +868,29 @@ function viewLinkSent() {
   };
   document.getElementById('otherEmail').onclick = () => { S.sendSeq = (S.sendSeq || 0) + 1; S.loginStage = 'form'; S.loginEmail = ''; viewLogin(); };
 }
-/** Signed in, but no clients row matches this email — calm, no data shown. */
+/** Signed in, but no clients row matches this email — calm, no data shown, never a dead end: the gear (Settings → sign out) stays,
+ *  we say which email they're signed in with (and nothing about any other account), and offer the ways forward. */
 function viewNoMatch() {
-  $root.innerHTML = headerHTML(false) + `<div class="gate"><div class="card">
+  const email = (S.session && S.session.user && S.session.user.email) || '';
+  const wa = 'https://wa.me/' + HALIMA_WA + '?text=' + encodeURIComponent('Hi Halima, I signed in to my haloe account with ' + email + " but can't see my booking.");
+  $root.innerHTML = headerHTML(true) + `<div class="gate"><div class="card">
     <div class="section-label">Your details</div>
     <p class="inwords" style="margin:10px 0 6px">We can’t find your details yet.</p>
-    <p class="muted" style="margin:0 0 18px">Please book or complete your intake form.</p>
+    <p style="margin:0 0 6px">You’re signed in as <b class="mail">${esc(email)}</b>.</p>
+    <p class="muted" style="margin:0 0 18px">If you booked with a different email, sign out and sign in with that one.</p>
     <a class="btn block" href="/book">Book a session</a>
     <a class="btn ghost block" style="margin-top:10px" href="/intake">Complete your intake form</a>
-    <button class="btn ghost block" id="relink" style="margin-top:10px" type="button">I’ve done this — check again</button>
-    <button class="btn ghost block" id="denyOut" style="margin-top:10px" type="button">Sign out</button>
-    <p class="small muted" style="margin:14px 0 0">Signed in as ${esc((S.session && S.session.user && S.session.user.email) || '')}</p></div></div>`;
+    <button class="btn ghost block" id="otherEmailBtn" style="margin-top:10px" type="button">Sign in with a different email</button>
+    <button class="btn ghost block" id="relink" style="margin-top:10px" type="button">I’ve done this, check again</button>
+    <a class="btn ghost block" id="waBtn" style="margin-top:10px" target="_blank" rel="noopener" href="${wa}">Message Halima on WhatsApp</a></div></div>`;
   wireHeader();
-  document.getElementById('denyOut').onclick = signOut;
-  document.getElementById('relink').onclick = () => enter(S.session);
+  document.getElementById('otherEmailBtn').onclick = signOut;           // signs out and returns to a sign-in screen with the email box empty
+  document.getElementById('relink').onclick = async () => {
+    const btn = document.getElementById('relink'); btn.disabled = true; btn.textContent = 'Checking…';
+    await enter(S.session);
+    if (S.cdata && !S.cdata.client && !S.cdata.bookings.length) toastMsg('Still no match for this email yet.');
+  };
+  if (S.reportedUnmatched !== email) { S.reportedUnmatched = email; api.reportUnmatched().catch(() => {}); }   // quiet, once per email per page load; failures are silent
 }
 
 function tabbarHTML() {
@@ -996,6 +1011,14 @@ function viewToday() {
 }
 
 /* ---- Clients ---- */
+/** Signed in with an email that matches no client — email and date only. Hidden once that email matches a client. */
+function unlinkedCardHTML() {
+  const known = new Set(((S.raw || S.data).clients || []).map((c) => lower(c.email)));
+  const list = ((S.data && S.data.unlinked) || []).filter((u) => !known.has(lower(u.email))).sort((x, y) => String(y.last_seen_at).localeCompare(String(x.last_seen_at)));
+  if (!list.length) return '';
+  return '<div class="card" id="unlinkedCard"><div class="section-label">Unlinked sign-ins</div><p class="muted small" style="margin:8px 0 6px">Signed in with an email that matches no client. Email and date only.</p>' +
+    list.map((u) => '<div class="toggle-line" style="margin:6px 0;gap:12px"><span class="mail">' + esc(u.email) + '</span><span class="muted small" style="white-space:nowrap">' + esc(fmtDate(ldn(new Date(u.last_seen_at)))) + '</span></div>').join('') + '</div>';
+}
 function viewClients() {
   const q = lower(S.filter).trim();
   let list = people();
@@ -1005,7 +1028,7 @@ function viewClients() {
     const nx = nextBookingDate(p);
     return `<button class="listrow" data-brief="${p.key}"><span><span class="nm">${esc(p.name)}</span> ${testPill(p.client)}<br><span class="sb">${nx ? 'Next: ' + fmtDate(nx) : (p.bookings[0] ? 'Last: ' + fmtDate(p.bookings[0].booking_date) : 'No bookings')}</span></span>${p.client && intakeOf(p.client.id) ? '' : '<span class="pill red">No intake</span>'}</button>`;
   }).join('');
-  shell(`${pageHead('Clients')}<div class="toggle-line" style="margin-top:-8px"><span>Show test</span><button class="switch-wrap" id="testBtn" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div><input class="search" id="q" type="search" placeholder="Search name, phone or email" value="${esc(S.filter)}" autocomplete="off">${rows || '<div class="card empty">No clients match.</div>'}`);
+  shell(`${pageHead('Clients')}<div class="toggle-line" style="margin-top:-8px"><span>Show test</span><button class="switch-wrap" id="testBtn" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div>${unlinkedCardHTML()}<input class="search" id="q" type="search" placeholder="Search name, phone or email" value="${esc(S.filter)}" autocomplete="off">${rows || '<div class="card empty">No clients match.</div>'}`);
   document.getElementById('testBtn').onclick = () => setShowTest(!S.showTest);
   const qi = document.getElementById('q');
   qi.oninput = () => { S.filter = qi.value; const pos = qi.selectionStart; render(); const n = document.getElementById('q'); n.focus(); n.setSelectionRange(pos, pos); };
@@ -1411,7 +1434,7 @@ function viewSettings() {
   document.getElementById('signOutBtn').onclick = signOut;
   const tb2 = document.getElementById('testBtn2'); if (tb2) tb2.onclick = () => setShowTest(!S.showTest);
   if (!S.isClient) initPushCard();
-  else { initClientPhotoCard(); initClientPushCard(); }
+  else if (S.cdata && S.cdata.client) { initClientPhotoCard(); initClientPushCard(); }
 }
 
 
@@ -1633,8 +1656,8 @@ function render() {
   }
   // client
   if (!S.cdata) { shell('<div class="empty">' + (S.error ? loadErrorHTML() : 'Loading…') + '</div>', false); return; }
-  if (!S.cdata.client && !S.cdata.bookings.length) return viewNoMatch();      // nothing of theirs on file yet
   route();
+  if (!S.cdata.client && !S.cdata.bookings.length && S.view !== 'settings') return viewNoMatch();      // nothing of theirs on file yet (the gear → Settings still works)
   window.scrollTo(0, 0);
   ({ home: viewHome, progress: viewProgress, book: viewBook, aftercare: viewAftercare, settings: viewSettings })[S.view]();
 }
