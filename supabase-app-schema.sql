@@ -552,3 +552,28 @@ alter table public.rebook_nudges enable row level security;
 grant select, insert on public.rebook_nudges to authenticated;
 grant select, insert, update, delete on public.rebook_nudges to service_role;
 create policy rebook_nudges_admin on public.rebook_nudges for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- claim_push_subscription — migration "claim_push_subscription", 8 Oct 2026 ------------------
+-- A phone that was registered for alerts under another account (e.g. the old admin sign-in) could not be re-registered: the push
+-- address is unique, row-level security hid the old row, and the plain insert was refused — so Settings showed "Couldn't load alert
+-- settings". This moves that ONE registration to whoever is signed in now. It matches on the push address only (a secret the phone
+-- itself holds), takes the owner from auth.uid() (never from the browser), returns nothing (so it can't read or list anyone's
+-- registrations), and resets the per-alert switches to their defaults when the owner changes. Alerts still go only to admin accounts.
+create or replace function public.claim_push_subscription(p_endpoint text, p_p256dh text, p_auth text, p_user_agent text default null) returns void
+language plpgsql security definer set search_path = public as $$
+declare uid uuid := auth.uid();
+begin
+  if uid is null then raise exception 'not_signed_in'; end if;
+  if coalesce(p_endpoint, '') = '' or coalesce(p_p256dh, '') = '' or coalesce(p_auth, '') = '' then raise exception 'bad_subscription'; end if;
+  insert into public.push_subscriptions (user_id, endpoint, p256dh, auth, user_agent)
+  values (uid, p_endpoint, p_p256dh, p_auth, left(p_user_agent, 200))
+  on conflict (endpoint) do update
+     set notify_reschedule = case when public.push_subscriptions.user_id = uid then public.push_subscriptions.notify_reschedule else true end,
+         notify_booking    = case when public.push_subscriptions.user_id = uid then public.push_subscriptions.notify_booking    else true end,
+         notify_intake     = case when public.push_subscriptions.user_id = uid then public.push_subscriptions.notify_intake     else true end,
+         notify_photo      = case when public.push_subscriptions.user_id = uid then public.push_subscriptions.notify_photo      else true end,
+         notify_unlinked   = case when public.push_subscriptions.user_id = uid then public.push_subscriptions.notify_unlinked   else true end,
+         user_id = uid, p256dh = excluded.p256dh, auth = excluded.auth, user_agent = excluded.user_agent;
+end $$;
+revoke all on function public.claim_push_subscription(text, text, text, text) from public, anon;
+grant execute on function public.claim_push_subscription(text, text, text, text) to authenticated;
