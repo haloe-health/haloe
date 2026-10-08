@@ -11,6 +11,7 @@ import {
   sendEmail, esc, emailButton, emailHeader, emailFooter, emailShell, heroRow, infoCard,
 } from '../_email.js';
 import { CLINIC_VENUE_ADDRESS } from '../_clinic.js';
+import { VENUE_COPY } from '../_venue-copy.js';
 
 const FROM = 'haloe <halima@haloe.health>';
 const PREVIEW_TO = 'iamhalimayasmin@gmail.com';
@@ -105,7 +106,7 @@ function locationLabel(d) {
 function clientEmailHtml(d) {
   const clinicNote = d.location === 'clinic'
     ? `<p style="color:${INK};font-size:14px;font-weight:600;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Getting there</p>
-       <p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">Milton Hall is at 244 Deansgate. When you arrive, Musa at the concierge desk will be expecting you — just give your name and he'll point you to Room 4 on the 3rd floor. Take the lift, or if you'd rather, the wide baroque staircase is worth the climb. Please arrive five minutes early. The room sits behind a key-coded door, so if it's closed, take a seat and Halima will come and collect you.</p>`
+       <p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">${VENUE_COPY.arrivalEmail}</p>`
     : '';
   const cancellationNote = `<p style="color:${BODY_TEXT};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>`;
 
@@ -131,7 +132,7 @@ function clientEmailHtml(d) {
               <!-- Personal note + compliance -->
               <tr>
                 <td style="padding:6px 4px 0;">
-                  <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">Halima will be in touch personally on WhatsApp to confirm the final details, send your health form, and answer any questions you may have.</p>
+                  <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0 0 16px;font-family:${FONT};">Halima will be in touch personally on WhatsApp to confirm the final details, send your health form, and answer any questions you may have.</p>
                   ${cancellationNote}
                   <p style="color:${BODY_TEXT};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">haloe offers complementary wellness therapy to support your general wellbeing, relaxation and everyday tension. It is not a substitute for medical advice, diagnosis or treatment.</p>
                 </td>

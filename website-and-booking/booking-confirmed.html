@@ -173,6 +173,7 @@
   <a class="cta" href="index.html">Back to haloe</a>
 </main>
 
+<script src="/venue-copy.js"></script>
 <script>
   const params = new URLSearchParams(window.location.search);
   const treatment = params.get('treatment') || '';
@@ -242,7 +243,7 @@
     document.getElementById('contact-note').textContent =
       'On WhatsApp, to confirm the details and send your health form.';
     document.getElementById('balance-note').textContent =
-      `Check in at reception${venue ? ' at ' + venue : ''} on the ground floor — they'll direct you to the room. Lift access is available.`;
+      VENUE_COPY.arrivalShort;   // shared with the confirmation email (venue-copy.js)
   } else if (travelZone === 'C') {
     // Zones A/B are already paid in full above — only Zone C (no fixed fee)
     // still needs Halima to confirm a travel cost after booking.
