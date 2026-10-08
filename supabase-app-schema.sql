@@ -580,3 +580,10 @@ grant execute on function public.claim_push_subscription(text, text, text, text)
 
 -- session_notes: record which admin wrote each note (Oct 2026) -----------------
 alter table public.session_notes add column if not exists created_by uuid default auth.uid() references auth.users(id) on delete set null;
+
+-- unlinked sign-ins: admin "Dismiss" (Oct 2026) — hides the row for good without deleting the account.
+-- Admin-only: only dismissed_at is updatable by a signed-in user, and only if public.is_admin(); clients have no policy at all.
+alter table public.unlinked_signins add column if not exists dismissed_at timestamptz;
+grant update (dismissed_at) on public.unlinked_signins to authenticated;
+drop policy if exists admin_dismiss_unlinked on public.unlinked_signins;
+create policy admin_dismiss_unlinked on public.unlinked_signins for update to authenticated using (public.is_admin()) with check (public.is_admin());

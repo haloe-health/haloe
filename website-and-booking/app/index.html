@@ -713,6 +713,7 @@ const api = {
   // Today → "For your clients": a ticked task is a row in admin_tasks (admin-only), un-ticking deletes it.
   // Rebook nudges: one log row per tap on "Send rebook nudge" (admin-only table). The weekly count and the streak come from this log.
   async logNudge(row) { const { data, error } = await sb.from('rebook_nudges').insert({ ...row, sent_by: S.session && S.session.user.id }).select().single(); if (error) throw error; return data; },
+  async dismissUnlinked(email) { const { error } = await sb.from('unlinked_signins').update({ dismissed_at: new Date().toISOString() }).eq('email', email); if (error) throw error; },
   async setTask(key, on) {
     if (on) { const { error } = await sb.from('admin_tasks').insert({ task_key: key, done_by: S.session && S.session.user.id }); if (error && error.code !== '23505') throw error; }   // 23505 = already ticked (e.g. on another device)
     else { const { error } = await sb.from('admin_tasks').delete().eq('task_key', key); if (error) throw error; }
@@ -1590,10 +1591,10 @@ function viewToday() {
 /** Signed in with an email that matches no client — email and date only. Hidden once that email matches a client. */
 function unlinkedCardHTML() {
   const known = new Set(((S.raw || S.data).clients || []).map((c) => lower(c.email)));
-  const list = ((S.data && S.data.unlinked) || []).filter((u) => !known.has(lower(u.email))).sort((x, y) => String(y.last_seen_at).localeCompare(String(x.last_seen_at)));
+  const list = ((S.data && S.data.unlinked) || []).filter((u) => !u.dismissed_at && !known.has(lower(u.email))).sort((x, y) => String(y.last_seen_at).localeCompare(String(x.last_seen_at)));
   if (!list.length) return '';
   return '<div class="tile" id="unlinkedCard"><div class="section-label">Unlinked sign-ins</div><p class="muted small" style="margin:8px 0 6px">Signed in with an email that matches no client. Email and date only.</p>' +
-    list.map((u) => '<div class="toggle-line" style="margin:6px 0;gap:12px"><span class="mail">' + esc(u.email) + '</span><span class="muted small" style="white-space:nowrap">' + esc(fmtDate(ldn(new Date(u.last_seen_at)))) + '</span></div>').join('') + '</div>';
+    list.map((u) => '<div class="toggle-line" style="margin:6px 0;gap:12px"><span class="mail">' + esc(u.email) + '</span><span class="muted small" style="white-space:nowrap">' + esc(fmtDate(ldn(new Date(u.last_seen_at)))) + '</span><button class="btn sm ghost unl-dismiss" type="button" data-dismiss="' + esc(u.email) + '" style="min-height:44px;min-width:44px">Dismiss</button></div>').join('') + '</div>';
 }
 /* ---- Clients: tile screen ----
  * First name + initial only. No medication, no health wording, no client levels or labels — the gamification is about the admin's own
@@ -1679,6 +1680,11 @@ function viewClients() {
   document.querySelectorAll('[data-cf]').forEach((b) => { b.onclick = () => { S.clientFilter = (S.clientFilter || 'all') === b.dataset.cf ? 'all' : b.dataset.cf; render(); }; });   // tapping the active tile returns to All
   document.querySelectorAll('[data-rb]').forEach((b) => { b.onclick = () => { S.rebookSel = b.dataset.rb; render(); }; });
   document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief; }; });
+  document.querySelectorAll('[data-dismiss]').forEach((b) => { b.onclick = async (ev) => {
+    ev.stopPropagation(); b.disabled = true; const em = b.dataset.dismiss;
+    try { await api.dismissUnlinked(em); const at = new Date().toISOString(); [S.data, S.raw].forEach((d) => ((d && d.unlinked) || []).forEach((u) => { if (u.email === em) u.dismissed_at = at; })); render(); toastMsg('Dismissed'); }
+    catch (e) { toastMsg(friendly(e, 'save')); b.disabled = false; }
+  }; });
   const send = document.getElementById('rbSend');
   if (send) send.onclick = () => nudgeClient(due.find((p) => personKey(p) === S.rebookSel), t);
 }

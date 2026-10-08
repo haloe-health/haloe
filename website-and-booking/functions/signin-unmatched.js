@@ -43,7 +43,7 @@ export async function onRequestPost({ request, env }) {
     await sbRequest(env, { path: `/rest/v1/unlinked_signins?email=eq.${encodeURIComponent(email)}`, method: 'PATCH', prefer: 'return=minimal', body: { last_seen_at: new Date().toISOString() } });
     // One alert per email per day: only the request that wins this conditional update sends the push.
     const claimed = await sbRequest(env, {
-      path: `/rest/v1/unlinked_signins?email=eq.${encodeURIComponent(email)}&or=(last_alert_on.is.null,last_alert_on.lt.${today})`,
+      path: `/rest/v1/unlinked_signins?email=eq.${encodeURIComponent(email)}&dismissed_at=is.null&or=(last_alert_on.is.null,last_alert_on.lt.${today})`,   // a dismissed email never alerts again
       method: 'PATCH', prefer: 'return=representation', body: { last_alert_on: today },
     });
     if (Array.isArray(claimed) && claimed.length) {
