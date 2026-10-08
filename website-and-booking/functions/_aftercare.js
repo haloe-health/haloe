@@ -12,7 +12,7 @@
 // PRIVACY: reminders carry no personal health detail — the email is the generic aftercare wording for that day (shared
 // with the app, see ../aftercare-copy.js) and links to the app; the push is a fixed generic line.
 import { sbRequest } from './_supabase.js';
-import { sendEmail, esc, emailShell, emailHeader, emailFooter, emailButton, heroRow } from './_email.js';
+import { sendEmail, esc, CREAM, GOLD, GOLD_DEEP, INK, BODY_TEXT, FONT, FONT_HEADING, FONT_HEADING_URL, LOGO_URL } from './_email.js';
 import { notifyClient } from './_push.js';
 import { AFTERCARE_COPY } from './_aftercare-copy.js';
 
@@ -36,19 +36,60 @@ const firstName = (n) => { const w = String(n || '').trim().split(/\s+/)[0] || '
 const HEADLINE = { 1: 'The day after', 7: 'A week on' };
 
 /**
- * ONE template for every aftercare reminder, so Day 1 and Day 7 cannot drift apart: the same logo, the same full-width
- * centred heading card, the same spacing and the same button. Every row is a fixed-width (480px, max-width:100% on small
- * screens) table cell — nothing is left to a mail client's shrink-to-fit.
+ * ONE template for every aftercare reminder, so Day 1 and Day 7 cannot drift apart: only the eyebrow, headline and
+ * paragraph differ. Calm and plain — no card, no inline-block, nothing a mail client can shrink-to-fit: one centred
+ * 480px column (width 100%, max-width 480px) of table rows whose cells carry width="100%"; Outlook, which ignores
+ * max-width, gets a fixed 480px table through the MSO conditionals. Colours are set three ways (bgcolor attribute,
+ * inline style, and a gradient background Gmail's dark mode doesn't invert) plus the [data-ogsc]/[data-ogsb] overrides
+ * Gmail uses for its dark mode, so the logo, the text and the gold button stay readable.
  */
-function reminderLayout({ eyebrow, headline, greeting, body }) {
-  const W = 480;
-  return emailShell(
-    emailHeader() +
-    heroRow(eyebrow, headline, '') +
-    `<tr><td width="${W}" align="left" style="width:${W}px;max-width:100%;padding:4px 4px 18px;font-size:15px;line-height:1.6;color:#5a5247;">${esc(greeting)}<br><br>${esc(body)}</td></tr>` +
-    `<tr><td width="${W}" align="center" style="width:${W}px;max-width:100%;padding:0 0 20px;">${emailButton(APP_URL, 'Open my aftercare')}</td></tr>` +
-    emailFooter(),
-  );
+const RULE = '#E4DCCB';
+const cell = (inner, style = '', attrs = '') => `<tr><td width="100%" ${attrs} style="${style}">${inner}</td></tr>`;
+const divider = (padding) => cell(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="100%" height="1" bgcolor="${RULE}" style="height:1px;font-size:0;line-height:0;background:${RULE};">&nbsp;</td></tr></table>`, `padding:${padding};`);
+function reminderLayout({ eyebrow, headline, greeting, body, note }) {
+  const bg = `background-color:${CREAM};background-image:linear-gradient(${CREAM},${CREAM});`;
+  return `<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light only">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: 'Tan Ashford'; src: url('${FONT_HEADING_URL}') format('woff2'); font-weight: normal; font-style: normal; }
+  :root { color-scheme: light only; supported-color-schemes: light only; }
+  body, table, td, p, a, div, span { font-family: ${FONT}; }
+  /* Gmail dark mode (Android/iOS) rewrites colours through these attributes — pin ours */
+  [data-ogsb] .bg-cream { background-color: ${CREAM} !important; background-image: linear-gradient(${CREAM},${CREAM}) !important; }
+  [data-ogsc] .ink { color: ${INK} !important; }
+  [data-ogsc] .body-text { color: ${BODY_TEXT} !important; }
+  [data-ogsc] .gold-text { color: ${GOLD_DEEP} !important; }
+  [data-ogsb] .btn-cell { background-color: ${GOLD} !important; background-image: linear-gradient(${GOLD},${GOLD}) !important; }
+  [data-ogsc] .btn-text { color: ${INK} !important; }
+</style>
+</head>
+<body class="bg-cream" bgcolor="${CREAM}" style="margin:0;padding:0;${bg}">
+<table role="presentation" class="bg-cream" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${CREAM}" style="width:100%;border-collapse:collapse;${bg}">
+<tr><td class="bg-cream" width="100%" align="center" bgcolor="${CREAM}" style="padding:0 16px;${bg}">
+<!--[if mso]><table role="presentation" width="480" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+<table role="presentation" width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:480px;margin:0 auto;border-collapse:collapse;">
+${cell(`<img src="${LOGO_URL}" width="172" height="46" alt="haloe" style="display:block;margin:0 auto;width:172px;height:auto;border:0;outline:none;">`, 'padding:32px 0 0;', 'align="center"')}
+${cell('HIJAMA &middot; WELLNESS &middot; MANCHESTER', `padding:12px 0 0;font-family:${FONT};font-size:11px;line-height:16px;letter-spacing:3px;color:${GOLD_DEEP};`, 'align="center" class="gold-text"')}
+${divider('28px 0')}
+${cell(esc(eyebrow.toUpperCase()), `padding:0 0 8px;font-family:${FONT};font-size:11px;line-height:16px;letter-spacing:2px;font-weight:600;color:${GOLD_DEEP};`, 'align="center" class="gold-text"')}
+${cell(esc(headline), `padding:0 0 24px;font-family:${FONT_HEADING};font-size:28px;line-height:34px;font-weight:normal;color:${INK};`, 'align="center" class="ink"')}
+${cell(`<p class="ink" style="margin:0 0 12px;font-family:${FONT};font-size:16px;line-height:24px;color:${INK};">${esc(greeting)}</p>
+<p class="body-text" style="margin:0;font-family:${FONT};font-size:16px;line-height:27px;color:${BODY_TEXT};">${esc(body)}</p>
+<p style="margin:20px 0 0;font-family:${FONT};font-size:15px;line-height:24px;color:#8a8174;">${esc(note)}</p>`, 'padding:0 32px;', 'align="left"')}
+${cell(`<table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;border-collapse:separate;"><tr><td class="btn-cell" align="center" bgcolor="${GOLD}" style="border-radius:26px;background-color:${GOLD};background-image:linear-gradient(${GOLD},${GOLD});padding:15px 32px;"><a class="btn-text" href="${APP_URL}" style="display:block;color:${INK};text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:16px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;">OPEN MY AFTERCARE</a></td></tr></table>`, 'padding:32px 0;', 'align="center"')}
+${divider('0 0 24px')}
+${cell(`<div class="gold-text" style="font-family:${FONT};font-size:12px;line-height:18px;letter-spacing:1px;font-weight:600;color:${GOLD_DEEP};">From haloe</div><div class="body-text" style="font-family:${FONT};font-size:11px;line-height:16px;margin-top:8px;color:${BODY_TEXT};">Manchester</div>`, 'padding:0 0 28px;', 'align="center"')}
+</table>
+<!--[if mso]></td></tr></table><![endif]-->
+</td></tr></table>
+</body>
+</html>`;
 }
 
 export function reminderEmail(name, day) {
@@ -58,7 +99,8 @@ export function reminderEmail(name, day) {
     eyebrow: day === 1 ? 'Aftercare · day 1' : 'Aftercare · day 7',
     headline: HEADLINE[day],
     greeting: firstName(name) ? `Hi ${firstName(name)},` : 'Hello,',
-    body: step.text + ' ' + AFTERCARE_COPY.photoLine,
+    body: step.text,
+    note: AFTERCARE_COPY.photoLine,
   });
   return { subject: day === 1 ? 'Your aftercare note · day 1' : 'Your aftercare note · day 7', html };
 }
