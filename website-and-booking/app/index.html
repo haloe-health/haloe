@@ -1493,8 +1493,7 @@ function viewBook() {
 // ALL the wording lives in /aftercare-copy.js (also used by the Day 1 / Day 7 reminder emails) — never type it here.
 // Symptom language only; one short paragraph per stage; the photo line is shown once under the timeline.
 const AFTERCARE_STEPS = AFTERCARE_COPY.steps, AFTERCARE_PHOTO_LINE = AFTERCARE_COPY.photoLine;
-// DRAFT — Halima must approve this wording before it is relied on (marker stays until she says approved).
-const BLISTER_GUIDANCE_DRAFT = AFTERCARE_COPY.blisterDraft;
+const BLISTER_GUIDANCE = AFTERCARE_COPY.blister;
 const daysBetween = (fromISO, toISO) => Math.round((Date.parse(toISO + 'T12:00:00Z') - Date.parse(fromISO + 'T12:00:00Z')) / 86400000);
 /** Where she is in the 14 days after her most recent session marked done; null when there's nothing to show. */
 function aftercareState(bookings) {
@@ -1525,7 +1524,7 @@ function viewAftercare() {
   const state = aftercareState(S.cdata.bookings);
   shell('<button class="back" id="bk">' + ICON.back + 'Home</button>' + pageHead('Aftercare') +
     '<div class="card"><div class="section-label">Your timeline</div><p class="muted small" style="margin:8px 0 0">' + (state ? AFTERCARE_COPY.intro + ' You are on the highlighted step.' : 'This guide follows your marks over the 14 days after a session. It lights up once your session is done. ' + AFTERCARE_COPY.intro) + '</p>' + timelineHTML(state, true) + '</div>' +
-    '<div class="card blister"><div class="section-label">A small blister?</div><p style="margin:10px 0 0">' + esc(BLISTER_GUIDANCE_DRAFT) + '</p>' + (S.cdata.client ? photoCtaHTML('photoBtnPage', true) : '') + '</div>');
+    '<div class="card blister"><div class="section-label">A small blister?</div><p style="margin:10px 0 0">' + esc(BLISTER_GUIDANCE) + '</p>' + (S.cdata.client ? photoCtaHTML('photoBtnPage', true) : '') + '</div>');
   document.getElementById('bk').onclick = () => { location.hash = '#/home'; };
   const pb = document.getElementById('photoBtnPage'); if (pb) pb.onclick = openPhotoSheet;
 }

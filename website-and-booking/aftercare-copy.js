@@ -19,7 +19,6 @@
     ],
     // Shown ONCE, under the timeline (not in every stage).
     photoLine: "Send me a photo if a mark worries you, isn't fading as you'd expect, or is still there at day 14.",
-    // DRAFT — Halima must approve this wording before it is relied on. Keep this marker until she says approved.
-    blisterDraft: "A small blister can appear on or near a mark and is usually harmless. Don't pop it. Keep it clean and lightly covered, and send me a photo. If redness spreads, pain increases or you feel unwell, contact your GP or NHS 111.",
+    blister: "A small blister can appear on or near a mark and is usually harmless. Don't pop it. Keep it clean and lightly covered, and send me a photo. If redness spreads, pain increases or you feel unwell, contact your GP or NHS 111.",
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);
