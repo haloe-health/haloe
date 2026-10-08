@@ -84,6 +84,7 @@
   .arr-btn[disabled] { cursor: default; opacity: .6; }
   .arr-field { position: relative; }
   .arr-field .arr-input { padding-right: 52px; }
+  .arr-hint { margin: 8px 0 0; font-size: 13px; line-height: 1.45; color: var(--arr-muted); }
   .arr-eye { position: absolute; right: 0; top: 4px; width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: none; color: var(--muted); cursor: pointer; }
   .arr-eye svg { width: 22px; height: 22px; }
   .arr-eye[aria-pressed="true"] { color: var(--gold-deep); }
@@ -858,6 +859,8 @@ const MSG_CREDS = "That email and password don't match.";
 const MSG_RATE = 'Too many attempts. Try again in a few minutes.';
 const MSG_CODE = "That code isn't right or has expired. Please ask for a new one.";
 const MSG_GENERIC = "That didn't work. Please try again in a minute.";
+/** The password rule, shown under the field AND used as the error when Supabase rejects a password as weak (Supabase → Authentication → password strength is the real gate). */
+const PASSWORD_RULE = 'At least 10 characters, with a lowercase letter, an uppercase letter and a number.';
 const loginHeaderHTML = () => `<header class="login-top"><button class="icon-btn" id="themeBtn" aria-label="Toggle light or dark">${themeIcon()}</button></header>`;
 const arrivalBrand = () => '<div class="arr-brand"><img class="arr-mark" src="/haloe-logo-flower.svg" alt=""><div class="arr-word" aria-label="haloe">haloe</div><div class="arr-tag">Hijama · Wellness · Manchester</div></div>';
 const SEND_FAILED_MSG = "That didn't send. Please try again in a minute.";
@@ -1060,7 +1063,8 @@ function viewCreatePassword() {
       <form id="npForm" novalidate>
         <input type="email" id="npUser" name="email" autocomplete="username" value="${esc(email)}" readonly tabindex="-1" aria-hidden="true" class="arr-hidden-user">
         <label class="arr-label" for="np">New password</label>
-        <div class="arr-field"><input class="arr-input" id="np" name="new-password" type="password" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" minlength="${MIN_PASSWORD}" required><button class="arr-eye" id="npEye" type="button" aria-label="Show password" aria-pressed="false">${EYE_ON}</button></div>
+        <div class="arr-field"><input class="arr-input" id="np" name="new-password" type="password" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" minlength="${MIN_PASSWORD}" required aria-describedby="npHint"><button class="arr-eye" id="npEye" type="button" aria-label="Show password" aria-pressed="false">${EYE_ON}</button></div>
+        <p class="arr-hint" id="npHint">${PASSWORD_RULE}</p>
         <label class="arr-label" for="np2" style="margin-top:18px">Confirm password</label>
         <input class="arr-input" id="np2" name="confirm-password" type="password" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" minlength="${MIN_PASSWORD}" required>
         <button class="arr-btn" id="npBtn" type="submit">Save password</button><p class="arr-err" id="npMsg" role="status" aria-live="polite"></p></form>
@@ -1091,7 +1095,8 @@ function viewCreatePassword() {
     }
     const m2 = document.getElementById('npMsg'), b2 = document.getElementById('npBtn');
     const code = String((r.error && r.error.code) || '');
-    if (m2) m2.textContent = r.kind === 'rejected' ? (code === 'same_password' ? 'Please choose a password you have not used here before.' : 'Please choose a different password.') : authMsg(r.kind, MSG_GENERIC);
+    const weak = code === 'weak_password' || /weak|should contain|at least \d+ char|password.*(requirement|strength|pwned|leak)/i.test(String((r.error && r.error.message) || ''));
+    if (m2) m2.textContent = r.kind === 'rejected' ? (weak ? PASSWORD_RULE : code === 'same_password' ? 'Please choose a password you have not used here before.' : 'Please choose a different password.') : authMsg(r.kind, MSG_GENERIC);
     if (b2) { b2.disabled = false; b2.textContent = 'Save password'; }
   };
 }
