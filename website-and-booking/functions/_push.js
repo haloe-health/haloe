@@ -1,7 +1,8 @@
 // Web Push for admin alerts — Cloudflare-Workers-compatible: WebCrypto + fetch only, no Node APIs.
 //   * message encryption: RFC 8291 (aes128gcm content coding, RFC 8188)
 //   * sender identification: VAPID, RFC 8292 (ES256 JWT)
-// Events: reschedule accepted, new booking, intake form completed (+ a test alert).
+// Admin events: reschedule accepted, new booking, intake form completed, client photo (+ a test alert).
+// Client event: aftercare reminders (notifyClient).
 // The `_` prefix keeps this file from becoming a route.
 //
 // Env (Cloudflare Pages secrets — see CLAUDE.md "Push notifications"):
@@ -103,12 +104,37 @@ export function fmtWhen(isoDate, startMin) {
  * Dead subscriptions (push service answers 404/410) are deleted. Never throws.
  * Returns { sent, removed, failed } or { skipped: reason }.
  */
+/** Deliver one payload to a list of subscription rows; delete the dead ones (404/410). Never throws. */
+async function deliver(env, subs, payload) {
+  const out = { sent: 0, removed: 0, failed: 0 };
+  await Promise.all((subs || []).map(async (s) => {
+    try {
+      const r = await sendWebPush(env, s, payload);
+      if (r.ok) {
+        out.sent++;
+        await sbRequest(env, { path: `/rest/v1/push_subscriptions?id=eq.${s.id}`, method: 'PATCH', prefer: 'return=minimal', body: { last_ok: new Date().toISOString() } }).catch(() => {});
+      } else if (r.status === 404 || r.status === 410) {
+        out.removed++;     // the device unsubscribed or the subscription expired — stop trying
+        await sbRequest(env, { path: `/rest/v1/push_subscriptions?id=eq.${s.id}`, method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});
+      } else {
+        out.failed++;
+        console.error('push: service answered', r.status, 'for subscription', s.id);
+      }
+    } catch (err) {
+      out.failed++;
+      console.error('push: send failed for subscription', s.id, err);
+    }
+  }));
+  return out;
+}
+
 export async function notifyAdmins(env, { kind, body, url, tag, userId, endpoint }) {
   try {
     if (!env.VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY) return { skipped: 'vapid_not_configured' };
     if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return { skipped: 'supabase_not_configured' };
 
-    // Only ever send to admin accounts, even if a stray row existed.
+    // Only ever send to admin accounts, even if a stray row existed (clients may now store their own devices for
+    // aftercare reminders — those rows belong to client accounts and are never selected here).
     const admins = await sbRequest(env, { path: '/rest/v1/profiles?select=id&role=eq.admin', method: 'GET' });
     const ids = (admins || []).map((a) => a.id).filter((id) => !userId || id === userId);
     if (!ids.length) return { sent: 0, removed: 0, failed: 0 };
@@ -117,32 +143,32 @@ export async function notifyAdmins(env, { kind, body, url, tag, userId, endpoint
     if (kind === 'reschedule') q += '&notify_reschedule=eq.true';
     if (kind === 'booking') q += '&notify_booking=eq.true';
     if (kind === 'intake') q += '&notify_intake=eq.true';
+    if (kind === 'photo') q += '&notify_photo=eq.true';
     if (endpoint) q += `&endpoint=eq.${encodeURIComponent(endpoint)}`;
     const subs = await sbRequest(env, { path: q, method: 'GET' });
-
-    const payload = { title: 'haloe', body, url, tag };
-    const out = { sent: 0, removed: 0, failed: 0 };
-    await Promise.all((subs || []).map(async (s) => {
-      try {
-        const r = await sendWebPush(env, s, payload);
-        if (r.ok) {
-          out.sent++;
-          await sbRequest(env, { path: `/rest/v1/push_subscriptions?id=eq.${s.id}`, method: 'PATCH', prefer: 'return=minimal', body: { last_ok: new Date().toISOString() } }).catch(() => {});
-        } else if (r.status === 404 || r.status === 410) {
-          out.removed++;     // the device unsubscribed or the subscription expired — stop trying
-          await sbRequest(env, { path: `/rest/v1/push_subscriptions?id=eq.${s.id}`, method: 'DELETE', prefer: 'return=minimal' }).catch(() => {});
-        } else {
-          out.failed++;
-          console.error('push: service answered', r.status, 'for subscription', s.id);
-        }
-      } catch (err) {
-        out.failed++;
-        console.error('push: send failed for subscription', s.id, err);
-      }
-    }));
-    return out;
+    return await deliver(env, subs, { title: 'haloe', body, url, tag });
   } catch (err) {
     console.error('push: notifyAdmins failed:', err);
+    return { skipped: 'error' };
+  }
+}
+
+/**
+ * A push to a CLIENT's own device(s) (aftercare reminders) — only accounts with role 'client' linked to this client
+ * record, and only devices that client chose to register. Never throws.
+ */
+export async function notifyClient(env, clientId, { body, url, tag }) {
+  try {
+    if (!clientId) return { skipped: 'no_client' };
+    if (!env.VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY) return { skipped: 'vapid_not_configured' };
+    if (!env.SUPABASE_URL || !env.SUPABASE_SERVICE_ROLE_KEY) return { skipped: 'supabase_not_configured' };
+    const profs = await sbRequest(env, { path: `/rest/v1/profiles?select=id&role=eq.client&client_id=eq.${Number(clientId)}`, method: 'GET' });
+    const ids = (profs || []).map((p) => p.id);
+    if (!ids.length) return { sent: 0, removed: 0, failed: 0 };
+    const subs = await sbRequest(env, { path: `/rest/v1/push_subscriptions?select=id,endpoint,p256dh,auth&user_id=in.(${ids.join(',')})`, method: 'GET' });
+    return await deliver(env, subs, { title: 'haloe', body, url, tag });
+  } catch (err) {
+    console.error('push: notifyClient failed:', err);
     return { skipped: 'error' };
   }
 }
@@ -209,4 +235,14 @@ export async function pushIntakeCompleted(env, { clientId, intake, clientPhone }
     console.error('push: intake alert failed:', err);
     return { skipped: 'error' };
   }
+}
+
+/** A client sent Halima a photo. No name, no photo — taps through to that client's brief. */
+export function pushPhotoSent(env, clientId) {
+  return notifyAdmins(env, {
+    kind: 'photo',
+    body: 'A client sent a photo',
+    url: clientId ? `/app/#/brief/c/${Number(clientId)}` : '/app/#/clients',
+    tag: clientId ? `photo-${Number(clientId)}` : 'photo',
+  });
 }

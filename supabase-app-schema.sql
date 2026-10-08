@@ -395,3 +395,93 @@ create policy admin_own_push on public.push_subscriptions for all to authenticat
 
 -- push: third switch — migration "push_notify_intake", 7 Oct 2026
 alter table public.push_subscriptions add column if not exists notify_intake boolean not null default true;
+
+-- aftercare: photos, reminders, client push, hourly cron — migration "aftercare_photos_reminders", 8 Oct 2026 -------
+-- * photo_submissions (up to 3 photos + note per row) + PRIVATE bucket 'aftercare-photos' (JPEG, 2 MB max; folder = client id).
+--   Clients read/insert/delete only their own folder/rows; admin reads/deletes all; anon nothing. Retention: expires_at = created + 90 days.
+-- * aftercare_reminders: one row per (booking, day 1|7) — the idempotency claim for the hourly reminder run (service role only).
+-- * push_subscriptions.notify_photo (admin "Photos" switch) + own_push policy: a client may store THEIR OWN device (aftercare
+--   reminders). Admin alerts only ever go to role='admin' accounts, so a client's device never receives them.
+-- * run_aftercare_cron(): pg_cron job 'aftercare-hourly' (0 * * * *) -> pg_net POST https://haloe.health/aftercare-cron with the
+--   header x-cron-secret taken from Vault (name 'aftercare_cron_secret'). The SAME value must be the Cloudflare secret CRON_SECRET.
+--   Create the Vault secret once with:  select vault.create_secret('<random>', 'aftercare_cron_secret');
+create extension if not exists pg_net with schema extensions;
+create extension if not exists pg_cron;
+
+create table if not exists public.aftercare_reminders (
+  booking_id bigint not null references public.bookings(id) on delete cascade,
+  day        int    not null check (day in (1, 7)),
+  sent_at    timestamptz not null default now(),
+  primary key (booking_id, day)
+);
+alter table public.aftercare_reminders enable row level security;
+grant select, insert, delete on public.aftercare_reminders to service_role;
+
+create table if not exists public.photo_submissions (
+  id          bigint generated always as identity primary key,
+  client_id   bigint not null references public.clients(id) on delete cascade,
+  booking_id  bigint references public.bookings(id) on delete set null,
+  note        text,
+  paths       text[] not null check (cardinality(paths) between 1 and 3),
+  created_at  timestamptz not null default now(),
+  expires_at  timestamptz not null default (now() + interval '90 days'),
+  alerted_at  timestamptz
+);
+create index if not exists photo_submissions_client_idx on public.photo_submissions(client_id, created_at);
+create index if not exists photo_submissions_expiry_idx on public.photo_submissions(expires_at);
+alter table public.photo_submissions enable row level security;
+
+create or replace function public.photo_submission_check() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare p text;
+begin
+  foreach p in array new.paths loop
+    if p not like (new.client_id::text || '/%') or p like '%..%' then raise exception 'bad_path'; end if;
+  end loop;
+  if new.booking_id is not null and not exists (select 1 from public.bookings where id = new.booking_id and client_id = new.client_id) then
+    new.booking_id := null;
+  end if;
+  new.note := left(new.note, 1000);
+  new.expires_at := new.created_at + interval '90 days';
+  new.alerted_at := null;
+  return new;
+end $$;
+drop trigger if exists photo_submission_check on public.photo_submissions;
+create trigger photo_submission_check before insert on public.photo_submissions
+  for each row execute function public.photo_submission_check();
+
+grant select, insert, delete on public.photo_submissions to authenticated;
+grant select, insert, update, delete on public.photo_submissions to service_role;
+create policy photos_client_insert on public.photo_submissions for insert to authenticated with check (client_id = public.my_client_id());
+create policy photos_client_select on public.photo_submissions for select to authenticated using (client_id = public.my_client_id());
+create policy photos_client_delete on public.photo_submissions for delete to authenticated using (client_id = public.my_client_id());
+create policy photos_admin_select on public.photo_submissions for select to authenticated using (public.is_admin());
+create policy photos_admin_delete on public.photo_submissions for delete to authenticated using (public.is_admin());
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('aftercare-photos', 'aftercare-photos', false, 2097152, array['image/jpeg'])
+on conflict (id) do update set public = false, file_size_limit = 2097152, allowed_mime_types = array['image/jpeg'];
+create policy aftercare_client_insert on storage.objects for insert to authenticated
+  with check (bucket_id = 'aftercare-photos' and public.my_client_id() is not null and (storage.foldername(name))[1] = public.my_client_id()::text);
+create policy aftercare_client_read on storage.objects for select to authenticated
+  using (bucket_id = 'aftercare-photos' and public.my_client_id() is not null and (storage.foldername(name))[1] = public.my_client_id()::text);
+create policy aftercare_client_delete on storage.objects for delete to authenticated
+  using (bucket_id = 'aftercare-photos' and public.my_client_id() is not null and (storage.foldername(name))[1] = public.my_client_id()::text);
+create policy aftercare_admin_read on storage.objects for select to authenticated using (bucket_id = 'aftercare-photos' and public.is_admin());
+create policy aftercare_admin_delete on storage.objects for delete to authenticated using (bucket_id = 'aftercare-photos' and public.is_admin());
+
+alter table public.push_subscriptions add column if not exists notify_photo boolean not null default true;
+create policy own_push on public.push_subscriptions for all to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+create or replace function public.run_aftercare_cron() returns void
+language plpgsql security definer set search_path = public, extensions as $$
+declare s text;
+begin
+  select decrypted_secret into s from vault.decrypted_secrets where name = 'aftercare_cron_secret' limit 1;
+  if s is null then return; end if;
+  perform net.http_post(url := 'https://haloe.health/aftercare-cron',
+    headers := jsonb_build_object('Content-Type', 'application/json', 'x-cron-secret', s),
+    body := '{}'::jsonb, timeout_milliseconds := 20000);
+end $$;
+revoke all on function public.run_aftercare_cron() from public, anon, authenticated;
+select cron.schedule('aftercare-hourly', '0 * * * *', $cron$select public.run_aftercare_cron()$cron$);

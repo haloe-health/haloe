@@ -280,6 +280,41 @@
   .gate .card { width: 100%; max-width: 420px; text-align: center; }
   .gate .brand { justify-content: center; margin-bottom: 18px; }
   .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--nav-h) + 24px); background: #1C1A16; color: #F5F0E8; padding: 10px 18px; border-radius: 999px; font-size: 14px; z-index: 50; max-width: calc(100% - 32px); }
+  /* aftercare timeline + photos */
+  .tl { list-style: none; margin: 14px 0 0; padding: 0; position: relative; }
+  .tl li { position: relative; padding: 0 0 18px 34px; }
+  .tl li::before { content: ''; position: absolute; left: 9px; top: 22px; bottom: -2px; width: 2px; background: var(--fill-hover); }
+  .tl li:last-child { padding-bottom: 0; }
+  .tl li:last-child::before { display: none; }
+  .tl .dot { position: absolute; left: 0; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--card); border: 2px solid var(--fill-hover); }
+  .tl li.past .dot { background: var(--fill-hover); }
+  .tl li.now .dot { background: var(--gold); border-color: var(--gold); box-shadow: 0 0 0 5px color-mix(in srgb, var(--gold) 28%, transparent); }
+  .tl .hd { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; min-height: 28px; }
+  .tl .hd b { font-weight: 600; font-size: 16px; }
+  .tl .hd span { font-size: 13px; color: var(--muted); }
+  .tl li.now .hd b { color: var(--gold-deep); }
+  :root[data-theme="dark"] .tl li.now .hd b { color: var(--gold); }
+  .tl .body { margin-top: 6px; display: grid; gap: 8px; font-size: 14.5px; line-height: 1.5; }
+  .tl .body div > i { display: block; font-style: normal; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .tl li.future .body, .tl li.past .body { display: none; }
+  .tl.all li .body { display: grid; }
+  .tl.all li.future, .tl.all li.past { opacity: .72; }
+  .blister { background: var(--fill); }
+  .photo-cta { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 48px; margin-top: 14px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--fill); color: var(--ink); font: inherit; font-weight: 600; font-size: 14.5px; }
+  .picks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .picks .btn { min-height: 48px; }
+  .thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+  .thumbs .th { position: relative; aspect-ratio: 1; border-radius: 16px; overflow: hidden; background: var(--fill); }
+  .thumbs .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumbs .th button { position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; border: 0; background: transparent; padding: 0; }
+  .thumbs .th button span { display: grid; place-items: center; width: 28px; height: 28px; margin: 8px 8px 0 auto; border-radius: 50%; background: rgba(28,26,22,.7); color: #fff; font-size: 16px; line-height: 1; }
+  .consent { font-size: 13.5px; color: var(--muted); line-height: 1.5; margin: 14px 0 0; }
+  .ph-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .ph-row .pt { width: 88px; height: 88px; padding: 0; border: 0; border-radius: 14px; overflow: hidden; background: var(--fill); }
+  .ph-row .pt img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .lightbox { position: fixed; inset: 0; z-index: 80; background: rgba(10,8,4,.92); display: grid; place-items: center; padding: 16px; }
+  .lightbox img { max-width: 100%; max-height: 86vh; border-radius: 12px; }
+  .lightbox button { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 10px; width: 48px; height: 48px; border: 0; border-radius: 50%; background: rgba(255,255,255,.16); color: #fff; font-size: 24px; }
   @media (min-width: 700px) { .wrap { padding-top: 16px; } }
 </style>
 </head>
@@ -351,10 +386,10 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession
 const api = {
   async load() {
     const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
-    const [clients, intakes, bookings, codes, collabs, redemptions, notes, checkins] = await Promise.all([
-      q('clients'), q('intake_forms'), q('bookings'), q('discount_codes'), q('collaborators'), q('code_redemptions'), q('session_notes'), q('check_ins'),
+    const [clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos] = await Promise.all([
+      q('clients'), q('intake_forms'), q('bookings'), q('discount_codes'), q('collaborators'), q('code_redemptions'), q('session_notes'), q('check_ins'), q('photo_submissions'),
     ]);
-    return { clients, intakes, bookings, codes, collabs, redemptions, notes, checkins };
+    return { clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos };
   },
   async markDone(id, done) { const { error } = await sb.from('bookings').update({ done_at: done ? new Date().toISOString() : null }).eq('id', id); if (error) throw error; },
   async setActive(id, active) { const { error } = await sb.from('discount_codes').update({ active }).eq('id', id); if (error) throw error; },
@@ -386,6 +421,27 @@ const api = {
     const res = await fetch('/push-test', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint }) });
     const body = await res.json().catch(() => ({}));
     return { status: res.status, ...body };
+  },
+  // Photos for Halima (private bucket; the folder is the client id; row-level security + storage policies enforce it).
+  async uploadPhoto(path, blob) { const { error } = await sb.storage.from('aftercare-photos').upload(path, blob, { contentType: 'image/jpeg', upsert: false }); if (error) throw error; },
+  async removePhotos(paths) { if (!paths.length) return; const { error } = await sb.storage.from('aftercare-photos').remove(paths); if (error) throw error; },
+  async addPhotoSubmission(row) { const { data, error } = await sb.from('photo_submissions').insert(row).select().single(); if (error) throw error; return data; },
+  async myPhotoSubmissions() { const { data, error } = await sb.from('photo_submissions').select('*').order('created_at', { ascending: false }); if (error) throw error; return data || []; },
+  async deleteMyPhotos() {
+    const subs = await this.myPhotoSubmissions();
+    await this.removePhotos(subs.flatMap((x) => x.paths || []));                     // files first, then the rows
+    if (subs.length) { const { error } = await sb.from('photo_submissions').delete().in('id', subs.map((x) => x.id)); if (error) throw error; }
+    return subs.length;
+  },
+  async signedPhotoUrls(paths) {
+    if (!paths.length) return {};
+    const { data, error } = await sb.storage.from('aftercare-photos').createSignedUrls(paths, 600);
+    if (error) throw error;
+    return Object.fromEntries((data || []).filter((x) => x.signedUrl).map((x) => [x.path, x.signedUrl]));
+  },
+  async alertPhoto(id) {
+    const { data: { session } } = await sb.auth.getSession();
+    await fetch('/photo-alert', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ submissionId: id }) });
   },
   async addCheckIn(row) { const { data, error } = await sb.from('check_ins').insert(row).select().single(); if (error) throw error; return data; },
   async addNote(row) { const { data, error } = await sb.from('session_notes').insert(row).select().single(); if (error) throw error; return data; },
@@ -422,8 +478,47 @@ const pushApi = {
 };
 function subRow(sub) {
   const j = sub.toJSON();
-  return { user_id: S.session.user.id, endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, user_agent: navigator.userAgent.slice(0, 200), notify_reschedule: true, notify_booking: true, notify_intake: true };
+  return { user_id: S.session.user.id, endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, user_agent: navigator.userAgent.slice(0, 200), notify_reschedule: true, notify_booking: true, notify_intake: true, notify_photo: true };
 }
+/** Client Settings: how many photos she has, and a two-tap "Delete my photos". */
+async function initClientPhotoCard() {
+  const cnt = document.getElementById('photoCount'), btn = document.getElementById('delPhotos'); if (!cnt || !btn) return;
+  let n = 0;
+  try { n = (await api.myPhotoSubmissions()).reduce((t, x) => t + (x.paths || []).length, 0); } catch (e) { cnt.textContent = ''; }
+  const label = () => { cnt.textContent = n ? 'You have ' + n + ' photo' + (n === 1 ? '' : 's') + ' saved.' : 'You have no photos saved.'; btn.disabled = !n; btn.textContent = 'Delete my photos'; };
+  label();
+  let armed = null;
+  btn.onclick = async () => {
+    if (!armed) { btn.textContent = 'Tap again to delete all my photos'; armed = setTimeout(() => { armed = null; label(); }, 4000); return; }
+    clearTimeout(armed); armed = null; btn.disabled = true; btn.textContent = 'Deleting…';
+    try { await api.deleteMyPhotos(); n = 0; toastMsg('Your photos have been deleted'); } catch (e) { toastMsg('Could not delete just now. Please try again.'); }
+    label();
+  };
+}
+/** Client Settings: allow quiet aftercare reminders (day 1 and day 7) on this device. */
+async function initClientPushCard() {
+  const box = document.getElementById('cpushBody'); if (!box) return;
+  const draw = (html) => { const b = document.getElementById('cpushBody'); if (b) b.innerHTML = html; };
+  const intro = '<p class="muted small" style="margin:0 0 6px">A quiet reminder on day 1 and day 7 after a session. It never shows any detail.</p>';
+  if (!pushApi.supported()) return draw(intro + (pushApi.isIOS() && !isStandalone() ? '<p class="muted small" style="margin:0">On iPhone, first add haloe to your Home Screen (Share → Add to Home Screen), then open it from there.</p>' : '<p class="muted small" style="margin:0">This browser can’t show reminders.</p>'));
+  if (pushApi.permission() === 'denied') return draw(intro + '<p class="muted small" style="margin:0">Reminders are blocked for haloe on this device. Allow notifications in your browser or phone settings to turn them on.</p>');
+  let sub = null, row = null;
+  try { sub = pushApi.permission() === 'granted' ? await pushApi.getSub() : null; if (sub) row = await api.getPushRow(sub.toJSON().endpoint); } catch (e) { return draw(intro + '<p class="muted small" style="margin:0">Couldn’t load this setting just now.</p>'); }
+  const on = !!(sub && row);
+  draw(intro + '<div class="toggle-line" style="margin:2px 0"><span>Reminders on this device</span><button class="switch-wrap" id="cpushMain" aria-label="Reminders on this device"><span class="switch" role="switch" aria-checked="' + on + '"></span></button></div>');
+  document.getElementById('cpushMain').onclick = async () => {
+    try {
+      if (on) { const ep = sub.toJSON().endpoint; await pushApi.unsubscribe(sub); await api.deletePushRow(ep); }
+      else {
+        const perm = await pushApi.requestPermission();
+        if (perm !== 'granted') { toastMsg('Reminders weren’t allowed on this device'); return initClientPushCard(); }
+        const ns = sub || await pushApi.subscribe(); if (!row) await api.savePushRow(subRow(ns));
+      }
+    } catch (e) { toastMsg('Could not change reminders: ' + e.message); }
+    initClientPushCard();
+  };
+}
+
 /** Fills the "Alerts on this device" card on Settings (admin only). */
 async function initPushCard() {
   const box = document.getElementById('pushBody'); if (!box) return;
@@ -444,7 +539,7 @@ async function initPushCard() {
   } catch (e) { return draw('<p class="muted small" style="margin:8px 0 0">Couldn’t load alert settings: ' + esc(e.message) + '</p>'); }
   const sw = (id, label, on) => '<div class="toggle-line" style="margin:2px 0"><span>' + label + '</span><button class="switch-wrap" id="' + id + '" aria-label="' + label + '"><span class="switch" role="switch" aria-checked="' + on + '"></span></button></div>';
   draw(sw('pushMain', 'Alerts on this device', !!sub) +
-    (sub && row ? '<div style="margin:6px 0 0;padding-left:2px">' + sw('pushResch', 'Reschedule accepted', row.notify_reschedule) + sw('pushBook', 'New bookings', row.notify_booking) + sw('pushIntake', 'Intake forms', row.notify_intake) +
+    (sub && row ? '<div style="margin:6px 0 0;padding-left:2px">' + sw('pushResch', 'Reschedule accepted', row.notify_reschedule) + sw('pushBook', 'New bookings', row.notify_booking) + sw('pushIntake', 'Intake forms', row.notify_intake) + sw('pushPhoto', 'Photos', row.notify_photo) +
       '<button class="btn ghost block" id="pushTest" type="button" style="margin-top:12px">Send test alert</button></div>' : '') +
     '<p class="muted small" style="margin:10px 0 0">Alerts show only the time — never a name or any detail.</p>');
 
@@ -462,7 +557,7 @@ async function initPushCard() {
   };
   if (sub && row) {
     const flip = (id, col) => { document.getElementById(id).onclick = async () => { try { await api.updatePushRow(row.endpoint, { [col]: !row[col] }); } catch (e) { toastMsg('Could not save: ' + e.message); } initPushCard(); }; };
-    flip('pushResch', 'notify_reschedule'); flip('pushBook', 'notify_booking'); flip('pushIntake', 'notify_intake');
+    flip('pushResch', 'notify_reschedule'); flip('pushBook', 'notify_booking'); flip('pushIntake', 'notify_intake'); flip('pushPhoto', 'notify_photo');
     document.getElementById('pushTest').onclick = async (ev) => {
       const b = ev.currentTarget; b.disabled = true;
       try {
@@ -489,6 +584,7 @@ function applyTest() {
     bookings: r.bookings.filter((b) => !badBk.has(b.id)),
     intakes: r.intakes.filter((i) => !bad.has(i.client_id)),
     checkins: r.checkins.filter((x) => !bad.has(x.client_id)),
+    photos: (r.photos || []).filter((x) => !bad.has(x.client_id)),
     notes: r.notes.filter((x) => !bad.has(x.client_id)),
     redemptions: r.redemptions.filter((x) => !badBk.has(x.booking_id)) };
 }
@@ -720,7 +816,7 @@ function viewNoMatch() {
 function tabbarHTML() {
   const items = S.isClient ? [['home', 'Home'], ['progress', 'Progress'], ['book', 'Book']] : [['today', 'Today'], ['clients', 'Clients'], ['codes', 'Codes'], ['stats', 'Stats']];
   return `<div class="tabbar${S.isClient ? ' three' : ''}" role="navigation" aria-label="Main">${items.map(([k, l]) =>
-    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span></button>`).join('')}</div>`;
+    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') || (k === 'home' && S.view === 'aftercare') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span></button>`).join('')}</div>`;
 }
 
 function shell(inner, withNav = true) {
@@ -932,6 +1028,36 @@ function openReschedule(bookingId, p) {
   document.body.appendChild(bg); draw();
 }
 
+/* ---- Photos from clients (admin) ---- */
+function photosCard(c, p) {
+  const subs = (S.data.photos || []).filter((x) => x.client_id === c.id).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+  if (!subs.length) return '';
+  const phone = p.phone || c.phone;
+  const wa = (phone) ? 'https://wa.me/' + waNumber(phone) + '?text=' + encodeURIComponent("Hi " + firstName(p.name) + ", it's Halima from haloe. Thank you for sending that over. I'll take a look and come back to you shortly.") : '';
+  return `<div class="card"><div class="section-label">Photos</div>${subs.map((x) => `<div class="note-item"><div class="when">${new Date(x.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/London' })} · deleted automatically on ${esc(fmtDate(ldn(new Date(x.expires_at))))}</div>
+      <div class="ph-row">${(x.paths || []).map((pt) => `<button class="pt" type="button" data-photo="${esc(pt)}" aria-label="Open photo"><img alt="Photo from client" hidden></button>`).join('')}</div>
+      ${x.note ? `<p style="margin-top:10px">${esc(x.note)}</p>` : '<p class="muted small" style="margin:10px 0 0">No note.</p>'}
+      ${wa ? `<a class="btn sm ghost" style="margin-top:10px" target="_blank" rel="noopener" href="${esc(wa)}">Reply on WhatsApp</a>` : ''}</div>`).join('')}</div>`;
+}
+async function loadPhotoThumbs() {
+  const btns = [...document.querySelectorAll('[data-photo]')]; if (!btns.length) return;
+  let urls = {};
+  try { urls = await api.signedPhotoUrls(btns.map((b) => b.dataset.photo)); } catch (e) { toastMsg('Could not load photos'); return; }
+  for (const b of btns) {
+    const u = urls[b.dataset.photo], img = b.querySelector('img'); if (!u) continue;
+    img.src = u; img.hidden = false; b.dataset.url = u;
+    b.onclick = () => openLightbox(u);
+  }
+}
+function openLightbox(url) {
+  const lb = document.createElement('div'); lb.className = 'lightbox'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-label', 'Photo');
+  lb.innerHTML = '<img alt="Photo from client"><button type="button" aria-label="Close">×</button>';
+  lb.querySelector('img').src = url;
+  const close = () => { lb.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  lb.onclick = close; document.addEventListener('keydown', onKey); document.body.appendChild(lb);
+}
+
 /* ---- Client brief ---- */
 function findPerson(key) { return people().find((p) => p.key === key) || (key.startsWith('b/') ? bookingPerson(Number(key.slice(2))) : null); }
 function bookingPerson(id) {
@@ -993,6 +1119,7 @@ function viewBrief(key, bid) {
       <div><div class="k">Main concern</div>${words(intake && intake.main_concern)}</div>
       <div><div class="k">Safety notes</div>${words(intake && intake.safety_notes)}</div></div></div>
     ${c ? progressCard(ciList) : ''}
+    ${c ? photosCard(c, p) : ''}
     ${ciList.length ? `<div class="card"><div class="section-label">Check-ins</div><div class="hist">${ciList.slice().reverse().slice(0, 4).map((x) => `<div class="h"><b>${shortDate(new Date(x.taken_at).getTime())}</b> · ${[['Concern', x.concern_score], ['Energy', x.energy], ['Sleep', x.sleep]].filter((r) => r[1] != null).map((r) => r[0] + ' ' + r[1]).join(' · ') || 'No scores'}${x.pain_areas ? `<br><span class="muted">Pain areas:</span> ${esc(x.pain_areas)}` : ''}${x.note ? `<br><span class="muted">Note:</span> ${esc(x.note)}` : ''}</div>`).join('')}</div></div>` : ''}
     <div class="card"><div class="section-label">Package and bookings</div>
       <div class="fact" style="margin-top:12px"><div class="k">Package chosen on intake</div><div class="v">${esc(intake && intake.package || '—')}</div></div>
@@ -1006,6 +1133,7 @@ function viewBrief(key, bid) {
     });
   }
   wireProgress(ciList);
+  if (c) loadPhotoThumbs();
   document.querySelectorAll('[data-resched]').forEach((btn) => { btn.onclick = () => openReschedule(Number(btn.dataset.resched), p); });
   const ciBtn = document.getElementById('ciBtn');
   if (ciBtn) ciBtn.onclick = () => openCheckIn(c, p.bookings.find((b) => confirmed(b) && b.booking_date === todayISO()) || null);   // today's session, if any
@@ -1114,6 +1242,7 @@ function viewSettings() {
       <div class="seg">${[['light', 'Light'], ['dark', 'Dark'], ['system', 'System']].map(([k, l]) => `<button data-th="${k}" aria-pressed="${th === k}">${l}</button>`).join('')}</div></div>
     ${S.isClient ? '' : `<div class="card" id="pushCard"><div class="section-label">Alerts on this device</div><div id="pushBody" class="muted small" style="margin-top:8px">Checking…</div></div>`}
     ${S.isClient ? '' : `<div class="card"><div class="section-label">Data</div><div class="toggle-line" style="margin:8px 0 0"><span>Show test data</span><button class="switch-wrap" id="testBtn2" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div><p class="muted small" style="margin:4px 0 0">Rehearsal clients and bookings. Hidden from Clients, Today, Codes and Stats (and so from revenue) unless this is on.</p></div>`}
+    ${S.isClient && S.cdata && S.cdata.client ? `<div class="card" id="photosCard"><div class="section-label">Photos</div><p class="muted small" style="margin:8px 0 0">Photos you send Halima are private to you and Halima. They are kept for 90 days, then deleted automatically.</p><p class="small" id="photoCount" style="margin:10px 0 0"></p><button class="btn ghost block" id="delPhotos" type="button" style="margin-top:12px">Delete my photos</button></div><div class="card" id="cpushCard"><div class="section-label">Aftercare reminders</div><div id="cpushBody" class="muted small" style="margin-top:8px">Checking…</div></div>` : ''}
     <div class="card"><div class="section-label">Account</div>
       <p style="margin:10px 0 14px">${esc((S.session && S.session.user && S.session.user.email) || ADMIN_EMAIL)}</p>
       <button class="btn ghost block" id="signOutBtn">Sign out</button></div>
@@ -1123,6 +1252,7 @@ function viewSettings() {
   document.getElementById('signOutBtn').onclick = signOut;
   const tb2 = document.getElementById('testBtn2'); if (tb2) tb2.onclick = () => setShowTest(!S.showTest);
   if (!S.isClient) initPushCard();
+  else { initClientPhotoCard(); initClientPushCard(); }
 }
 
 
@@ -1166,7 +1296,11 @@ function viewHome() {
   const links = `<a class="listrow" href="/before-your-session"><span><span class="nm">Before your session</span><br><span class="sb">A short, quiet guide to your visit.</span></span></a>
     <a class="listrow" href="/intake"><span><span class="nm">Your intake form</span><br><span class="sb">${intakeSub}</span></span></a>`;
   const pastCard = past.length ? `<h2 class="sub">Past sessions</h2><div class="card"><div class="hist" style="margin-top:0">${past.map((x) => `<div class="h"><b>${esc(fmtDate(x.booking_date))} · ${fmtTime(x.start_min)}</b><br>${esc(x.treatment || '—')} ${tagHTML(pk(x))}<br><span class="muted">${esc(placeOf(x))} · booked ${esc(bookedOn(x))}</span></div>`).join('')}</div></div>` : '';
-  shell(`${pageHead(who ? 'Hello, ' + firstName(who) : 'Hello')}${newTime}${nextCard}${noClient}<h2 class="sub">Good to have to hand</h2>${links}${pastCard}`);
+  const ac = aftercareState(d.bookings);
+  const photoRow = d.client ? `<button class="listrow" id="photoBtnHome" type="button"><span><span class="nm">Worried about a mark?</span><br><span class="sb">Send Halima a photo</span></span></button>` : '';
+  shell(`${pageHead(who ? 'Hello, ' + firstName(who) : 'Hello')}${newTime}${ac ? aftercareCardHTML(ac) : ''}${nextCard}${noClient}<h2 class="sub">Good to have to hand</h2>${photoRow}${links}${pastCard}`);
+  const pbc = document.getElementById('photoBtnCard'); if (pbc) pbc.onclick = openPhotoSheet;
+  const pbh = document.getElementById('photoBtnHome'); if (pbh) pbh.onclick = openPhotoSheet;
   document.querySelectorAll('[data-accept]').forEach((btn) => {
     btn.onclick = async () => {
       btn.disabled = true; btn.textContent = 'Confirming…';
@@ -1196,8 +1330,144 @@ function viewBook() {
     <a class="btn block" href="/book">Book a session</a></div>`);
 }
 
+/* ---------- client: aftercare timeline + photos for Halima ---------- */
+// Wording comes from the site's /before-your-session page ("After" and "The marks"). Nothing medical is invented here:
+// the marks timeline is the site's (Day 0 just after · Days 1–3 settling · Days 4–7 fading · Days 7–14 nearly gone ·
+// Day 14+ gone). Symptom language only; marks usually fade within 14 days at most.
+const AFTERCARE_STEPS = [
+  { at: 0, label: 'Today', sub: 'just after',
+    normal: 'Round marks that look like light bruising. They are not scars and fade on their own.',
+    todo: 'Keep the area clean and dry for 24–48 hours. No swimming or saunas. Apply the black seed oil you were given, as shown. Take it easy for the rest of the day: eat well, drink water, sleep.',
+    ask: 'Worried about a mark? Send me a photo.' },
+  { at: 1, label: 'Tomorrow', sub: 'settling',
+    normal: 'The marks are settling. Some tenderness for a day or two is normal.',
+    todo: 'Keep the area clean and dry (24–48 hours). No swimming or saunas. Keep applying the black seed oil as shown.',
+    ask: 'If something about a mark worries you, send me a photo.' },
+  { at: 3, label: 'Day 3', sub: 'settling',
+    normal: 'The marks are still settling and will start to fade over the next few days.',
+    todo: 'Keep eating well, drinking water and sleeping.',
+    ask: 'If something about a mark worries you, send me a photo.' },
+  { at: 7, label: 'Day 7', sub: 'fading',
+    normal: 'The marks are fading. They are not scars and fade on their own.',
+    todo: 'Nothing special — let them fade.',
+    ask: 'If a mark is not fading as you would expect, send me a photo.' },
+  { at: 14, label: 'Day 14', sub: 'nearly gone',
+    normal: 'Marks usually fade within 14 days at most.',
+    todo: 'Nothing special — they should be gone or nearly gone.',
+    ask: 'If a mark is still there, send me a photo and I will take a look.' },
+];
+// DRAFT — Halima must approve this wording before it is relied on.
+const BLISTER_GUIDANCE_DRAFT = "A small blister can appear on or near a mark. It is usually harmless. Please don't pop it. Keep it clean and lightly covered, and send me a photo. If you notice spreading redness, increasing pain, or you feel unwell, speak to your GP or NHS 111.";
+const daysBetween = (fromISO, toISO) => Math.round((Date.parse(toISO + 'T12:00:00Z') - Date.parse(fromISO + 'T12:00:00Z')) / 86400000);
+/** Where she is in the 14 days after her most recent session marked done; null when there's nothing to show. */
+function aftercareState(bookings) {
+  const done = bookings.filter((b) => b.done_at && (b.status === 'confirmed')).sort((a, b) => String(b.done_at).localeCompare(String(a.done_at)));
+  if (!done.length) return null;
+  const day = daysBetween(ldn(new Date(done[0].done_at)), todayISO());
+  if (day < 0 || day > 14) return null;
+  let idx = 0; AFTERCARE_STEPS.forEach((st, i) => { if (st.at <= day) idx = i; });
+  return { booking: done[0], day, idx };
+}
+function timelineHTML(state, all) {
+  return '<ul class="tl' + (all ? ' all' : '') + '">' + AFTERCARE_STEPS.map((st, i) => {
+    const cls = state ? (i === state.idx ? 'now' : i < state.idx ? 'past' : 'future') : 'future';
+    return '<li class="' + cls + '"' + (cls === 'now' ? ' aria-current="step"' : '') + '><span class="dot"></span><div class="hd"><b>' + esc(st.label) + '</b><span>' + esc(st.sub) + '</span></div>' +
+      '<div class="body"><div><i>What is normal</i>' + esc(st.normal) + '</div><div><i>What to do</i>' + esc(st.todo) + '</div><div><i>When to message Halima</i>' + esc(st.ask) + '</div></div></li>';
+  }).join('') + '</ul>';
+}
+const photoCtaHTML = (id) => '<button class="photo-cta" id="' + id + '" type="button">Worried about a mark? Send Halima a photo</button>';
+function aftercareCardHTML(state) {
+  return '<div class="card" id="aftercareCard"><div class="section-label">Aftercare</div>' +
+    '<p class="muted small" style="margin:8px 0 0">' + (state.day === 0 ? 'Your session was today.' : state.day === 1 ? 'Your session was yesterday.' : 'Your session was ' + state.day + ' days ago.') + ' Marks usually fade within 14 days at most.</p>' +
+    timelineHTML(state, false) +
+    '<a class="btn ghost block" style="margin-top:16px" href="#/aftercare">See the full aftercare guide</a>' + photoCtaHTML('photoBtnCard') + '</div>';
+}
+function viewAftercare() {
+  const state = aftercareState(S.cdata.bookings);
+  shell('<button class="back" id="bk">' + ICON.back + 'Home</button>' + pageHead('Aftercare') +
+    '<div class="card"><div class="section-label">Your timeline</div><p class="muted small" style="margin:8px 0 0">' + (state ? 'Marks usually fade within 14 days at most. You are on the highlighted step.' : 'This guide follows your marks over the 14 days after a session. It lights up once your session is done. Marks usually fade within 14 days at most.') + '</p>' + timelineHTML(state, true) + '</div>' +
+    '<div class="card blister"><div class="section-label">A small blister?</div><p style="margin:10px 0 0">' + esc(BLISTER_GUIDANCE_DRAFT) + '</p>' + (S.cdata.client ? photoCtaHTML('photoBtnPage') : '') + '</div>');
+  document.getElementById('bk').onclick = () => { location.hash = '#/home'; };
+  const pb = document.getElementById('photoBtnPage'); if (pb) pb.onclick = openPhotoSheet;
+}
+
+/** Shrink a photo in the browser: longest side ≤ 1600px, JPEG ≤ ~1.5 MB. Re-encoding also drops EXIF (location etc.). */
+async function compressImage(file, maxBytes = 1.5 * 1024 * 1024, maxSide = 1600) {
+  if (!/^image\//.test(file.type || '')) throw new Error('not_image');
+  let bmp;
+  try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch (e) { bmp = await new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image(); im.onload = () => { URL.revokeObjectURL(u); res(im); }; im.onerror = () => rej(new Error('unreadable')); im.src = u; }); }
+  const w0 = bmp.width || bmp.naturalWidth, h0 = bmp.height || bmp.naturalHeight;
+  let scale = Math.min(1, maxSide / Math.max(w0, h0)), q = 0.86, blob = null;
+  for (let i = 0; i < 12; i++) {
+    const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w0 * scale)); c.height = Math.max(1, Math.round(h0 * scale));
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(bmp, 0, 0, c.width, c.height);
+    blob = await new Promise((res) => c.toBlob(res, 'image/jpeg', q));
+    if (blob && blob.size <= maxBytes) break;
+    if (q > 0.56) q -= 0.1; else scale *= 0.8;
+  }
+  if (bmp.close) bmp.close();
+  if (!blob || blob.size > maxBytes) throw new Error('too_large');
+  return blob;
+}
+
+function openPhotoSheet() {
+  const client = S.cdata && S.cdata.client; if (!client) return;
+  // The photo belongs to the session she has most recently HAD (on or before today); only if there is none, her latest booking.
+  const mine = S.cdata.bookings.filter(confirmed).sort(byDateDesc);
+  const latest = mine.find((b) => b.booking_date <= todayISO()) || mine[0] || null;
+  const picked = [];                                          // { blob, url }
+  const bg = document.createElement('div'); bg.className = 'sheet-bg';
+  bg.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-label="Send Halima a photo"><div class="grab"></div>' +
+    '<div class="lab">Send Halima a photo</div>' +
+    '<div class="picks"><label class="btn" for="phCam">Take a photo</label><label class="btn ghost" for="phPick">Choose photos</label></div>' +
+    '<input id="phCam" type="file" accept="image/*" capture="environment" hidden><input id="phPick" type="file" accept="image/*" multiple hidden>' +
+    '<div class="thumbs" id="phThumbs"></div><p class="muted small" id="phCount" style="margin:8px 0 0">Up to 3 photos.</p>' +
+    '<label class="f" for="phNote">Add a note (optional)</label><textarea class="note" id="phNote" maxlength="1000" style="min-height:84px" placeholder="In your own words"></textarea>' +
+    '<p class="consent">Only you and Halima can see this. Please photograph the mark itself only.</p>' +
+    '<div class="sheet-actions"><button class="btn ghost" id="phCancel" type="button">Cancel</button><button class="btn" id="phSend" type="button" disabled>Send to Halima</button></div></div>';
+  document.body.appendChild(bg);
+  const $ = (id) => bg.querySelector('#' + id);
+  const close = () => { picked.forEach((p) => URL.revokeObjectURL(p.url)); bg.remove(); };
+  const draw = () => {
+    $('phThumbs').innerHTML = picked.map((p, i) => '<div class="th"><img alt="Photo ' + (i + 1) + '" src="' + p.url + '"><button type="button" data-rm="' + i + '" aria-label="Remove photo ' + (i + 1) + '"><span>×</span></button></div>').join('');
+    $('phCount').textContent = picked.length ? picked.length + ' of 3 photos' : 'Up to 3 photos.';
+    $('phSend').disabled = !picked.length;
+    bg.querySelectorAll('[data-rm]').forEach((b) => { b.onclick = () => { const [r] = picked.splice(Number(b.dataset.rm), 1); URL.revokeObjectURL(r.url); draw(); }; });
+  };
+  const add = async (files) => {
+    for (const f of [...files]) {
+      if (picked.length >= 3) { toastMsg('Up to 3 photos'); break; }
+      try { const blob = await compressImage(f); picked.push({ blob, url: URL.createObjectURL(blob) }); }
+      catch (e) { toastMsg(e.message === 'not_image' ? 'That file isn’t a photo' : 'That photo couldn’t be used'); }
+    }
+    draw();
+  };
+  $('phCam').onchange = (e) => { add(e.target.files); e.target.value = ''; };
+  $('phPick').onchange = (e) => { add(e.target.files); e.target.value = ''; };
+  $('phCancel').onclick = close;
+  bg.onclick = (e) => { if (e.target === bg) close(); };
+  $('phSend').onclick = async () => {
+    const btn = $('phSend'); btn.disabled = true; btn.textContent = 'Sending…';
+    const done = [];
+    try {
+      const stamp = Date.now();
+      for (let i = 0; i < picked.length; i++) {
+        const path = client.id + '/' + stamp + '-' + i + '-' + Math.random().toString(36).slice(2, 8) + '.jpg';
+        await api.uploadPhoto(path, picked[i].blob); done.push(path);
+      }
+      const row = await api.addPhotoSubmission({ client_id: client.id, booking_id: latest ? latest.id : null, note: $('phNote').value.trim() || null, paths: done });
+      api.alertPhoto(row.id).catch(() => {});                  // Halima is told by push + email; a failure here never undoes the upload
+      close(); toastMsg('Sent. Halima will take a look.');
+    } catch (e) {
+      try { await api.removePhotos(done); } catch (x) {}       // don't leave orphaned files behind
+      toastMsg('Couldn’t send that just now. Please try again.'); btn.disabled = false; btn.textContent = 'Send to Halima';
+    }
+  };
+}
+
 /* ---------- router / boot ---------- */
-const ADMIN_VIEWS = ['today', 'clients', 'codes', 'stats', 'settings'], CLIENT_VIEWS = ['home', 'progress', 'book', 'settings'];
+const ADMIN_VIEWS = ['today', 'clients', 'codes', 'stats', 'settings'], CLIENT_VIEWS = ['home', 'progress', 'book', 'aftercare', 'settings'];
 function route() {
   const h = (location.hash || (S.isClient ? '#/home' : '#/today')).replace(/^#\//, '');
   const [path, qs] = h.split('?');
@@ -1222,7 +1492,7 @@ function render() {
   if (!S.cdata.client && !S.cdata.bookings.length) return viewNoMatch();      // nothing of theirs on file yet
   route();
   window.scrollTo(0, 0);
-  ({ home: viewHome, progress: viewProgress, book: viewBook, settings: viewSettings })[S.view]();
+  ({ home: viewHome, progress: viewProgress, book: viewBook, aftercare: viewAftercare, settings: viewSettings })[S.view]();
 }
 async function refreshData() { await loadAdminData(); render(); }
 async function enter(session) {
