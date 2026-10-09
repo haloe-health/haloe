@@ -622,6 +622,9 @@
   .st-mini .s { font-size: 12px; line-height: 1.4; color: var(--th-muted); }
   .tile-home.stats .row-split { display: flex; justify-content: space-between; gap: var(--s3); padding: var(--s2) 0; border-top: 1px solid color-mix(in srgb, var(--th-muted) 18%, transparent); font-size: 15px; }
   .tile-home.stats .th-title + .row-split { border-top: 0; }
+  button.th-half { border: 0; font: inherit; text-align: left; width: 100%; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .fill-times { display: flex; flex-wrap: wrap; gap: var(--s2); margin: 14px 0 0; }
+  .fill-time { display: inline-flex; align-items: center; min-height: 36px; padding: 0 var(--s3); border-radius: 999px; background: var(--th-sand, var(--fill)); color: var(--th-ink, var(--ink)); font-size: 14px; font-weight: 600; }
   @media (min-width: 700px) { .wrap { padding-top: 16px; } }
 </style>
 </head>
@@ -1555,12 +1558,54 @@ function tasksTile(t) {
   return `<section class="tile" id="tasksTile"><div class="th-head"><h2 class="th-title">For your clients</h2><span class="th-count" id="tasksCount">${nDone} of ${tasks.length} done</span></div>` +
     (tasks.length ? tasks.map((x) => `<button class="task" type="button" data-task="${esc(x.key)}" aria-pressed="${done.has(x.key)}"><span class="ck">${ICON.check}</span><span class="tx"><span class="tt">${esc(x.title)}</span><span class="ts">${esc(x.sub)}</span></span></button>`).join('') : '<p class="th-empty">Nothing to do right now.</p>') + '</section>';
 }
+/* ---- "Fill {clinic day}": open times, read only. Tapping the tile opens this sheet; nothing in it navigates anywhere. ---- */
+const CLINIC_FIRST_MIN = 9 * 60, CLINIC_LAST_MIN = 19 * 60 + 30, CLINIC_STEP_MIN = 30;   // mirrors HOURS.clinic[2] in functions/_slots.js
+const BOOKING_LINK = 'https://haloe.health/book';
+/** Start times on a clinic day with room for at least a 30-minute session: not inside any active booking's blocked time, and fits the closing rule. */
+function clinicOpenTimes(d) {
+  const busy = S.data.bookings.filter((b) => b.location === 'clinic' && b.booking_date === d && (b.status === 'confirmed' || b.status === 'reschedule_pending'));
+  const hm = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()), nowMin = d === todayISO() ? Number(hm.slice(0, 2)) * 60 + Number(hm.slice(3, 5)) : -1;
+  const out = [];
+  for (let t = CLINIC_FIRST_MIN; t <= CLINIC_LAST_MIN; t += CLINIC_STEP_MIN) {
+    if (t <= nowMin) continue;
+    if (window.CLINIC_RULES && !CLINIC_RULES.fits(t, 30)) continue;
+    if (busy.some((b) => t < (b.end_min || 0) && t + 30 > (b.start_min || 0))) continue;
+    out.push(t);
+  }
+  return out;
+}
+function openFillSheet(d) {
+  if (document.querySelector('.sheet-bg.fill-sheet')) return;
+  const times = clinicOpenTimes(d);
+  const bg = document.createElement('div'); bg.className = 'sheet-bg fill-sheet';
+  bg.innerHTML = '<div class="sheet" role="dialog" aria-modal="true" aria-label="Open times for ' + esc(fmtDate(d)) + '"><div class="grab"></div>' +
+    '<div class="lab">Open times</div><div style="font-weight:700;font-size:20px;letter-spacing:-.02em;margin-top:2px">' + esc(fmtDate(d)) + ' · Milton Hall</div>' +
+    (times.length ? '<div class="fill-times" role="list">' + times.map((t) => '<span class="fill-time" role="listitem">' + esc(fmtTime(t)) + '</span>').join('') + '</div>'
+                  : '<p class="th-empty" style="margin:14px 0 0">Fully booked for this clinic day.</p>') +
+    '<p class="muted small" style="margin:12px 0 0">Start times with at least 30 minutes free. A longer session also needs the time after it to be free.</p>' +
+    '<div class="sheet-actions" style="grid-template-columns:1fr 1fr"><button class="btn ghost" id="fs-close" type="button">Close</button><button class="btn" id="fs-copy" type="button">Copy booking link</button></div></div>';
+  document.body.appendChild(bg);
+  const close = () => { bg.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  bg.onclick = (e) => { if (e.target === bg) close(); };
+  bg.querySelector('#fs-close').onclick = close;
+  const copy = bg.querySelector('#fs-copy');
+  copy.onclick = async () => {                                  // copies only; never opens the page
+    const okc = await copyText(BOOKING_LINK);
+    copy.textContent = okc ? 'Copied' : "Couldn't copy"; setTimeout(() => { if (copy.isConnected) copy.textContent = 'Copy booking link'; }, 2000);
+  };
+  // swipe down to close (from the handle or the top of the sheet)
+  const sheet = bg.querySelector('.sheet'); let y0 = null;
+  sheet.addEventListener('touchstart', (e) => { y0 = sheet.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
+  sheet.addEventListener('touchend', (e) => { if (y0 != null && e.changedTouches[0].clientY - y0 > 60) close(); y0 = null; }, { passive: true });
+}
 function pairTiles() {
   const nc = nextClinicDate(), { booked, open } = openSlotsFor(nc);
   const count = S.data.clients.length, goal = MILESTONES.find((m) => m > count) || Math.ceil((count + 1) / 500) * 500;
   const dots = Array.from({ length: CLINIC_SLOT_COUNT }, (_, i) => `<i class="dot${i < booked ? ' on' : ''}"></i>`).join('');
   return `<div class="th-pair">
-    <a class="th-half th-fill" href="/book?location=clinic" target="_blank" rel="noopener" aria-label="Fill ${esc(fmtDate(nc))}: ${open} slots to fill. Open the booking page"><span class="th-k">Fill ${esc(fmtDate(nc))}</span><span><span class="big">${open}</span><span class="sub">slots to fill</span></span><span class="dots" aria-hidden="true">${dots}</span></a>
+    <button class="th-half th-fill" type="button" id="fillTile" aria-haspopup="dialog" aria-label="Fill ${esc(fmtDate(nc))}: ${open} slots to fill. Show the open times"><span class="th-k">Fill ${esc(fmtDate(nc))}</span><span><span class="big">${open}</span><span class="sub">slots to fill</span></span><span class="dots" aria-hidden="true">${dots}</span></button>
     <div class="th-half th-milestone"><span class="th-k">Next milestone</span><span><span class="big sm">${count} / ${goal}</span><span class="sub">clients</span></span><span class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${goal}" aria-valuenow="${count}"><i style="width:${Math.min(100, Math.round(count / goal * 100))}%"></i></span></div></div>`;
 }
 
@@ -1600,6 +1645,7 @@ function viewToday() {
   const tabs = [['day', 'Day'], ['week', 'Week'], ['month', 'Month']].map(([k, l]) => `<button type="button" role="tab" data-ttab="${k}" aria-selected="${tab === k}">${l}</button>`).join('');
   shell(`<div class="tile-home today"><div class="th-tabs" role="tablist" aria-label="View">${tabs}</div>${tab === 'week' ? weekView(t) : tab === 'month' ? monthView(t) : dayView(t)}</div>`);
   document.querySelectorAll('[data-ttab]').forEach((b) => { b.onclick = () => { S.todayTab = b.dataset.ttab; render(); }; });
+  const fillTile = document.getElementById('fillTile'); if (fillTile) fillTile.onclick = () => openFillSheet(nextClinicDate());
   document.querySelectorAll('[data-task]').forEach((b) => {
     b.onclick = async () => {
       const key = b.dataset.task, on = b.getAttribute('aria-pressed') !== 'true';
