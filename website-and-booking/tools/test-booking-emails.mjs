@@ -37,7 +37,7 @@ check('short wording is exactly what the success page should say', VENUE_COPY.ar
 check('both versions are built from the same facts (address, concierge)', ['244 Deansgate', 'Musa'].every((t) => VENUE_COPY.arrivalShort.includes(t) && VENUE_COPY.arrivalEmail.includes(t)), 0);
 
 const page = fs.readFileSync(path.join(root, 'booking-confirmed.html'), 'utf8');
-check('the success page loads /venue-copy.js and uses VENUE_COPY.arrivalShort for clinic bookings', page.includes('<script src="/venue-copy.js"></script>') && /bookingLocation === 'clinic'[\s\S]{0,400}VENUE_COPY\.arrivalShort/.test(page), 0);
+check('the success page loads /venue-copy.js and uses VENUE_COPY.arrivalShort for clinic bookings', /<script src="\/venue-copy\.js(\?v=\d+)?"><\/script>/.test(page) && /bookingLocation === 'clinic'[\s\S]{0,400}VENUE_COPY\.arrivalShort/.test(page), 0);
 check('the old out-of-date "reception … ground floor" wording is gone from the page', !/Check in at reception|on the ground floor/.test(page), 0);
 check('home-visit step 2 is left as it was ("She comes to you.")', page.includes('<span id="balance-note">She comes to you.</span>'), 0);
 
