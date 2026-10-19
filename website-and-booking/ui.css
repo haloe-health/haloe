@@ -235,3 +235,20 @@ input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="
   html[data-ui="dark-aware"] .cal-day.disabled, html[data-ui="dark-aware"] .cal-day[aria-disabled="true"], html[data-ui="dark-aware"] .time-slot.taken { color: #A59C8B; }
   html[data-ui="dark-aware"] .banner-error .btn-secondary { --sec-fg: #FFD7D3; }
 }
+
+/* ---------- 6. Responsive + touch targets (checked at 375 / 768 / 1280) ----------
+   Every tappable thing is at least 44x44 (the visible shape can be smaller; the
+   hit area is not). */
+.category-tabs .seg-option { min-height: 44px; }
+.cart-remove { width: 44px; min-width: 44px; height: 44px; min-height: 44px; margin: -8px -8px -8px 0; }
+.ios-row input, #discount-code { min-height: 44px; }
+.cal-grid { column-gap: 0; row-gap: 4px; }
+.cal-day[role="button"] { min-width: 44px; }
+.nav-logo, nav .nav-logo { min-height: 44px; }
+.footer-links a, .footer-right a, .nav-links a, nav a:not(.nav-logo):not(.nav-cta), .nav-cta { display: inline-flex; align-items: center; min-height: 44px; }
+.ticks a, .intro-line a { display: inline-block; padding: 12px 0; margin: -12px 0; }
+@media (max-width: 860px) {
+  /* nav collapses to the hamburger (already built per page); keep it a 44px target */
+  .nav-hamburger { min-width: 44px; min-height: 44px; }
+}
+.footer-links a, .footer-right a, .nav-links a, nav a:not(.nav-logo):not(.nav-cta) { min-width: 44px; justify-content: center; }
