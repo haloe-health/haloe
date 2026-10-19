@@ -603,6 +603,7 @@
      that isn't the title or the venue/label subtitle folds into one
      descriptor line. */
   .where-grid {
+    --where-indent: 32px; /* radio ring (22px) + header gap (10px): the text column's left edge */
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -686,7 +687,8 @@
     font-weight: 500;
     color: #1a1208;
     line-height: 1.4;
-    margin: 0 0 3px 30px;
+    margin: 0 0 3px var(--where-indent);
+    text-wrap: pretty;
   }
   @media (prefers-color-scheme: dark) {
     .where-card-address { color: var(--cream); }
@@ -697,7 +699,8 @@
     font-weight: 400;
     color: #75706a;
     line-height: 1.5;
-    margin-left: 30px;
+    margin-left: var(--where-indent);
+    text-wrap: pretty;
   }
   /* Decorative radio dot — real state is on the hidden input */
   .where-radio-ring {
@@ -1293,7 +1296,7 @@
     border-top: 1px solid var(--footer-border, rgba(13,13,13,0.10));
     /* Room for the home-bar on notched iPhones, so the bar's own bottom
        padding grows with it rather than the CTA sitting under the bar. */
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: min(env(safe-area-inset-bottom, 0px), 14px);
   }
   /* Same --header-bg pattern as #bookNav — was a hardcoded light rgba, which
      is why the footer bar stayed cream even in dark mode while everything
@@ -1621,7 +1624,7 @@
   .panel-title { font-size: 24px; margin-bottom: 0.25rem; line-height: 1.15; }
   .panel-sub { font-size: 14px; line-height: 1.4; margin-bottom: 0.7rem; }
   @media (max-width: 600px) { .panel-sub { font-size: 14px; } }
-  body { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+  body { padding-bottom: calc(72px + min(env(safe-area-inset-bottom, 0px), 14px)); }
   .footbar-inner { padding-top: 0.45rem; padding-bottom: 0.45rem; }
   .foot-cta { min-height: 44px; padding-top: 0.4rem; padding-bottom: 0.4rem; }
   @media (max-width: 560px) { .footbar .foot-cta { font-size: 1rem; padding: 0.4rem 1.2rem; } }
