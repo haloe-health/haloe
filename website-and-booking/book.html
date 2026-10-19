@@ -3288,6 +3288,11 @@ function markTouched(id) { touchedFields.add(id); checkStep3(); }
 
 function checkStep3() {
   document.getElementById('address-row').style.display = isMobile() ? '' : 'none';
+  // The address box only exists for home visits. While it is hidden it must not be fillable either:
+  // a hidden autocomplete="street-address" field makes Android (Samsung Pass) open its "Select address"
+  // panel over the bottom of the page, covering the Continue button.
+  const addrBox = document.getElementById('address');
+  if (addrBox) { addrBox.disabled = !isMobile(); addrBox.setAttribute('autocomplete', isMobile() ? 'street-address' : 'off'); }
   const addressError = document.getElementById('address-error');
   const venueBlock = document.getElementById('clinic-venue-block');
   if (isClinic()) {
