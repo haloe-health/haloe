@@ -156,8 +156,12 @@ export function applyDiscount(amountPence, percent) {
 // checks, but only one INSERT here succeeds. The loser gets a Postgres
 // unique-violation (23505), reported back as null — same contract as
 // reserveSlot() reporting a taken slot.
-// `type` 'promo' (HALOE20) is reusable without limit until it expires, so it's
-// written with enforce_limits = false and the DB's unique indexes ignore it.
+// `type` 'promo' (HALOE20/NOV20) is reusable without limit until it expires, so
+// it's written with enforce_limits = false and enforce_customer = false: the
+// DB's unique indexes ignore it entirely.
+// `type` 'audience' (YASMZEE25 etc.) has no total cap — many followers use it —
+// so enforce_limits = false lifts the one-use-per-code index, but
+// enforce_customer stays true so the DB still allows each email only once.
 export async function reserveDiscountCode(env, { codeId, email, discountPence, periodKey, type }, now) {
   try {
     const rows = await sbRequest(env, {
@@ -170,7 +174,8 @@ export async function reserveDiscountCode(env, { codeId, email, discountPence, p
         discount_amount: discountPence,
         status: 'reserved',
         period_key: periodKey || null,
-        enforce_limits: type !== 'promo',
+        enforce_limits: type !== 'promo' && type !== 'audience',
+        enforce_customer: type !== 'promo',
         hold_expires_at: now + DISCOUNT_HOLD_SECONDS,
         created_at: now,
       },
