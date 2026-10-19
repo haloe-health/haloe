@@ -295,7 +295,8 @@
   @media(max-width:860px){ body { padding-bottom:calc(104px + 24px + min(env(safe-area-inset-bottom,0px),14px)); } }
   /* Atelier scale (Oct 2026): the same dark floating bar as the booking page and intake form */
   .mobile-bar { left:12px; right:12px; bottom:calc(10px + min(env(safe-area-inset-bottom,0px),14px)); width:auto; max-width:576px; margin:0 auto; padding:10px; background:var(--gold); border-radius:18px; pointer-events:auto; box-shadow:0 10px 30px rgba(31,23,34,0.20),0 1px 2px rgba(31,23,34,0.12); }
-  .mobile-bar .btn { height:46px; font-weight:600; background:#0D0D0D; color:#F5F0E8; }
+  .mobile-bar::before { content:'Ready when you are'; flex:1; min-width:0; padding-left:8px; font-size:13px; font-weight:500; color:#0D0D0D; white-space:nowrap; align-self:center; }
+  .mobile-bar .btn { flex:none; height:46px; min-width:150px; font-weight:600; background:#0D0D0D; color:#F5F0E8; }
 </style>
 </head>
 <body>
