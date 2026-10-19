@@ -185,6 +185,8 @@ async function sendWhatsAppNotification(env, d) {
 // Warm, premium, on-brand confirmation for the customer.
 // COMPLIANCE: wellness/symptom language only — no claims to treat/cure/manage conditions.
 function clientEmailHtml(d) {
+  // A free (code) booking has no payment, so the wording must not say one was received.
+  const isFree = /^£0(\.00)?$/.test(String(d.amount || '').trim());
   const clinicNote = d.location === 'clinic'
     ? `<p style="color:${INK};font-size:14px;font-weight:600;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Getting there</p>
        <p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">${VENUE_COPY.arrivalEmail}</p>`
@@ -202,7 +204,7 @@ function clientEmailHtml(d) {
                 <td style="padding:28px 4px 18px;">
                   <h1 style="color:${INK};font-size:24px;font-weight:normal;margin:0 0 16px;font-family:${FONT_HEADING};">Your booking is confirmed</h1>
                   <p style="color:${INK};font-size:15px;line-height:1.75;margin:0 0 14px;font-family:${FONT};">Dear ${esc(d.name)},</p>
-                  <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0;font-family:${FONT};">Thank you for booking with haloe. Your payment has been received and your appointment is reserved. We look forward to welcoming you for a calm, restorative session.</p>
+                  <p style="color:${BODY_TEXT};font-size:15px;line-height:1.75;margin:0;font-family:${FONT};">Thank you for booking with haloe. ${isFree ? 'Your appointment is reserved.' : 'Your payment has been received and your appointment is reserved.'} We look forward to welcoming you for a calm, restorative session.</p>
                 </td>
               </tr>
               ${heroRow(d.date, d.time, locationLabel(d))}
@@ -232,6 +234,7 @@ function clientEmailHtml(d) {
 
 // Plain, information-dense notification for Halima with everything she needs to follow up.
 function halimaEmailHtml(d) {
+  const isFree = /^£0(\.00)?$/.test(String(d.amount || '').trim());
   const travelZoneLabel = d.location === 'mobile'
     ? (d.travelZone === 'Q' ? 'Beyond 16 miles — travel by quote'
       : d.travelZone ? `${travelLabelFor(d.travelZone)} — ${formatGBP(d.travelPence)}` : '')
@@ -239,7 +242,7 @@ function halimaEmailHtml(d) {
 
   const inner = `<tr>
                 <td style="padding:0 0 16px;">
-                  <div style="color:${GOLD_DEEP};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:${FONT};font-weight:600;">New booking &middot; payment received</div>
+                  <div style="color:${GOLD_DEEP};font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:${FONT};font-weight:600;">New booking &middot; ${isFree ? 'no payment (code)' : 'payment received'}</div>
                   <h1 style="color:${INK};font-size:22px;font-weight:normal;margin:8px 0 0;font-family:${FONT_HEADING};">${esc(d.name)}</h1>
                 </td>
               </tr>
