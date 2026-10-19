@@ -244,6 +244,11 @@
       'On WhatsApp, to confirm the details and send your health form.';
     document.getElementById('balance-note').textContent =
       VENUE_COPY.arrivalShort;   // shared with the confirmation email (venue-copy.js)
+  } else if (bookingLocation === 'virtual') {
+    document.getElementById('contact-note').textContent =
+      'On WhatsApp, to confirm the details and send your health form. Your video link is in your confirmation email.';
+    document.getElementById('balance-note').textContent =
+      'Join from somewhere private and quiet, a minute or two early. Your video link is in your confirmation email.';
   } else if (travelZone === 'C') {
     // Zones A/B are already paid in full above — only Zone C (no fixed fee)
     // still needs Halima to confirm a travel cost after booking.

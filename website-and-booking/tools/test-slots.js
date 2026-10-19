@@ -250,6 +250,25 @@ for (const cat of Object.keys(SERVER_SERVICES)) {
 eq('no client/server duration mismatches', durationMismatches, 0);
 ok('every package is 75 min on the server', SERVER_SERVICES.packages.every((p) => p.min === 75));
 
+console.log('\nLife coaching: Milton Hall or online, never a home visit; booked on its own');
+const coachingCart = [{ name: 'Life Coaching Session', category: 'coaching' }];
+const rc = resolveCart(coachingCart);
+ok('single session is £75 and 60 min', rc.ok && rc.totalPence === 7500 && rc.totalMin === 60);
+const rp = resolveCart([{ name: 'Six-Session Coaching Package', category: 'coaching' }]);
+ok('six-session package is £400 and books a 60 min first session', rp.ok && rp.totalPence === 40000 && rp.totalMin === 60);
+eq('coaching cannot be combined with a massage', resolveCart([...coachingCart, { name: 'Face Massage', category: 'massage' }]).error, 'package_not_combinable');
+const coachingCheckout = async (location, time = '7:00 pm') => {
+  const res = await createCheckout({ request: new Request('https://x.invalid/create-checkout', { method: 'POST', body: JSON.stringify({ treatments: coachingCart, customerEmail: 'a@example.invalid', customerName: 'Test', customerPhone: '07000000000', date: 'x', time, location, bookingDate: '2099-12-29', travelPostcode: 'M1 1AA', customerAddress: 'x' }) }), env: {} });
+  let body = {}; try { body = await res.json(); } catch (e) {}
+  return { status: res.status, error: body.error };
+};
+eq('coaching as a home visit → 400 treatment_location_mismatch', (await coachingCheckout('mobile')).error, 'treatment_location_mismatch');
+ok('coaching online is not rejected for location or slot (Tuesday 2099-12-29 7pm)', !['treatment_location_mismatch', 'slot_invalid'].includes((await coachingCheckout('virtual')).error));
+ok('coaching at the clinic is not rejected for location or slot', !['treatment_location_mismatch', 'slot_invalid'].includes((await coachingCheckout('clinic')).error));
+const massageOnline = await createCheckout({ request: new Request('https://x.invalid/create-checkout', { method: 'POST', body: JSON.stringify({ treatments: [{ name: 'Face Massage', category: 'massage' }], customerEmail: 'a@example.invalid', customerName: 'Test', customerPhone: '07000000000', date: 'x', time: '7:00 pm', location: 'virtual', bookingDate: '2099-12-29' }) }), env: {} });
+eq('a massage cannot be booked online', (await massageOnline.json()).error, 'treatment_location_mismatch');
+ok('online coaching uses the Mon–Sat 10:00–20:00 hours (a Thursday 20:00 start is offered, Sunday has none)', generateSlots({ location: 'mobile', weekday: MOBILE_DAY, durationMin: 60 }).includes(1200) && startGrid('mobile', 0).length === 0);
+
 // Summary
 console.log(`\n${pass + fail} tests — ${pass} passed, ${fail} failed${fail ? ' ← FIX BEFORE SHIPPING' : ''}\n`);
 if (fail) process.exit(1);

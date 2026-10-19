@@ -385,7 +385,9 @@
   .category-tabs {
     display: flex;
     flex-wrap: nowrap;
-    justify-content: center;
+    justify-content: safe center;
+    overflow-x: auto;
+    scrollbar-width: none;
     gap: 6px;
     padding: 6px 0;
     background: transparent;
@@ -393,10 +395,10 @@
     margin-bottom: 0;
   }
   .category-tabs .seg-option {
-    flex: 1;
+    flex: 1 0 auto;
     border-radius: 999px;
     border: none;
-    padding: 8px 0;
+    padding: 8px 12px;
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
     font-weight: 500;
@@ -413,6 +415,7 @@
     background: #a8873a;
     color: #fff;
   }
+  .category-tabs .seg-option[hidden] { display: none; }
   @media (prefers-color-scheme: dark) {
     .category-tabs .seg-option {
       background: rgba(255,255,255,0.10);
@@ -1689,7 +1692,7 @@
   <!-- STEP 1: Where -->
   <div class="panel active" id="panel-1">
     <p class="panel-title">Where would you like your session?</p>
-    <p class="panel-sub">Choose a clinic day appointment or a home visit.</p>
+    <p class="panel-sub">Choose a clinic day appointment, a home visit, or an online coaching session.</p>
 
     <div class="where-grid" id="where-grid">
       <label class="where-card" id="where-clinic" for="where-clinic-radio" role="radio" aria-checked="false">
@@ -1713,6 +1716,19 @@
         </div>
         <span class="where-card-address">Halima comes to you</span>
         <span class="where-card-meta">Greater Manchester · Travel fee from <span id="where-mobile-fee"></span> · Full sterile setup brought to you</span>
+        <div class="where-card-footer">
+          <span class="where-card-sel-label">✓ Selected</span>
+          <span class="where-radio-ring" aria-hidden="true"></span>
+        </div>
+      </label>
+      <label class="where-card" id="where-virtual" for="where-virtual-radio" role="radio" aria-checked="false">
+        <input type="radio" name="whereLocation" id="where-virtual-radio" value="virtual" onchange="selectLocation('virtual')">
+        <div class="where-card-header">
+          <span class="where-card-name">Online</span>
+          <span class="where-card-badge where-card-badge--grey">Mon – Sat</span>
+        </div>
+        <span class="where-card-address">Life coaching by video call</span>
+        <span class="where-card-meta">No travel and no address needed · Your video link arrives by email</span>
         <div class="where-card-footer">
           <span class="where-card-sel-label">✓ Selected</span>
           <span class="where-radio-ring" aria-hidden="true"></span>
@@ -1746,6 +1762,7 @@
         <button class="tab-btn seg-option" data-cat="dry" role="tab" aria-selected="false" tabindex="-1">Dry Cupping</button>
         <button class="tab-btn seg-option" data-cat="wet" role="tab" aria-selected="false" tabindex="-1">Hijama</button>
         <button class="tab-btn seg-option" data-cat="packages" role="tab" aria-selected="false" tabindex="-1">Packages</button>
+        <button class="tab-btn seg-option" data-cat="coaching" role="tab" aria-selected="false" tabindex="-1">Coaching</button>
       </div>
     </div>
     <p class="packages-policy-line hidden" id="packages-policy-line">Packages are paid in full. Free reschedule or full refund up to 48 hours before a session; inside 48 hours, sessions are non-refundable but can be moved once. For more information contact Halima on WhatsApp: <a href="https://wa.me/447474833643" style="color:#a8873a;text-decoration:none;">07474 833643</a></p>
@@ -2085,6 +2102,9 @@ function selectLocation(loc) {
   // (e.g. the ?location= deep link), not just from the radio's own onchange.
   document.getElementById('where-clinic-radio').checked = (loc === 'clinic');
   document.getElementById('where-mobile-radio').checked = (loc === 'mobile');
+  document.getElementById('where-virtual').classList.toggle('selected', loc === 'virtual');
+  document.getElementById('where-virtual').setAttribute('aria-checked', loc === 'virtual' ? 'true' : 'false');
+  document.getElementById('where-virtual-radio').checked = (loc === 'virtual');
   document.getElementById('loc-notice').style.display = loc === 'mobile' ? '' : 'none';
   document.getElementById('postcode-block').classList.toggle('hidden', loc !== 'mobile');
   // Clinic has a fixed venue and no travel fee — a mobile booking can't
@@ -2096,7 +2116,37 @@ function selectLocation(loc) {
   // location's calendar/slots — drop it rather than carry over a bad pick.
   state.date = null;
   state.time = null;
+  applyLocationToCatalogue();
   updateRail();
+}
+
+/* Life coaching is Milton Hall or online only; online offers coaching only.
+   Hide the tabs that don't apply to the chosen place, drop any cart item that
+   can't be booked there, and move off a tab that has just become unavailable.
+   The server enforces the same rule (cartFitsLocation in functions/_services.js). */
+const SOLO_CATEGORIES = ['packages', 'coaching']; // booked on their own, never combined
+function categoryAllowedAt(cat, loc) {
+  if (loc === 'virtual') return cat === 'coaching';
+  if (loc === 'mobile') return cat !== 'coaching';
+  return true; // clinic, or nothing chosen yet
+}
+function applyLocationToCatalogue() {
+  document.querySelectorAll('.tab-btn').forEach(b => { b.hidden = !categoryAllowedAt(b.dataset.cat, state.location); });
+  const before = state.cart.length;
+  state.cart = state.cart.filter(c => categoryAllowedAt(c.cat, state.location));
+  if (state.cart.length !== before) clearDiscountForCartChange();
+  if (!categoryAllowedAt(state.category, state.location)) {
+    state.category = state.location === 'virtual' ? 'coaching' : 'massage';
+  }
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    const on = b.dataset.cat === state.category;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+    b.tabIndex = on ? 0 : -1;
+  });
+  const btn2 = document.getElementById('btn-step2');
+  if (btn2) btn2.disabled = state.cart.length === 0;
+  renderServices();
 }
 
 // Live postcode -> travel zone/fee, shown on Step 1 before the customer
@@ -2201,7 +2251,7 @@ function applyDeepLink() {
   // Pre-select the location (e.g. the homepage's "Book a Tuesday slot"
   // button) — independent of any cat/svc deep link below.
   const wantedLocation = params.get('location');
-  if (wantedLocation === 'clinic' || wantedLocation === 'mobile') {
+  if (wantedLocation === 'clinic' || wantedLocation === 'mobile' || wantedLocation === 'virtual') {
     selectLocation(wantedLocation);
   }
 
@@ -2250,7 +2300,7 @@ function init() {
   state.calYear = now.getFullYear();
   state.calMonth = now.getMonth();
   applyDeepLink();
-  renderServices();
+  applyLocationToCatalogue();
   renderCalendar();
   updateRail();
 }
@@ -2270,7 +2320,8 @@ function updateRail() {
     ? state.date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
     : '';
   const whereLabel = state.location === 'clinic' ? `Clinic Day — ${CLINIC_VENUE_NAME}`
-    : state.location === 'mobile' ? 'Home visit' : '';
+    : state.location === 'mobile' ? 'Home visit'
+    : state.location === 'virtual' ? 'Online (video call)' : '';
   const rows = [
     ['Where', whereLabel],
     ['Treatment', names.join(' + ')],
@@ -2293,7 +2344,8 @@ function updateRail() {
 
   // Frosted footer (Apple layout): running selection + total.
   const locFootLabel = state.location === 'clinic' ? 'Clinic Day'
-    : state.location === 'mobile' ? 'Home visit' : '';
+    : state.location === 'mobile' ? 'Home visit'
+    : state.location === 'virtual' ? 'Online' : '';
   const fs = document.getElementById('foot-sum');
   if (fs) {
     if (currentStep === 1) {
@@ -2301,6 +2353,7 @@ function updateRail() {
       // copy instead of the stale "No treatment selected" default.
       fs.textContent = state.location === 'clinic' ? `Clinic Day · ${CLINIC_VENUE_NAME}`
         : state.location === 'mobile' ? 'Home visit · Greater Manchester'
+        : state.location === 'virtual' ? 'Online · video call'
         : "Choose where you'd like your session";
     } else if (!svc) {
       fs.textContent = 'Select a treatment';
@@ -2466,12 +2519,12 @@ function toggleService(i) {
   cartNote = '';
   if (inCart(cat, i)) {
     state.cart = state.cart.filter(c => !(c.cat === cat && c.i === i));
-  } else if (cat === 'packages') {
-    if (state.cart.length) cartNote = 'A package is booked on its own, so your other selections were removed.';
+  } else if (SOLO_CATEGORIES.includes(cat)) {
+    if (state.cart.length) cartNote = cat === 'coaching' ? 'Coaching is booked on its own, so your other selections were removed.' : 'A package is booked on its own, so your other selections were removed.';
     state.cart = [{ cat, i }];
   } else {
-    if (state.cart.some(c => c.cat === 'packages')) cartNote = 'Your package was removed — packages are booked on their own.';
-    state.cart = state.cart.filter(c => c.cat !== 'packages').concat([{ cat, i }]);
+    if (state.cart.some(c => SOLO_CATEGORIES.includes(c.cat))) cartNote = 'Your earlier selection was removed — packages and coaching are booked on their own.';
+    state.cart = state.cart.filter(c => !SOLO_CATEGORIES.includes(c.cat)).concat([{ cat, i }]);
   }
   clearDiscountForCartChange();
   // A chosen time may not fit the new combined length; loadSlots() (on
@@ -2547,7 +2600,7 @@ categoryTabsEl.addEventListener('click', e => {
 });
 categoryTabsEl.addEventListener('keydown', e => {
   if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-  const tabs = Array.from(categoryTabsEl.querySelectorAll('.tab-btn'));
+  const tabs = Array.from(categoryTabsEl.querySelectorAll('.tab-btn')).filter(b => !b.hidden);
   const currentIdx = tabs.indexOf(document.activeElement);
   if (currentIdx === -1) return;
   e.preventDefault();
@@ -2838,12 +2891,19 @@ function validateField(inputId, errorId, validatorFn, message) {
 function isClinic() {
   return state.location === 'clinic';
 }
+function isVirtual() {
+  return state.location === 'virtual';
+}
+// Only home visits need the client's address and a priced postcode.
+function isMobile() {
+  return state.location === 'mobile';
+}
 
 const touchedFields = new Set();
 function markTouched(id) { touchedFields.add(id); checkStep3(); }
 
 function checkStep3() {
-  document.getElementById('address-row').style.display = isClinic() ? 'none' : '';
+  document.getElementById('address-row').style.display = isMobile() ? '' : 'none';
   const addressError = document.getElementById('address-error');
   const venueBlock = document.getElementById('clinic-venue-block');
   if (isClinic()) {
@@ -2872,7 +2932,7 @@ function checkStep3() {
     ? validateField('phone', 'phone-error', isValidPhone,
         'Please enter a valid UK mobile number (e.g. 07700 900900).')
     : isValidPhone(document.getElementById('phone').value.trim());
-  const addressOk = isClinic() || (touchedFields.has('address')
+  const addressOk = !isMobile() || (touchedFields.has('address')
     ? validateField('address', 'address-error', isValidAddress,
         'Please include your full address and postcode.')
     : isValidAddress(document.getElementById('address').value.trim()));
@@ -2887,9 +2947,9 @@ function buildSummary() {
   const items = cartItems();
   if (!items.length) return {};
   const names = items.map(x => x.svc.name);
-  const catLabel = items.length > 1 ? '' : { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package' }[items[0].cat];
+  const catLabel = items.length > 1 ? '' : { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package', coaching: 'Life coaching' }[items[0].cat];
   const dateStr = state.date ? state.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
-  const locationLabel = isClinic() ? `Clinic Day — ${CLINIC_VENUE_NAME}` : 'Home visit';
+  const locationLabel = isClinic() ? `Clinic Day — ${CLINIC_VENUE_NAME}` : isVirtual() ? 'Online (video call)' : 'Home visit';
   const name = document.getElementById('fullname').value.trim();
   return { items, names, catLabel, dateStr, locationLabel, name };
 }
@@ -2897,7 +2957,7 @@ function buildSummary() {
 // Travel fee for whatever's currently selected — 0 for clinic (no travel
 // line, ever) or until a mobile booking has a priceable postcode.
 function travelPenceForSelection() {
-  return (!isClinic() && state.travelZone) ? travelFeeFor(state.travelZone) : 0;
+  return (isMobile() && state.travelZone) ? travelFeeFor(state.travelZone) : 0;
 }
 
 function renderSummary() {
@@ -2914,7 +2974,7 @@ function renderSummary() {
     : (multi ? formatPounds(subtotalPence) : priceHtml(items[0].svc));
 
   const travelPence = travelPenceForSelection();
-  const travelRow = !isClinic() && state.travelZone ? `
+  const travelRow = isMobile() && state.travelZone ? `
       <div class="pass-extra">
         <span>Travel${state.travelZone === 'C' ? '' : ` (Zone ${state.travelZone})`}</span>
         <span class="v">${state.travelZone === 'C' ? 'Confirmed by WhatsApp' : formatPounds(travelPence)}</span>
@@ -2931,7 +2991,7 @@ function renderSummary() {
       <div class="pass-when">
         <div class="pass-date">${dateStr}</div>
         <div class="pass-time">${state.time}</div>
-        <div class="pass-at">${isClinic() ? `${locationLabel} · ${CLINIC_VENUE_ADDRESS}` : `${locationLabel} · Manchester`}</div>
+        <div class="pass-at">${isClinic() ? `${locationLabel} · ${CLINIC_VENUE_ADDRESS}` : isVirtual() ? `${locationLabel} · link sent by email` : `${locationLabel} · Manchester`}</div>
       </div>
       <div class="pass-perf"><span></span></div>
       <div class="pass-what">
@@ -2954,7 +3014,7 @@ async function handlePayment() {
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
   const notes = document.getElementById('notes') ? document.getElementById('notes').value : '';
-  const address = isClinic() ? '' : document.getElementById('address').value.trim();
+  const address = isMobile() ? document.getElementById('address').value.trim() : '';
 
   // Final guard — never reach Stripe with missing or invalid contact details.
   if (!name) {
@@ -2969,11 +3029,11 @@ async function handlePayment() {
     alert("Please go back and enter a valid UK mobile number so Halima can confirm your booking.");
     goToStep(4); return;
   }
-  if (!isClinic() && !isValidAddress(address)) {
+  if (isMobile() && !isValidAddress(address)) {
     alert("Please go back and enter the full address, including postcode, where your session will take place.");
     goToStep(4); return;
   }
-  if (!isClinic() && state.travelZone === null) {
+  if (isMobile() && state.travelZone === null) {
     alert("Please go back to Step 1 and enter your postcode so we can price travel.");
     goToStep(1); return;
   }
@@ -3008,7 +3068,7 @@ async function handlePayment() {
         // for display and the WhatsApp/email copy).
         bookingDate: state.date ? toISODate(state.date) : '',
         discountCode: state.discount ? state.discount.code : '',
-        travelPostcode: isClinic() ? '' : state.travelPostcode,
+        travelPostcode: isMobile() ? state.travelPostcode : '',
       }),
     });
 

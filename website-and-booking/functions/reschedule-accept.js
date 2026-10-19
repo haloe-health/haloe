@@ -70,7 +70,7 @@ export async function onRequestPost(context) {
         infoCard([
           { label: 'Client', value: b.name },
           { label: 'Treatment', value: b.treatment },
-          { label: 'Where', value: b.location === 'clinic' ? CLINIC_VENUE_NAME : 'Home visit' },
+          { label: 'Where', value: b.location === 'clinic' ? CLINIC_VENUE_NAME : b.location === 'virtual' ? 'Online' : 'Home visit' },
           { label: 'Moved from', value: fmtOriginal(b.original_starts_at) },
         ]) +
         emailFooter(),

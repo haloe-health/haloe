@@ -1,16 +1,17 @@
 import { reserveSlot, confirmBooking, releaseBooking, slotToMinutes, STRIPE_SESSION_SECONDS } from './_bookings.js';
 import { isOfferableStart, TURNAROUND_MIN } from './_slots.js';
 import { CLINIC_RULES, CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
-import { resolveCart, formatDuration } from './_services.js';
+import { resolveCart, formatDuration, cartFitsLocation } from './_services.js';
 import { validateDiscountCode, applyDiscount, reserveDiscountCode, confirmDiscountRedemption, releaseDiscountReservation } from './_discounts.js';
 import { travelZoneFor, travelFeeFor } from './_travel.js';
 import { notifyBooking, formatGBP, upperPostcode } from './_notify.js';
 
 export async function onRequestPost(context) {
   try {
-    const { treatmentName: legacyName, treatmentCategory: legacyCategory, treatments, customerEmail, customerName, customerPhone, customerAddress, date, time, location, notes, bookingDate, discountCode, travelPostcode } = await context.request.json();
-    // location is 'clinic' | 'mobile'. Every booking is paid in full — there is
+    const { treatmentName: legacyName, treatmentCategory: legacyCategory, treatments, customerEmail, customerName, customerPhone, customerAddress, date, time, location: rawLocation, notes, bookingDate, discountCode, travelPostcode } = await context.request.json();
+    // location is 'clinic' | 'mobile' | 'virtual' (online coaching only). Every booking is paid in full — there is
     // no deposit path.
+    const location = rawLocation || 'mobile';
     const venue = location === 'clinic' ? CLINIC_VENUE_NAME : '';
 
     // Price AND duration come from the server-side catalogue, never the
@@ -26,6 +27,14 @@ export async function onRequestPost(context) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    // Coaching is Milton Hall or online only; online is coaching only.
+    if (!cartFitsLocation(cart.items, location)) {
+      return new Response(JSON.stringify({ error: 'treatment_location_mismatch' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    const isVirtual = location === 'virtual';
     // Display name for emails/Stripe/admin: "Face Massage + Head Massage".
     // Names never contain " + ", so the webhook can split it back apart.
     const treatmentName = cart.items.map(x => x.name).join(' + ');
@@ -153,8 +162,8 @@ export async function onRequestPost(context) {
           name: customerName,
           email: customerEmail,
           phone: customerPhone,
-          location: location || 'mobile',
-          address: location === 'clinic' ? `${venue} — ${CLINIC_VENUE_ADDRESS}` : customerAddress,
+          location,
+          address: location === 'clinic' ? `${venue} — ${CLINIC_VENUE_ADDRESS}` : isVirtual ? 'Online (video call)' : customerAddress,
           amountPence: Number(totalAmount),
           discountCode: appliedCode,
           discountPence: discountPenceApplied,
@@ -178,7 +187,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    const venueAddress = location === 'clinic' ? `${venue} — ${CLINIC_VENUE_ADDRESS}` : customerAddress;
+    const venueAddress = location === 'clinic' ? `${venue} — ${CLINIC_VENUE_ADDRESS}` : isVirtual ? 'Online (video call)' : customerAddress;
 
     // --- Free booking (a 100%-off gift/reward/competition code) ---
     // No Stripe involved at all — there's nothing to pay, and Stripe Checkout
@@ -202,8 +211,8 @@ export async function onRequestPost(context) {
       const detail = {
         name: customerName, phone: customerPhone, email: customerEmail,
         treatment: treatmentName, treatments: cart.items.map(x => x.name), durationLabel: formatDuration(totalDurationMin),
-        date, time, location: location || 'mobile', venue,
-        address: upperPostcode(location === 'clinic' ? venueAddress : customerAddress),
+        date, time, location, venue, bookingDate, startMin, durationMin: totalDurationMin,
+        address: isVirtual ? '' : upperPostcode(location === 'clinic' ? venueAddress : customerAddress),
         amount: formatGBP(0), paymentLabel: `${formatGBP(0)} — paid in full`, notes,
         originalAmountLabel: appliedCode ? formatGBP(originalAmount) : '',
         discountRowLabel: appliedCode ? `${appliedCode} discount` : '',
@@ -218,7 +227,7 @@ export async function onRequestPost(context) {
 
       const successParams = new URLSearchParams({
         name: customerName || '', treatment: treatmentName || '', duration: String(totalDurationMin), date: date || '', time: time || '',
-        location: location || 'mobile', venue: venue || '', amount: '0', treatmentAmount: '0',
+        location, venue: venue || '', amount: '0', treatmentAmount: '0',
         ...(appliedCode ? { discountCode: appliedCode, discountAmount: String(discountPenceApplied), originalAmount: String(originalAmount) } : {}),
         ...(location === 'mobile' ? { travelZone, travelPence: '0' } : {}),
       });
@@ -264,7 +273,9 @@ export async function onRequestPost(context) {
     params.append('metadata[totalDurationMin]', String(totalDurationMin));
     params.append('metadata[date]', date || '');
     params.append('metadata[time]', time || '');
-    params.append('metadata[location]', location || 'mobile');
+    params.append('metadata[location]', location);
+    params.append('metadata[bookingDate]', bookingDate || '');
+    params.append('metadata[startMin]', String(startMin));
     if (venue) params.append('metadata[venue]', venue);
     params.append('metadata[customerAddress]', customerAddress || '');
     params.append('metadata[notes]', notes || '');
@@ -295,7 +306,7 @@ export async function onRequestPost(context) {
       duration: String(totalDurationMin),
       date: date || '',
       time: time || '',
-      location: location || 'mobile',
+      location,
       venue: venue || '',
       amount: String(totalAmount),
       treatmentAmount: String(treatmentAmount),

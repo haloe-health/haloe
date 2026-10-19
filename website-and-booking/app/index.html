@@ -2303,7 +2303,7 @@ function viewClientSettings() {
 // Everything here is the client's OWN data, enforced by row-level security. Scores and their own
 // words only — no condition names, no practitioner notes (session_notes is never queried or readable).
 const firstName = (n) => { const w = String(n || '').trim().split(/\s+/)[0] || ''; return w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ''; };
-const placeOf = (b) => (b.location === 'clinic' ? 'Milton Hall, Deansgate' : 'Home visit' + (b.address ? ' · ' + b.address : ''));
+const placeOf = (b) => (b.location === 'clinic' ? 'Milton Hall, Deansgate' : b.location === 'virtual' ? 'Online (video call)' : 'Home visit' + (b.address ? ' · ' + b.address : ''));
 function viewHome() {
   const d = S.cdata, t = todayISO();
   const who = d.client ? d.client.full_name : (d.bookings[0] && d.bookings[0].customer_name);

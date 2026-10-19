@@ -6,6 +6,7 @@
 // webhook event for a booking Stripe never saw. The `_` prefix keeps this
 // file from becoming a route.
 
+import { createVideoMeeting } from './_video.js';
 import {
   INK, BODY_TEXT, GOLD_DEEP, FONT, FONT_HEADING,
   sendEmail, esc, emailHeader, emailFooter, emailShell, heroRow, infoCard,
@@ -54,7 +55,7 @@ function treatmentRows(d) {
 }
 
 function locationLabel(d) {
-  return d.location === 'clinic' ? 'Clinic Day' : 'Home visit';
+  return d.location === 'clinic' ? 'Clinic Day' : d.location === 'virtual' ? 'Online' : 'Home visit';
 }
 
 // Sends everything for a confirmed booking: Halima's WhatsApp alert, the
@@ -69,6 +70,13 @@ function locationLabel(d) {
 // address, amount, paymentLabel, notes, originalAmountLabel, discountRowLabel,
 // discountLabel, travelLabel, travelZone, travelPence, slotConflict.
 export async function notifyBooking(env, d) {
+  // Online sessions get a video link, created once here so the client's email
+  // and Halima's carry the same one. Null (no Zoom set up, or Zoom down) means
+  // the emails say Halima will send it on WhatsApp.
+  if (d.location === 'virtual' && !d.videoUrl) {
+    const meeting = await createVideoMeeting(env, { topic: `haloe — ${d.treatment}`, bookingDate: d.bookingDate, startMin: d.startMin, durationMin: d.durationMin });
+    d.videoUrl = meeting ? meeting.joinUrl : '';
+  }
   // Lock-screen alert to the admin's devices, started now so it runs alongside the emails. It never throws.
   const pushDone = pushNewBooking(env, d.bookingId).catch((err) => console.error('push alert failed:', err));
   try {
@@ -146,6 +154,7 @@ async function sendWhatsAppNotification(env, d) {
     d.time ? `Time: ${d.time}` : null,
     `Location: ${locationLabel(d)}`,
     d.location === 'mobile' && d.address ? `Address: ${d.address}` : null,
+    d.location === 'virtual' ? `Video link: ${d.videoUrl || 'not created — send it yourself'}` : null,
     `Payment: ${d.paymentLabel}`,
     d.notes ? `Notes: ${d.notes}` : null,
   ]
@@ -178,6 +187,11 @@ function clientEmailHtml(d) {
   const clinicNote = d.location === 'clinic'
     ? `<p style="color:${INK};font-size:14px;font-weight:600;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Getting there</p>
        <p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">${VENUE_COPY.arrivalEmail}</p>`
+    : d.location === 'virtual'
+    ? `<p style="color:${INK};font-size:14px;font-weight:600;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Joining online</p>
+       <p style="color:${BODY_TEXT};font-size:14px;line-height:1.7;margin:0 0 8px;font-family:${FONT};">${d.videoUrl
+         ? `Your video link: <a href="${esc(d.videoUrl)}" style="color:${GOLD_DEEP};">${esc(d.videoUrl)}</a>. Please join a minute or two early from somewhere private and quiet.`
+         : 'Halima will send your video link on WhatsApp before your session. Please join a minute or two early from somewhere private and quiet.'}</p>`
     : '';
   const cancellationNote = `<p style="color:${BODY_TEXT};font-size:12px;line-height:1.7;margin:0 0 6px;font-family:${FONT};">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>`;
 
@@ -239,7 +253,7 @@ function halimaEmailHtml(d) {
               ])}
               ${infoCard([
                 { label: 'Location', value: d.location === 'clinic' ? `${locationLabel(d)} — ${d.venue}` : locationLabel(d) },
-                { label: 'Address', value: d.location === 'clinic' ? CLINIC_VENUE_ADDRESS : d.address },
+                { label: d.location === 'virtual' ? 'Video link' : 'Address', value: d.location === 'clinic' ? CLINIC_VENUE_ADDRESS : d.location === 'virtual' ? (d.videoUrl || '⚠ Not created — send the client a link yourself') : d.address },
                 { label: 'Postcode zone', value: travelZoneLabel },
                 { label: 'Phone', value: d.phone },
                 { label: 'Email', value: d.email },

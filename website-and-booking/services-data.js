@@ -36,6 +36,14 @@ const SERVICES = {
     { name: 'Full Body', time: '1 hr 30 min', price: 120, desc: 'Whole-body hijama, or wet cupping, for an all-over reset.' },
     { name: 'Head, Scalp & Full Body', time: '1 hr 45 min', price: 150, desc: 'The complete hijama (wet cupping) session, head to toe.' },
   ],
+  // Life coaching (Oct 2026): in person at Milton Hall OR online by video —
+  // never a home visit. Each is booked on its own (not combinable). Prices and
+  // length come from the brand document. The six-session package books its
+  // FIRST session (sessionMin) like the cupping packages do.
+  coaching: [
+    { name: 'Life Coaching Session', time: '1 hour', price: 75, desc: 'A calm one-to-one conversation to help you notice and shift unhelpful thoughts.' },
+    { name: 'Six-Session Coaching Package', time: '6 sessions of 1 hour', price: 400, sessionMin: 60, desc: 'Six one-hour sessions, booked one at a time with Halima, at the clinic or online.' },
+  ],
   packages: [
     { name: 'Pain & Mobility',     time: '4 sessions of 1 hr 15 min · over 8–12 wks', pkgMeta: '4 sessions · over 8–12 wks',  pkgDur: '1 hr 15 min', price: 340, sessionMin: 75, desc: 'Targeted cupping on areas of tension and restricted movement, over four sessions.' },
     { name: 'Breathe & Reset',     time: '4 sessions of 1 hr 15 min · over 16 wks',   pkgMeta: '4 sessions · over 16 wks',   pkgDur: '1 hr 15 min', price: 340, sessionMin: 75, desc: 'Four sessions on the chest, upper back and shoulders, spaced over the season.' },

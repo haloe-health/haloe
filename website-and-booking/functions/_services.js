@@ -35,6 +35,10 @@ export const SERVICES = {
     { name: 'Full Body', price: 120, min: 90 },
     { name: 'Head, Scalp & Full Body', price: 150, min: 105 },
   ],
+  coaching: [
+    { name: 'Life Coaching Session', price: 75, min: 60 },
+    { name: 'Six-Session Coaching Package', price: 400, min: 60 },
+  ],
   packages: [
     { name: 'Pain & Mobility', price: 340, min: 75 },
     { name: 'Breathe & Reset', price: 340, min: 75 },
@@ -91,6 +95,8 @@ export function findService(treatmentName, category) {
 // The same treatment twice is collapsed to one; a package (a multi-session
 // product) must be the only thing in the booking.
 export const MAX_TREATMENTS_PER_BOOKING = 6;
+// Booked on their own: a multi-session product, or a conversation rather than a hands-on treatment.
+export const SOLO_CATEGORIES = ['packages', 'coaching'];
 
 export function resolveCart(items) {
   if (!Array.isArray(items) || items.length === 0) return { ok: false, error: 'no_treatments' };
@@ -110,13 +116,22 @@ export function resolveCart(items) {
     });
   }
   if (out.length > MAX_TREATMENTS_PER_BOOKING) return { ok: false, error: 'too_many_treatments' };
-  if (out.length > 1 && out.some(x => x.category === 'packages')) return { ok: false, error: 'package_not_combinable' };
+  if (out.length > 1 && out.some(x => SOLO_CATEGORIES.includes(x.category))) return { ok: false, error: 'package_not_combinable' };
   return {
     ok: true,
     items: out,
     totalPence: out.reduce((n, x) => n + x.pricePence, 0),
     totalMin: out.reduce((n, x) => n + x.min, 0),
   };
+}
+
+// Which places a cart may be booked at. Coaching: Milton Hall or online only.
+// Online: coaching only. Everything else: Milton Hall or a home visit.
+export function cartFitsLocation(items, location) {
+  const coaching = items.filter(x => x.category === 'coaching').length;
+  if (location === 'virtual') return coaching === items.length;
+  if (location === 'mobile') return coaching === 0;
+  return location === 'clinic';
 }
 
 // 105 -> '1 hr 45 min', 60 -> '1 hour', 45 -> '45 min' (same wording as services-data.js).
