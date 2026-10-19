@@ -6,6 +6,7 @@
 <title>Booking Confirmed · haloe</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/tokens.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,8 +18,8 @@
     --ink: #0D0D0D;
     --t2: #5a5247;
     --t3: #8a8272;
-    --s1: #FFFFFF;
-    --s3: #F0EAE0;
+    --surf: #FFFFFF;
+    --surf2: #F0EAE0;
     --sep: rgba(13,13,13,0.08);
     --sep2: rgba(13,13,13,0.14);
     --font-heading: 'Poppins', sans-serif;
@@ -34,8 +35,8 @@
       --ink: #F5F0E8;
       --t2: #C9C0B2;
       --t3: #9C9484;
-      --s1: #1C1C1E;
-      --s3: #2E2820;
+      --surf: #1C1C1E;
+      --surf2: #2E2820;
       --sep: rgba(255,255,255,0.10);
       --sep2: rgba(255,255,255,0.10);
     }
@@ -80,7 +81,7 @@
   }
 
   .group {
-    background: var(--s1); border-radius: 28px;
+    background: var(--surf); border-radius: 28px;
     box-shadow: 0 8px 24px rgba(13,13,13,0.06);
     overflow: hidden; margin-top: 1.3rem;
   }
@@ -92,7 +93,7 @@
   .next:last-child { border-bottom: none; }
   .num {
     width: 24px; height: 24px; border-radius: 50%;
-    background: var(--s3); color: var(--ink);
+    background: var(--surf2); color: var(--ink);
     font-size: 0.74rem; font-weight: 500;
     display: flex; align-items: center; justify-content: center;
     flex: none; margin-top: 0.1rem;
@@ -105,7 +106,7 @@
   }
 
   .items {
-    background: var(--s1); border-radius: 20px;
+    background: var(--surf); border-radius: 20px;
     box-shadow: 0 8px 24px rgba(13,13,13,0.06);
     overflow: hidden; margin-top: 1rem;
   }
@@ -136,6 +137,33 @@
     transition: color 0.2s;
   }
   .quiet:hover { color: var(--ink); }
+
+  /* ---- Atelier scale + accessibility (Oct 2026): true 16px root, 15px body,
+     13px captions, 44px+ button, AA contrast. Same system as the booking page. ---- */
+  html { font-size: 100%; }
+  :root { --t3: var(--c-muted); }
+  @media (prefers-color-scheme: dark) { :root { --t3: #B9B0A1; } }
+  body { font-weight: 400; padding: var(--s6) var(--s4) var(--s5); }
+  main { max-width: 480px; }
+  .tick { width: 56px; height: 56px; margin-bottom: var(--s5); }
+  .tick svg { width: 26px; height: 26px; }
+  h1 { font-family: Georgia, 'Iowan Old Style', 'Times New Roman', serif; font-weight: 400; font-size: var(--fs-title); line-height: 1.15; letter-spacing: -0.012em; }
+  .sub { font-size: var(--fs-body); line-height: 1.5; margin-top: var(--s1); }
+  .items, .group { border-radius: 16px; margin-top: var(--s4); }
+  .item { padding: var(--s3) var(--s4); font-size: var(--fs-body); line-height: 1.5; gap: var(--s4); }
+  .item .v { font-weight: 600; }
+  .item.total .v { color: var(--c-gold-deep); }
+  .next { padding: var(--s4); gap: var(--s3); }
+  .num { width: 28px; height: 28px; font-size: var(--fs-caption); font-weight: 600; margin-top: 0; }
+  .next p { font-size: var(--fs-body); line-height: 1.5; font-weight: 600; }
+  .next p span { font-size: var(--fs-caption); line-height: 1.5; font-weight: 400; margin-top: var(--s1); }
+  .cta { height: 48px; display: flex; align-items: center; justify-content: center; padding: 0 var(--s5); margin-top: var(--s5); font-size: var(--fs-body); font-weight: 600; color: var(--c-ink); background: var(--c-gold); transition: background-color 180ms ease; }
+  .cta:active { background: var(--c-gold-mid); }
+  .cta:focus-visible, .quiet:focus-visible { outline: 3px solid var(--c-ink); outline-offset: 2px; }
+  @media (prefers-color-scheme: dark) { .cta:focus-visible, .quiet:focus-visible { outline-color: var(--c-cream); } }
+  .quiet { font-size: var(--fs-caption); min-height: 44px; display: flex; align-items: center; justify-content: center; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media (prefers-color-scheme: dark) { .item.total .v { color: var(--c-gold-light); } }
 </style>
 </head>
 <body>
