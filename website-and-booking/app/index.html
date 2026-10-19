@@ -2151,9 +2151,10 @@ async function copyText(text) {
 }
 const usesOf = (c) => S.data.redemptions.filter((r) => r.code_id === c.id && (r.status === 'reserved' || r.status === 'confirmed')).length;
 const codeDesc = (c) => (c.percent_off === 100 ? 'Free session' : c.percent_off === 50 ? 'Half price' : c.percent_off + '% off') + ' · ' + (c.max_uses_total == null ? 'unlimited use' : c.max_uses_total + (c.max_uses_total === 1 ? ' use' : ' uses'));
-/** HALOE20's real state: days to its real expiry, its real use count — or clearly "off" / "expired". */
+/** The public promo code (one constant: change it each month). Its real state: days to its real expiry, its real use count — or clearly "off" / "expired". */
+const PUBLIC_PROMO = 'NOV20';
 function haloe20State() {
-  const c = S.data.codes.find((x) => x.code === 'HALOE20'); if (!c) return { ok: false, line: 'Not found', code: null };
+  const c = S.data.codes.find((x) => x.code === PUBLIC_PROMO); if (!c) return { ok: false, line: 'Not found', code: null };
   const now = Date.now() / 1000;
   if (!c.active) return { ok: false, line: 'Switched off', code: c };
   if (c.valid_until && c.valid_until < now) return { ok: false, line: 'Expired', code: c };
@@ -2182,7 +2183,7 @@ function viewCodes() {
       <button class="switch-wrap" data-active="${c.id}" aria-label="${esc(c.code)} active"><span class="switch" role="switch" aria-checked="${c.active}"></span></button></div>`;
   }).join('');
   shell(`<div class="tile-home codes"><div class="th-titlerow"><h1>Codes</h1><span>Tap one to make a code</span></div>
-    <div class="qt-row">${qt('free', 'qt-gold', 'Free session', 'Free', 'single use')}${qt('half', 'qt-dark', 'Half price', '50%', 'single use')}${qt('haloe', 'qt-white' + (h.ok ? '' : ' off'), 'HALOE20', '20%', esc(h.line))}</div>${ready}
+    <div class="qt-row">${qt('free', 'qt-gold', 'Free session', 'Free', 'single use')}${qt('half', 'qt-dark', 'Half price', '50%', 'single use')}${qt('haloe', 'qt-white' + (h.ok ? '' : ' off'), PUBLIC_PROMO, '20%', esc(h.line))}</div>${ready}
     <div class="st-row"><div class="st"><span class="th-k">Active</span><b>${live.length}</b></div><div class="st"><span class="th-k">Used</span><b>${usedAll}</b></div><div class="st"><span class="th-k">Revenue</span><b>${money(revAll)}</b></div></div>
     <section class="tile cd-list"><div class="th-head"><h2 class="th-title">All codes</h2><button class="cd-inactive" type="button" id="inactiveBtn" aria-pressed="${!!S.showInactive}">${S.showInactive ? 'Hide inactive' : 'Show inactive'}</button></div>${rowsHTML || stateHTML('No codes to show', S.showInactive ? 'Tap a tile above to make one.' : 'Tap a tile above to make one, or show inactive codes.')}</section></div>`);
   document.querySelectorAll('[data-active]').forEach((b) => {
@@ -2205,9 +2206,9 @@ async function quickTap(kind) {
   const release = () => { setTimeout(() => { S.quickBusy = false; document.querySelectorAll('[data-quick]').forEach((b) => { b.disabled = false; }); }, 1000); };      // a second tap within a second does nothing
   if (kind === 'haloe') {
     const h = haloe20State();
-    if (!h.ok) { S.codeReady = null; render(); toastMsg('HALOE20 is ' + h.line.toLowerCase()); release(); return; }
-    S.codeReady = { code: 'HALOE20', desc: '20% off · ' + h.line, id: null };
-    const ok = await copyText('HALOE20'); render(); toastMsg(ok ? 'Copied' : 'Couldn’t copy'); release(); return;
+    if (!h.ok) { S.codeReady = null; render(); toastMsg(PUBLIC_PROMO + ' is ' + h.line.toLowerCase()); release(); return; }
+    S.codeReady = { code: PUBLIC_PROMO, desc: '20% off · ' + h.line, id: null };
+    const ok = await copyText(PUBLIC_PROMO); render(); toastMsg(ok ? 'Copied' : 'Couldn’t copy'); release(); return;
   }
   render();
   try {
