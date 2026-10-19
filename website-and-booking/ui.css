@@ -1,0 +1,237 @@
+/* haloe shared UI layer (Oct 2026) — loaded LAST by book.html, intake.html and
+   before-your-session.html so it wins over the page's own rules.
+   One place for: accessible colour tokens, the type scale, the three button
+   styles, focus / hover / active states, and the loading / empty / error
+   states. Change a rule here, not in the pages.
+   Spacing is a 4px/8px grid (see each page's own spacing block). */
+
+/* ---------- 1. Colour (WCAG AA: 4.5:1 for text, 3:1 for large text and UI) ----------
+   Palette is unchanged; only the text-weight shades were darkened a touch:
+   gold-deep #8a6a2c -> #7A5C22 (4.4:1 -> 5.6:1 on cream), grey captions
+   #888 / #8a8272 -> #6B6357 (3.5:1 -> 5.2:1). Gold (#C8A96E) is kept for fills
+   and always carries dark ink text (8:1). */
+:root {
+  --gold-deep: #7A5C22;
+  --text-sand: #6B6357;
+  --text-cashmere: #6B6357;
+  --ui-ink: #0D0D0D;
+  --ui-cream: #F5F0E8;
+  --ui-gold: #C8A96E;
+  --ui-line: rgba(13, 13, 13, 0.14);
+  --ui-error: #B3261E;
+  --ui-error-bg: #FBEAE8;
+  --ui-ease: 180ms ease;
+}
+/* dark variants apply only to pages that have a dark theme (the booking page marks
+   itself with data-ui="dark-aware"); intake and the guide are light-only */
+@media (prefers-color-scheme: dark) {
+  html[data-ui="dark-aware"] {
+    --gold-deep: #D9BF86;
+    --text-sand: #B9B0A1;
+    --text-cashmere: #C9C0B2;
+    --ui-line: rgba(245, 240, 232, 0.2);
+    --ui-error: #FF9C94;
+    --ui-error-bg: #3A1F1C;
+  }
+}
+
+/* contrast: elements that used a light gold or a washed-out grey for text */
+.category-tabs .seg-option.active { background: var(--ui-gold); color: var(--ui-ink); }
+.svc-dur-tag, .svc-meta-line { color: var(--text-sand); }
+.svc-dur-tag { color: var(--gold-deep); }
+.where-card-badge--gold, .where-card-badge--grey, .s4-eyebrow-label { color: var(--gold-deep); }
+.where-card-badge--grey { color: var(--text-sand); }
+.s4-eyebrow-label { font-size: 12px; }
+.foot-helper, .foot-label, .foot-total { color: inherit; }
+.sign-ph { color: var(--text-sand); }
+
+/* ---------- 2. Type scale ----------
+   title 28 serif · heading 17/600 · body 15/400 · caption 13/400 · label 12/500 caps ·
+   input 16 (stops phone zoom). Weights: 400 body, 500 labels/emphasis, 600 headings and
+   prices — nothing lighter or heavier. Line-height: title 1.15, heading 1.3, body 1.5,
+   caption 1.4. Each component below uses at most two of these sizes. */
+body, button, input, select, textarea { font-weight: 400; }
+input, select, textarea { line-height: 1.4; }
+button, .btn { line-height: 1.25; }
+
+/* booking · step 1 cards: heading + body */
+.where-card-name { font-size: 17px; font-weight: 600; line-height: 1.3; }
+.where-card-address, .where-card-meta { font-size: 15px; font-weight: 400; line-height: 1.5; }
+.where-card-address { color: var(--cream, var(--ui-ink)); }
+.where-card-meta { color: var(--text-sand); }
+.where-card-badge { font-size: 12px; font-weight: 500; line-height: 1.4; }
+/* booking · step 2 rows: heading + caption */
+.svc-name, .svc-price { font-size: 17px; font-weight: 600; line-height: 1.3; }
+.svc-desc, .svc-meta-line, .svc-dur-tag { font-size: 13px; line-height: 1.4; font-weight: 400; }
+.svc-dur-tag { font-weight: 500; }
+.cart-title { font-size: 13px; font-weight: 500; line-height: 1.4; }
+.cart-name, .cart-price, .cart-total, .cart-total .v { font-size: 15px; line-height: 1.5; }
+.cart-name, .cart-price { font-weight: 400; }
+.cart-total, .cart-total .v { font-weight: 600; }
+.cart-remove { font-size: 15px; font-weight: 500; line-height: 1; }
+.cart-note, .packages-policy-line { font-size: 13px; line-height: 1.4; }
+/* booking · step 3: body + caption */
+.cal-month { font-size: 15px; font-weight: 600; line-height: 1.3; }
+.cal-nav { font-size: 15px; }
+.cal-day-name { font-size: 13px; font-weight: 500; line-height: 1.4; }
+.cal-day { font-size: 15px; font-weight: 400; line-height: 1.4; }
+.cal-day.today, .cal-day.selected { font-weight: 600; }
+.section-label, .time-count, .time-group-label, .time-hint, .time-empty { font-size: 13px; font-weight: 500; line-height: 1.4; letter-spacing: 0; color: var(--text-sand); }
+.time-slot { font-size: 15px; font-weight: 500; line-height: 1.3; }
+/* booking · step 4: caption + input */
+.field-label { font-size: 13px; font-weight: 500; line-height: 1.4; }
+.field-input { font-size: 16px; font-weight: 400; line-height: 1.4; }
+.field-helper, .field-error, .field-optional { font-size: 13px; line-height: 1.4; }
+.consent-row, .consent-row span { font-size: 15px; line-height: 1.5; font-weight: 400; }
+.s4-eyebrow-label { font-size: 12px; font-weight: 500; line-height: 1.4; }
+/* booking · step 5 */
+.ios-row label, .ios-row input { font-size: 16px; line-height: 1.4; }
+.ios-toggle, .ios-toggle span { font-size: 15px; line-height: 1.5; font-weight: 400; }
+.cancellation-policy, .pay-note, .discount-note, .care-pay-hint, .packages-policy-line { font-size: 13px; line-height: 1.4; }
+.care-card, .care-card * { font-size: 15px; line-height: 1.5; }
+.care-card .care-heading, .care-card strong, .care-head { font-weight: 600; }
+.pass-time { font-size: 32px; font-weight: 600; line-height: 1.15; }
+.pass-date, .pass-at, .pass-meta, .pass-name, .pass-price, .pass-extra, .pass-extra span, .pass-extra .v, .pass-extra.total .v { font-size: 15px; line-height: 1.5; }
+.pass-date { font-weight: 500; letter-spacing: 0.04em; color: var(--text-sand); }
+.pass-at, .pass-meta { font-weight: 400; color: var(--text-sand); }
+.pass-name { font-weight: 400; }
+.pass-price, .pass-extra .v, .pass-extra.total .v { font-weight: 600; }
+/* footer bar: caption + body */
+.foot-label { font-size: 13px; font-weight: 400; line-height: 1.4; }
+.foot-total { font-size: 15px; font-weight: 600; line-height: 1.4; }
+.foot-cta, .pay-btn { font-size: 15px; font-weight: 600; }
+/* step header */
+.panel-title { line-height: 1.15; }
+.panel-sub { font-size: 15px; line-height: 1.5; }
+#step-counter { font-size: 13px; font-weight: 400; }
+
+/* intake + guide */
+.progress-step { font-size: 12px; font-weight: 500; line-height: 1.4; }
+.progress-name { font-size: 13px; font-weight: 400; line-height: 1.4; }
+.field > label.q { line-height: 1.4; }
+.field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date], .field select, .field textarea { font-weight: 400; font-size: 16px; line-height: 1.4; }
+.consent-statement, .check-item, .check-item > span:not(.check-box), .care-field .care-body { font-size: 15px; line-height: 1.5; font-weight: 400; }
+.section-intro, .intro-line { font-size: 15px; line-height: 1.5; }
+.ticks li { font-size: 15px; line-height: 1.5; }
+.step-nav .btn, .mobile-bar .btn { font-size: 15px; font-weight: 600; }
+
+/* ---------- 3. Buttons: one primary, one secondary, one ghost ----------
+   Same height (48), radius (full) and padding (0 24) everywhere. The old
+   page-specific button rules still exist but are overridden here. Icon-only
+   ghosts (calendar arrows, remove) keep the style at 44px square. */
+:root { --btn-h: 48px; --btn-px: 24px; --btn-bg: #0D0D0D; --btn-fg: #F5F0E8; --sec-fg: #0D0D0D; --ghost-fg: var(--gold-deep); --ui-focus: #0D0D0D; --ui-hover: rgba(13, 13, 13, 0.06); --ui-press: rgba(13, 13, 13, 0.12); }
+@media (prefers-color-scheme: dark) {
+  html[data-ui="dark-aware"] { --btn-bg: #F5F0E8; --btn-fg: #0D0D0D; --sec-fg: #F5F0E8; --ui-focus: #F5F0E8; --ui-hover: rgba(245, 240, 232, 0.1); --ui-press: rgba(245, 240, 232, 0.18); }
+}
+.btn-primary, .btn-secondary, .btn-ghost,
+.foot-cta, #btn-full.pay-btn, .step-nav .btn, .mobile-bar .btn, .discount-apply-btn, .screen .btn, .btn.btn-gold, .btn.btn-outline {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: var(--btn-h); min-height: var(--btn-h); padding: 0 var(--btn-px); margin: 0;
+  border-radius: 999px; border: 1px solid transparent;
+  font: 600 15px/1.25 'Poppins', sans-serif; letter-spacing: 0; text-transform: none; text-decoration: none; white-space: nowrap;
+  cursor: pointer; box-shadow: none; -webkit-tap-highlight-color: transparent;
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, opacity 180ms ease;
+}
+/* primary: solid ink (inverts in dark mode); on the gold bars it stays ink */
+.btn-primary, #btn-full.pay-btn, .btn.btn-gold, .screen .btn-gold,
+.foot-cta, .step-nav .btn-gold, .mobile-bar .btn { background: var(--btn-bg); color: var(--btn-fg); border-color: var(--btn-bg); }
+.foot-cta, .step-nav .btn-gold, .mobile-bar .btn { --btn-bg: #0D0D0D; --btn-fg: #F5F0E8; --ui-focus: #0D0D0D; }
+.foot-cta svg { color: #DFC38E; }
+/* secondary: outlined */
+.btn-secondary, .discount-apply-btn, .step-nav .btn-outline, .btn.btn-outline, .screen .btn-outline { background: transparent; color: var(--sec-fg); border-color: currentColor; }
+.step-nav .btn-outline { --sec-fg: #0D0D0D; border-color: rgba(13, 13, 13, 0.5); }
+/* ghost: text only */
+.btn-ghost, .sign-clear, .cal-nav, .cart-remove { background: transparent; color: var(--ghost-fg); border-color: transparent; }
+.btn-ghost { text-decoration: underline; text-underline-offset: 4px; }
+.sign-clear { height: var(--btn-h); padding: 0 16px; font-weight: 500; }
+.cal-nav, .cart-remove { padding: 0; min-width: 44px; height: 44px; min-height: 44px; border-radius: 999px; }
+.cart-remove { min-width: 32px; width: 32px; height: 32px; min-height: 32px; }
+/* hover (mouse only) and pressed */
+@media (hover: hover) {
+  .btn-primary:hover:not(:disabled), #btn-full.pay-btn:hover:not(:disabled), .btn.btn-gold:hover:not(:disabled), .foot-cta:hover:not(:disabled),
+  .step-nav .btn-gold:hover:not(:disabled), .mobile-bar .btn:hover:not(:disabled) { background: #2A2620; border-color: #2A2620; filter: none; opacity: 1; }
+  .btn-secondary:hover:not(:disabled), .discount-apply-btn:hover:not(:disabled), .step-nav .btn-outline:hover:not(:disabled), .btn.btn-outline:hover:not(:disabled) { background: var(--ui-hover); }
+  .btn-ghost:hover:not(:disabled), .sign-clear:hover:not(:disabled), .cal-nav:hover:not(:disabled), .cart-remove:hover:not(:disabled) { background: var(--ui-hover); color: var(--ghost-fg); }
+}
+.btn-primary:active:not(:disabled), #btn-full.pay-btn:active:not(:disabled), .btn.btn-gold:active:not(:disabled), .foot-cta:active:not(:disabled),
+.step-nav .btn-gold:active:not(:disabled), .mobile-bar .btn:active:not(:disabled) { background: #000; border-color: #000; }
+.btn-secondary:active:not(:disabled), .discount-apply-btn:active:not(:disabled), .step-nav .btn-outline:active:not(:disabled), .btn.btn-outline:active:not(:disabled),
+.btn-ghost:active:not(:disabled), .sign-clear:active:not(:disabled), .cal-nav:active:not(:disabled), .cart-remove:active:not(:disabled) { background: var(--ui-press); }
+/* disabled: visibly inactive, never clickable */
+.btn-primary:disabled, #btn-full.pay-btn:disabled, .btn.btn-gold:disabled, .foot-cta:disabled, .step-nav .btn-gold:disabled, .mobile-bar .btn:disabled,
+.btn-primary[aria-disabled="true"] { background: rgba(13, 13, 13, 0.14); color: rgba(13, 13, 13, 0.62); border-color: transparent; cursor: not-allowed; opacity: 1; }
+.foot-cta:disabled svg { color: rgba(13, 13, 13, 0.5); }
+.btn-secondary:disabled, .discount-apply-btn:disabled, .step-nav .btn-outline:disabled, .btn-ghost:disabled, .sign-clear:disabled { opacity: 0.45; cursor: not-allowed; }
+/* loading: a spinner replaces the label's leading space; the button is also disabled */
+.spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; display: inline-block; animation: ui-spin 0.7s linear infinite; flex: none; }
+@keyframes ui-spin { to { transform: rotate(360deg); } }
+.is-loading, .is-loading:disabled { cursor: progress; }
+#btn-full.pay-btn.is-loading:disabled { background: var(--btn-bg); color: var(--btn-fg); }
+
+/* ---------- 4. Focus, hover, active (keyboard users get a ring on everything) ---------- */
+a, button, input, select, textarea, [role="button"], [role="checkbox"], [role="radio"], [tabindex], summary, label.where-card, label.check-item, label.ios-toggle {
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+}
+:focus { outline: none; }
+:focus-visible, label.where-card:has(input:focus-visible), label.check-item:has(input:focus-visible), label.ios-toggle:has(input:focus-visible) {
+  outline: 3px solid var(--ui-focus); outline-offset: 2px;
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--ui-focus); outline-offset: 1px; }
+.choices .opt input:focus-visible + span, .check-item input:focus-visible ~ .check-box { outline: 3px solid var(--ui-focus); outline-offset: 2px; box-shadow: none; }
+.service-card:focus-visible { outline-offset: 2px; }
+.step-nav .btn:focus-visible, .mobile-bar .btn:focus-visible, .foot-cta:focus-visible { outline-color: #0D0D0D; box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.7); }
+@media (hover: hover) {
+  .where-card:hover:not(.selected), .service-card:hover:not(.selected) { border-color: var(--gold-deep); }
+  .cal-day[role="button"]:hover:not([aria-disabled="true"]):not(.selected), .time-slot:hover:not(.selected):not(.taken) { background: var(--ui-hover); border-color: var(--gold-deep); }
+  .category-tabs .seg-option:hover:not(.active) { background: var(--ui-press); filter: none; }
+  .choices .opt:hover input:not(:checked) + span { background: var(--fill-hover, var(--ui-press)); }
+  .check-item:hover, .ios-toggle:hover { background-color: var(--ui-hover); }
+  a:not([class]):hover, .time-empty a:hover, .confirm-intake a:hover { text-decoration: underline; }
+}
+.where-card:active, .service-card:active, .cal-day[role="button"]:active:not([aria-disabled="true"]), .time-slot:active, .category-tabs .seg-option:active, .check-item:active, .ios-toggle:active { background-color: var(--ui-press); }
+.cal-day[aria-disabled="true"], .time-slot.taken { cursor: not-allowed; }
+input:disabled, select:disabled, textarea:disabled { opacity: 0.6; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; } }
+
+/* ---------- 5. States: loading, empty, error ---------- */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.skeleton { display: block; border-radius: 12px; background: linear-gradient(90deg, rgba(13, 13, 13, 0.06) 25%, rgba(13, 13, 13, 0.12) 50%, rgba(13, 13, 13, 0.06) 75%); background-size: 200% 100%; animation: ui-shimmer 1.2s ease-in-out infinite; }
+@media (prefers-color-scheme: dark) { html[data-ui="dark-aware"] .skeleton { background: linear-gradient(90deg, rgba(245, 240, 232, 0.07) 25%, rgba(245, 240, 232, 0.14) 50%, rgba(245, 240, 232, 0.07) 75%); background-size: 200% 100%; } }
+@keyframes ui-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+.skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.skeleton-grid .skeleton { height: 48px; }
+.state-box { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; padding: 24px 16px; border: 1px dashed var(--ui-line); border-radius: 16px; }
+.state-title { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.3; }
+.state-text { margin: 0; font-size: 15px; line-height: 1.5; color: var(--text-sand); max-width: 28em; }
+.state-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+.banner { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 16px; margin: 0 0 12px; border-radius: 12px; font-size: 15px; line-height: 1.5; }
+.banner p { margin: 0; }
+.banner[hidden] { display: none; }
+.banner-error { background: var(--ui-error-bg); color: #7A1A14; border: 1px solid var(--ui-error); }
+@media (prefers-color-scheme: dark) { html[data-ui="dark-aware"] .banner-error { color: #FFD7D3; } }
+.banner-error .btn-secondary { --sec-fg: #7A1A14; }
+
+/* step 5 pass: names ink, price gold-deep; disabled text on the gold bar stays legible */
+.pass-name { color: var(--cream, var(--ui-ink)); }
+.pass-price { color: var(--gold-deep); }
+.foot-cta:disabled { color: rgba(13, 13, 13, 0.75); background: rgba(13, 13, 13, 0.16); }
+.foot-cta:disabled svg { color: rgba(13, 13, 13, 0.6); }
+
+/* inline field errors: red text + icon-free but never colour alone (the message is the signal) */
+.field-error { color: var(--ui-error); font-size: 13px; line-height: 1.4; font-weight: 500; }
+input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"], .field-input.invalid { border-color: var(--ui-error) !important; box-shadow: 0 0 0 1px var(--ui-error); }
+.field input.invalid, .field select.invalid { box-shadow: 0 0 0 1.5px var(--ui-error); }
+.field-error.visible::before { content: "! "; font-weight: 700; }
+
+/* final contrast pass: disabled buttons, disabled days, dark-mode secondary on error banner */
+.foot-cta:disabled, .step-nav .btn-gold:disabled, .step-nav .btn:disabled, .mobile-bar .btn:disabled { color: rgba(13, 13, 13, 0.9); background: rgba(13, 13, 13, 0.14); opacity: 1; }
+.foot-cta:disabled svg { color: rgba(13, 13, 13, 0.8); }
+#btn-full.pay-btn:disabled { color: rgba(13, 13, 13, 0.85); background: rgba(13, 13, 13, 0.14); }
+.cal-day.disabled, .cal-day[aria-disabled="true"], .time-slot.taken { color: #766E5E; }
+.foot-total { font-size: 15px; }
+.foot-helper { font-size: 13px; font-weight: 500; line-height: 1.4; }
+@media (prefers-color-scheme: dark) {
+  html[data-ui="dark-aware"] #btn-full.pay-btn:disabled { color: rgba(245, 240, 232, 0.8); background: rgba(245, 240, 232, 0.16); }
+  html[data-ui="dark-aware"] .cal-day.disabled, html[data-ui="dark-aware"] .cal-day[aria-disabled="true"], html[data-ui="dark-aware"] .time-slot.taken { color: #A59C8B; }
+  html[data-ui="dark-aware"] .banner-error .btn-secondary { --sec-fg: #FFD7D3; }
+}

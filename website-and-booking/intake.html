@@ -75,7 +75,7 @@
   html { scroll-behavior:smooth; }
   body {
     background:var(--page-bg); color:var(--white);
-    font-family:'Poppins',sans-serif; font-weight:300;
+    font-family:'Poppins',sans-serif; font-weight: 400;
     overflow-x:hidden; font-size:16px; line-height:1.7;
   }
 
@@ -156,11 +156,11 @@
 
   /* Fields */
   .field { margin:26px 0; }
-  .field > label.q { display:block; font-size:0.9rem; color:var(--white); font-weight:300; margin-bottom:12px; line-height:1.6; }
+  .field > label.q { display:block; font-size:0.9rem; color:var(--white); font-weight: 400; margin-bottom:12px; line-height:1.6; }
   .field .opt-hint { color:var(--dim); font-size:0.9rem; font-style:italic; }
   .field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date], .field select, .field textarea {
     width:100%; background:var(--surface); border:1px solid var(--border); color:var(--white);
-    font-family:'Poppins',sans-serif; font-size:0.92rem; font-weight:300;
+    font-family:'Poppins',sans-serif; font-size:0.92rem; font-weight: 400;
     padding:0.85rem 1rem; outline:none; border-radius:6px; transition:border-color 0.2s, box-shadow 0.2s; -webkit-appearance:none;
   }
   .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,160,64,0.12); }
@@ -318,14 +318,14 @@
   /* One question per card */
   .group { display: contents; }
   .field > label.q { display: block; font-size: 17px; line-height: 1.4; font-weight: 400; color: var(--ink); margin: 0 0 12px; letter-spacing: 0; text-transform: none; }
-  .field .opt-hint { display: block; margin-top: 4px; font-size: 14px; line-height: 1.45; font-style: italic; font-weight: 300; color: var(--muted); letter-spacing: 0; text-transform: none; }
+  .field .opt-hint { display: block; margin-top: 4px; font-size: 14px; line-height: 1.45; font-style: italic; font-weight: 400; color: var(--muted); letter-spacing: 0; text-transform: none; }
 
   /* Text inputs: 48px, label above in small muted caps */
   .field:has(> input[type]) > label.q { font-size: 12px; font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
   .field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date], .field select {
     display: block; width: 100%; height: 48px; padding: 0 16px;
     background: var(--fill); border: 0; border-radius: 14px; box-shadow: none;
-    font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 300; line-height: 1.2; color: var(--ink);
+    font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 400; line-height: 1.2; color: var(--ink);
     text-align: left; -webkit-appearance: none; appearance: none;
     transition: box-shadow 150ms ease, background 150ms ease;
   }
@@ -338,7 +338,7 @@
   .field textarea {
     display: block; width: 100%; min-height: 96px; padding: 12px 16px; resize: none;
     background: var(--fill); border: 0; border-radius: 14px; box-shadow: none;
-    font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 300; line-height: 1.5; color: var(--ink);
+    font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 400; line-height: 1.5; color: var(--ink);
     -webkit-appearance: none; appearance: none; transition: box-shadow 150ms ease, background 150ms ease;
   }
   .field input::placeholder, .field textarea::placeholder { color: #9A917F; }
@@ -539,6 +539,7 @@
   .step-nav .btn-outline { order: 0; }
   .step-nav .btn-gold { order: 2; }
 </style>
+<link rel="stylesheet" href="/ui.css">
 <script src="/care-copy.js"></script>
 </head>
 <body>
@@ -1443,7 +1444,9 @@
   submitBtn.addEventListener('click', function () {
     if (!validateStep(5)) return;
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Sending…';
+    submitBtn.classList.add('is-loading');
+    submitBtn.setAttribute('aria-busy', 'true');
+    submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span>Sending\u2026';
     var payload = collect();
     fetch('/intake-submit', {
       method: 'POST',
@@ -1466,11 +1469,47 @@
     });
   });
 
+  // ---- Inline validation: check a field when the person leaves it, show the
+  // reason under it (and tie it to the field for screen readers), and clear it
+  // as soon as they fix it. Only fields in REQUIRED are checked. ----
+  var FIELD_MSG = {
+    email: 'That email address doesn\u2019t look right. It should look like name@example.com.',
+    phone: 'Please enter a phone number we can reach you on.',
+    emergency_contact_phone: 'Please enter a phone number for your emergency contact.'
+  };
+  function fieldDef(key) {
+    for (var st in REQUIRED) { for (var i = 0; i < REQUIRED[st].length; i++) { if (REQUIRED[st][i].key === key) return REQUIRED[st][i]; } }
+    return null;
+  }
+  function checkField(inp, force) {
+    var def = fieldDef(inp.id); if (!def) return;
+    var ok = fieldValid(def);
+    var msg = $('.field-error[data-for="' + def.key + '"]');
+    if (msg) {
+      if (!msg.id) msg.id = 'err_' + def.key;
+      msg.setAttribute('role', 'alert');
+      if (FIELD_MSG[def.key] && inp.value.trim()) msg.textContent = FIELD_MSG[def.key];
+      else if (FIELD_MSG[def.key]) msg.textContent = (def.key === 'email' ? 'Please enter your email address.' : FIELD_MSG[def.key]);
+    }
+    showError(def.key, !ok); markInvalid(def.key, def.type, !ok);
+    inp.setAttribute('aria-invalid', ok ? 'false' : 'true');
+    if (msg) inp.setAttribute('aria-describedby', msg.id);
+  }
+  var wired = document.querySelectorAll('#intakeForm input[type=text], #intakeForm input[type=tel], #intakeForm input[type=email], #intakeForm input[type=date], #intakeForm select');
+  Array.prototype.forEach.call(wired, function (inp) {
+    if (!inp.id || !fieldDef(inp.id)) return;
+    inp.addEventListener('blur', function () { checkField(inp); });
+    var fix = function () { if (inp.getAttribute('aria-invalid') === 'true') checkField(inp); };
+    inp.addEventListener('input', fix); inp.addEventListener('change', fix);
+  });
+
   document.getElementById('retryBtn').addEventListener('click', function () {
     document.getElementById('errorScreen').classList.remove('active');
     $('#intakeForm').style.display = '';
     $('#progress').style.display = '';
     submitBtn.disabled = false;
+    submitBtn.classList.remove('is-loading');
+    submitBtn.removeAttribute('aria-busy');
     submitBtn.textContent = 'Submit form';
     render();
   });
