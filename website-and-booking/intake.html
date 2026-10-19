@@ -538,6 +538,9 @@
   .step-nav::before { padding-left: var(--s2); order: 1; }
   .step-nav .btn-outline { order: 0; }
   .step-nav .btn-gold { order: 2; }
+  /* desktop nav: 12px minimum, 44px targets (the page's 78% root size had shrunk these to ~9px) */
+  nav ul a { font-size:12px; display:inline-flex; align-items:center; min-height:44px; }
+  .nav-cta { padding:0 24px; }
 </style>
 <link rel="stylesheet" href="/tokens.css">
 <link rel="stylesheet" href="/ui.css">

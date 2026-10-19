@@ -286,8 +286,10 @@
   /* html is 78% for the shared nav, so the footer's rem sizes are pinned to
      what they rendered at before */
   .footer-left { font-size:20.8px; }
-  .footer-links a { font-size:11px; }
-  .footer-right { font-size:10.4px; }
+  nav ul a { font-size:12px; display:inline-flex; align-items:center; min-height:44px; }
+  .nav-cta { padding:0 24px; }
+  .footer-links a { font-size:12px; }
+  .footer-right { font-size:12px; }
 
   /* the phone CTA bar: same soft-fade bar as intake's action bar */
   .mobile-bar { background:linear-gradient(to top, var(--page-bg) 52%, rgba(245,240,232,0)); border-top:0; backdrop-filter:none; -webkit-backdrop-filter:none; padding:28px 16px calc(16px + env(safe-area-inset-bottom,0px)); gap:var(--s3); pointer-events:none; }
