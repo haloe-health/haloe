@@ -258,7 +258,7 @@
 
   // The address was only ever held for the old WhatsApp hand-off, which has gone.
   // Clear it rather than leave a home address sitting in storage.
-  try { sessionStorage.removeItem('haloe_address'); } catch (e) {}
+  try { sessionStorage.removeItem('haloe_address'); sessionStorage.removeItem('haloe_booking_progress'); } catch (e) {}
 </script>
 
 </body>

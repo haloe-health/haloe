@@ -2,7 +2,7 @@
 <html lang="en" class="theme-light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
 <title>Book a Session — haloe Hijama Manchester</title>
 <meta name="description" content="Book your hijama or cupping session in Manchester with haloe. Secure online booking.">
 <link rel="canonical" href="https://haloe.health/book.html">
@@ -1649,6 +1649,11 @@
   .field-label { margin-bottom: 0.2rem; }
   .field-input { height: 2.9rem; }
   textarea.field-input { height: 4.2rem; min-height: 0; }
+
+  /* Typing on a phone: the fixed footer steps aside so the form has the room. */
+  .kb-open .footbar { display: none; }
+  .kb-open body { padding-bottom: 24px; }
+  .kb-open { scroll-padding-bottom: 24px; }
 </style>
 </head>
 <body>
@@ -2307,7 +2312,9 @@ function init() {
   const now = new Date();
   state.calYear = now.getFullYear();
   state.calMonth = now.getMonth();
-  applyDeepLink();
+  const hasDeepLink = /[?&](cat|svc|location|code)=/.test(location.search);
+  if (!hasDeepLink) restoreProgress();
+  else applyDeepLink();
   applyLocationToCatalogue();
   renderCalendar();
   updateRail();
@@ -2319,6 +2326,7 @@ let currentStep = 1;
 // Live "Your booking" rail (Option B). Reflects state on every change; shows a
 // dash placeholder for anything not chosen yet.
 function updateRail() {
+  saveProgress();
   const items = cartItems();
   const svc = items.length ? items[0].svc : null; // truthy iff something is selected
   const names = items.map(x => x.svc.name);
@@ -2373,21 +2381,26 @@ function updateRail() {
         ? `${items.length} treatments · ${formatPounds(totalPence)}`
         : `${svc.name} · ${priceFmt(netPrice(svc))}`;
     } else {
-      // Name · date · time only — omit svc.time (duration) to avoid truncation,
-      // especially for packages whose time string is long.
-      const bits = [items.length > 1 ? `${items.length} treatments · ${durationText(totalMin)}` : svc.name];
-      if (dateStr) bits.push(dateStr);
-      if (state.time) bits.push(state.time);
-      // Location prefix on Treatment step onwards, dropped on phone widths
-      // (.foot-loc-prefix) where it would wrap.
-      fs.innerHTML = (locFootLabel ? `<span class="foot-loc-prefix">${locFootLabel} · </span>` : '') + bits.join(' · ');
+      // Steps 3+: the treatment on top, price (plus travel for a home visit)
+      // on the second line. Date and time are already on the page above.
+      fs.textContent = items.length > 1 ? `${items.length} treatments · ${durationText(totalMin)}` : svc.name;
     }
   }
   const ft = document.getElementById('foot-total');
-  // Blank rather than a stray "—" placeholder when nothing's picked yet —
-  // the summary text alone ("Select a treatment") already says so.
-  if (ft) ft.innerHTML = svc && currentStep !== 2
-    ? (items.length > 1 ? formatPounds(totalPence) : priceHtml(svc)) : '';
+  // Home visits show the travel fee next to the treatment price so the
+  // customer always sees what they will pay, not just the treatment.
+  const travelOn = isMobile() && state.travelZone;
+  if (ft) {
+    if (!svc || (currentStep === 2 && !travelOn)) {
+      ft.innerHTML = '';
+    } else if (travelOn) {
+      ft.textContent = state.travelZone === 'Q'
+        ? `${formatPounds(totalPence)} + travel confirmed by WhatsApp`
+        : `${formatPounds(totalPence)} + ${formatPounds(state.travelPence)} travel = ${formatPounds(totalPence + state.travelPence)}`;
+    } else {
+      ft.innerHTML = items.length > 1 ? formatPounds(totalPence) : priceHtml(svc);
+    }
+  }
   const fh = document.getElementById('foot-helper');
   if (fh) fh.classList.toggle('hidden', !(currentStep === 1 && !state.location));
   const sc = document.querySelector('.foot-summary-col');
@@ -3136,6 +3149,7 @@ async function handlePayment() {
       // Kept in sessionStorage rather than the success_url so a home address
       // never ends up in a URL, in browser history, or in server logs.
       try { sessionStorage.setItem('haloe_address', address); } catch (e) {}
+      clearProgress();
       window.location.href = data.url;
     } else {
       alert('Payment setup failed: the server didn’t return a payment link. Please try again, or let Halima know if it keeps happening.');
@@ -3319,6 +3333,109 @@ function goToStep(n) {
   updateRail();
   window.scrollTo(0, 0);
 }
+
+/* ---- Keyboard: while a field is being typed in, hide the fixed footer ----
+   On a phone the on-screen keyboard shrinks the viewport and a fixed bottom
+   bar rides up above it, leaving almost no room for the form. The bar comes
+   back as soon as the field loses focus. Enter on a one-line field closes
+   the keyboard so the bar (and Continue) return. */
+(function () {
+  const isField = el => el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && !/^(radio|checkbox|button|submit)$/.test(el.type || '');
+  document.addEventListener('focusin', e => {
+    if (!isField(e.target)) return;
+    document.documentElement.classList.add('kb-open');
+    setTimeout(() => { try { e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {} }, 250);
+  });
+  document.addEventListener('focusout', () => {
+    setTimeout(() => { if (!isField(document.activeElement)) document.documentElement.classList.remove('kb-open'); }, 80);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target && e.target.tagName === 'INPUT' && isField(e.target)) e.target.blur();
+  });
+})();
+
+/* ---- Footer always sits on the true bottom edge ----
+   After the on-screen keyboard closes, some Android browsers leave the layout
+   viewport at its shrunken height, so a fixed bottom bar floats above a blank
+   strip. Compare the layout viewport to what is really visible and nudge the
+   bar by the difference; re-run on every viewport change. */
+(function () {
+  const vv = window.visualViewport;
+  function pin() {
+    const bar = document.querySelector('.footbar');
+    if (!bar) return;
+    if (!vv) { bar.style.transform = ''; return; }
+    const delta = Math.round((vv.offsetTop + vv.height) - window.innerHeight);
+    // Only correct a stale, too-short layout viewport (delta > 0). While the
+    // keyboard is up the bar is hidden anyway.
+    bar.style.transform = (delta > 0 && !document.documentElement.classList.contains('kb-open')) ? `translateY(${delta}px)` : '';
+  }
+  if (vv) { vv.addEventListener('resize', pin); vv.addEventListener('scroll', pin); }
+  window.addEventListener('resize', pin);
+  window.addEventListener('orientationchange', () => setTimeout(pin, 250));
+  window.addEventListener('pageshow', pin);
+  document.addEventListener('focusout', () => { setTimeout(pin, 120); setTimeout(pin, 500); });
+  document.addEventListener('DOMContentLoaded', pin);
+})();
+
+/* ---- Keep the customer's place if the page reloads ----
+   sessionStorage (this tab only, gone when it closes): step, venue, cart,
+   date/time, travel and the typed details. Never the discount or the
+   consent ticks — those are re-confirmed every time. Cleared on payment. */
+const PROGRESS_KEY = 'haloe_booking_progress';
+const PROGRESS_MAX_AGE_MS = 3 * 60 * 60 * 1000;
+const PROGRESS_FIELDS = ['fullname', 'phone', 'email', 'address', 'referral', 'notes'];
+function saveProgress() {
+  try {
+    if (restoringProgress) return;
+    if (!state.location && !state.cart.length) { sessionStorage.removeItem(PROGRESS_KEY); return; }
+    const fields = {};
+    PROGRESS_FIELDS.forEach(id => { const el = document.getElementById(id); if (el) fields[id] = el.value; });
+    sessionStorage.setItem(PROGRESS_KEY, JSON.stringify({
+      t: Date.now(), step: currentStep, location: state.location, category: state.category, cart: state.cart,
+      date: state.date ? toISODate(state.date) : null, time: state.time,
+      postcode: state.travelPostcode, zone: state.travelZone, pence: state.travelPence, label: state.travelLabel,
+      fields,
+    }));
+  } catch (_) {}
+}
+function clearProgress() { try { sessionStorage.removeItem(PROGRESS_KEY); } catch (_) {} }
+let restoringProgress = false;
+function restoreProgress() {
+  let p = null;
+  try { p = JSON.parse(sessionStorage.getItem(PROGRESS_KEY) || 'null'); } catch (_) {}
+  if (!p || !p.t || Date.now() - p.t > PROGRESS_MAX_AGE_MS || !p.location) return false;
+  restoringProgress = true;
+  try {
+    selectLocation(p.location);
+    if (Array.isArray(p.cart)) state.cart = p.cart.filter(c => c && SERVICES[c.cat] && SERVICES[c.cat][c.i]);
+    if (p.category && SERVICES[p.category] && categoryAllowedAt(p.category, p.location)) state.category = p.category;
+    PROGRESS_FIELDS.forEach(id => { const el = document.getElementById(id); if (el && p.fields && typeof p.fields[id] === 'string') el.value = p.fields[id]; });
+    if (p.location === 'mobile' && p.postcode) {
+      document.getElementById('travel-postcode').value = p.postcode;
+      state.travelPostcode = p.postcode; state.travelZone = p.zone || null;
+      state.travelPence = p.pence || 0; state.travelLabel = p.label || '';
+      renderTravelFeeLine();
+    }
+    if (p.date) {
+      const [y, m, d] = p.date.split('-').map(Number);
+      state.date = new Date(y, m - 1, d); state.calYear = y; state.calMonth = m - 1;
+      state.time = p.time || null;
+    }
+    document.getElementById('btn-step2').disabled = state.cart.length === 0;
+    document.getElementById('btn-step1').disabled = (state.location === 'mobile') ? (state.travelZone === null) : false;
+    renderServices();
+    let step = Math.min(Math.max(parseInt(p.step, 10) || 1, 1), 5);
+    if (step >= 2 && !state.cart.length) step = 2;
+    if (step >= 3 && (!state.date || !state.time)) step = Math.min(step, 3);
+    if (step > 1) goToStep(step);
+  } finally {
+    restoringProgress = false;
+  }
+  saveProgress();
+  return true;
+}
+document.addEventListener('input', () => { clearTimeout(saveProgress._t); saveProgress._t = setTimeout(saveProgress, 300); });
 
 // This script tag sits before the .footbar markup in the document, so at the
 // moment it runs mid-parse, #foot-sum/#foot-total/#foot-cta don't exist yet —
