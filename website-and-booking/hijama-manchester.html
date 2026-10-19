@@ -321,7 +321,18 @@
     }
     .price-row:last-child { border-bottom:1px solid var(--border); margin-bottom:0; }
   }
+  /* ---- Accessibility + scale pass (Oct 2026): 12px minimum, AA gold text, 44px targets.
+     Shared rules (focus rings, states, tokens) come from tokens.css / ui.css. ---- */
+  .eyebrow, .section-tag, .tag, .price-tab, .footer-right { font-size: var(--fs-label); }
+  .eyebrow, .section-tag, .tag, .inline-link { color: var(--c-gold-deep); }
+  .nav-logo { min-height: 44px; }
+  nav ul a { font-size: var(--fs-label); display: inline-flex; align-items: center; min-height: 44px; }
+  .nav-cta { padding: 0 24px; }
+  .footer-links a { display: inline-flex; align-items: center; min-height: 44px; font-size: var(--fs-label); }
+  .footer-links { gap: 4px 24px; }
 </style>
+<link rel="stylesheet" href="/tokens.css">
+<link rel="stylesheet" href="/ui.css">
 </head>
 <body>
 
