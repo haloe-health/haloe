@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="theme-light">
+<html lang="en" class="theme-light" data-ui="dark-aware">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
@@ -62,15 +62,15 @@
     --gold: #c9a040;
     --gold-light: #dbb85a;
     --gold-dark: #a8842f;
-    --gold-deep: #8a6a2c;
-    --black: #F5F0E8;
-    --cream: #0D0D0D;
+    --gold-deep: var(--c-gold-deep);
+    --black: var(--c-cream);
+    --cream: var(--c-ink);
     --cream-mid: #EDE6D6;
-    --white: #FFFFFF;
-    --text-muted: #5a5247;
+    --white: var(--c-white);
+    --text-muted: var(--c-body-soft);
     --border: rgba(201, 160, 64, 0.18);
     --border-strong: rgba(201, 160, 64, 0.4);
-    --surface: #FFFFFF;
+    --surface: var(--c-white);
     --radius: 16px;
     --focus-glow: 0 0 0 3px rgba(201, 160, 64, 0.15);
     --step-active: var(--gold);
@@ -83,18 +83,18 @@
 
     /* --- New design-system tokens (Stitch spec) — additive, existing
        tokens above are untouched and still drive most of the page. --- */
-    --obsidian-base: #0D0D0D;
-    --obsidian-elevated: #FFFFFF;
-    --obsidian-floating: #F0EAE0;
-    --obsidian-inset: #F0EAE0;
-    --gold-primary: #C8A96E;
-    --gold-highlight: #DFC38E;
+    --obsidian-base: var(--c-ink);
+    --obsidian-elevated: var(--c-white);
+    --obsidian-floating: var(--c-sand);
+    --obsidian-inset: var(--c-sand);
+    --gold-primary: var(--c-gold);
+    --gold-highlight: var(--c-gold-light);
     --gold-burnished: #A38548;
     --hairline-border: rgba(200, 169, 110, 0.2);
     --active-border: rgba(223, 195, 142, 0.5);
-    --text-cream: #0D0D0D;
-    --text-cashmere: #6b6357;
-    --text-sand: #8a8272;
+    --text-cream: var(--c-ink);
+    --text-cashmere: var(--c-muted);
+    --text-sand: var(--c-muted);
 
     --radius-sm: 0.5rem;
     --radius-default: 1rem;
@@ -117,16 +117,16 @@
      that kept --ink unflipped for gold-background text on the homepage. */
   @media (prefers-color-scheme: dark) {
     :root {
-      --black: #1A1712;
-      --cream: #F5F0E8;
-      --cream-mid: #211D16;
-      --white: #262119;
-      --surface: #262119;
+      --black: var(--c-dark-page);
+      --cream: var(--c-cream);
+      --cream-mid: var(--c-dark-card);
+      --white: var(--c-dark-surface);
+      --surface: var(--c-dark-surface);
       --text-muted: #C9C0B2;
-      --obsidian-elevated: #262119;
-      --obsidian-floating: #2E2820;
-      --obsidian-inset: #2E2820;
-      --text-cream: #F5F0E8;
+      --obsidian-elevated: var(--c-dark-surface);
+      --obsidian-floating: var(--c-dark-raised);
+      --obsidian-inset: var(--c-dark-raised);
+      --text-cream: var(--c-cream);
       --text-cashmere: #C9C0B2;
       --text-sand: #9C9484;
       --step-idle: #4A4438;
@@ -142,7 +142,7 @@
     background: var(--black);
     color: var(--cream);
     font-family: 'Poppins', sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     min-height: 100vh;
   }
 
@@ -207,7 +207,7 @@
   .logo {
     font-family: 'Poppins', sans-serif;
     font-size: 2.2rem;
-    font-weight: 300;
+    font-weight: 400;
     letter-spacing: 0.35em;
     color: var(--cream);
     display: block;
@@ -312,7 +312,7 @@
   }
   .panel-title {
     font-family: var(--font-heading);
-    font-size: 28px;
+    font-size: var(--fs-title);
     font-weight: 600;
     color: var(--cream);
     margin-bottom: 0.5rem;
@@ -378,8 +378,8 @@
        reaches the screen edges, then restore 16px gutters for the pills. */
     margin-left: calc(-1 * clamp(1rem, 4vw, 1.5rem));
     margin-right: calc(-1 * clamp(1rem, 4vw, 1.5rem));
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: var(--s4);
+    padding-right: var(--s4);
   }
   .category-tabs-wrap.is-stuck { box-shadow: 0 1px 0 var(--hairline), 0 4px 12px rgba(13,13,13,0.06); }
   .category-tabs {
@@ -398,9 +398,9 @@
     flex: 1 0 auto;
     border-radius: 999px;
     border: none;
-    padding: 8px 12px;
+    padding: var(--s2) var(--s3);
     font-family: 'Poppins', sans-serif;
-    font-size: 12px;
+    font-size: var(--fs-label);
     font-weight: 500;
     line-height: 1;
     min-height: 0;
@@ -412,8 +412,8 @@
     text-align: center;
   }
   .category-tabs .seg-option.active {
-    background: #a8873a;
-    color: #fff;
+    background: var(--c-gold-mid);
+    color: var(--c-white);
   }
   .category-tabs .seg-option[hidden] { display: none; }
   @media (prefers-color-scheme: dark) {
@@ -422,8 +422,8 @@
       color: var(--text-muted);
     }
     .category-tabs .seg-option.active {
-      background: #a8873a;
-      color: #fff;
+      background: var(--c-gold-mid);
+      color: var(--c-white);
     }
   }
   @media (hover: hover) {
@@ -498,17 +498,17 @@
   .service-card.selected .svc-ring svg { opacity: 1; }
   .svc-main { flex: 1; min-width: 0; }
   .svc-name {
-    font-size: 15px;
+    font-size: var(--fs-body);
     font-weight: 600;
-    color: #1a1208;
+    color: var(--c-ink-warm);
     letter-spacing: -0.01em;
     line-height: 1.3;
   }
   .svc-meta-line {
     display: block;
-    font-size: 13px;
+    font-size: var(--fs-caption);
     font-weight: 400;
-    color: #888;
+    color: var(--text-sand);
     line-height: 1.4;
     margin-top: 3px;
   }
@@ -518,19 +518,19 @@
     flex-direction: column;
     align-items: flex-end;
     flex-shrink: 0;
-    gap: 8px;
+    gap: var(--s2);
   }
   .svc-price {
-    font-size: 15px;
+    font-size: var(--fs-body);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
-    color: #1a1208;
+    color: var(--c-ink-warm);
     white-space: nowrap;
   }
   .svc-dur-tag {
-    font-size: 12px;
+    font-size: var(--fs-label);
     font-weight: 500;
-    color: #a8873a;
+    color: var(--c-gold-mid);
     white-space: nowrap;
   }
   @media (prefers-color-scheme: dark) {
@@ -606,22 +606,19 @@
     --where-indent: 32px; /* radio ring (22px) + header gap (10px): the text column's left edge */
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--s3);
     margin: 1.5rem 0 1.5rem;
   }
-  @media (min-width: 768px) {
-    .where-grid { flex-direction: row; }
-    .where-card { flex: 1 1 0; }
-  }
+  /* the booking page is one centred column at every width, so the cards stay stacked */
   /* ---- Location cards (Option B) ---- */
   .where-card {
     position: relative;
     display: flex;
     flex-direction: column;
-    background: #fff;
+    background: var(--c-white);
     border: 1.5px solid transparent;
     border-radius: 20px;
-    padding: 16px;
+    padding: var(--s4);
     cursor: pointer;
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     box-shadow: 0 1px 6px rgba(0,0,0,0.07);
@@ -638,13 +635,13 @@
     opacity: 0; pointer-events: none;
   }
   .where-card:has(input:focus-visible) {
-    outline: 2px solid #a8873a;
+    outline: 2px solid var(--c-gold-mid);
     outline-offset: 3px;
   }
   .where-card.selected {
-    border-color: #a8873a;
+    border-color: var(--c-gold-mid);
     background: #fbf6ea;
-    box-shadow: 0 0 0 1px #a8873a;
+    box-shadow: 0 0 0 1px var(--c-gold-mid);
   }
   @media (prefers-color-scheme: dark) {
     .where-card.selected { background: rgba(168,135,58,0.12); }
@@ -655,14 +652,14 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 8px;
+    margin-bottom: var(--s2);
   }
   .where-card-name {
     flex: 1 1 auto;
     font-family: Poppins, sans-serif;
-    font-size: 16px;
+    font-size: var(--fs-input);
     font-weight: 600;
-    color: #1a1208;
+    color: var(--c-ink-warm);
     letter-spacing: -0.01em;
     line-height: 1.2;
   }
@@ -674,18 +671,18 @@
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding: 4px 10px;
+    padding: var(--s1) 10px;
     border-radius: 999px;
     white-space: nowrap;
   }
-  .where-card-badge--gold { background: #f5eddb; color: #a8873a; }
-  .where-card-badge--grey { background: #f0ede8; color: #888; }
+  .where-card-badge--gold { background: #f5eddb; color: var(--c-gold-mid); }
+  .where-card-badge--grey { background: #f0ede8; color: var(--text-sand); }
   /* Address + meta lines */
   .where-card-address {
     display: block;
     font-size: 14px;
     font-weight: 500;
-    color: #1a1208;
+    color: var(--c-ink-warm);
     line-height: 1.4;
     margin: 0 0 3px var(--where-indent);
     text-wrap: pretty;
@@ -695,7 +692,7 @@
   }
   .where-card-meta {
     display: block;
-    font-size: 13px;
+    font-size: var(--fs-caption);
     font-weight: 400;
     color: #75706a;
     line-height: 1.5;
@@ -718,8 +715,8 @@
     background: transparent;
     transition: background 0.2s;
   }
-  .where-card.selected .where-radio-ring { border-color: #a8873a; background: rgba(168,135,58,0.1); }
-  .where-card.selected .where-radio-ring::after { background: #a8873a; }
+  .where-card.selected .where-radio-ring { border-color: var(--c-gold-mid); background: rgba(168,135,58,0.1); }
+  .where-card.selected .where-radio-ring::after { background: var(--c-gold-mid); }
 
   /* ---- Location Toggle ---- (styling reuses the shared .segmented / .seg-option component) */
   /* Apple step 1: the travel-fee note is a quiet line, not a bordered box */
@@ -795,7 +792,7 @@
   .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: var(--s1);
     text-align: center;
   }
   .cal-day-name {
@@ -829,7 +826,7 @@
   /* Selection must win over .today — otherwise selecting today's date turned
      the number gold-on-gold and it vanished. */
   .cal-day.selected { background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); font-weight: 500; box-shadow: 0 0 0 3px var(--active-border); }
-  .cal-day.disabled { color: #C4BBA8; cursor: default; }
+  .cal-day.disabled { color: #8F8676; cursor: default; }
   .cal-day.empty { cursor: default; }
 
   /* ---- Time Slots ---- */
@@ -871,7 +868,7 @@
     .time-slot:hover:not(.taken):not(.selected) { border-color: var(--gold-deep); color: var(--gold-deep); }
   }
   .time-slot.selected { border-color: var(--gold-primary); background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); color: var(--obsidian-base); font-weight: 500; box-shadow: 0 0 0 3px var(--active-border); }
-  .time-slot.taken { color: #C4BBA8; cursor: not-allowed; border-color: rgba(13,13,13,0.06); }
+  .time-slot.taken { color: #8F8676; text-decoration: line-through; cursor: not-allowed; border-color: rgba(13,13,13,0.06); }
 
   /* ---- Form Fields ---- */
   .form-grid { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -888,12 +885,12 @@
   .form-field select,
   .form-field textarea {
     width: 100%;
-    background: #FFFFFF;
+    background: var(--c-white);
     border: 1px solid rgba(13,13,13,0.12);
     color: var(--cream);
     font-family: 'Poppins', sans-serif;
     font-size: 0.88rem;
-    font-weight: 300;
+    font-weight: 400;
     padding: 0.7rem 0.85rem;
     outline: none;
     border-radius: 10px;
@@ -906,7 +903,7 @@
     border-color: var(--gold);
     box-shadow: var(--focus-glow);
   }
-  .form-field select option { background: #FFFFFF; color: var(--cream); }
+  .form-field select option { background: var(--c-white); color: var(--cream); }
   .form-field textarea { resize: vertical; min-height: 70px; }
   /* Error state wins over focus — declared last so the red border isn't overridden */
   .form-field input.invalid,
@@ -999,7 +996,7 @@
     content: '';
     display: block;
     width: 5px; height: 9px;
-    border: 2px solid #0D0D0D;
+    border: 2px solid var(--c-ink);
     border-top: none; border-left: none;
     transform: rotate(45deg) translateY(-1px);
   }
@@ -1042,7 +1039,7 @@
     background: none; border: none; outline: none;
     color: var(--cream);
     font-family: 'Poppins', sans-serif;
-    font-size: 1.05rem; font-weight: 300;
+    font-size: 1.05rem; font-weight: 400;
     text-align: right;
     padding: 0; border-radius: 0;
     -webkit-appearance: none;
@@ -1081,7 +1078,7 @@
     /* Knob stays light regardless of theme or track state (off-track is now
        light grey, on-track gold) — --cream means dark ink text now, so it
        can't double as the knob colour any more. */
-    background: #FFFFFF; transition: transform 0.2s;
+    background: var(--c-white); transition: transform 0.2s;
   }
   .ios-toggle input:checked + .switch { background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); }
   .ios-toggle input:checked + .switch::after { transform: translateX(16px); }
@@ -1149,11 +1146,11 @@
   .pay-secondary:hover:not(:disabled) { background: rgba(13,13,13,0.06); }
   .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   /* Modesty and care — part of the review step, never a pop-up. Sand card, gold edge, no red/green/warning icons. */
-  .care-card { position: relative; display: flex; gap: 12px; align-items: flex-start; box-sizing: border-box; width: 100%; margin: 1rem 0 0; padding: 16px 16px 16px 19px; background: #EFE7D8; border-radius: 28px; overflow: hidden; color: #4A3F2E; }
-  .care-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #C8A96E; }
-  .care-ico { flex: none; width: 40px; height: 40px; border-radius: 50%; background: #FFFFFF; display: grid; place-items: center; }
+  .care-card { position: relative; display: flex; gap: var(--s3); align-items: flex-start; box-sizing: border-box; width: 100%; margin: 1rem 0 0; padding: var(--s4) var(--s4) var(--s4) 19px; background: #EFE7D8; border-radius: 28px; overflow: hidden; color: #4A3F2E; }
+  .care-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--c-gold); }
+  .care-ico { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--c-white); display: grid; place-items: center; }
   .care-txt { min-width: 0; }
-  .care-h { margin: 0 0 4px; font-size: 15px; font-weight: 600; line-height: 1.4; color: #4A3F2E; }
+  .care-h { margin: 0 0 var(--s1); font-size: var(--fs-body); font-weight: 600; line-height: 1.4; color: #4A3F2E; }
   .care-b { margin: 0; font-size: 14px; line-height: 1.5; color: #4A3F2E; overflow-wrap: anywhere; }
   .care-pay-hint { font-size: 0.78rem; color: var(--text-muted); text-align: center; margin: 0.6rem 0 0; line-height: 1.5; }
   .pay-note {
@@ -1221,7 +1218,7 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-muted);
-    margin-top: 4px;
+    margin-top: var(--s1);
   }
   .sc-hero-price {
     font-family: 'Poppins', sans-serif;
@@ -1378,7 +1375,7 @@
   .confirm-title {
     font-family: 'Poppins', sans-serif;
     font-size: 2rem;
-    font-weight: 300;
+    font-weight: 400;
     color: var(--cream);
     margin-bottom: 0.5rem;
     letter-spacing: -0.02em;
@@ -1437,7 +1434,7 @@
      logic. */
   @media (max-width: 600px) {
     .ios-row { padding: 0.9rem 0.85rem; min-height: 48px; }
-    .ios-row input, .ios-row select, .ios-row textarea { font-size: 16px; }
+    .ios-row input, .ios-row select, .ios-row textarea { font-size: var(--fs-input); }
     .ios-row select { min-height: 44px; }
     .back-link, .back-link:link, .back-link:visited { min-height: 44px; }
     .foot-cta { min-height: 48px; }
@@ -1448,7 +1445,7 @@
     .panel-sub, .foot-label, .svc-desc, .loc-line, #loc-notice, .pay-note,
     .ios-toggle span, .field-error, .time-hint, .time-count, .time-group-label, .time-empty, .section-label,
     .ios-group-label, .confirm-sub, .confirm-intake {
-      font-size: 15px;
+      font-size: var(--fs-body);
     }
   }
 
@@ -1472,8 +1469,8 @@
     font-family: 'Poppins', sans-serif;
     font-size: 1rem; /* real 16px — avoids Safari zoom */
     font-weight: 400;
-    color: #1a1208;
-    background: #ffffff;
+    color: var(--c-ink-warm);
+    background: var(--c-white);
     border: 1px solid #e0d9ce;
     border-radius: 1rem;
     outline: none;
@@ -1499,7 +1496,7 @@
   }
   .field-select-wrap { position: relative; }
   .field-select { padding-right: 2.6rem; cursor: pointer; }
-  .field-select option { background: #ffffff; color: #1a1208; }
+  .field-select option { background: var(--c-white); color: var(--c-ink-warm); }
   .field-chevron {
     position: absolute; right: 1rem; top: 50%;
     transform: translateY(-50%) scaleY(0.85);
@@ -1519,10 +1516,10 @@
   .field-input:-webkit-autofill:hover,
   .field-input:-webkit-autofill:focus,
   .field-input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 60px #ffffff inset !important;
-    -webkit-text-fill-color: #1a1208 !important;
-    box-shadow: 0 0 0 60px #ffffff inset !important;
-    caret-color: #1a1208;
+    -webkit-box-shadow: 0 0 0 60px var(--c-white) inset !important;
+    -webkit-text-fill-color: var(--c-ink-warm) !important;
+    box-shadow: 0 0 0 60px var(--c-white) inset !important;
+    caret-color: var(--c-ink-warm);
   }
   .field-input.invalid:-webkit-autofill,
   .field-input.invalid:-webkit-autofill:focus {
@@ -1533,27 +1530,27 @@
   /* ---- Eyebrow divider (location + consent headings) ---- */
   .s4-eyebrow {
     display: flex; align-items: center; gap: 10px;
-    margin: 24px 0 12px;
+    margin: var(--s5) 0 var(--s3);
   }
   .s4-eyebrow-label {
     font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
-    text-transform: uppercase; color: #a8873a; white-space: nowrap;
+    text-transform: uppercase; color: var(--gold-deep); white-space: nowrap;
   }
   .s4-eyebrow::after {
     content: ''; flex: 1; height: 1px; background: #e8e2d6;
   }
   /* ---- Location block ---- */
   .s4-location-address {
-    font-size: 14px; font-weight: 600; color: #1a1208; line-height: 1.4;
+    font-size: 14px; font-weight: 600; color: var(--c-ink-warm); line-height: 1.4;
     margin: 0 0 3px;
   }
   .s4-location-sub {
-    font-size: 12px; color: #888; line-height: 1.4; margin: 0;
+    font-size: var(--fs-caption); color: var(--text-sand); line-height: 1.4; margin: 0;
   }
   /* ---- Consent ---- */
   .consent-block { margin-bottom: 1.6rem; }
   .consent-row {
-    display: flex; align-items: flex-start; gap: 12px;
+    display: flex; align-items: flex-start; gap: var(--s3);
     padding: 10px 0; cursor: pointer; min-height: 44px;
     border-bottom: 1px solid #e8e2d6;
   }
@@ -1561,23 +1558,23 @@
   .consent-check {
     flex: none; width: 22px; height: 22px; margin-top: 1px;
     border: 1.5px solid #ccc; border-radius: 6px;
-    background: #ffffff;
+    background: var(--c-white);
     -webkit-appearance: none; appearance: none;
     cursor: pointer; position: relative;
     transition: border-color 0.18s, background 0.18s;
   }
   .consent-check:checked {
-    background: #a8873a;
-    border-color: #a8873a;
+    background: var(--c-gold-mid);
+    border-color: var(--c-gold-mid);
   }
   .consent-check:checked::after {
     content: '✓';
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
-    font-size: 13px; color: #ffffff; line-height: 1;
+    font-size: var(--fs-caption); color: var(--c-white); line-height: 1;
   }
   .consent-check:focus-visible { box-shadow: 0 0 0 3px rgba(168,135,58,0.25); }
-  .consent-text { font-size: 13px; color: #1a1208; line-height: 1.5; }
+  .consent-text { font-size: var(--fs-caption); color: var(--c-ink-warm); line-height: 1.5; }
 
   /* ---- Dark-mode contrast fixes (step 3 time slots, step 4 text/fields) ----
      The rules above hard-code light-mode colours that vanish on the dark
@@ -1612,7 +1609,7 @@
     .field-input.invalid:-webkit-autofill:focus { -webkit-text-fill-color: #E5736A !important; }
     .field-select option { background: #1C1C1E; color: var(--cream); }
     .consent-check { background: #1C1C1E; border-color: rgba(245,240,232,0.30); }
-    .consent-check:checked { background: #a8873a; border-color: #a8873a; }
+    .consent-check:checked { background: var(--c-gold-mid); border-color: var(--c-gold-mid); }
     .consent-check:checked::after { color: var(--cream); }
   }
 
@@ -1629,12 +1626,12 @@
   .foot-cta { min-height: 44px; padding-top: 0.4rem; padding-bottom: 0.4rem; }
   @media (max-width: 560px) { .footbar .foot-cta { font-size: 1rem; padding: 0.4rem 1.2rem; } }
   /* Step 1 */
-  .where-grid { gap: 8px; margin: 0.5rem 0 0.6rem; }
-  .where-card { padding: 12px 14px; }
-  .where-card-header { margin-bottom: 4px; }
+  .where-grid { gap: var(--s2); margin: 0.5rem 0 0.6rem; }
+  .where-card { padding: var(--s3) 14px; }
+  .where-card-header { margin-bottom: var(--s1); }
   /* Step 2 */
   .category-tabs-wrap { margin-bottom: 0.4rem; }
-  .category-tabs { padding: 4px 0; }
+  .category-tabs { padding: var(--s1) 0; }
   .service-card { padding: 0.6rem 0.25rem; }
   /* Step 3 */
   .date-section { margin-bottom: 0.8rem; }
@@ -1710,7 +1707,7 @@
   #panel-1 .panel-sub { margin-bottom: 0.8rem; max-width: 30em; }
   .where-grid { gap: 9px; margin: 0.2rem 0 0.6rem; }
   .where-card {
-    padding: 12px 14px 11px;
+    padding: var(--s3) 14px 11px;
     border: 1px solid rgba(13, 13, 13, 0.10);
     border-radius: 14px;
     box-shadow: none;
@@ -1725,16 +1722,16 @@
   }
   @media (prefers-color-scheme: dark) { .where-card.selected { background: rgba(200,169,110,0.10); } }
   .where-card-header { margin-bottom: 5px; }
-  .where-card-name { font-weight: 600; font-size: 16px; line-height: 1.25; letter-spacing: -0.005em; }
+  .where-card-name { font-weight: 600; font-size: var(--fs-input); line-height: 1.25; letter-spacing: -0.005em; }
   .where-card-badge {
     background: transparent !important;
     border: 1px solid var(--hairline-border);
-    font-size: 9.5px; letter-spacing: 0.16em; padding: 4px 9px;
+    font-size: 9.5px; letter-spacing: 0.16em; padding: var(--s1) 9px;
   }
   .where-card-badge--gold { color: var(--gold-deep); border-color: rgba(168,135,58,0.45); }
   .where-card-badge--grey { color: var(--text-sand); }
   .where-card-address { font-size: 13.5px; font-weight: 500; margin-bottom: 2px; }
-  .where-card-meta { font-size: 12px; line-height: 1.5; color: var(--text-cashmere); }
+  .where-card-meta { font-size: var(--fs-label); line-height: 1.5; color: var(--text-cashmere); }
   .where-radio-ring { width: 20px; height: 20px; border-width: 1px; border-color: var(--text-sand); }
   .where-card.selected .where-radio-ring { background: transparent; }
   .where-card-header .where-radio-ring { margin-right: 2px; }
@@ -1765,31 +1762,31 @@
      colours and fonts. Loaded last, so this block wins; change sizes here. */
   html { font-size: 100%; }
 
-  body { font-size: 15px; line-height: 1.45; padding-bottom: calc(96px + min(env(safe-area-inset-bottom, 0px), 14px)); }
-  .book-shell { padding-left: 16px; padding-right: 16px; }
+  body { font-size: var(--fs-body); line-height: 1.45; padding-bottom: calc(96px + min(env(safe-area-inset-bottom, 0px), 14px)); }
+  .book-shell { padding-left: var(--s4); padding-right: var(--s4); }
 
   /* Headings: one size for every step title, 12px floor for labels. */
-  .panel-title { font-size: 28px; line-height: 1.15; }
-  .panel:not(#panel-1) .panel-title { font-size: 28px; }
-  .panel-title::before { font-size: 12px; letter-spacing: 0.2em; margin-bottom: 8px; }
-  .panel-sub, .panel:not(#panel-1) .panel-sub { font-size: 15px; line-height: 1.45; margin-bottom: 14px; }
-  .section-label, .time-group-label, .time-hint, .time-count { font-size: 13px; letter-spacing: 0; }
-  .ios-group-label { font-size: 12px; letter-spacing: 0.06em; }
+  .panel-title { font-size: var(--fs-title); line-height: 1.15; }
+  .panel:not(#panel-1) .panel-title { font-size: var(--fs-title); }
+  .panel-title::before { font-size: var(--fs-label); letter-spacing: 0.2em; margin-bottom: var(--s2); }
+  .panel-sub, .panel:not(#panel-1) .panel-sub { font-size: var(--fs-body); line-height: 1.45; margin-bottom: 14px; }
+  .section-label, .time-group-label, .time-hint, .time-count { font-size: var(--fs-caption); letter-spacing: 0; }
+  .ios-group-label { font-size: var(--fs-label); letter-spacing: 0.06em; }
 
   /* Progress: flat 4px bars, like Atelier's step meter. */
   .steps { gap: 6px; }
   .step-dot { width: 22px; height: 4px; border-radius: 4px; }
   .step.active .step-dot { width: 30px; }
-  #step-counter { font-size: 13px; }
+  #step-counter { font-size: var(--fs-caption); }
 
   /* Step 1 — choice cards: 16px padding / 16px corners / 12px gap */
-  .where-grid { gap: 12px; margin: 4px 0 14px; }
-  .where-card { padding: 16px; border-radius: 16px; }
+  .where-grid { gap: var(--s3); margin: var(--s1) 0 14px; }
+  .where-card { padding: var(--s4); border-radius: 16px; }
   .where-card-header { margin-bottom: 6px; }
-  .where-card-name { font-size: 17px; }
-  .where-card-address { font-size: 15px; margin-bottom: 3px; }
-  .where-card-meta { font-size: 13px; line-height: 1.45; }
-  .where-card-badge { font-size: 12px; letter-spacing: 0.06em; padding: 3px 10px; }
+  .where-card-name { font-size: var(--fs-heading); }
+  .where-card-address { font-size: var(--fs-body); margin-bottom: 3px; }
+  .where-card-meta { font-size: var(--fs-caption); line-height: 1.45; }
+  .where-card-badge { font-size: var(--fs-label); letter-spacing: 0.06em; padding: 3px 10px; }
   .where-radio-ring { width: 24px; height: 24px; }
   .where-card.selected .where-radio-ring::after { width: 12px; height: 12px; }
   .where-card-address, .where-card-meta { margin-left: 36px; }
@@ -1797,11 +1794,11 @@
   .loc-line, #loc-notice { font-size: 13.5px; line-height: 1.45; }
 
   /* Step 2 — treatments as cards, one selected style (gold border + tint + tick) */
-  .category-tabs .seg-option { min-height: 40px; padding: 9px 16px; font-size: 14px; }
-  .category-tabs-wrap { margin-bottom: 8px; }
-  .service-grid { border-top: 0; display: flex; flex-direction: column; gap: 8px; }
+  .category-tabs .seg-option { min-height: 40px; padding: 9px var(--s4); font-size: 14px; }
+  .category-tabs-wrap { margin-bottom: var(--s2); }
+  .service-grid { border-top: 0; display: flex; flex-direction: column; gap: var(--s2); }
   .service-card {
-    padding: 13px 14px; gap: 12px; align-items: center;
+    padding: 13px 14px; gap: var(--s3); align-items: center;
     background: var(--obsidian-elevated);
     border: 1px solid rgba(13, 13, 13, 0.10); border-radius: 14px;
   }
@@ -1809,46 +1806,46 @@
   .service-card:hover { background: var(--obsidian-elevated); }
   .service-card.selected { border-color: var(--gold-primary); background: rgba(200,169,110,0.14); }
   .service-card .svc-ring { width: 28px; height: 28px; margin-top: 0; }
-  .svc-name { font-size: 16px; }
-  .svc-desc, .svc-meta-line { font-size: 13px; line-height: 1.4; }
-  .svc-price { font-size: 16px; }
-  .svc-dur-tag { font-size: 13px; }
-  .cart-summary { border-radius: 16px; padding: 14px 16px; }
-  .cart-title { font-size: 12px; } .cart-name, .cart-price { font-size: 14px; } .cart-note { font-size: 13px; }
+  .svc-name { font-size: var(--fs-input); }
+  .svc-desc, .svc-meta-line { font-size: var(--fs-caption); line-height: 1.4; }
+  .svc-price { font-size: var(--fs-input); }
+  .svc-dur-tag { font-size: var(--fs-caption); }
+  .cart-summary { border-radius: 16px; padding: 14px var(--s4); }
+  .cart-title { font-size: var(--fs-label); } .cart-name, .cart-price { font-size: 14px; } .cart-note { font-size: var(--fs-caption); }
 
   /* Step 3 — 44px+ targets */
-  .calendar { border-radius: 16px; padding: 12px; }
-  .cal-day { height: 44px; font-size: 15px; }
-  .cal-day-name { font-size: 12px; }
-  .cal-month { font-size: 17px; }
+  .calendar { border-radius: 16px; padding: var(--s3); }
+  .cal-day { height: 44px; font-size: var(--fs-body); }
+  .cal-day-name { font-size: var(--fs-label); }
+  .cal-month { font-size: var(--fs-heading); }
   .cal-nav { min-width: 44px; min-height: 44px; }
-  .time-grid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
-  .time-slot { min-height: 48px; border-radius: 12px; font-size: 15px; }
+  .time-grid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: var(--s2); }
+  .time-slot { min-height: 48px; border-radius: 12px; font-size: var(--fs-body); }
 
   /* Step 4/5 — inputs 48px, 12px corners; 16px type stops mobile zoom */
-  .field-input { height: 48px; border-radius: 12px; font-size: 16px; }
-  textarea.field-input { height: 5rem; padding-top: 12px; }
-  .field-label { font-size: 13px; font-weight: 500; }
+  .field-input { height: 48px; border-radius: 12px; font-size: var(--fs-input); }
+  textarea.field-input { height: 5rem; padding-top: var(--s3); }
+  .field-label { font-size: var(--fs-caption); font-weight: 500; }
   .ios-row label { white-space: nowrap; }
-  .pay-note, .field-error, .confirm-sub { font-size: 13px; }
+  .pay-note, .field-error, .confirm-sub { font-size: var(--fs-caption); }
 
   /* The footer is Atelier's dark summary bar: what you picked and what it
      costs on the left, the one action on the right, on every step. */
   .footbar { background: transparent; border-top: 0; backdrop-filter: none; -webkit-backdrop-filter: none; padding: 0 12px calc(10px + min(env(safe-area-inset-bottom, 0px), 14px)); }
   .footbar-inner {
-    max-width: 560px; background: var(--gold-primary); color: #0D0D0D;
-    border-radius: 18px; padding: 10px 10px 10px 18px; gap: 12px;
+    max-width: 560px; background: var(--gold-primary); color: var(--c-ink);
+    border-radius: 18px; padding: 10px 10px 10px 18px; gap: var(--s3);
     box-shadow: 0 10px 30px rgba(31, 23, 34, 0.20), 0 1px 2px rgba(31, 23, 34, 0.12);
   }
   .foot-summary-col { display: block !important; }
-  .foot-label { color: inherit; opacity: 0.8; font-size: 13px; line-height: 1.3; }
+  .foot-label { color: inherit; opacity: 0.8; font-size: var(--fs-caption); line-height: 1.3; }
   .foot-total { color: inherit; font-size: 14.5px; font-weight: 600; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .foot-cta {
-    background: #0D0D0D; color: #F5F0E8; border: 0; box-shadow: none;
-    min-height: 46px; padding: 0 18px; font-size: 15px; font-weight: 600; letter-spacing: 0;
+    background: var(--c-ink); color: var(--c-cream); border: 0; box-shadow: none;
+    min-height: 46px; padding: 0 18px; font-size: var(--fs-body); font-weight: 600; letter-spacing: 0;
   }
-  .footbar .foot-cta { font-size: 15px; padding: 0 16px; gap: 6px; }
-  .foot-cta svg { color: #DFC38E; }
+  .footbar .foot-cta { font-size: var(--fs-body); padding: 0 var(--s4); gap: 6px; }
+  .foot-cta svg { color: var(--c-gold-light); }
   .foot-cta:hover:not(:disabled) { filter: none; opacity: 0.9; }
   .foot-cta:disabled { background: rgba(13, 13, 13, 0.14); color: rgba(13, 13, 13, 0.55); border: 0; }
   .foot-cta:disabled svg { color: rgba(13, 13, 13, 0.45); }
@@ -1858,7 +1855,6 @@
      of 4 (steps 4 / 8 / 12 / 16 / 24 / 32). Cards 16, buttons and inputs 48,
      choice rows 12 x 16, gaps 8 or 12. One block, loaded last: change a step
      here, not in the rules above. */
-  :root { --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; }
   .panel { padding-top: var(--s2); }
   .panel-sub, #panel-1 .panel-sub, .panel:not(#panel-1) .panel-sub { margin-bottom: var(--s4); }
   h1 { margin-top: 0; margin-bottom: 0; }
@@ -1923,6 +1919,8 @@
   .footbar .foot-cta { gap: var(--s2); }
   body { padding-bottom: calc(96px + min(env(safe-area-inset-bottom, 0px), 16px)); }
 </style>
+<link rel="stylesheet" href="/tokens.css">
+<link rel="stylesheet" href="/ui.css">
 </head>
 <body>
 <!-- Branded loading screen — fades on window load; CSS failsafe hides it if JS fails -->
@@ -1984,6 +1982,8 @@
 
 
 <div class="container">
+
+  <div class="banner banner-error" id="panel-error" role="alert" hidden><p></p></div>
 
   <!-- STEP 1: Where -->
   <div class="panel active" id="panel-1">
@@ -2700,6 +2700,21 @@ function syncFooter() {
   const label = document.getElementById('foot-cta-label');
   if (label) label.textContent = currentStep === 4 ? 'Review booking' : 'Continue';
   cta.disabled = src ? src.disabled : true;
+  // A disabled button must say why (and a screen reader hears it too).
+  const fh = document.getElementById('foot-helper');
+  if (fh) {
+    const reasons = {
+      1: state.location === 'mobile' && state.travelZone === null ? 'Enter your postcode to continue' : "Choose where you'd like your session",
+      2: 'Choose at least one treatment',
+      3: state.date ? 'Pick a time to continue' : 'Pick a date and time',
+      4: 'Finish your details to continue',
+    };
+    const why = cta.disabled ? reasons[currentStep] : '';
+    fh.textContent = why;
+    fh.classList.toggle('hidden', !why);
+    fh.setAttribute('role', 'status');
+    cta.setAttribute('aria-describedby', 'foot-helper');
+  }
 }
 
 // Step 1 lets the link through to the homepage; later steps step backwards.
@@ -2926,8 +2941,18 @@ function renderCalendar() {
   const today = new Date(); today.setHours(0,0,0,0);
   const firstDay = new Date(state.calYear, state.calMonth, 1).getDay();
   const daysInMonth = new Date(state.calYear, state.calMonth + 1, 0).getDate();
-  let html = DAYS.map(d => `<div class="cal-day-name">${d}</div>`).join('');
-  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty"></div>`;
+  let html = DAYS.map(d => `<div class="cal-day-name" aria-hidden="true">${d}</div>`).join('');
+  for (let i = 0; i < firstDay; i++) html += `<div class="cal-day empty" aria-hidden="true"></div>`;
+  // Roving tabindex: one tab stop in the grid (the chosen day, else the first
+  // bookable one); arrow keys move between days (see the keyboard handler).
+  let rovingDay = null;
+  for (let d = 1; d <= daysInMonth && rovingDay === null; d++) {
+    const dt = new Date(state.calYear, state.calMonth, d);
+    if (dateIsBookable(dt, today) && state.date && dt.toDateString() === state.date.toDateString()) rovingDay = d;
+  }
+  for (let d = 1; d <= daysInMonth && rovingDay === null; d++) {
+    if (dateIsBookable(new Date(state.calYear, state.calMonth, d), today)) rovingDay = d;
+  }
   for (let d = 1; d <= daysInMonth; d++) {
     const date = new Date(state.calYear, state.calMonth, d);
     const bookable = dateIsBookable(date, today);
@@ -2939,8 +2964,10 @@ function renderCalendar() {
       isSelected ? 'selected' : '',
       isToday ? 'today' : '',
     ].filter(Boolean).join(' ');
-    const onclick = bookable ? `onclick="selectDate(${state.calYear},${state.calMonth},${d})"` : '';
-    html += `<div class="${cls}" ${onclick}>${d}</div>`;
+    const label = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    html += bookable
+      ? `<div class="${cls}" role="button" tabindex="${d === rovingDay ? 0 : -1}" aria-pressed="${!!isSelected}" aria-label="${label}" data-d="${d}" onclick="selectDate(${state.calYear},${state.calMonth},${d})">${d}</div>`
+      : `<div class="${cls}" role="button" aria-disabled="true" aria-label="${label}, unavailable" data-d="${d}">${d}</div>`;
   }
   grid.innerHTML = html;
 }
@@ -2962,6 +2989,8 @@ let availableSlots = [];
 let nextAvailableISO = null;
 // True while /availability is in flight for the selected date.
 let slotsLoading = false;
+// True when /availability could not be reached and the plain grid is shown instead.
+let availabilityError = false;
 
 function slotToMinutes(t) {
   const m = /^(\d{1,2}):(\d{2})\s*(am|pm)$/i.exec(t);
@@ -3037,6 +3066,7 @@ async function loadSlots() {
   const reqId = ++availabilityRequest;
   const iso = toISODate(state.date);
   slotsLoading = true;
+  availabilityError = false;
   availableSlots = [];
   nextAvailableISO = null;
   renderTimes();
@@ -3054,9 +3084,11 @@ async function loadSlots() {
     nextAvailableISO = typeof data.next === 'string' ? data.next : null;
   } catch (e) {
     if (reqId !== availabilityRequest) return;
-    // Fail open: render the plain grid so a lookup fault never blocks booking.
+    // Fail open: render the plain grid so a lookup fault never blocks booking —
+    // but say so, with a retry, instead of pretending the times are live.
     availableSlots = localSlotsFor(state.date);
     nextAvailableISO = null;
+    availabilityError = true;
   }
   slotsLoading = false;
   // A previously chosen time may no longer be on offer (treatment got longer,
@@ -3103,16 +3135,23 @@ function renderTimes() {
 
   if (slotsLoading) {
     count.hidden = true;
-    wrap.innerHTML = '<p class="time-empty">Checking availability…</p>';
+    // Skeleton in the same shape as the real grid, so nothing jumps when it loads.
+    wrap.innerHTML = '<div role="status" aria-busy="true"><span class="sr-only">Checking availability…</span>'
+      + '<div class="skeleton-grid" aria-hidden="true">' + '<span class="skeleton"></span>'.repeat(8) + '</div></div>';
     return;
   }
 
   if (availableSlots.length === 0) {
     count.hidden = true;
-    const next = nextAvailableISO
-      ? ` — next available: <a role="button" tabindex="0" onclick="selectDateISO('${nextAvailableISO}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDateISO('${nextAvailableISO}')}">${friendlyDate(nextAvailableISO)}</a>`
+    const wa = 'https://wa.me/447474833643?text=' + encodeURIComponent("Hi Halima, I'd like to book but I can't see a time that works.");
+    const nextBtn = nextAvailableISO
+      ? `<button type="button" class="btn-secondary" onclick="selectDateISO('${nextAvailableISO}')">Go to ${friendlyDate(nextAvailableISO)}</button>`
       : '';
-    wrap.innerHTML = `<p class="time-empty">No times left on this day${next}</p>`;
+    wrap.innerHTML = `<div class="state-box" role="status">
+        <p class="state-title">No times left on this day</p>
+        <p class="state-text">${nextAvailableISO ? 'The next free day is ' + friendlyDate(nextAvailableISO) + '. Or pick another date above.' : 'Please pick another date above, or message Halima and she will find a time with you.'}</p>
+        <div class="state-actions">${nextBtn}<a class="btn-ghost" href="${wa}" target="_blank" rel="noopener">Message Halima</a></div>
+      </div>`;
     return;
   }
 
@@ -3124,15 +3163,71 @@ function renderTimes() {
     ['Afternoon', availableSlots.filter(t => t >= 12 * 60 && t < 17 * 60)],
     ['Evening', availableSlots.filter(t => t >= 17 * 60)],
   ];
-  wrap.innerHTML = groups.filter(([, list]) => list.length).map(([label, list]) => `
+  const rovingT = (state.time && availableSlots.some(m => minutesToLabel(m) === state.time)) ? state.time : minutesToLabel(availableSlots[0]);
+  const banner = availabilityError
+    ? `<div class="banner banner-error" role="alert"><p>We couldn't check live availability, so some of these times may already be taken. Halima will confirm your slot.</p><button type="button" class="btn-secondary" onclick="loadSlots()">Try again</button></div>`
+    : '';
+  wrap.innerHTML = banner + groups.filter(([, list]) => list.length).map(([label, list]) => `
     <div class="time-group">
       <p class="time-group-label">${label}</p>
       <div class="time-grid">${list.map(min => {
         const t = minutesToLabel(min);
-        return `<div class="time-slot${state.time === t ? ' selected' : ''}" onclick="selectTime('${t}')">${t}</div>`;
+        return `<div class="time-slot${state.time === t ? ' selected' : ''}" role="button" tabindex="${t === rovingT ? 0 : -1}" aria-pressed="${state.time === t}" data-t="${t}" onclick="selectTime('${t}')">${t}</div>`;
       }).join('')}</div>
     </div>`).join('');
 }
+
+/* Keyboard for the date grid and the time grid (they are role=button divs with a
+   roving tabindex): arrows move, Home/End jump, Enter/Space choose. After a
+   choice re-renders the grid, focus goes back to the chosen item. */
+(function () {
+  function bind(containerId, itemSel, keyAttr, next) {
+    const box = document.getElementById(containerId);
+    if (!box) return;
+    box.addEventListener('keydown', e => {
+      const cur = document.activeElement;
+      if (!cur || !cur.matches(itemSel)) return;
+      const k = e.key;
+      if (k === 'Enter' || k === ' ') {
+        e.preventDefault();
+        if (cur.getAttribute('aria-disabled') === 'true') return;
+        const id = cur.dataset[keyAttr];
+        cur.click();
+        setTimeout(() => { const el = document.getElementById(containerId).querySelector(`${itemSel}[data-${keyAttr === 'd' ? 'd' : 't'}="${id}"]`); if (el) el.focus(); }, 0);
+        return;
+      }
+      const target = next(cur, k);
+      if (target) {
+        e.preventDefault();
+        box.querySelectorAll(itemSel).forEach(x => { x.tabIndex = -1; });
+        target.tabIndex = 0; target.focus();
+      }
+    });
+  }
+  // dates: left/right = ±1 day, up/down = ±7, skipping unavailable days
+  bind('cal-grid', '.cal-day[role="button"]', 'd', (cur, k) => {
+    const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 7, ArrowUp: -7 }[k];
+    const box = document.getElementById('cal-grid');
+    const free = [...box.querySelectorAll('.cal-day[role="button"]:not([aria-disabled="true"])')];
+    if (k === 'Home') return free[0];
+    if (k === 'End') return free[free.length - 1];
+    if (!step) return null;
+    for (let d = +cur.dataset.d + step; d >= 1 && d <= 31; d += step) {
+      const el = box.querySelector(`.cal-day[data-d="${d}"]:not([aria-disabled="true"])`);
+      if (el) return el;
+    }
+    return null;
+  });
+  // times: left/right = ±1, up/down = one row
+  bind('time-groups', '.time-slot', 't', (cur, k) => {
+    const box = document.getElementById('time-groups');
+    const items = [...box.querySelectorAll('.time-slot')];
+    const i = items.indexOf(cur);
+    const row = items.filter(x => x.offsetTop === items[0].offsetTop).length || 1;
+    const n = { ArrowRight: i + 1, ArrowLeft: i - 1, ArrowDown: i + row, ArrowUp: i - row, Home: 0, End: items.length - 1 }[k];
+    return n != null ? items[n] : null;
+  });
+})();
 
 function selectTime(t) {
   if (!slotIsOffered(t)) return;
@@ -3193,6 +3288,11 @@ function markTouched(id) { touchedFields.add(id); checkStep3(); }
 
 function checkStep3() {
   document.getElementById('address-row').style.display = isMobile() ? '' : 'none';
+  // The address box only exists for home visits. While it is hidden it must not be fillable either:
+  // a hidden autocomplete="street-address" field makes Android (Samsung Pass) open its "Select address"
+  // panel over the bottom of the page, covering the Continue button.
+  const addrBox = document.getElementById('address');
+  if (addrBox) { addrBox.disabled = !isMobile(); addrBox.setAttribute('autocomplete', isMobile() ? 'street-address' : 'off'); }
   const addressError = document.getElementById('address-error');
   const venueBlock = document.getElementById('clinic-venue-block');
   if (isClinic()) {
@@ -3280,7 +3380,7 @@ function renderSummary() {
       <div class="pass-when">
         <div class="pass-date">${dateStr}</div>
         <div class="pass-time">${state.time}</div>
-        <div class="pass-at">${isClinic() ? `${locationLabel} · ${CLINIC_VENUE_ADDRESS}` : isVirtual() ? `${locationLabel} · link sent by email` : `${locationLabel} · Manchester`}</div>
+        <div class="pass-at">${isClinic() ? `Clinic Day · ${CLINIC_VENUE_ADDRESS}` : isVirtual() ? `${locationLabel} · link sent by email` : `${locationLabel} · Manchester`}</div>
       </div>
       <div class="pass-perf"><span></span></div>
       <div class="pass-what">
@@ -3296,8 +3396,24 @@ function renderSummary() {
   `;
 }
 
+// Inline, polite error banner at the top of the page (replaces browser pop-ups).
+// `step` moves the customer to the step where they can fix it first.
+function failPay(msg, step) {
+  if (step) goToStep(step);
+  showPanelError(msg);
+}
+function showPanelError(msg) {
+  const el = document.getElementById('panel-error');
+  if (!el) return;
+  el.querySelector('p').textContent = msg;
+  el.hidden = false;
+  el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+function clearPanelError() { const el = document.getElementById('panel-error'); if (el) el.hidden = true; }
+
 async function handlePayment() {
-  if (!state.cart.length) { alert("Please go back and select a treatment."); return; }
+  clearPanelError();
+  if (!state.cart.length) { failPay("Please choose a treatment first.", 2); return; }
   const { names, dateStr, locationLabel } = buildSummary();
   const name  = document.getElementById('fullname').value.trim();
   const email = document.getElementById('email').value.trim();
@@ -3307,33 +3423,27 @@ async function handlePayment() {
 
   // Final guard — never reach Stripe with missing or invalid contact details.
   if (!name) {
-    alert("Please go back and enter your full name before paying.");
-    goToStep(4); return;
+    failPay("Please enter your full name before paying.", 4); return;
   }
   if (!isValidEmail(email)) {
-    alert("Please go back and enter a valid email address — we send your intake form there.");
-    goToStep(4); return;
+    failPay("Please enter a valid email address — your confirmation is sent there.", 4); return;
   }
   if (!isValidPhone(phone)) {
-    alert("Please go back and enter a valid UK mobile number so Halima can confirm your booking.");
-    goToStep(4); return;
+    failPay("Please enter a valid UK mobile number so Halima can confirm your booking.", 4); return;
   }
   if (isMobile() && !isValidAddress(address)) {
-    alert("Please go back and enter the full address, including postcode, where your session will take place.");
-    goToStep(4); return;
+    failPay("Please enter the full address, including postcode, where your session will take place.", 4); return;
   }
   if (isMobile() && state.travelZone === null) {
-    alert("Please go back to Step 1 and enter your postcode so we can price travel.");
-    goToStep(1); return;
+    failPay("Please enter your postcode so we can price travel.", 1); return;
   }
   const consentCancellation = document.getElementById('consent-cancellation');
   if (!consentCancellation || !consentCancellation.checked) {
-    alert("Please tick the box to confirm you accept the cancellation policy before paying.");
-    return;
+    failPay("Please tick the box to accept the cancellation policy before paying."); return;
   }
 
   const fullBtn = document.getElementById('btn-full');
-  if (fullBtn) { fullBtn.disabled = true; fullBtn.textContent = 'Redirecting to payment…'; }
+  if (fullBtn) { fullBtn.disabled = true; fullBtn.classList.add('is-loading'); fullBtn.setAttribute('aria-busy', 'true'); fullBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span>Taking you to payment…'; }
 
   const amount = cartTotalPence(); // pence — every booking is paid in full; create-checkout.js recomputes this itself if a discount code is present, never trusting this figure for the actual charge.
 
@@ -3364,11 +3474,11 @@ async function handlePayment() {
     // 409 = the slot was booked by someone else during checkout. Send them back
     // to pick another time, and refresh availability so it shows as taken.
     if (res.status === 409) {
-      alert('Sorry — that time was just booked by someone else. Please choose another slot.');
       state.time = null;
       resetPayButtons();
       goToStep(3);
       if (state.date) selectDate(state.date.getFullYear(), state.date.getMonth(), state.date.getDate());
+      showPanelError('That time was just booked by someone else. Please choose another.');
       return;
     }
 
@@ -3382,23 +3492,23 @@ async function handlePayment() {
       // happens if the list went stale (e.g. the same-day notice window
       // moved past the chosen time while they filled in their details).
       if (errBody.error === 'slot_invalid') {
-        alert('Sorry — that time is no longer available. Please choose another slot.');
         state.time = null;
         resetPayButtons();
         goToStep(3);
+        showPanelError('That time is no longer available. Please choose another.');
         return;
       }
       if (errBody.error === 'discount_invalid' || errBody.error === 'discount_unavailable') {
-        alert('Sorry — your discount code is no longer valid. It has been removed; please review your total and pay again.');
         removeDiscountCode();
         resetPayButtons();
+        showPanelError('Your discount code is no longer valid, so it has been removed. Please check your total and pay again.');
         return;
       }
       // Any other 400 — show the server's actual reason rather than a
       // generic message, so a real cause (e.g. an unrecognised treatment) is
       // visible instead of hidden behind "please try again".
-      alert(`Payment setup failed: ${errBody.reason || errBody.error || 'unknown error'}. Please try again, or let Halima know if it keeps happening.`);
       resetPayButtons();
+      showPanelError(`We couldn't start your payment (${errBody.reason || errBody.error || 'unknown error'}). Please try again, or message Halima if it keeps happening.`);
       return;
     }
 
@@ -3407,8 +3517,8 @@ async function handlePayment() {
       // server actually said instead of a blanket "please try again", so a
       // real bug (a bad env var, a schema mismatch) is visible on the spot.
       const errBody = await res.json().catch(() => ({}));
-      alert(`Payment setup failed: ${errBody.error || `server error (${res.status})`}. Please try again, or let Halima know if it keeps happening.`);
       resetPayButtons();
+      showPanelError(`We couldn't start your payment (${errBody.error || `server error ${res.status}`}). Please try again, or message Halima if it keeps happening.`);
       return;
     }
 
@@ -3420,12 +3530,12 @@ async function handlePayment() {
       clearProgress();
       window.location.href = data.url;
     } else {
-      alert('Payment setup failed: the server didn’t return a payment link. Please try again, or let Halima know if it keeps happening.');
       resetPayButtons();
+      showPanelError("We couldn't get a payment link. Please try again, or message Halima if it keeps happening.");
     }
   } catch (err) {
-    alert(`Something went wrong: ${err.message || err}. Please try again.`);
     resetPayButtons();
+    showPanelError(navigator.onLine === false ? "You appear to be offline. Please check your connection and try again." : "Something went wrong on our side. Please try again in a moment.");
   }
 }
 
@@ -3445,7 +3555,7 @@ function checkStep5() {
 
 function resetPayButtons() {
   const fullBtn = document.getElementById('btn-full');
-  if (fullBtn) fullBtn.textContent = fullLabel();
+  if (fullBtn) { fullBtn.classList.remove('is-loading'); fullBtn.removeAttribute('aria-busy'); fullBtn.textContent = fullLabel(); }
   checkStep5();
 }
 
@@ -3565,7 +3675,8 @@ function goToStep(n) {
   // Reset touched tracking whenever the customer navigates away from step 4
   // so errors don't carry over on Back+Forward.
   if (n !== 4) touchedFields.clear();
-  if (n === 5 && !state.cart.length) { alert("Please select a treatment first."); return; }
+  clearPanelError();
+  if (n === 5 && !state.cart.length) { failPay("Please choose a treatment first.", 2); return; }
   currentStep = n;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById(`panel-${n}`).classList.add('active');

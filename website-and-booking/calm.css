@@ -14,35 +14,35 @@
 html { font-size: 78%; }
 
 :root {
-  --page-bg: #F5F0E8;
-  --card: #FFFFFF;
+  --page-bg: var(--c-cream);
+  --card: var(--c-white);
   --fill: #EFE9DD;          /* warm grey: inactive controls, input wells */
   --fill-hover: #E8E1D2;
   --ink: #1C1A16;
   --muted: #6B6354;
-  --gold: #C8A96E;
-  --gold-deep: #8a6a2c;
+  --gold: var(--c-gold);
+  --gold-deep: var(--c-gold-deep);
   --ring: rgba(200,169,110,0.5);
   --shadow: 0 1px 2px rgba(60,45,20,0.04), 0 6px 20px rgba(60,45,20,0.05);
   --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;      /* titles */
   --serif-text: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif; /* softer serif for sentences */
 }
 
-body { background: var(--page-bg); color: var(--ink); font-size: 16px; }
+body { background: var(--page-bg); color: var(--ink); font-size: var(--fs-input); }
 
-nav { padding: 12px 20px; }
+nav { padding: var(--s3) 20px; }
 
 @media (min-width: 861px) { nav { padding: 14px 40px; } }
 
 /* page frame: 16px gutters, clear of the fixed nav */
-.wrap { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; padding: 88px 16px 24px; }
+.wrap { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; padding: 88px var(--s4) var(--s5); }
 
-h1 { font-family: var(--serif); font-weight: normal; font-size: 28px; line-height: 1.15; letter-spacing: -0.012em; margin: 0 0 12px; color: var(--ink); }
+h1 { font-family: var(--serif); font-weight: normal; font-size: var(--fs-title); line-height: 1.15; letter-spacing: -0.012em; margin: 0 0 var(--s3); color: var(--ink); }
 
-.intro-line { font-size: 15px; line-height: 1.65; color: var(--muted); max-width: none; }
+.intro-line { font-size: var(--fs-body); line-height: 1.65; color: var(--muted); max-width: none; }
 
 .step-lede { font-family: var(--serif-text); font-size: 21px; line-height: 1.35; letter-spacing: -0.005em; color: var(--ink); margin: 0 0 20px; }
 
-.progress-step, .section-label { font-size: 12px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-deep); }
+.progress-step, .section-label { font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-deep); }
 
-.field, .card { background: var(--card); border: 1px solid rgba(13,13,13,0.07); border-radius: 16px; padding: 16px; margin: 0 0 12px; box-shadow: var(--shadow); }
+.field, .card { background: var(--card); border: 1px solid rgba(13,13,13,0.07); border-radius: 16px; padding: var(--s4); margin: 0 0 var(--s3); box-shadow: var(--shadow); }

@@ -30,11 +30,11 @@
     /* Light theme (Sep 2026) — was true-black; --white/--dim are still the
        text-colour tokens (light text on dark before, now dark text on
        light), --page-bg is new for the former --black page background. */
-    --deep: #FFFFFF;
+    --deep: var(--c-white);
     --gold-light: #DBB85A;
     --gold-dim: rgba(200,169,110,0.14);
-    --white: #0D0D0D;
-    --dim: #5a5247;
+    --white: var(--c-ink);
+    --dim: var(--c-body-soft);
     --border: rgba(13,13,13,0.1);
     --radius: 0px;
     --font-heading: 'Poppins', sans-serif;
@@ -47,9 +47,9 @@
     background:var(--page-bg);
     color:var(--white);
     font-family:'Poppins',sans-serif;
-    font-weight:300;
+    font-weight: 400;
     overflow-x:hidden;
-    font-size:16px;
+    font-size:var(--fs-input);
     line-height:1.7;
   }
 
@@ -121,7 +121,7 @@
     display:inline-block; text-decoration:none;
     font-family:'Poppins',sans-serif; font-size:0.72rem;
     letter-spacing:0.2em; text-transform:uppercase;
-    padding:16px 44px; transition:all 0.35s;
+    padding:var(--s4) 44px; transition:all 0.35s;
     font-weight:400; border-radius:50px;
   }
   .btn-gold { background:var(--gold); color:#080806; font-weight:500; }
@@ -132,8 +132,8 @@
   /* Section tag / eyebrow — copied from index.html */
   .section-tag {
     font-size:0.65rem; letter-spacing:0.28em; text-transform:uppercase;
-    color:var(--gold-deep); margin-bottom:24px;
-    display:flex; align-items:center; gap:12px; opacity:0.9;
+    color:var(--gold-deep); margin-bottom:var(--s5);
+    display:flex; align-items:center; gap:var(--s3); opacity:0.9;
   }
   .section-tag.center { justify-content:center; }
   .section-tag::before { content:''; width:24px; height:1px; background:var(--gold); opacity:0.6; }
@@ -142,7 +142,7 @@
     font-family:var(--font-heading);
     font-size:clamp(1.75rem, 5vw, 2rem);
     font-weight:600; line-height:1.1;
-    margin-bottom:24px;
+    margin-bottom:var(--s5);
   }
   h2 {
     font-family:var(--font-heading);
@@ -178,7 +178,7 @@
     font-style:normal; font-size:1em; line-height:1; color:var(--gold);
     letter-spacing:normal; font-weight:normal;
   }
-  .footer-links { display:flex; gap:32px; }
+  .footer-links { display:flex; gap:var(--s6); }
   .footer-links a {
     /* Footer keeps its dark background even on the light theme (matches
        index.html), so its text stays hardcoded light rather than following
@@ -223,7 +223,7 @@
   .nav-overlay-links a {
     color:var(--white); text-decoration:none;
     font-family:'Poppins',sans-serif; font-size:1.5rem; letter-spacing:0.01em;
-    padding:8px 0; display:inline-block; min-height:44px;
+    padding:var(--s2) 0; display:inline-block; min-height:44px;
   }
   .nav-overlay-links a:hover { color:var(--gold-deep); }
   .nav-overlay-cta { min-height:44px; display:inline-flex; align-items:center; justify-content:center; }
@@ -241,12 +241,12 @@
   .mobile-bar .btn { flex:1; text-align:center; padding:14px 20px; }
 
   @media(max-width:860px){
-    nav { padding:18px 24px; }
+    nav { padding:18px var(--s5); }
     nav ul { display:none; }
     .nav-hamburger { display:flex; }
     .mobile-bar { display:flex; }
     body { padding-bottom:78px; }
-    footer { flex-direction:column; gap:28px; text-align:center; padding:48px 24px; }
+    footer { flex-direction:column; gap:28px; text-align:center; padding:48px var(--s5); }
     .footer-links { flex-wrap:wrap; justify-content:center; }
     .footer-right { text-align:center; }
   }
@@ -256,29 +256,29 @@
   /* before-your-session: layout only. Tokens, Tan Ashford title, Georgia intro
      line, the gold label and the white card come from calm.css (shared with
      intake.html) — nothing here redefines them. */
-  .btn { font-size:15px; letter-spacing:0; text-transform:none; padding:0 28px; height:48px; display:inline-flex; align-items:center; justify-content:center; }
+  .btn { font-size:var(--fs-body); letter-spacing:0; text-transform:none; padding:0 28px; height:48px; display:inline-flex; align-items:center; justify-content:center; }
   .btn:hover { transform:none; box-shadow:none; }
 
-  .article-hero { padding:0 0 8px; text-align:left; background:none; }
-  .article-hero .section-label { display:block; margin:0 0 16px; }
-  .article-hero .step-lede { margin:0 0 24px; }
+  .article-hero { padding:0 0 var(--s2); text-align:left; background:none; }
+  .article-hero .section-label { display:block; margin:0 0 var(--s4); }
+  .article-hero .step-lede { margin:0 0 var(--s5); }
 
   /* one card per section, 24px between sections */
-  .article > .card { margin:0 0 24px; font-size:17px; line-height:1.5; font-weight:300; color:var(--ink); }
-  .card .section-label { margin:0 0 16px; line-height:1.4; }
-  .card p { margin:0 0 16px; font-size:17px; line-height:1.5; color:var(--ink); }
+  .article > .card { margin:0 0 var(--s5); font-size:var(--fs-heading); line-height:1.5; font-weight: 400; color:var(--ink); }
+  .card .section-label { margin:0 0 var(--s4); line-height:1.4; }
+  .card p { margin:0 0 var(--s4); font-size:var(--fs-heading); line-height:1.5; color:var(--ink); }
   .card p:last-child { margin-bottom:0; }
   .card a { color:var(--gold-deep); text-decoration:underline; text-underline-offset:3px; }
 
   .ticks { list-style:none; margin:0; padding:0; }
-  .ticks li { position:relative; padding-left:28px; margin-bottom:12px; font-size:17px; line-height:1.5; color:var(--ink); }
+  .ticks li { position:relative; padding-left:28px; margin-bottom:var(--s3); font-size:var(--fs-heading); line-height:1.5; color:var(--ink); }
   .ticks li:last-child { margin-bottom:0; }
-  .ticks li::before { content:'✓'; position:absolute; left:0; top:0; color:var(--gold-deep); font-size:15px; }
+  .ticks li::before { content:'✓'; position:absolute; left:0; top:0; color:var(--gold-deep); font-size:var(--fs-body); }
 
   /* the fade timeline: warm-fill tiles, 3 + 2 on a phone */
-  .timeline { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:0 0 16px; }
-  .timeline .t-step { background:var(--fill); border-radius:16px; padding:12px 8px; text-align:center; }
-  .timeline .t-day { display:block; margin-bottom:4px; font-size:12px; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold-deep); }
+  .timeline { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--s2); margin:0 0 var(--s4); }
+  .timeline .t-step { background:var(--fill); border-radius:16px; padding:var(--s3) var(--s2); text-align:center; }
+  .timeline .t-day { display:block; margin-bottom:var(--s1); font-size:var(--fs-label); font-weight:500; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold-deep); }
   .timeline .t-label { font-size:14px; color:var(--muted); }
 
   .closing { text-align:center; }
@@ -290,15 +290,17 @@
   .footer-right { font-size:10.4px; }
 
   /* the phone CTA bar: same soft-fade bar as intake's action bar */
-  .mobile-bar { background:linear-gradient(to top, var(--page-bg) 52%, rgba(245,240,232,0)); border-top:0; backdrop-filter:none; -webkit-backdrop-filter:none; padding:28px 16px calc(16px + env(safe-area-inset-bottom,0px)); gap:12px; pointer-events:none; }
+  .mobile-bar { background:linear-gradient(to top, var(--page-bg) 52%, rgba(245,240,232,0)); border-top:0; backdrop-filter:none; -webkit-backdrop-filter:none; padding:28px 16px calc(16px + env(safe-area-inset-bottom,0px)); gap:var(--s3); pointer-events:none; }
   .mobile-bar .btn { pointer-events:auto; flex:1; padding:0 28px; }
   @media(max-width:860px){ body { padding-bottom:calc(104px + 24px + min(env(safe-area-inset-bottom,0px),14px)); } }
   /* Atelier scale (Oct 2026): the same dark floating bar as the booking page and intake form */
   .mobile-bar { left:12px; right:12px; bottom:calc(10px + min(env(safe-area-inset-bottom,0px),14px)); width:auto; max-width:576px; margin:0 auto; padding:10px; background:var(--gold); border-radius:18px; pointer-events:auto; box-shadow:0 10px 30px rgba(31,23,34,0.20),0 1px 2px rgba(31,23,34,0.12); }
-  .mobile-bar::before { content:'Ready when you are'; flex:1; min-width:0; padding-left:8px; font-size:13px; font-weight:500; color:#0D0D0D; white-space:nowrap; align-self:center; }
-  .mobile-bar { padding:8px; bottom:calc(8px + min(env(safe-area-inset-bottom,0px),16px)); gap:8px; }
-  .mobile-bar .btn { flex:none; height:48px; min-width:150px; font-weight:600; background:#0D0D0D; color:#F5F0E8; }
+  .mobile-bar::before { content:'Ready when you are'; flex:1; min-width:0; padding-left:var(--s2); font-size:var(--fs-caption); font-weight:500; color:var(--c-ink); white-space:nowrap; align-self:center; }
+  .mobile-bar { padding:var(--s2); bottom:calc(8px + min(env(safe-area-inset-bottom,0px),16px)); gap:var(--s2); }
+  .mobile-bar .btn { flex:none; height:48px; min-width:150px; font-weight:600; background:var(--c-ink); color:var(--c-cream); }
 </style>
+<link rel="stylesheet" href="/tokens.css">
+<link rel="stylesheet" href="/ui.css">
 </head>
 <body>
 

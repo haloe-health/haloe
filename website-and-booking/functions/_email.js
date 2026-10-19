@@ -17,7 +17,7 @@ export const WHITE = '#FFFFFF';
 export const INK = '#0D0D0D';
 export const BODY_TEXT = '#5a5247';
 export const GOLD = '#C8A96E';
-export const GOLD_DEEP = '#8a6a2c';
+export const GOLD_DEEP = '#7A5C22';   // darkened from #8a6a2c: 5.6:1 on cream (was 4.4:1, below AA for small text)
 export const HAIRLINE = 'rgba(13,13,13,0.08)';
 // Poppins where the client supports web fonts (a <link> to the Google Fonts
 // CSS in emailShell's <head> covers Apple Mail and some Gmail apps), with a
@@ -100,7 +100,7 @@ export function esc(value) {
 // `label` is escaped; `href` is trusted (always a hard-coded site URL, never
 // user input).
 export function emailButton(href, label) {
-  return `<a href="${href}" style="display:inline-block;background:${GOLD};color:${INK};text-decoration:none;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;padding:15px 32px;border-radius:26px;font-family:Arial,Helvetica,sans-serif;">${esc(label)}</a>`;
+  return `<a href="${href}" style="display:inline-block;background:${GOLD};color:${INK};text-decoration:none;font-size:14px;line-height:20px;letter-spacing:1.5px;text-transform:uppercase;font-weight:bold;padding:14px 32px;border-radius:28px;font-family:Arial,Helvetica,sans-serif;">${esc(label)}</a>`;
 }
 
 // The haloe header row: the flower + wordmark PNG, centred, on the cream
@@ -121,9 +121,9 @@ export function emailButton(href, label) {
 export function emailHeader() {
   return `<!-- Header -->
               <tr>
-                <td align="center" width="480" bgcolor="${CREAM}" style="width:480px;max-width:100%;padding:3px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
+                <td align="center" width="100%" bgcolor="${CREAM}" style="width:100%;padding:3px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
                   <img src="${LOGO_URL}" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="haloe" style="display:block;width:${LOGO_WIDTH}px;height:auto;max-width:100%;border:0;outline:none;">
-                  <div style="font-family:${FONT};font-size:11px;letter-spacing:3px;color:${GOLD_DEEP};text-transform:uppercase;margin-top:10px;">Hijama &middot; Wellness &middot; Manchester</div>
+                  <div style="font-family:${FONT};font-size:12px;letter-spacing:3px;color:${GOLD_DEEP};text-transform:uppercase;margin-top:10px;">Hijama &middot; Wellness &middot; Manchester</div>
                 </td>
               </tr>`;
 }
@@ -132,9 +132,9 @@ export function emailHeader() {
 export function emailFooter() {
   return `<!-- Footer -->
               <tr>
-                <td align="center" width="480" bgcolor="${CREAM}" style="width:480px;max-width:100%;padding:26px 4px 8px;border-top:1px solid ${HAIRLINE};background:${CREAM};">
-                  <div style="color:${GOLD_DEEP};font-size:12px;letter-spacing:1px;font-weight:600;font-family:${FONT};">From haloe</div>
-                  <div style="color:${BODY_TEXT};font-size:11px;margin-top:12px;font-family:${FONT};opacity:0.8;">Manchester</div>
+                <td align="center" width="100%" bgcolor="${CREAM}" style="width:100%;padding:26px 4px 8px;border-top:1px solid ${HAIRLINE};background:${CREAM};">
+                  <div style="color:${GOLD_DEEP};font-size:13px;letter-spacing:1px;font-weight:600;font-family:${FONT};">From haloe</div>
+                  <div style="color:${BODY_TEXT};font-size:12px;margin-top:12px;font-family:${FONT};">Manchester</div>
                 </td>
               </tr>`;
 }
@@ -144,13 +144,13 @@ export function emailFooter() {
 // into the 480px shell table.
 export function heroRow(eyebrow, big, sub) {
   return `<tr>
-                <td width="480" style="width:480px;max-width:100%;padding:0 0 14px;">
+                <td width="100%" style="width:100%;padding:0 0 14px;">
                   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${WHITE}" style="width:100%;border-collapse:separate;border-radius:14px;background:${WHITE};border:1px solid ${HAIRLINE};">
                     <tr>
                       <td align="center" style="padding:22px 16px;font-family:${FONT};">
-                        <div style="color:${GOLD_DEEP};font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;">${esc(eyebrow)}</div>
+                        <div style="color:${GOLD_DEEP};font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;">${esc(eyebrow)}</div>
                         <div style="color:${INK};font-family:${FONT_HEADING};font-size:32px;font-weight:normal;letter-spacing:-0.5px;margin-top:3px;">${esc(big)}</div>
-                        ${sub ? `<div style="color:${BODY_TEXT};font-size:13px;margin-top:6px;">${esc(sub)}</div>` : ''}
+                        ${sub ? `<div style="color:${BODY_TEXT};font-size:14px;line-height:1.5;margin-top:6px;">${esc(sub)}</div>` : ''}
                       </td>
                     </tr>
                   </table>
@@ -167,8 +167,8 @@ export function infoCard(rows) {
   const body = items.map((r, i) => {
     const bb = i === items.length - 1 ? '' : `border-bottom:1px solid ${HAIRLINE};`;
     return `<tr>
-                      <td style="width:38%;padding:12px 14px;${bb}font-family:${FONT};font-size:13.5px;color:${r.gold ? INK : BODY_TEXT};font-weight:${r.gold ? '600' : '400'};vertical-align:top;">${esc(r.label)}</td>
-                      <td align="right" style="width:62%;padding:12px 14px;${bb}font-family:${FONT};font-size:13.5px;font-weight:${r.gold ? '600' : '500'};color:${r.gold ? GOLD_DEEP : INK};text-align:right;word-break:break-word;overflow-wrap:anywhere;">${esc(r.value)}</td>
+                      <td style="width:38%;padding:12px 14px;${bb}font-family:${FONT};font-size:14px;line-height:1.5;color:${r.gold ? INK : BODY_TEXT};font-weight:${r.gold ? '600' : '400'};vertical-align:top;">${esc(r.label)}</td>
+                      <td align="right" style="width:62%;padding:12px 14px;${bb}font-family:${FONT};font-size:14px;line-height:1.5;font-weight:${r.gold ? '600' : '500'};color:${r.gold ? GOLD_DEEP : INK};text-align:right;word-break:break-word;overflow-wrap:anywhere;">${esc(r.value)}</td>
                     </tr>`;
   }).join('');
   return `<tr>
@@ -216,9 +216,11 @@ export function emailShell(innerRows) {
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="${CREAM}" style="border-collapse:collapse;background:${CREAM};">
       <tr>
         <td align="center" bgcolor="${CREAM}" style="padding:16px 16px 32px;background:${CREAM};">
-          <table role="presentation" width="480" cellpadding="0" cellspacing="0" style="width:480px;max-width:100%;border-collapse:collapse;">
+          <!--[if mso]><table role="presentation" width="480" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;max-width:480px;margin:0 auto;border-collapse:collapse;">
             ${innerRows}
           </table>
+          <!--[if mso]></td></tr></table><![endif]-->
         </td>
       </tr>
     </table>

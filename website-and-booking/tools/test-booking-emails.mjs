@@ -32,8 +32,9 @@ check('owner "New booking" email has no black body paragraph slip', !/<p style="
 check('clinic email carries the shared arrival wording exactly', clinicCustomer.includes(VENUE_COPY.arrivalEmail), 0);
 check('home-visit email has no Milton Hall arrival text', !/Milton Hall|concierge|Musa|Room 4/.test(mobileCustomer), 0);
 
-check('short wording is exactly what the success page should say', VENUE_COPY.arrivalShort === "Milton Hall, 244 Deansgate. Give your name to Musa at the concierge desk and he'll point you to Room 4 on the 3rd floor. Lift access is available.", VENUE_COPY.arrivalShort);
-check('both versions are built from the same facts (address, concierge, room, floor)', ['244 Deansgate', 'Musa', 'Room 4', '3rd floor'].every((t) => VENUE_COPY.arrivalShort.includes(t) && VENUE_COPY.arrivalEmail.includes(t)), 0);
+check('the room number and floor are never given (brand document)', !/Room \d|\d(st|nd|rd|th) floor|\bfloor\b/i.test(VENUE_COPY.arrivalShort + ' ' + VENUE_COPY.arrivalEmail), 0);
+check('short wording is exactly what the success page should say', VENUE_COPY.arrivalShort === "Milton Hall, 244 Deansgate. Give your name to Musa at the concierge desk and ask for haloe — he'll point you the way. Lift access is available.", VENUE_COPY.arrivalShort);
+check('both versions are built from the same facts (address, concierge)', ['244 Deansgate', 'Musa'].every((t) => VENUE_COPY.arrivalShort.includes(t) && VENUE_COPY.arrivalEmail.includes(t)), 0);
 
 const page = fs.readFileSync(path.join(root, 'booking-confirmed.html'), 'utf8');
 check('the success page loads /venue-copy.js and uses VENUE_COPY.arrivalShort for clinic bookings', page.includes('<script src="/venue-copy.js"></script>') && /bookingLocation === 'clinic'[\s\S]{0,400}VENUE_COPY\.arrivalShort/.test(page), 0);
