@@ -516,6 +516,28 @@
   .step-nav .btn-outline { background: transparent; border: 1px solid rgba(13,13,13,0.35); color: #0D0D0D; font-weight: 500; min-width: 84px; padding: 0 18px; }
   @media (hover: hover) { .step-nav .btn-outline:hover { background: rgba(13,13,13,0.08); border-color: rgba(13,13,13,0.6); color: #0D0D0D; } .step-nav .btn-gold:hover { background: #26231d; } }
   .step-nav .btn:disabled, .step-nav .btn[disabled] { opacity: 0.4; }
+
+  /* ---- Spacing scale (4px / 8px grid): every padding, margin, gap and control
+     height below is a multiple of 4 (4 / 8 / 12 / 16 / 24). Cards 16, inputs
+     and buttons 48. Loaded last; change a step here. ---- */
+  .progress { padding: 16px 0; }
+  .progress-meta { margin-bottom: 16px; }
+  .progress-dots { gap: 8px; }
+  .section-intro { margin: 0 0 24px; }
+  .choices { gap: 8px; } .choices.wide { gap: 8px; }
+  .choices.stack .opt span { padding: 12px 16px; }
+  .check-item { padding: 12px 16px; }
+  .care-field .care-head { margin-bottom: 8px; }
+  .care-field .care-body { margin-bottom: 16px; }
+  .care-hint { margin-top: 8px; }
+  :root { --bar-h: calc(96px + min(env(safe-area-inset-bottom, 0px), 16px)); }
+  .step-nav { padding: 8px; gap: 8px; bottom: calc(8px + min(env(safe-area-inset-bottom, 0px), 16px)); }
+  .step-nav .btn { height: 48px; }
+  .step-nav .btn-gold { padding: 0 24px; }
+  .step-nav .btn-outline { padding: 0 16px; }
+  .step-nav::before { padding-left: 8px; order: 1; }
+  .step-nav .btn-outline { order: 0; }
+  .step-nav .btn-gold { order: 2; }
 </style>
 <script src="/care-copy.js"></script>
 </head>

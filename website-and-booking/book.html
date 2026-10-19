@@ -1852,6 +1852,76 @@
   .foot-cta:hover:not(:disabled) { filter: none; opacity: 0.9; }
   .foot-cta:disabled { background: rgba(13, 13, 13, 0.14); color: rgba(13, 13, 13, 0.55); border: 0; }
   .foot-cta:disabled svg { color: rgba(13, 13, 13, 0.45); }
+
+  /* ================= Spacing scale (4px / 8px grid) =================
+     Every padding, margin, gap and control height on this page is a multiple
+     of 4 (steps 4 / 8 / 12 / 16 / 24 / 32). Cards 16, buttons and inputs 48,
+     choice rows 12 x 16, gaps 8 or 12. One block, loaded last: change a step
+     here, not in the rules above. */
+  :root { --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; }
+  .panel { padding-top: var(--s2); }
+  .panel-sub, #panel-1 .panel-sub, .panel:not(#panel-1) .panel-sub { margin-bottom: var(--s4); }
+  h1 { margin-top: 0; margin-bottom: 0; }
+  /* step 1 */
+  .where-grid { gap: var(--s3); margin: var(--s1) 0 var(--s4); }
+  .where-card-header { gap: var(--s3); margin-bottom: var(--s2); }
+  .where-card-address { margin-bottom: var(--s1); }
+  .where-card-badge { padding: var(--s1) var(--s3); }
+  /* step 2 */
+  .category-tabs { gap: var(--s2); }
+  .category-tabs .seg-option { padding: var(--s2) var(--s4); }
+  .service-card { padding: var(--s3) var(--s4); gap: var(--s3); }
+  .svc-meta-line { margin-top: var(--s1); }
+  .cart-summary { padding: var(--s4); margin-top: var(--s5); }
+  .cart-title { margin-bottom: var(--s2); }
+  .cart-row { padding: var(--s2) 0; gap: var(--s2); }
+  .cart-remove { width: 32px; height: 32px; padding: 0; }
+  .cart-total { padding-top: var(--s3); }
+  /* step 3 */
+  .section-label { margin-bottom: var(--s2); }
+  .cal-header { margin-bottom: var(--s2); }
+  .cal-nav { padding: var(--s1) var(--s2); }
+  .cal-grid { gap: var(--s1); }
+  .cal-day-name { padding: var(--s1) 0; }
+  .time-count { margin: 0 0 var(--s3); }
+  .time-group-label { margin-bottom: var(--s2); }
+  .time-slot { padding: var(--s1); }
+  /* step 4 */
+  .field-block, #address-row.field-block { margin-bottom: var(--s3); }
+  .field-label { margin-bottom: var(--s1); }
+  textarea.field-input { padding: var(--s3) var(--s4); }
+  .field-select, select.field-input { padding-right: 40px; }
+  .field-helper { margin-top: var(--s2); }
+  .s4-eyebrow { gap: var(--s2); }
+  .consent-block { margin-bottom: var(--s5); }
+  .consent-row { padding: var(--s3) 0; }
+  .consent-check { width: 24px; height: 24px; margin-top: 0; }
+  /* step 5 */
+  .pass-when { padding: 20px var(--s4) var(--s4); }
+  .pass-time { margin-bottom: var(--s1); }
+  .pass-what { padding-bottom: var(--s4); }
+  .pass-meta { margin-top: var(--s1); }
+  .pass-extra, .pass-extra.total { padding-top: var(--s3); padding-bottom: var(--s3); }
+  .ios-group { margin-bottom: var(--s3); }
+  .ios-row.discount-row { padding: var(--s4); gap: var(--s4); }
+  #discount-code { height: 40px; }
+  .discount-apply-btn { padding-left: var(--s4); padding-right: var(--s4); }
+  .discount-note { margin-top: var(--s2); }
+  .cancellation-policy { margin-bottom: var(--s4); }
+  .ios-toggle { padding: var(--s3) var(--s4); gap: var(--s4); }
+  .ios-toggle .switch { margin-top: 0; }
+  .care-card { padding-left: 20px; }
+  .pay-actions { margin-top: var(--s5); gap: var(--s3); }
+  .pay-btn, #btn-full.pay-btn { padding: 0 var(--s4); height: 56px; min-height: 56px; }
+  .care-pay-hint { margin-top: var(--s2); }
+  .pay-note { margin-top: var(--s3); }
+  /* footer bar: 8px inset all round, 48px button */
+  .footbar { padding-bottom: calc(var(--s2) + min(env(safe-area-inset-bottom, 0px), 16px)); }
+  .footbar-inner { padding: var(--s2) var(--s2) var(--s2) var(--s4); gap: var(--s3); }
+  .foot-helper { margin-top: var(--s1); }
+  .foot-cta { min-height: 48px; height: 48px; gap: var(--s2); }
+  .footbar .foot-cta { gap: var(--s2); }
+  body { padding-bottom: calc(96px + min(env(safe-area-inset-bottom, 0px), 16px)); }
 </style>
 </head>
 <body>
