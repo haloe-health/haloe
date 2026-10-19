@@ -26,3 +26,10 @@ Tokens live in `website-and-booking/tokens.css` (plain CSS custom properties; th
 - **rem/em (about 200 uses)**: `1rem`, `0.6rem`, `0.85rem`, `0.4rem`, … — same legacy 78% issue, plus values like `0.962rem` and `1.282rem` that were derived from the old shrink.
 - **Off-grid px:** `10px` (18 uses), `14px` (14), `6px` (12), `18px` (12), `28px` (12), `20px` (9), `9px`, `22px`, `26px`, `40px`, `48px`, `80px`, `2px`, `3px`, `5px`, `7px`, `11px`. Several are fixed bar heights/insets (`80px` etc.); the rest are legacy and should round to the nearest 4.
 - **Expressions that cannot be a token:** `calc(1.17em * 0.35)` (logo lock-up), `calc(-1 * clamp(1rem, 4vw, 1.5rem))` (full-bleed bar), `-8px` negative margins (tap-target growth).
+
+## Homepage (`index.html`) — added Oct 2026
+Linked `tokens.css` + `ui.css`; replaced **29 colours, 3 font sizes, 44 spacing values** (before/after screenshots at 375/768/1280 are pixel-identical). Flagged, left as-is:
+- **Colour (37 uses, 11 values):** #C9A040×24, #2A2520×2, #0F0F0D×2, #DBB85A×2, #8A6A2C×1, #EFE7D8×1, #C9C0B2×1, #302A20×1, #D4BB85×1, #7A7060×1, #1A1710×1.
+- **Font size (83 uses):** 79 are rem/em (the homepage keeps the legacy 78% base for the shared nav, so these have no px equivalent without changing the layout); the rest are odd px values.
+- **Spacing (159 uses):** mostly rem and off-grid px (10, 14, 18, 28…), plus `clamp()`/`calc()` expressions.
+- **Hidden booking widget (`#book`, `display:none`)** has its own `hb-*` styles and was not touched; it should be removed or restyled before it is ever re-enabled.
