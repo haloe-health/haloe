@@ -25,7 +25,6 @@
 <!-- Poppins only — 300/400/500/600 are the weights used on this page. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   /* ── Branded loading screen (presentation only) ──
@@ -1659,7 +1658,7 @@
   /* Spare room under the form so even the last field can scroll to the middle. */
   .kb-open body { padding-bottom: 60vh; }
 
-  /* ================= Design pass (Oct 2026) =================
+  /* ================= Design pass (Oct 2026, tightened) =================
      Presentation only — no markup, ids or behaviour changed. One idea runs
      through every step: a quiet "stationery" system. Tan Ashford titles, a
      numbered gold eyebrow and a hairline gold rule open each step; choices
@@ -1667,20 +1666,13 @@
      action is an ink pill. Colours come from the existing tokens, so dark
      mode follows. Step 1 gets the most room; steps 2-5 stay compact so each
      still fits a phone screen. */
-  @font-face {
-    font-family: 'Tan Ashford';
-    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'), url('fonts/TAN-ASHFORD.woff') format('woff');
-    font-weight: normal; font-style: normal; font-display: swap;
-  }
-  :root { --font-display: 'Tan Ashford', Georgia, 'Times New Roman', serif; }
-
   /* Titles are sentences, so a light serif (Tan Ashford is too heavy for
      them — it is kept for the short card names below). */
   .panel-title {
     font-family: Georgia, 'Times New Roman', serif;
     font-weight: 400;
-    font-size: 31px;
-    line-height: 1.16;
+    font-size: 27px;
+    line-height: 1.15;
     letter-spacing: -0.012em;
     color: var(--cream);
     margin-bottom: 0;
@@ -1691,14 +1683,14 @@
     font-size: 10.5px; font-weight: 500;
     letter-spacing: 0.26em; text-transform: uppercase;
     color: var(--gold-deep);
-    margin-bottom: 12px;
+    margin-bottom: 7px;
   }
-  .panel { padding-top: 10px; }
+  .panel { padding-top: 6px; }
   .panel-title::after {
     content: ''; display: block;
     width: 34px; height: 1px;
     background: var(--gold-primary);
-    margin: 16px 0 12px;
+    margin: 11px 0 9px;
   }
   @media (prefers-color-scheme: dark) { .panel-title::before { color: var(--gold-light); } }
   #panel-1 .panel-title::before { content: '01  \00B7  Arrival'; }
@@ -1709,16 +1701,16 @@
   .panel-sub { font-size: 14px; line-height: 1.55; color: var(--text-cashmere); margin-bottom: 0.9rem; }
 
   /* Steps 2-5 stay tight so they still fit one screen. */
-  .panel:not(#panel-1) .panel-title { font-size: 26px; }
+  .panel:not(#panel-1) .panel-title { font-size: 25px; }
   .panel:not(#panel-1) .panel-title::before { margin-bottom: 6px; }
   .panel:not(#panel-1) .panel-title::after { margin: 11px 0 9px; }
   .panel:not(#panel-1) .panel-sub { margin-bottom: 0.7rem; }
 
   /* Step 1 — the room to breathe */
-  #panel-1 .panel-sub { margin-bottom: 1.4rem; max-width: 30em; }
-  .where-grid { gap: 14px; margin: 0.4rem 0 1.4rem; }
+  #panel-1 .panel-sub { margin-bottom: 0.8rem; max-width: 30em; }
+  .where-grid { gap: 9px; margin: 0.2rem 0 0.6rem; }
   .where-card {
-    padding: 18px 18px 17px;
+    padding: 12px 14px 11px;
     border: 1px solid rgba(13, 13, 13, 0.10);
     border-radius: 14px;
     box-shadow: none;
@@ -1732,11 +1724,8 @@
     box-shadow: inset 3px 0 0 var(--gold-primary);
   }
   @media (prefers-color-scheme: dark) { .where-card.selected { background: rgba(200,169,110,0.10); } }
-  .where-card-header { margin-bottom: 8px; }
-  .where-card-name {
-    font-family: var(--font-display);
-    font-weight: 400; font-size: 19px; line-height: 1.25; letter-spacing: 0.01em;
-  }
+  .where-card-header { margin-bottom: 5px; }
+  .where-card-name { font-weight: 600; font-size: 16px; line-height: 1.25; letter-spacing: -0.005em; }
   .where-card-badge {
     background: transparent !important;
     border: 1px solid var(--hairline-border);
@@ -1744,8 +1733,8 @@
   }
   .where-card-badge--gold { color: var(--gold-deep); border-color: rgba(168,135,58,0.45); }
   .where-card-badge--grey { color: var(--text-sand); }
-  .where-card-address { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
-  .where-card-meta { font-size: 12.5px; line-height: 1.55; color: var(--text-cashmere); }
+  .where-card-address { font-size: 13.5px; font-weight: 500; margin-bottom: 2px; }
+  .where-card-meta { font-size: 12px; line-height: 1.5; color: var(--text-cashmere); }
   .where-radio-ring { width: 20px; height: 20px; border-width: 1px; border-color: var(--text-sand); }
   .where-card.selected .where-radio-ring { background: transparent; }
   .where-card-header .where-radio-ring { margin-right: 2px; }
@@ -1762,10 +1751,11 @@
   @media (prefers-color-scheme: dark) { .foot-cta svg { color: var(--gold-deep); } }
   .foot-cta:hover:not(:disabled) { filter: none; opacity: 0.92; }
   .foot-cta:disabled {
-    background: transparent; color: var(--text-sand); opacity: 1; box-shadow: none;
-    border: 1px solid var(--hairline-border);
+    background: var(--obsidian-floating); color: var(--text-cashmere); opacity: 1; box-shadow: none;
+    border: 1px solid rgba(13,13,13,0.12);
   }
-  .foot-cta:disabled svg { color: var(--text-sand); }
+  @media (prefers-color-scheme: dark) { .foot-cta:disabled { border-color: rgba(245,240,232,0.16); } }
+  .foot-cta:disabled svg { color: var(--text-cashmere); }
   .footbar { border-top-color: var(--hairline-border); }
 </style>
 </head>
