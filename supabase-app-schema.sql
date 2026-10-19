@@ -4,7 +4,7 @@
 --
 -- What it does:
 --   * profiles(role 'admin'|'client') + is_admin() — the gate every policy uses
---   * trigger: new auth user -> profile; admin ONLY for iamhalimayasmin@gmail.com
+--   * trigger: new auth user -> profile; admin ONLY for halima@haloe.health
 --   * bookings.client_id (nullable, stored link to clients) + bookings.done_at
 --     - backfilled by email, then phone (last 10 digits)
 --     - kept current by two triggers, so the Workers need no change
@@ -18,7 +18,7 @@
 --   1. Authentication -> URL configuration: Site URL https://haloe.health/app ;
 --      add https://haloe.health/app/ (and http://localhost:8788/app/ for local) as redirect URLs
 --   2. Sign-ups stay ON (clients sign in with the same email link). The admin is whoever signs in
---      with iamhalimayasmin@gmail.com (handle_new_user). Consider custom SMTP (e.g. Resend):
+--      with halima@haloe.health (handle_new_user). Consider custom SMTP (e.g. Resend):
 --      Supabase's built-in email sender is limited to a handful of emails per hour.
 
 -- profiles + role gate -------------------------------------------------
@@ -42,7 +42,7 @@ returns trigger language plpgsql security definer set search_path = public as $$
 begin
   insert into public.profiles (id, email, role)
   values (new.id, new.email,
-          case when lower(new.email) = 'iamhalimayasmin@gmail.com' then 'admin' else 'client' end)
+          case when lower(new.email) = 'halima@haloe.health' then 'admin' else 'client' end)
   on conflict (id) do nothing;
   return new;
 end $$;
@@ -183,7 +183,7 @@ returns trigger language plpgsql security definer set search_path = public as $$
 begin
   insert into public.profiles (id, email, role, client_id)
   values (new.id, new.email,
-          case when lower(new.email) = 'iamhalimayasmin@gmail.com' then 'admin' else 'client' end,
+          case when lower(new.email) = 'halima@haloe.health' then 'admin' else 'client' end,
           public.find_client_for(new.email, new.phone))
   on conflict (id) do nothing;
   return new;
