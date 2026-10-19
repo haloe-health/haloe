@@ -492,6 +492,29 @@
   @media (prefers-reduced-motion: reduce) {
     .progress-dots i, .choices .opt span, .check-item .check-box, .check-item .check-box::after, .choices.as-toggle .opt span, .choices.as-toggle .opt span::after { transition: none; }
   }
+
+  /* ---- Atelier scale (Oct 2026): 16px cards / 12px gaps, flat progress bars,
+     and the dark action bar shared with the booking page ---- */
+  .field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date], .field select, .field textarea { border-radius: 12px; }
+  .consent-statement { border-radius: 16px; padding: 16px; margin: 0 0 12px; }
+  .check-item { border-radius: 14px; }
+  .progress { padding: 18px 0 14px; }
+  .progress-step { font-size: 12px; }
+  .progress-dots { gap: 6px; justify-content: stretch; }
+  .progress-dots i { flex: 1; width: auto; height: 4px; border-radius: 4px; }
+  .progress-dots i.on { width: auto; background: var(--gold); }
+  :root { --bar-h: calc(104px + min(env(safe-area-inset-bottom, 0px), 14px)); }
+  .step-nav {
+    left: 12px; right: 12px; bottom: calc(10px + min(env(safe-area-inset-bottom, 0px), 14px));
+    max-width: 576px; margin: 0 auto; padding: 10px; gap: 10px;
+    background: var(--ink); border-radius: 18px; pointer-events: auto;
+    box-shadow: 0 10px 30px rgba(31, 23, 34, 0.20), 0 1px 2px rgba(31, 23, 34, 0.12);
+  }
+  .step-nav .btn { height: 46px; padding: 0 22px; font-weight: 600; }
+  .step-nav .btn-gold { background: var(--gold); color: #0D0D0D; }
+  .step-nav .btn-outline { background: transparent; border: 1px solid rgba(245,240,232,0.28); color: #F5F0E8; font-weight: 500; min-width: 88px; }
+  @media (hover: hover) { .step-nav .btn-outline:hover { background: rgba(245,240,232,0.08); border-color: rgba(245,240,232,0.5); color: #F5F0E8; } }
+  .step-nav .btn:disabled, .step-nav .btn[disabled] { opacity: 0.45; }
 </style>
 <script src="/care-copy.js"></script>
 </head>
