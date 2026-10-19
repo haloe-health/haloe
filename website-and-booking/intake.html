@@ -58,15 +58,15 @@
   :root {
     /* Light theme (Sep 2026) — was true-black; --white/--dim are still the
        text-colour tokens (light-on-dark before, dark-on-light now). */
-    --page-bg: #F5F0E8;
-    --deep: #FFFFFF;
-    --gold: #C8A96E;
+    --page-bg: var(--c-cream);
+    --deep: var(--c-white);
+    --gold: var(--c-gold);
     --gold-light: #DBB85A;
     --gold-deep: #8a6a2c;
-    --white: #0D0D0D;
-    --dim: #5a5247;
+    --white: var(--c-ink);
+    --dim: var(--c-body-soft);
     --border: rgba(13,13,13,0.1);
-    --surface: #FFFFFF;
+    --surface: var(--c-white);
     --error: #C0392B;
     --font-heading: 'Poppins', sans-serif;
     --font-wordmark: 'Tan Ashford', Georgia, serif;
@@ -76,7 +76,7 @@
   body {
     background:var(--page-bg); color:var(--white);
     font-family:'Poppins',sans-serif; font-weight: 400;
-    overflow-x:hidden; font-size:16px; line-height:1.7;
+    overflow-x:hidden; font-size:var(--fs-input); line-height:1.7;
   }
 
   /* NAV — matches index.html / before-your-session.html */
@@ -116,13 +116,13 @@
     padding:10px 26px; font-weight:400 !important; background:transparent !important;
     transition:all 0.4s !important; border-radius:50px !important; text-decoration:none !important; display:inline-block !important;
   }
-  .nav-cta:hover { background:var(--gold) !important; color:#0D0D0D !important; border-color:var(--gold) !important; }
+  .nav-cta:hover { background:var(--gold) !important; color:var(--c-ink) !important; border-color:var(--gold) !important; }
 
   /* Buttons */
   .btn {
     display:inline-block; text-decoration:none; cursor:pointer;
     font-family:'Poppins',sans-serif; font-size:0.72rem; letter-spacing:0.2em;
-    text-transform:uppercase; padding:16px 40px; transition:all 0.35s; font-weight:400;
+    text-transform:uppercase; padding:var(--s4) 40px; transition:all 0.35s; font-weight:400;
     border-radius:50px; border:none;
   }
   .btn-gold { background:var(--gold); color:#080806; font-weight:500; }
@@ -132,15 +132,15 @@
   .btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
 
   /* Layout */
-  .wrap { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:150px 24px 80px; }
+  .wrap { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:150px var(--s5) 80px; }
   .intro-head { margin-bottom:40px; }
-  .intro-head .eyebrow { font-size:0.6rem; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold-deep); margin-bottom:18px; display:flex; align-items:center; gap:12px; }
+  .intro-head .eyebrow { font-size:0.6rem; letter-spacing:0.28em; text-transform:uppercase; color:var(--gold-deep); margin-bottom:18px; display:flex; align-items:center; gap:var(--s3); }
   .intro-head .eyebrow::before { content:''; width:24px; height:1px; background:var(--gold); opacity:0.6; }
-  h1 { font-family:var(--font-heading); font-size:28px; font-weight:600; line-height:1.1; margin-bottom:18px; }
+  h1 { font-family:var(--font-heading); font-size:var(--fs-title); font-weight:600; line-height:1.1; margin-bottom:18px; }
   .intro-line { color:var(--dim); font-size:1rem; line-height:1.9; max-width:600px; }
 
   /* Progress bar */
-  .progress { position:sticky; top:76px; z-index:50; background:var(--page-bg); padding:14px 0 18px; margin-bottom:8px; }
+  .progress { position:sticky; top:76px; z-index:50; background:var(--page-bg); padding:14px 0 18px; margin-bottom:var(--s2); }
   .progress-meta { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; }
   .progress-step { font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold-deep); }
   .progress-name { font-size:0.85rem; color:var(--dim); letter-spacing:0.04em; }
@@ -151,12 +151,12 @@
   .step { display:none; }
   .step.active { display:block; animation:fadeUp 0.5s ease both; }
   @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-  .step h2 { font-family:var(--font-heading); font-size:24px; font-weight:600; line-height:1.1; margin-bottom:8px; }
-  .section-intro { color:var(--dim); font-size:0.9rem; line-height:1.8; margin-bottom:28px; padding:16px 18px; border-left:2px solid rgba(201,160,64,0.3); background:rgba(201,160,64,0.03); border-radius:0 6px 6px 0; }
+  .step h2 { font-family:var(--font-heading); font-size:24px; font-weight:600; line-height:1.1; margin-bottom:var(--s2); }
+  .section-intro { color:var(--dim); font-size:0.9rem; line-height:1.8; margin-bottom:28px; padding:var(--s4) 18px; border-left:2px solid rgba(201,160,64,0.3); background:rgba(201,160,64,0.03); border-radius:0 6px 6px 0; }
 
   /* Fields */
   .field { margin:26px 0; }
-  .field > label.q { display:block; font-size:0.9rem; color:var(--white); font-weight: 400; margin-bottom:12px; line-height:1.6; }
+  .field > label.q { display:block; font-size:0.9rem; color:var(--white); font-weight: 400; margin-bottom:var(--s3); line-height:1.6; }
   .field .opt-hint { color:var(--dim); font-size:0.9rem; font-style:italic; }
   .field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date], .field select, .field textarea {
     width:100%; background:var(--surface); border:1px solid var(--border); color:var(--white);
@@ -164,7 +164,7 @@
     padding:0.85rem 1rem; outline:none; border-radius:6px; transition:border-color 0.2s, box-shadow 0.2s; -webkit-appearance:none;
   }
   .field input:focus, .field select:focus, .field textarea:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,160,64,0.12); }
-  .field select option { background:#FFFFFF; color:var(--white); }
+  .field select option { background:var(--c-white); color:var(--white); }
   .field textarea { resize:vertical; min-height:90px; }
   .field input.invalid, .field select.invalid, .field textarea.invalid { border-color:#c97a6e; }
 
@@ -193,17 +193,17 @@
   .check-item input:focus-visible + .check-box { box-shadow:0 0 0 3px rgba(201,160,64,0.25); }
 
   /* Consent statement block */
-  .consent-statement { font-size:0.86rem; color:var(--dim); line-height:1.9; padding:22px 24px; border:1px solid var(--border); background:var(--surface); border-radius:8px; margin-bottom:26px; }
+  .consent-statement { font-size:0.86rem; color:var(--dim); line-height:1.9; padding:22px var(--s5); border:1px solid var(--border); background:var(--surface); border-radius:8px; margin-bottom:26px; }
 
   /* Field-level error message */
-  .field-error { display:none; font-size:0.74rem; color:var(--error); margin-top:8px; line-height:1.5; }
+  .field-error { display:none; font-size:0.74rem; color:var(--error); margin-top:var(--s2); line-height:1.5; }
   .field-error.visible { display:block; }
 
   /* Honeypot — hidden from humans */
   .hp { position:absolute; left:-9999px; top:-9999px; width:1px; height:1px; overflow:hidden; opacity:0; }
 
   /* Nav buttons */
-  .step-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:40px; padding-top:28px; border-top:1px solid var(--border); }
+  .step-nav { display:flex; justify-content:space-between; align-items:center; gap:var(--s4); margin-top:40px; padding-top:28px; border-top:1px solid var(--border); }
   .step-nav .spacer { flex:1; }
 
   /* Confirmation / error screens */
@@ -226,7 +226,7 @@
   }
   .footer-left-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
   .footer-left span { font-family:var(--font-wordmark); font-style:normal; font-size:1em; line-height:1; color:var(--gold); letter-spacing:normal; font-weight:normal; }
-  .footer-links { display:flex; gap:32px; }
+  .footer-links { display:flex; gap:var(--s6); }
   .footer-links a { color:#f7f2ea; text-decoration:none; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; transition:color 0.4s; opacity:0.6; }
   .footer-links a:hover { color:var(--gold); opacity:1; }
   .footer-right { font-size:0.65rem; color:rgba(247,242,234,0.5); text-align:right; line-height:1.8; }
@@ -263,19 +263,19 @@
   .nav-overlay-links a {
     color:var(--white); text-decoration:none;
     font-size:1.5rem; letter-spacing:0.01em;
-    padding:8px 0; display:inline-block; min-height:44px;
+    padding:var(--s2) 0; display:inline-block; min-height:44px;
   }
   .nav-overlay-links a:hover { color:var(--gold-deep); }
   .nav-overlay-cta { min-height:44px; display:inline-flex; align-items:center; justify-content:center; }
   body.nav-open { overflow:hidden; }
 
   @media(max-width:860px){
-    nav { padding:18px 24px; }
+    nav { padding:18px var(--s5); }
     nav ul { display:none; }
     .nav-hamburger { display:flex; }
     .wrap { padding:120px 20px 56px; }
     .progress { top:64px; }
-    footer { flex-direction:column; gap:28px; text-align:center; padding:48px 24px; }
+    footer { flex-direction:column; gap:28px; text-align:center; padding:48px var(--s5); }
     .footer-links { flex-wrap:wrap; justify-content:center; }
     .footer-right { text-align:center; }
   }
@@ -299,14 +299,14 @@
   /* --bar-h = the fixed action bar (32 fade + 48 button + 16 bottom); the page is padded by it plus 24px so the last card always clears the bar */
   :root { --bar-h: calc(96px + env(safe-area-inset-bottom)); }
   .wrap { max-width: 600px; padding: 88px 16px calc(var(--bar-h) + 24px); }
-  .intro-head { display: none; margin: 8px 0 0; }
+  .intro-head { display: none; margin: var(--s2) 0 0; }
   .wrap:has(.step[data-step="1"].active) .intro-head { display: block; }
 
   /* Step header: "STEP 3 OF 5" gold left, step name right, dots centred below */
-  .progress { position: static; background: none; padding: 24px 0; margin: 0; }
-  .progress-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 14px; }
+  .progress { position: static; background: none; padding: var(--s5) 0; margin: 0; }
+  .progress-meta { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); margin: 0 0 14px; }
   .progress-name { font-size: 14px; color: var(--muted); letter-spacing: 0; text-align: right; }
-  .progress-dots { display: flex; justify-content: center; gap: 8px; padding: 0; }
+  .progress-dots { display: flex; justify-content: center; gap: var(--s2); padding: 0; }
   .progress-dots i { display: block; width: 8px; height: 8px; border-radius: 999px; background: var(--fill-hover); font-style: normal; transition: background 150ms ease, width 150ms ease; }
   .progress-dots i.done { background: rgba(200,169,110,0.55); }
   .progress-dots i.on { background: var(--gold); width: 24px; }
@@ -317,15 +317,15 @@
 
   /* One question per card */
   .group { display: contents; }
-  .field > label.q { display: block; font-size: 17px; line-height: 1.4; font-weight: 400; color: var(--ink); margin: 0 0 12px; letter-spacing: 0; text-transform: none; }
-  .field .opt-hint { display: block; margin-top: 4px; font-size: 14px; line-height: 1.45; font-style: italic; font-weight: 400; color: var(--muted); letter-spacing: 0; text-transform: none; }
+  .field > label.q { display: block; font-size: var(--fs-heading); line-height: 1.4; font-weight: 400; color: var(--ink); margin: 0 0 var(--s3); letter-spacing: 0; text-transform: none; }
+  .field .opt-hint { display: block; margin-top: var(--s1); font-size: 14px; line-height: 1.45; font-style: italic; font-weight: 400; color: var(--muted); letter-spacing: 0; text-transform: none; }
 
   /* Text inputs: 48px, label above in small muted caps */
-  .field:has(> input[type]) > label.q { font-size: 12px; font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+  .field:has(> input[type]) > label.q { font-size: var(--fs-label); font-weight: 500; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
   .field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date], .field select {
-    display: block; width: 100%; height: 48px; padding: 0 16px;
+    display: block; width: 100%; height: 48px; padding: 0 var(--s4);
     background: var(--fill); border: 0; border-radius: 14px; box-shadow: none;
-    font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 400; line-height: 1.2; color: var(--ink);
+    font-family: 'Poppins', sans-serif; font-size: var(--fs-input); font-weight: 400; line-height: 1.2; color: var(--ink);
     text-align: left; -webkit-appearance: none; appearance: none;
     transition: box-shadow 150ms ease, background 150ms ease;
   }
@@ -336,9 +336,9 @@
     background-repeat: no-repeat; background-position: right 18px center;
   }
   .field textarea {
-    display: block; width: 100%; min-height: 96px; padding: 12px 16px; resize: none;
+    display: block; width: 100%; min-height: 96px; padding: var(--s3) var(--s4); resize: none;
     background: var(--fill); border: 0; border-radius: 14px; box-shadow: none;
-    font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 400; line-height: 1.5; color: var(--ink);
+    font-family: 'Poppins', sans-serif; font-size: var(--fs-input); font-weight: 400; line-height: 1.5; color: var(--ink);
     -webkit-appearance: none; appearance: none; transition: box-shadow 150ms ease, background 150ms ease;
   }
   .field input::placeholder, .field textarea::placeholder { color: #9A917F; }
@@ -355,7 +355,7 @@
     min-height: 44px; min-width: 88px; padding: 0 20px;
     border: 0 !important; border-radius: 999px;
     background: var(--fill); color: var(--muted);
-    font-size: 15px; font-weight: 400; line-height: 1.3; white-space: nowrap; text-align: center;
+    font-size: var(--fs-body); font-weight: 400; line-height: 1.3; white-space: nowrap; text-align: center;
     transition: background 150ms ease, color 150ms ease; user-select: none; -webkit-tap-highlight-color: transparent;
   }
   @media (hover: hover) { .choices .opt:hover input:not(:checked) + span { background: var(--fill-hover); color: var(--ink); } }
@@ -364,19 +364,19 @@
   /* three short options: equal columns, side by side */
   .choices.wide { justify-content: stretch; }
   .choices.wide .opt { flex: 1 1 0; min-width: 0; }
-  .choices.wide .opt span { min-width: 0; padding: 0 8px; }
+  .choices.wide .opt span { min-width: 0; padding: 0 var(--s2); }
   /* long labels: stacked rows, never narrower than 44px */
-  .choices.stack { flex-direction: column; align-items: stretch; gap: 8px; }
+  .choices.stack { flex-direction: column; align-items: stretch; gap: var(--s2); }
   .choices.stack .opt { flex: none; }
-  .choices.stack .opt span { justify-content: flex-start; min-width: 0; padding: 10px 16px; border-radius: 14px; text-align: left; white-space: normal; font-size: 15px; }
+  .choices.stack .opt span { justify-content: flex-start; min-width: 0; padding: 10px var(--s4); border-radius: 14px; text-align: left; white-space: normal; font-size: var(--fs-body); }
 
   /* "I confirm I am 18 or over" is a consent, so it stays a switch (the No
      radio stays in the DOM, hidden — the stored value is still 'Yes') */
-  .field:has(> .choices.as-toggle) { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+  .field:has(> .choices.as-toggle) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4); }
   .field:has(> .choices.as-toggle) > label.q { flex: 1; min-width: 0; margin: 0; }
   .choices.as-toggle { flex: none; gap: 0; }
   .choices.as-toggle .opt:has(input[value="No"]) { display: none; }
-  .choices.as-toggle .opt:has(input[value="Yes"]) { padding: 8px 0; }
+  .choices.as-toggle .opt:has(input[value="Yes"]) { padding: var(--s2) 0; }
   .choices.as-toggle .opt:has(input[value="Yes"]) span {
     position: relative; display: block; width: 52px; height: 30px; min-width: 0; min-height: 0; padding: 0;
     border-radius: 999px; background: #D8D0BF; font-size: 0;
@@ -390,12 +390,12 @@
   .field:has(> .choices.as-toggle) > .field-error { flex-basis: 100%; margin-top: 0; }
 
   /* Consent / acknowledgement switches */
-  .check-list { display: flex; flex-direction: column; gap: 12px; background: none; border-radius: 0; overflow: visible; outline: 0; }
+  .check-list { display: flex; flex-direction: column; gap: var(--s3); background: none; border-radius: 0; overflow: visible; outline: 0; }
   .check-list.invalid { outline: 0; }
-  .check-item { display: flex; align-items: center; gap: 16px; min-height: 44px; padding: 14px 16px; background: var(--fill); border: 0; border-radius: 16px; cursor: pointer; font-size: 15px; line-height: 1.5; color: var(--ink); user-select: none; -webkit-tap-highlight-color: transparent; }
+  .check-item { display: flex; align-items: center; gap: var(--s4); min-height: 44px; padding: 14px var(--s4); background: var(--fill); border: 0; border-radius: 16px; cursor: pointer; font-size: var(--fs-body); line-height: 1.5; color: var(--ink); user-select: none; -webkit-tap-highlight-color: transparent; }
   .check-list .check-item:last-child { border: 0; }
   .check-item input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
-  .check-item > span:not(.check-box) { order: 1; flex: 1; font-size: 15px; line-height: 1.5; color: var(--ink); }
+  .check-item > span:not(.check-box) { order: 1; flex: 1; font-size: var(--fs-body); line-height: 1.5; color: var(--ink); }
   .check-item .check-box {
     order: 2; position: relative; flex: none; margin: 0 0 0 auto;
     width: 52px; height: 30px; min-width: 52px; border: 0 !important; border-radius: 999px;
@@ -409,25 +409,25 @@
   .check-item input:checked ~ .check-box::after { transform: translateX(22px); width: 24px; height: 24px; border: 0; border-radius: 50%; background: var(--card); }
   .check-item input:focus-visible ~ .check-box { box-shadow: 0 0 0 3px var(--ring); }
   /* Modesty and care: a real tick box (28px) on a 56px row, not a switch */
-  .care-field .care-head { font-size: 15px; font-weight: 600; color: var(--ink); margin: 0 0 6px; }
-  .care-field .care-body { font-size: 15px; line-height: 1.5; color: var(--ink); margin: 0 0 14px; }
-  .care-field .check-item { min-height: 56px; padding: 0 16px; }
+  .care-field .care-head { font-size: var(--fs-body); font-weight: 600; color: var(--ink); margin: 0 0 6px; }
+  .care-field .care-body { font-size: var(--fs-body); line-height: 1.5; color: var(--ink); margin: 0 0 14px; }
+  .care-field .check-item { min-height: 56px; padding: 0 var(--s4); }
   .care-field .check-item .check-box { width: 28px; height: 28px; min-width: 28px; border-radius: 8px; background: transparent; border: 2px solid var(--gold) !important; box-sizing: border-box; order: 0; margin: 0; }
   .care-field .check-item > span:not(.check-box) { order: 1; }
   .care-field .check-item .check-box::after { top: 3px; left: 8px; width: 7px; height: 13px; border: solid var(--card); border-width: 0 2.5px 2.5px 0; border-radius: 0; background: none; box-shadow: none; transform: rotate(45deg) scale(0); transition: transform 120ms ease; }
   .care-field .check-item input:checked ~ .check-box { background: var(--gold); }
   .care-field .check-item input:checked ~ .check-box::after { transform: rotate(45deg) scale(1); width: 7px; height: 13px; border: solid var(--card); border-width: 0 2.5px 2.5px 0; border-radius: 0; background: none; }
-  .care-hint { font-size: 13px; color: var(--ink-soft, #6B5E4B); margin: 10px 0 0; text-align: right; }
+  .care-hint { font-size: var(--fs-caption); color: var(--ink-soft, #6B5E4B); margin: 10px 0 0; text-align: right; }
   .care-hint[hidden] { display: none; }
   /* a consent that is the whole card needs no second box inside the card */
   .field:has(> .check-list > .check-item:only-child) .check-item { background: none; padding: 0; border-radius: 0; }
 
-  .consent-statement { font-size: 15px; line-height: 1.7; color: var(--muted); background: var(--card); border: 0; border-radius: 24px; padding: 20px; margin: 0 0 16px; box-shadow: var(--shadow); }
+  .consent-statement { font-size: var(--fs-body); line-height: 1.7; color: var(--muted); background: var(--card); border: 0; border-radius: 24px; padding: 20px; margin: 0 0 var(--s4); box-shadow: var(--shadow); }
 
   /* Draw-to-sign */
-  .sign-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; }
+  .sign-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); margin: 0 0 var(--s3); }
   .sign-head label.q { margin: 0; }
-  .sign-clear { background: none; border: 0; padding: 0 4px; min-height: 44px; min-width: 44px; font: 400 15px 'Poppins', sans-serif; color: var(--gold-deep); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+  .sign-clear { background: none; border: 0; padding: 0 var(--s1); min-height: 44px; min-width: 44px; font: 400 15px 'Poppins', sans-serif; color: var(--gold-deep); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
   .sign-pad { position: relative; height: 160px; background: #FBF8F2; border-radius: 16px; overflow: hidden; touch-action: none; }
   .sign-pad canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
   .sign-line { position: absolute; left: 16px; right: 16px; bottom: 40px; height: 1px; background: rgba(28,26,22,0.22); pointer-events: none; }
@@ -435,7 +435,7 @@
   .sign-ph { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-70%); text-align: center; font-size: 14px; color: #A59C89; pointer-events: none; }
   .sign-pad.has-ink .sign-ph { display: none; }
   .sign-pad:has(canvas.invalid) { box-shadow: inset 0 0 0 1.5px rgba(192,57,43,0.55); }
-  .sign-hint { margin: 12px 0 0; font-size: 14px; line-height: 1.45; color: var(--muted); font-style: italic; }
+  .sign-hint { margin: var(--s3) 0 0; font-size: 14px; line-height: 1.45; color: var(--muted); font-style: italic; }
 
   /* Progressive disclosure: a follow-up appears (as its own card) on Yes */
   .field.reveal { display: none; }
@@ -446,7 +446,7 @@
   }
 
   /* Validation: under the field, quiet */
-  .field-error { display: none; margin-top: 12px; font-size: 13px; line-height: 1.45; color: var(--error); letter-spacing: 0; }
+  .field-error { display: none; margin-top: var(--s3); font-size: var(--fs-caption); line-height: 1.45; color: var(--error); letter-spacing: 0; }
   .field-error.visible { display: block; }
   .field:has(.invalid) { box-shadow: 0 0 0 1.5px rgba(192,57,43,0.4), var(--shadow); }
 
@@ -458,7 +458,7 @@
   @keyframes stepIn { from { opacity: 0; } to { opacity: 1; } }
   .step-nav {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
-    display: flex; align-items: center; gap: 12px;
+    display: flex; align-items: center; gap: var(--s3);
     margin: 0; border: 0;
     padding: 32px max(16px, calc((100vw - 600px) / 2 + 16px)) calc(16px + env(safe-area-inset-bottom));
     background: linear-gradient(to top, var(--page-bg) 52%, rgba(245,240,232,0));
@@ -467,7 +467,7 @@
   .step-nav .spacer { display: none; }
   .step-nav .btn {
     pointer-events: auto; height: 48px; padding: 0 28px; display: inline-flex; align-items: center; justify-content: center;
-    font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 500; letter-spacing: 0; text-transform: none;
+    font-family: 'Poppins', sans-serif; font-size: var(--fs-body); font-weight: 500; letter-spacing: 0; text-transform: none;
     border-radius: 999px; transition: background 150ms ease, border-color 150ms ease, opacity 150ms ease;
   }
   .step-nav .btn:hover { transform: none; box-shadow: none; }
@@ -479,8 +479,8 @@
 
   /* Confirmation / error screens */
   .screen h2 { font-family: var(--serif); font-weight: normal; font-size: 26px; line-height: 1.2; }
-  .screen p { font-size: 15px; line-height: 1.7; }
-  .screen .btn { font-size: 15px; letter-spacing: 0; text-transform: none; padding: 0 28px; height: 48px; }
+  .screen p { font-size: var(--fs-body); line-height: 1.7; }
+  .screen .btn { font-size: var(--fs-body); letter-spacing: 0; text-transform: none; padding: 0 28px; height: 48px; }
 
   /* Autofill: paint over the pale yellow with the input's own fill */
   input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, select:-webkit-autofill, textarea:-webkit-autofill {
@@ -496,10 +496,10 @@
   /* ---- Atelier scale (Oct 2026): 16px cards / 12px gaps, flat progress bars,
      and the dark action bar shared with the booking page ---- */
   .field input[type=text], .field input[type=tel], .field input[type=email], .field input[type=date], .field select, .field textarea { border-radius: 12px; }
-  .consent-statement { border-radius: 16px; padding: 16px; margin: 0 0 12px; }
+  .consent-statement { border-radius: 16px; padding: var(--s4); margin: 0 0 var(--s3); }
   .check-item { border-radius: 14px; }
   .progress { padding: 18px 0 14px; }
-  .progress-step { font-size: 12px; }
+  .progress-step { font-size: var(--fs-label); }
   .progress-dots { gap: 6px; justify-content: stretch; }
   .progress-dots i { flex: 1; width: auto; height: 4px; border-radius: 4px; }
   .progress-dots i.on { width: auto; background: var(--gold); }
@@ -511,34 +511,35 @@
     box-shadow: 0 10px 30px rgba(31, 23, 34, 0.20), 0 1px 2px rgba(31, 23, 34, 0.12);
   }
   .step-nav .btn { height: 46px; padding: 0 22px; font-weight: 600; }
-  .step-nav::before { content: attr(data-label); flex: 1; min-width: 0; padding-left: 8px; font-size: 13px; font-weight: 500; color: #0D0D0D; white-space: nowrap; }
-  .step-nav .btn-gold { flex: none; min-width: 132px; background: #0D0D0D; color: #F5F0E8; }
-  .step-nav .btn-outline { background: transparent; border: 1px solid rgba(13,13,13,0.35); color: #0D0D0D; font-weight: 500; min-width: 84px; padding: 0 18px; }
-  @media (hover: hover) { .step-nav .btn-outline:hover { background: rgba(13,13,13,0.08); border-color: rgba(13,13,13,0.6); color: #0D0D0D; } .step-nav .btn-gold:hover { background: #26231d; } }
+  .step-nav::before { content: attr(data-label); flex: 1; min-width: 0; padding-left: var(--s2); font-size: var(--fs-caption); font-weight: 500; color: var(--c-ink); white-space: nowrap; }
+  .step-nav .btn-gold { flex: none; min-width: 132px; background: var(--c-ink); color: var(--c-cream); }
+  .step-nav .btn-outline { background: transparent; border: 1px solid rgba(13,13,13,0.35); color: var(--c-ink); font-weight: 500; min-width: 84px; padding: 0 18px; }
+  @media (hover: hover) { .step-nav .btn-outline:hover { background: rgba(13,13,13,0.08); border-color: rgba(13,13,13,0.6); color: var(--c-ink); } .step-nav .btn-gold:hover { background: #26231d; } }
   .step-nav .btn:disabled, .step-nav .btn[disabled] { opacity: 0.4; }
 
   /* ---- Spacing scale (4px / 8px grid): every padding, margin, gap and control
      height below is a multiple of 4 (4 / 8 / 12 / 16 / 24). Cards 16, inputs
      and buttons 48. Loaded last; change a step here. ---- */
-  .progress { padding: 16px 0; }
-  .progress-meta { margin-bottom: 16px; }
-  .progress-dots { gap: 8px; }
-  .section-intro { margin: 0 0 24px; }
-  .choices { gap: 8px; } .choices.wide { gap: 8px; }
-  .choices.stack .opt span { padding: 12px 16px; }
-  .check-item { padding: 12px 16px; }
-  .care-field .care-head { margin-bottom: 8px; }
-  .care-field .care-body { margin-bottom: 16px; }
-  .care-hint { margin-top: 8px; }
+  .progress { padding: var(--s4) 0; }
+  .progress-meta { margin-bottom: var(--s4); }
+  .progress-dots { gap: var(--s2); }
+  .section-intro { margin: 0 0 var(--s5); }
+  .choices { gap: var(--s2); } .choices.wide { gap: var(--s2); }
+  .choices.stack .opt span { padding: var(--s3) var(--s4); }
+  .check-item { padding: var(--s3) var(--s4); }
+  .care-field .care-head { margin-bottom: var(--s2); }
+  .care-field .care-body { margin-bottom: var(--s4); }
+  .care-hint { margin-top: var(--s2); }
   :root { --bar-h: calc(96px + min(env(safe-area-inset-bottom, 0px), 16px)); }
-  .step-nav { padding: 8px; gap: 8px; bottom: calc(8px + min(env(safe-area-inset-bottom, 0px), 16px)); }
+  .step-nav { padding: var(--s2); gap: var(--s2); bottom: calc(8px + min(env(safe-area-inset-bottom, 0px), 16px)); }
   .step-nav .btn { height: 48px; }
-  .step-nav .btn-gold { padding: 0 24px; }
-  .step-nav .btn-outline { padding: 0 16px; }
-  .step-nav::before { padding-left: 8px; order: 1; }
+  .step-nav .btn-gold { padding: 0 var(--s5); }
+  .step-nav .btn-outline { padding: 0 var(--s4); }
+  .step-nav::before { padding-left: var(--s2); order: 1; }
   .step-nav .btn-outline { order: 0; }
   .step-nav .btn-gold { order: 2; }
 </style>
+<link rel="stylesheet" href="/tokens.css">
 <link rel="stylesheet" href="/ui.css">
 <script src="/care-copy.js"></script>
 </head>

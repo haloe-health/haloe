@@ -62,15 +62,15 @@
     --gold: #c9a040;
     --gold-light: #dbb85a;
     --gold-dark: #a8842f;
-    --gold-deep: #7A5C22;
-    --black: #F5F0E8;
-    --cream: #0D0D0D;
+    --gold-deep: var(--c-gold-deep);
+    --black: var(--c-cream);
+    --cream: var(--c-ink);
     --cream-mid: #EDE6D6;
-    --white: #FFFFFF;
-    --text-muted: #5a5247;
+    --white: var(--c-white);
+    --text-muted: var(--c-body-soft);
     --border: rgba(201, 160, 64, 0.18);
     --border-strong: rgba(201, 160, 64, 0.4);
-    --surface: #FFFFFF;
+    --surface: var(--c-white);
     --radius: 16px;
     --focus-glow: 0 0 0 3px rgba(201, 160, 64, 0.15);
     --step-active: var(--gold);
@@ -83,18 +83,18 @@
 
     /* --- New design-system tokens (Stitch spec) — additive, existing
        tokens above are untouched and still drive most of the page. --- */
-    --obsidian-base: #0D0D0D;
-    --obsidian-elevated: #FFFFFF;
-    --obsidian-floating: #F0EAE0;
-    --obsidian-inset: #F0EAE0;
-    --gold-primary: #C8A96E;
-    --gold-highlight: #DFC38E;
+    --obsidian-base: var(--c-ink);
+    --obsidian-elevated: var(--c-white);
+    --obsidian-floating: var(--c-sand);
+    --obsidian-inset: var(--c-sand);
+    --gold-primary: var(--c-gold);
+    --gold-highlight: var(--c-gold-light);
     --gold-burnished: #A38548;
     --hairline-border: rgba(200, 169, 110, 0.2);
     --active-border: rgba(223, 195, 142, 0.5);
-    --text-cream: #0D0D0D;
-    --text-cashmere: #6b6357;
-    --text-sand: #6B6357;
+    --text-cream: var(--c-ink);
+    --text-cashmere: var(--c-muted);
+    --text-sand: var(--c-muted);
 
     --radius-sm: 0.5rem;
     --radius-default: 1rem;
@@ -117,16 +117,16 @@
      that kept --ink unflipped for gold-background text on the homepage. */
   @media (prefers-color-scheme: dark) {
     :root {
-      --black: #1A1712;
-      --cream: #F5F0E8;
-      --cream-mid: #211D16;
-      --white: #262119;
-      --surface: #262119;
+      --black: var(--c-dark-page);
+      --cream: var(--c-cream);
+      --cream-mid: var(--c-dark-card);
+      --white: var(--c-dark-surface);
+      --surface: var(--c-dark-surface);
       --text-muted: #C9C0B2;
-      --obsidian-elevated: #262119;
-      --obsidian-floating: #2E2820;
-      --obsidian-inset: #2E2820;
-      --text-cream: #F5F0E8;
+      --obsidian-elevated: var(--c-dark-surface);
+      --obsidian-floating: var(--c-dark-raised);
+      --obsidian-inset: var(--c-dark-raised);
+      --text-cream: var(--c-cream);
       --text-cashmere: #C9C0B2;
       --text-sand: #9C9484;
       --step-idle: #4A4438;
@@ -312,7 +312,7 @@
   }
   .panel-title {
     font-family: var(--font-heading);
-    font-size: 28px;
+    font-size: var(--fs-title);
     font-weight: 600;
     color: var(--cream);
     margin-bottom: 0.5rem;
@@ -378,8 +378,8 @@
        reaches the screen edges, then restore 16px gutters for the pills. */
     margin-left: calc(-1 * clamp(1rem, 4vw, 1.5rem));
     margin-right: calc(-1 * clamp(1rem, 4vw, 1.5rem));
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: var(--s4);
+    padding-right: var(--s4);
   }
   .category-tabs-wrap.is-stuck { box-shadow: 0 1px 0 var(--hairline), 0 4px 12px rgba(13,13,13,0.06); }
   .category-tabs {
@@ -398,9 +398,9 @@
     flex: 1 0 auto;
     border-radius: 999px;
     border: none;
-    padding: 8px 12px;
+    padding: var(--s2) var(--s3);
     font-family: 'Poppins', sans-serif;
-    font-size: 12px;
+    font-size: var(--fs-label);
     font-weight: 500;
     line-height: 1;
     min-height: 0;
@@ -412,8 +412,8 @@
     text-align: center;
   }
   .category-tabs .seg-option.active {
-    background: #a8873a;
-    color: #fff;
+    background: var(--c-gold-mid);
+    color: var(--c-white);
   }
   .category-tabs .seg-option[hidden] { display: none; }
   @media (prefers-color-scheme: dark) {
@@ -422,8 +422,8 @@
       color: var(--text-muted);
     }
     .category-tabs .seg-option.active {
-      background: #a8873a;
-      color: #fff;
+      background: var(--c-gold-mid);
+      color: var(--c-white);
     }
   }
   @media (hover: hover) {
@@ -498,15 +498,15 @@
   .service-card.selected .svc-ring svg { opacity: 1; }
   .svc-main { flex: 1; min-width: 0; }
   .svc-name {
-    font-size: 15px;
+    font-size: var(--fs-body);
     font-weight: 600;
-    color: #1a1208;
+    color: var(--c-ink-warm);
     letter-spacing: -0.01em;
     line-height: 1.3;
   }
   .svc-meta-line {
     display: block;
-    font-size: 13px;
+    font-size: var(--fs-caption);
     font-weight: 400;
     color: var(--text-sand);
     line-height: 1.4;
@@ -518,19 +518,19 @@
     flex-direction: column;
     align-items: flex-end;
     flex-shrink: 0;
-    gap: 8px;
+    gap: var(--s2);
   }
   .svc-price {
-    font-size: 15px;
+    font-size: var(--fs-body);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
-    color: #1a1208;
+    color: var(--c-ink-warm);
     white-space: nowrap;
   }
   .svc-dur-tag {
-    font-size: 12px;
+    font-size: var(--fs-label);
     font-weight: 500;
-    color: #a8873a;
+    color: var(--c-gold-mid);
     white-space: nowrap;
   }
   @media (prefers-color-scheme: dark) {
@@ -606,7 +606,7 @@
     --where-indent: 32px; /* radio ring (22px) + header gap (10px): the text column's left edge */
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--s3);
     margin: 1.5rem 0 1.5rem;
   }
   /* the booking page is one centred column at every width, so the cards stay stacked */
@@ -615,10 +615,10 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    background: #fff;
+    background: var(--c-white);
     border: 1.5px solid transparent;
     border-radius: 20px;
-    padding: 16px;
+    padding: var(--s4);
     cursor: pointer;
     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     box-shadow: 0 1px 6px rgba(0,0,0,0.07);
@@ -635,13 +635,13 @@
     opacity: 0; pointer-events: none;
   }
   .where-card:has(input:focus-visible) {
-    outline: 2px solid #a8873a;
+    outline: 2px solid var(--c-gold-mid);
     outline-offset: 3px;
   }
   .where-card.selected {
-    border-color: #a8873a;
+    border-color: var(--c-gold-mid);
     background: #fbf6ea;
-    box-shadow: 0 0 0 1px #a8873a;
+    box-shadow: 0 0 0 1px var(--c-gold-mid);
   }
   @media (prefers-color-scheme: dark) {
     .where-card.selected { background: rgba(168,135,58,0.12); }
@@ -652,14 +652,14 @@
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin-bottom: 8px;
+    margin-bottom: var(--s2);
   }
   .where-card-name {
     flex: 1 1 auto;
     font-family: Poppins, sans-serif;
-    font-size: 16px;
+    font-size: var(--fs-input);
     font-weight: 600;
-    color: #1a1208;
+    color: var(--c-ink-warm);
     letter-spacing: -0.01em;
     line-height: 1.2;
   }
@@ -671,18 +671,18 @@
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding: 4px 10px;
+    padding: var(--s1) 10px;
     border-radius: 999px;
     white-space: nowrap;
   }
-  .where-card-badge--gold { background: #f5eddb; color: #a8873a; }
+  .where-card-badge--gold { background: #f5eddb; color: var(--c-gold-mid); }
   .where-card-badge--grey { background: #f0ede8; color: var(--text-sand); }
   /* Address + meta lines */
   .where-card-address {
     display: block;
     font-size: 14px;
     font-weight: 500;
-    color: #1a1208;
+    color: var(--c-ink-warm);
     line-height: 1.4;
     margin: 0 0 3px var(--where-indent);
     text-wrap: pretty;
@@ -692,7 +692,7 @@
   }
   .where-card-meta {
     display: block;
-    font-size: 13px;
+    font-size: var(--fs-caption);
     font-weight: 400;
     color: #75706a;
     line-height: 1.5;
@@ -715,8 +715,8 @@
     background: transparent;
     transition: background 0.2s;
   }
-  .where-card.selected .where-radio-ring { border-color: #a8873a; background: rgba(168,135,58,0.1); }
-  .where-card.selected .where-radio-ring::after { background: #a8873a; }
+  .where-card.selected .where-radio-ring { border-color: var(--c-gold-mid); background: rgba(168,135,58,0.1); }
+  .where-card.selected .where-radio-ring::after { background: var(--c-gold-mid); }
 
   /* ---- Location Toggle ---- (styling reuses the shared .segmented / .seg-option component) */
   /* Apple step 1: the travel-fee note is a quiet line, not a bordered box */
@@ -792,7 +792,7 @@
   .cal-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: var(--s1);
     text-align: center;
   }
   .cal-day-name {
@@ -885,7 +885,7 @@
   .form-field select,
   .form-field textarea {
     width: 100%;
-    background: #FFFFFF;
+    background: var(--c-white);
     border: 1px solid rgba(13,13,13,0.12);
     color: var(--cream);
     font-family: 'Poppins', sans-serif;
@@ -903,7 +903,7 @@
     border-color: var(--gold);
     box-shadow: var(--focus-glow);
   }
-  .form-field select option { background: #FFFFFF; color: var(--cream); }
+  .form-field select option { background: var(--c-white); color: var(--cream); }
   .form-field textarea { resize: vertical; min-height: 70px; }
   /* Error state wins over focus — declared last so the red border isn't overridden */
   .form-field input.invalid,
@@ -996,7 +996,7 @@
     content: '';
     display: block;
     width: 5px; height: 9px;
-    border: 2px solid #0D0D0D;
+    border: 2px solid var(--c-ink);
     border-top: none; border-left: none;
     transform: rotate(45deg) translateY(-1px);
   }
@@ -1078,7 +1078,7 @@
     /* Knob stays light regardless of theme or track state (off-track is now
        light grey, on-track gold) — --cream means dark ink text now, so it
        can't double as the knob colour any more. */
-    background: #FFFFFF; transition: transform 0.2s;
+    background: var(--c-white); transition: transform 0.2s;
   }
   .ios-toggle input:checked + .switch { background: linear-gradient(135deg, var(--gold-highlight), var(--gold-primary)); }
   .ios-toggle input:checked + .switch::after { transform: translateX(16px); }
@@ -1146,11 +1146,11 @@
   .pay-secondary:hover:not(:disabled) { background: rgba(13,13,13,0.06); }
   .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   /* Modesty and care — part of the review step, never a pop-up. Sand card, gold edge, no red/green/warning icons. */
-  .care-card { position: relative; display: flex; gap: 12px; align-items: flex-start; box-sizing: border-box; width: 100%; margin: 1rem 0 0; padding: 16px 16px 16px 19px; background: #EFE7D8; border-radius: 28px; overflow: hidden; color: #4A3F2E; }
-  .care-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: #C8A96E; }
-  .care-ico { flex: none; width: 40px; height: 40px; border-radius: 50%; background: #FFFFFF; display: grid; place-items: center; }
+  .care-card { position: relative; display: flex; gap: var(--s3); align-items: flex-start; box-sizing: border-box; width: 100%; margin: 1rem 0 0; padding: var(--s4) var(--s4) var(--s4) 19px; background: #EFE7D8; border-radius: 28px; overflow: hidden; color: #4A3F2E; }
+  .care-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--c-gold); }
+  .care-ico { flex: none; width: 40px; height: 40px; border-radius: 50%; background: var(--c-white); display: grid; place-items: center; }
   .care-txt { min-width: 0; }
-  .care-h { margin: 0 0 4px; font-size: 15px; font-weight: 600; line-height: 1.4; color: #4A3F2E; }
+  .care-h { margin: 0 0 var(--s1); font-size: var(--fs-body); font-weight: 600; line-height: 1.4; color: #4A3F2E; }
   .care-b { margin: 0; font-size: 14px; line-height: 1.5; color: #4A3F2E; overflow-wrap: anywhere; }
   .care-pay-hint { font-size: 0.78rem; color: var(--text-muted); text-align: center; margin: 0.6rem 0 0; line-height: 1.5; }
   .pay-note {
@@ -1218,7 +1218,7 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-muted);
-    margin-top: 4px;
+    margin-top: var(--s1);
   }
   .sc-hero-price {
     font-family: 'Poppins', sans-serif;
@@ -1434,7 +1434,7 @@
      logic. */
   @media (max-width: 600px) {
     .ios-row { padding: 0.9rem 0.85rem; min-height: 48px; }
-    .ios-row input, .ios-row select, .ios-row textarea { font-size: 16px; }
+    .ios-row input, .ios-row select, .ios-row textarea { font-size: var(--fs-input); }
     .ios-row select { min-height: 44px; }
     .back-link, .back-link:link, .back-link:visited { min-height: 44px; }
     .foot-cta { min-height: 48px; }
@@ -1445,7 +1445,7 @@
     .panel-sub, .foot-label, .svc-desc, .loc-line, #loc-notice, .pay-note,
     .ios-toggle span, .field-error, .time-hint, .time-count, .time-group-label, .time-empty, .section-label,
     .ios-group-label, .confirm-sub, .confirm-intake {
-      font-size: 15px;
+      font-size: var(--fs-body);
     }
   }
 
@@ -1469,8 +1469,8 @@
     font-family: 'Poppins', sans-serif;
     font-size: 1rem; /* real 16px — avoids Safari zoom */
     font-weight: 400;
-    color: #1a1208;
-    background: #ffffff;
+    color: var(--c-ink-warm);
+    background: var(--c-white);
     border: 1px solid #e0d9ce;
     border-radius: 1rem;
     outline: none;
@@ -1496,7 +1496,7 @@
   }
   .field-select-wrap { position: relative; }
   .field-select { padding-right: 2.6rem; cursor: pointer; }
-  .field-select option { background: #ffffff; color: #1a1208; }
+  .field-select option { background: var(--c-white); color: var(--c-ink-warm); }
   .field-chevron {
     position: absolute; right: 1rem; top: 50%;
     transform: translateY(-50%) scaleY(0.85);
@@ -1516,10 +1516,10 @@
   .field-input:-webkit-autofill:hover,
   .field-input:-webkit-autofill:focus,
   .field-input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 60px #ffffff inset !important;
-    -webkit-text-fill-color: #1a1208 !important;
-    box-shadow: 0 0 0 60px #ffffff inset !important;
-    caret-color: #1a1208;
+    -webkit-box-shadow: 0 0 0 60px var(--c-white) inset !important;
+    -webkit-text-fill-color: var(--c-ink-warm) !important;
+    box-shadow: 0 0 0 60px var(--c-white) inset !important;
+    caret-color: var(--c-ink-warm);
   }
   .field-input.invalid:-webkit-autofill,
   .field-input.invalid:-webkit-autofill:focus {
@@ -1530,7 +1530,7 @@
   /* ---- Eyebrow divider (location + consent headings) ---- */
   .s4-eyebrow {
     display: flex; align-items: center; gap: 10px;
-    margin: 24px 0 12px;
+    margin: var(--s5) 0 var(--s3);
   }
   .s4-eyebrow-label {
     font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
@@ -1541,16 +1541,16 @@
   }
   /* ---- Location block ---- */
   .s4-location-address {
-    font-size: 14px; font-weight: 600; color: #1a1208; line-height: 1.4;
+    font-size: 14px; font-weight: 600; color: var(--c-ink-warm); line-height: 1.4;
     margin: 0 0 3px;
   }
   .s4-location-sub {
-    font-size: 13px; color: var(--text-sand); line-height: 1.4; margin: 0;
+    font-size: var(--fs-caption); color: var(--text-sand); line-height: 1.4; margin: 0;
   }
   /* ---- Consent ---- */
   .consent-block { margin-bottom: 1.6rem; }
   .consent-row {
-    display: flex; align-items: flex-start; gap: 12px;
+    display: flex; align-items: flex-start; gap: var(--s3);
     padding: 10px 0; cursor: pointer; min-height: 44px;
     border-bottom: 1px solid #e8e2d6;
   }
@@ -1558,23 +1558,23 @@
   .consent-check {
     flex: none; width: 22px; height: 22px; margin-top: 1px;
     border: 1.5px solid #ccc; border-radius: 6px;
-    background: #ffffff;
+    background: var(--c-white);
     -webkit-appearance: none; appearance: none;
     cursor: pointer; position: relative;
     transition: border-color 0.18s, background 0.18s;
   }
   .consent-check:checked {
-    background: #a8873a;
-    border-color: #a8873a;
+    background: var(--c-gold-mid);
+    border-color: var(--c-gold-mid);
   }
   .consent-check:checked::after {
     content: '✓';
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
-    font-size: 13px; color: #ffffff; line-height: 1;
+    font-size: var(--fs-caption); color: var(--c-white); line-height: 1;
   }
   .consent-check:focus-visible { box-shadow: 0 0 0 3px rgba(168,135,58,0.25); }
-  .consent-text { font-size: 13px; color: #1a1208; line-height: 1.5; }
+  .consent-text { font-size: var(--fs-caption); color: var(--c-ink-warm); line-height: 1.5; }
 
   /* ---- Dark-mode contrast fixes (step 3 time slots, step 4 text/fields) ----
      The rules above hard-code light-mode colours that vanish on the dark
@@ -1609,7 +1609,7 @@
     .field-input.invalid:-webkit-autofill:focus { -webkit-text-fill-color: #E5736A !important; }
     .field-select option { background: #1C1C1E; color: var(--cream); }
     .consent-check { background: #1C1C1E; border-color: rgba(245,240,232,0.30); }
-    .consent-check:checked { background: #a8873a; border-color: #a8873a; }
+    .consent-check:checked { background: var(--c-gold-mid); border-color: var(--c-gold-mid); }
     .consent-check:checked::after { color: var(--cream); }
   }
 
@@ -1626,12 +1626,12 @@
   .foot-cta { min-height: 44px; padding-top: 0.4rem; padding-bottom: 0.4rem; }
   @media (max-width: 560px) { .footbar .foot-cta { font-size: 1rem; padding: 0.4rem 1.2rem; } }
   /* Step 1 */
-  .where-grid { gap: 8px; margin: 0.5rem 0 0.6rem; }
-  .where-card { padding: 12px 14px; }
-  .where-card-header { margin-bottom: 4px; }
+  .where-grid { gap: var(--s2); margin: 0.5rem 0 0.6rem; }
+  .where-card { padding: var(--s3) 14px; }
+  .where-card-header { margin-bottom: var(--s1); }
   /* Step 2 */
   .category-tabs-wrap { margin-bottom: 0.4rem; }
-  .category-tabs { padding: 4px 0; }
+  .category-tabs { padding: var(--s1) 0; }
   .service-card { padding: 0.6rem 0.25rem; }
   /* Step 3 */
   .date-section { margin-bottom: 0.8rem; }
@@ -1707,7 +1707,7 @@
   #panel-1 .panel-sub { margin-bottom: 0.8rem; max-width: 30em; }
   .where-grid { gap: 9px; margin: 0.2rem 0 0.6rem; }
   .where-card {
-    padding: 12px 14px 11px;
+    padding: var(--s3) 14px 11px;
     border: 1px solid rgba(13, 13, 13, 0.10);
     border-radius: 14px;
     box-shadow: none;
@@ -1722,16 +1722,16 @@
   }
   @media (prefers-color-scheme: dark) { .where-card.selected { background: rgba(200,169,110,0.10); } }
   .where-card-header { margin-bottom: 5px; }
-  .where-card-name { font-weight: 600; font-size: 16px; line-height: 1.25; letter-spacing: -0.005em; }
+  .where-card-name { font-weight: 600; font-size: var(--fs-input); line-height: 1.25; letter-spacing: -0.005em; }
   .where-card-badge {
     background: transparent !important;
     border: 1px solid var(--hairline-border);
-    font-size: 9.5px; letter-spacing: 0.16em; padding: 4px 9px;
+    font-size: 9.5px; letter-spacing: 0.16em; padding: var(--s1) 9px;
   }
   .where-card-badge--gold { color: var(--gold-deep); border-color: rgba(168,135,58,0.45); }
   .where-card-badge--grey { color: var(--text-sand); }
   .where-card-address { font-size: 13.5px; font-weight: 500; margin-bottom: 2px; }
-  .where-card-meta { font-size: 12px; line-height: 1.5; color: var(--text-cashmere); }
+  .where-card-meta { font-size: var(--fs-label); line-height: 1.5; color: var(--text-cashmere); }
   .where-radio-ring { width: 20px; height: 20px; border-width: 1px; border-color: var(--text-sand); }
   .where-card.selected .where-radio-ring { background: transparent; }
   .where-card-header .where-radio-ring { margin-right: 2px; }
@@ -1762,31 +1762,31 @@
      colours and fonts. Loaded last, so this block wins; change sizes here. */
   html { font-size: 100%; }
 
-  body { font-size: 15px; line-height: 1.45; padding-bottom: calc(96px + min(env(safe-area-inset-bottom, 0px), 14px)); }
-  .book-shell { padding-left: 16px; padding-right: 16px; }
+  body { font-size: var(--fs-body); line-height: 1.45; padding-bottom: calc(96px + min(env(safe-area-inset-bottom, 0px), 14px)); }
+  .book-shell { padding-left: var(--s4); padding-right: var(--s4); }
 
   /* Headings: one size for every step title, 12px floor for labels. */
-  .panel-title { font-size: 28px; line-height: 1.15; }
-  .panel:not(#panel-1) .panel-title { font-size: 28px; }
-  .panel-title::before { font-size: 12px; letter-spacing: 0.2em; margin-bottom: 8px; }
-  .panel-sub, .panel:not(#panel-1) .panel-sub { font-size: 15px; line-height: 1.45; margin-bottom: 14px; }
-  .section-label, .time-group-label, .time-hint, .time-count { font-size: 13px; letter-spacing: 0; }
-  .ios-group-label { font-size: 12px; letter-spacing: 0.06em; }
+  .panel-title { font-size: var(--fs-title); line-height: 1.15; }
+  .panel:not(#panel-1) .panel-title { font-size: var(--fs-title); }
+  .panel-title::before { font-size: var(--fs-label); letter-spacing: 0.2em; margin-bottom: var(--s2); }
+  .panel-sub, .panel:not(#panel-1) .panel-sub { font-size: var(--fs-body); line-height: 1.45; margin-bottom: 14px; }
+  .section-label, .time-group-label, .time-hint, .time-count { font-size: var(--fs-caption); letter-spacing: 0; }
+  .ios-group-label { font-size: var(--fs-label); letter-spacing: 0.06em; }
 
   /* Progress: flat 4px bars, like Atelier's step meter. */
   .steps { gap: 6px; }
   .step-dot { width: 22px; height: 4px; border-radius: 4px; }
   .step.active .step-dot { width: 30px; }
-  #step-counter { font-size: 13px; }
+  #step-counter { font-size: var(--fs-caption); }
 
   /* Step 1 — choice cards: 16px padding / 16px corners / 12px gap */
-  .where-grid { gap: 12px; margin: 4px 0 14px; }
-  .where-card { padding: 16px; border-radius: 16px; }
+  .where-grid { gap: var(--s3); margin: var(--s1) 0 14px; }
+  .where-card { padding: var(--s4); border-radius: 16px; }
   .where-card-header { margin-bottom: 6px; }
-  .where-card-name { font-size: 17px; }
-  .where-card-address { font-size: 15px; margin-bottom: 3px; }
-  .where-card-meta { font-size: 13px; line-height: 1.45; }
-  .where-card-badge { font-size: 12px; letter-spacing: 0.06em; padding: 3px 10px; }
+  .where-card-name { font-size: var(--fs-heading); }
+  .where-card-address { font-size: var(--fs-body); margin-bottom: 3px; }
+  .where-card-meta { font-size: var(--fs-caption); line-height: 1.45; }
+  .where-card-badge { font-size: var(--fs-label); letter-spacing: 0.06em; padding: 3px 10px; }
   .where-radio-ring { width: 24px; height: 24px; }
   .where-card.selected .where-radio-ring::after { width: 12px; height: 12px; }
   .where-card-address, .where-card-meta { margin-left: 36px; }
@@ -1794,11 +1794,11 @@
   .loc-line, #loc-notice { font-size: 13.5px; line-height: 1.45; }
 
   /* Step 2 — treatments as cards, one selected style (gold border + tint + tick) */
-  .category-tabs .seg-option { min-height: 40px; padding: 9px 16px; font-size: 14px; }
-  .category-tabs-wrap { margin-bottom: 8px; }
-  .service-grid { border-top: 0; display: flex; flex-direction: column; gap: 8px; }
+  .category-tabs .seg-option { min-height: 40px; padding: 9px var(--s4); font-size: 14px; }
+  .category-tabs-wrap { margin-bottom: var(--s2); }
+  .service-grid { border-top: 0; display: flex; flex-direction: column; gap: var(--s2); }
   .service-card {
-    padding: 13px 14px; gap: 12px; align-items: center;
+    padding: 13px 14px; gap: var(--s3); align-items: center;
     background: var(--obsidian-elevated);
     border: 1px solid rgba(13, 13, 13, 0.10); border-radius: 14px;
   }
@@ -1806,46 +1806,46 @@
   .service-card:hover { background: var(--obsidian-elevated); }
   .service-card.selected { border-color: var(--gold-primary); background: rgba(200,169,110,0.14); }
   .service-card .svc-ring { width: 28px; height: 28px; margin-top: 0; }
-  .svc-name { font-size: 16px; }
-  .svc-desc, .svc-meta-line { font-size: 13px; line-height: 1.4; }
-  .svc-price { font-size: 16px; }
-  .svc-dur-tag { font-size: 13px; }
-  .cart-summary { border-radius: 16px; padding: 14px 16px; }
-  .cart-title { font-size: 12px; } .cart-name, .cart-price { font-size: 14px; } .cart-note { font-size: 13px; }
+  .svc-name { font-size: var(--fs-input); }
+  .svc-desc, .svc-meta-line { font-size: var(--fs-caption); line-height: 1.4; }
+  .svc-price { font-size: var(--fs-input); }
+  .svc-dur-tag { font-size: var(--fs-caption); }
+  .cart-summary { border-radius: 16px; padding: 14px var(--s4); }
+  .cart-title { font-size: var(--fs-label); } .cart-name, .cart-price { font-size: 14px; } .cart-note { font-size: var(--fs-caption); }
 
   /* Step 3 — 44px+ targets */
-  .calendar { border-radius: 16px; padding: 12px; }
-  .cal-day { height: 44px; font-size: 15px; }
-  .cal-day-name { font-size: 12px; }
-  .cal-month { font-size: 17px; }
+  .calendar { border-radius: 16px; padding: var(--s3); }
+  .cal-day { height: 44px; font-size: var(--fs-body); }
+  .cal-day-name { font-size: var(--fs-label); }
+  .cal-month { font-size: var(--fs-heading); }
   .cal-nav { min-width: 44px; min-height: 44px; }
-  .time-grid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
-  .time-slot { min-height: 48px; border-radius: 12px; font-size: 15px; }
+  .time-grid { grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: var(--s2); }
+  .time-slot { min-height: 48px; border-radius: 12px; font-size: var(--fs-body); }
 
   /* Step 4/5 — inputs 48px, 12px corners; 16px type stops mobile zoom */
-  .field-input { height: 48px; border-radius: 12px; font-size: 16px; }
-  textarea.field-input { height: 5rem; padding-top: 12px; }
-  .field-label { font-size: 13px; font-weight: 500; }
+  .field-input { height: 48px; border-radius: 12px; font-size: var(--fs-input); }
+  textarea.field-input { height: 5rem; padding-top: var(--s3); }
+  .field-label { font-size: var(--fs-caption); font-weight: 500; }
   .ios-row label { white-space: nowrap; }
-  .pay-note, .field-error, .confirm-sub { font-size: 13px; }
+  .pay-note, .field-error, .confirm-sub { font-size: var(--fs-caption); }
 
   /* The footer is Atelier's dark summary bar: what you picked and what it
      costs on the left, the one action on the right, on every step. */
   .footbar { background: transparent; border-top: 0; backdrop-filter: none; -webkit-backdrop-filter: none; padding: 0 12px calc(10px + min(env(safe-area-inset-bottom, 0px), 14px)); }
   .footbar-inner {
-    max-width: 560px; background: var(--gold-primary); color: #0D0D0D;
-    border-radius: 18px; padding: 10px 10px 10px 18px; gap: 12px;
+    max-width: 560px; background: var(--gold-primary); color: var(--c-ink);
+    border-radius: 18px; padding: 10px 10px 10px 18px; gap: var(--s3);
     box-shadow: 0 10px 30px rgba(31, 23, 34, 0.20), 0 1px 2px rgba(31, 23, 34, 0.12);
   }
   .foot-summary-col { display: block !important; }
-  .foot-label { color: inherit; opacity: 0.8; font-size: 13px; line-height: 1.3; }
+  .foot-label { color: inherit; opacity: 0.8; font-size: var(--fs-caption); line-height: 1.3; }
   .foot-total { color: inherit; font-size: 14.5px; font-weight: 600; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .foot-cta {
-    background: #0D0D0D; color: #F5F0E8; border: 0; box-shadow: none;
-    min-height: 46px; padding: 0 18px; font-size: 15px; font-weight: 600; letter-spacing: 0;
+    background: var(--c-ink); color: var(--c-cream); border: 0; box-shadow: none;
+    min-height: 46px; padding: 0 18px; font-size: var(--fs-body); font-weight: 600; letter-spacing: 0;
   }
-  .footbar .foot-cta { font-size: 15px; padding: 0 16px; gap: 6px; }
-  .foot-cta svg { color: #DFC38E; }
+  .footbar .foot-cta { font-size: var(--fs-body); padding: 0 var(--s4); gap: 6px; }
+  .foot-cta svg { color: var(--c-gold-light); }
   .foot-cta:hover:not(:disabled) { filter: none; opacity: 0.9; }
   .foot-cta:disabled { background: rgba(13, 13, 13, 0.14); color: rgba(13, 13, 13, 0.55); border: 0; }
   .foot-cta:disabled svg { color: rgba(13, 13, 13, 0.45); }
@@ -1855,7 +1855,6 @@
      of 4 (steps 4 / 8 / 12 / 16 / 24 / 32). Cards 16, buttons and inputs 48,
      choice rows 12 x 16, gaps 8 or 12. One block, loaded last: change a step
      here, not in the rules above. */
-  :root { --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; }
   .panel { padding-top: var(--s2); }
   .panel-sub, #panel-1 .panel-sub, .panel:not(#panel-1) .panel-sub { margin-bottom: var(--s4); }
   h1 { margin-top: 0; margin-bottom: 0; }
@@ -1920,6 +1919,7 @@
   .footbar .foot-cta { gap: var(--s2); }
   body { padding-bottom: calc(96px + min(env(safe-area-inset-bottom, 0px), 16px)); }
 </style>
+<link rel="stylesheet" href="/tokens.css">
 <link rel="stylesheet" href="/ui.css">
 </head>
 <body>
@@ -2707,7 +2707,7 @@ function syncFooter() {
       1: state.location === 'mobile' && state.travelZone === null ? 'Enter your postcode to continue' : "Choose where you'd like your session",
       2: 'Choose at least one treatment',
       3: state.date ? 'Pick a time to continue' : 'Pick a date and time',
-      4: 'Complete your details and tick both boxes',
+      4: 'Finish your details to continue',
     };
     const why = cta.disabled ? reasons[currentStep] : '';
     fh.textContent = why;

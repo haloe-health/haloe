@@ -1,0 +1,35 @@
+/* haloe design tokens (Oct 2026) — the single source for colour, spacing and type
+   sizes on the booking page, intake form and pre-session guide. Loaded before
+   ui.css. Plain CSS custom properties (the site has no build step or Tailwind).
+   Change a value here and every page follows. Anything still hard-coded in a page
+   is listed in TOKENS.md as "does not map cleanly". */
+:root {
+  /* colour — brand */
+  --c-ink: #0D0D0D;
+  --c-ink-warm: #1A1208;
+  --c-cream: #F5F0E8;
+  --c-white: #FFFFFF;
+  --c-gold: #C8A96E;
+  --c-gold-mid: #A8873A;
+  --c-gold-light: #DFC38E;
+  --c-gold-deep: #7A5C22;       /* gold used as text: 5.6:1 on cream */
+  --c-muted: #6B6357;           /* secondary text: 5.2:1 on cream */
+  --c-body-soft: #5A5247;
+  --c-sand: #F0EAE0;
+  /* colour — dark theme surfaces (booking page) */
+  --c-dark-page: #1A1712;
+  --c-dark-card: #211D16;
+  --c-dark-surface: #262119;
+  --c-dark-raised: #2E2820;
+
+  /* spacing — 4px grid */
+  --s1: 4px;  --s2: 8px;  --s3: 12px;  --s4: 16px;  --s5: 24px;  --s6: 32px;
+
+  /* type scale (px) */
+  --fs-label: 12px;     /* caps labels, badges */
+  --fs-caption: 13px;   /* captions, helper text */
+  --fs-body: 15px;      /* body, buttons */
+  --fs-input: 16px;     /* form fields (stops phone zoom) */
+  --fs-heading: 17px;   /* card and row headings */
+  --fs-title: 28px;     /* step titles */
+}

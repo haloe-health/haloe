@@ -23,14 +23,17 @@ check('booking-page line under the pay button', CARE_COPY.payHint === 'You will 
 
 // ---- booking page
 const book = read('book.html');
+// The page CSS uses design tokens (tokens.css); expand them so these checks still read real values.
+const TOK = Object.fromEntries([...read('tokens.css').matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(m => [m[1], m[2].trim()]));
+const bookR = book.replace(/var\((--[\w-]+)\)/g, (m, k) => TOK[k] || m);
 check('booking page loads /care-copy.js and fills heading, body and the pay hint from it', book.includes('<script src="/care-copy.js"></script>') && /CARE_COPY[\s\S]{0,300}care-h[\s\S]{0,200}care-b[\s\S]{0,200}care-pay-hint/.test(book), 0);
 const iCard = book.indexOf('id="care-card"'), iPay = book.indexOf('id="btn-full"'), iHint = book.indexOf('id="care-pay-hint"');
 check('card sits before the pay button, hint directly under it', iCard > 0 && iCard < iPay && iPay < iHint, [iCard, iPay, iHint]);
 check('card is on the review step (panel-5), not a pop-up/modal', book.indexOf('id="panel-5"') < iCard && iCard < book.indexOf('id="confirmation"') && !/care-card[^>]*(modal|dialog|popup)/i.test(book), 0);
-const css = (book.match(/\.care-card \{[^}]*\}/) || [''])[0];
+const css = (bookR.match(/\.care-card \{[^}]*\}/) || [''])[0];
 check('card styles: sand #EFE7D8, 28px radius, 16px padding, #4A3F2E text', /#EFE7D8/i.test(css) && /border-radius: 28px/.test(css) && /padding: 16px/.test(css) && /#4A3F2E/i.test(css), css);
-check('3px gold (#C8A96E) left edge, 40px white circle', /\.care-card::before \{[^}]*width: 3px[^}]*#C8A96E|\.care-card::before \{[^}]*#C8A96E[^}]*width: 3px/i.test(book) && /\.care-ico \{[^}]*width: 40px[^}]*height: 40px[^}]*#FFFFFF/i.test(book), 0);
-check('heading 15px/600, body 14px/1.5', /\.care-h \{[^}]*font-size: 15px[^}]*font-weight: 600/.test(book) && /\.care-b \{[^}]*font-size: 14px[^}]*line-height: 1\.5/.test(book), 0);
+check('3px gold (#C8A96E) left edge, 40px white circle', /\.care-card::before \{[^}]*width: 3px[^}]*#C8A96E|\.care-card::before \{[^}]*#C8A96E[^}]*width: 3px/i.test(bookR) && /\.care-ico \{[^}]*width: 40px[^}]*height: 40px[^}]*#FFFFFF/i.test(bookR), 0);
+check('heading 15px/600, body 14px/1.5', /\.care-h \{[^}]*font-size: 15px[^}]*font-weight: 600/.test(bookR) && /\.care-b \{[^}]*font-size: 14px[^}]*line-height: 1\.5/.test(bookR), 0);
 check("towel icon = three stacked rounded rects in gold line", !!book.match(/<svg[^>]*stroke="#C8A96E"[^>]*>(<rect[^>]*rx="2"\/>){3}<\/svg>/), 0);
 check('no red/green/warning marks on the card', !/⚠/.test(book.slice(iCard, iPay)) && !/\.care-(card|h|b|ico)[^{]*\{[^}]*(red|green|#c97a6e|#E5736A)/i.test(book), 0);
 
