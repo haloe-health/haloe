@@ -25,6 +25,7 @@
 <!-- Poppins only — 300/400/500/600 are the weights used on this page. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="fonts/TAN-ASHFORD.woff2" as="font" type="font/woff2" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   /* ── Branded loading screen (presentation only) ──
@@ -1657,6 +1658,115 @@
   .kb-open .footbar { display: none; }
   /* Spare room under the form so even the last field can scroll to the middle. */
   .kb-open body { padding-bottom: 60vh; }
+
+  /* ================= Design pass (Oct 2026) =================
+     Presentation only — no markup, ids or behaviour changed. One idea runs
+     through every step: a quiet "stationery" system. Tan Ashford titles, a
+     numbered gold eyebrow and a hairline gold rule open each step; choices
+     are flat, hairline-ruled sheets with a gold spine when chosen; the one
+     action is an ink pill. Colours come from the existing tokens, so dark
+     mode follows. Step 1 gets the most room; steps 2-5 stay compact so each
+     still fits a phone screen. */
+  @font-face {
+    font-family: 'Tan Ashford';
+    src: url('fonts/TAN-ASHFORD.woff2') format('woff2'), url('fonts/TAN-ASHFORD.woff') format('woff');
+    font-weight: normal; font-style: normal; font-display: swap;
+  }
+  :root { --font-display: 'Tan Ashford', Georgia, 'Times New Roman', serif; }
+
+  /* Titles are sentences, so a light serif (Tan Ashford is too heavy for
+     them — it is kept for the short card names below). */
+  .panel-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 400;
+    font-size: 31px;
+    line-height: 1.16;
+    letter-spacing: -0.012em;
+    color: var(--cream);
+    margin-bottom: 0;
+  }
+  .panel-title::before {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 10.5px; font-weight: 500;
+    letter-spacing: 0.26em; text-transform: uppercase;
+    color: var(--gold-deep);
+    margin-bottom: 12px;
+  }
+  .panel { padding-top: 10px; }
+  .panel-title::after {
+    content: ''; display: block;
+    width: 34px; height: 1px;
+    background: var(--gold-primary);
+    margin: 16px 0 12px;
+  }
+  @media (prefers-color-scheme: dark) { .panel-title::before { color: var(--gold-light); } }
+  #panel-1 .panel-title::before { content: '01  \00B7  Arrival'; }
+  #panel-2 .panel-title::before { content: '02  \00B7  The session'; }
+  #panel-3 .panel-title::before { content: '03  \00B7  Your time'; }
+  #panel-4 .panel-title::before { content: '04  \00B7  Your details'; }
+  #panel-5 .panel-title::before { content: '05  \00B7  Confirm'; }
+  .panel-sub { font-size: 14px; line-height: 1.55; color: var(--text-cashmere); margin-bottom: 0.9rem; }
+
+  /* Steps 2-5 stay tight so they still fit one screen. */
+  .panel:not(#panel-1) .panel-title { font-size: 26px; }
+  .panel:not(#panel-1) .panel-title::before { margin-bottom: 6px; }
+  .panel:not(#panel-1) .panel-title::after { margin: 11px 0 9px; }
+  .panel:not(#panel-1) .panel-sub { margin-bottom: 0.7rem; }
+
+  /* Step 1 — the room to breathe */
+  #panel-1 .panel-sub { margin-bottom: 1.4rem; max-width: 30em; }
+  .where-grid { gap: 14px; margin: 0.4rem 0 1.4rem; }
+  .where-card {
+    padding: 18px 18px 17px;
+    border: 1px solid rgba(13, 13, 13, 0.10);
+    border-radius: 14px;
+    box-shadow: none;
+    background: var(--obsidian-elevated);
+  }
+  @media (prefers-color-scheme: dark) { .where-card { border-color: var(--hairline-border); } }
+  @media (hover: hover) { .where-card:hover:not(.selected) { border-color: var(--gold-primary); } }
+  .where-card.selected {
+    border-color: var(--gold-primary);
+    background: #fbf7ee;
+    box-shadow: inset 3px 0 0 var(--gold-primary);
+  }
+  @media (prefers-color-scheme: dark) { .where-card.selected { background: rgba(200,169,110,0.10); } }
+  .where-card-header { margin-bottom: 8px; }
+  .where-card-name {
+    font-family: var(--font-display);
+    font-weight: 400; font-size: 19px; line-height: 1.25; letter-spacing: 0.01em;
+  }
+  .where-card-badge {
+    background: transparent !important;
+    border: 1px solid var(--hairline-border);
+    font-size: 9.5px; letter-spacing: 0.16em; padding: 4px 9px;
+  }
+  .where-card-badge--gold { color: var(--gold-deep); border-color: rgba(168,135,58,0.45); }
+  .where-card-badge--grey { color: var(--text-sand); }
+  .where-card-address { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+  .where-card-meta { font-size: 12.5px; line-height: 1.55; color: var(--text-cashmere); }
+  .where-radio-ring { width: 20px; height: 20px; border-width: 1px; border-color: var(--text-sand); }
+  .where-card.selected .where-radio-ring { background: transparent; }
+  .where-card-header .where-radio-ring { margin-right: 2px; }
+
+  /* The one action: an ink pill, gold arrow. Disabled = an outline, so it
+     reads as "not yet" rather than a washed-out button. */
+  .foot-cta {
+    background: var(--cream); color: var(--black);
+    border: 1px solid var(--cream);
+    letter-spacing: 0.02em; font-weight: 500;
+    box-shadow: 0 6px 18px -8px rgba(13,13,13,0.5);
+  }
+  .foot-cta svg { color: var(--gold-highlight); }
+  @media (prefers-color-scheme: dark) { .foot-cta svg { color: var(--gold-deep); } }
+  .foot-cta:hover:not(:disabled) { filter: none; opacity: 0.92; }
+  .foot-cta:disabled {
+    background: transparent; color: var(--text-sand); opacity: 1; box-shadow: none;
+    border: 1px solid var(--hairline-border);
+  }
+  .foot-cta:disabled svg { color: var(--text-sand); }
+  .footbar { border-top-color: var(--hairline-border); }
 </style>
 </head>
 <body>
@@ -3337,42 +3447,70 @@ function goToStep(n) {
   window.scrollTo(0, 0);
 }
 
-/* ---- Keyboard: while a field is being typed in, hide the fixed footer ----
-   On a phone the on-screen keyboard shrinks the viewport and a fixed bottom
-   bar rides up above it, leaving almost no room for the form. The bar comes
-   back as soon as the field loses focus. Enter on a one-line field closes
-   the keyboard so the bar (and Continue) return. */
+/* ---- Keyboard: while the on-screen keyboard is up, hide the fixed footer ----
+   On a phone the keyboard shrinks the viewport and a fixed bottom bar rides up
+   above it, leaving almost no room for the form. The bar must come back the
+   moment the keyboard goes away — and on Android the keyboard can be closed
+   (its own down-arrow / the back key) WITHOUT the field losing focus, so
+   "field blurred" is not a reliable signal. We watch the real viewport height
+   instead: the keyboard is "up" only while the visible height is well below
+   its resting height. Enter on a one-line field closes the keyboard. */
 (function () {
-  const isField = el => el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && !/^(radio|checkbox|button|submit)$/.test(el.type || '');
-  // Centre the focused field in the part of the screen the keyboard leaves
-  // free (below the fixed top bar). Re-run as the keyboard finishes opening,
-  // because the visible height keeps changing for a few hundred ms.
+  const vv = window.visualViewport;
+  const root = document.documentElement;
   const NAV_H = 56;
+  const isField = el => el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && !/^(radio|checkbox|button|submit)$/.test(el.type || '');
+  const viewH = () => (vv ? vv.height : window.innerHeight);
+  let restH = viewH();          // height with no keyboard, learned while nothing is focused
+  let focusedField = null;
+  let settleTimer = null;
+
+  function keyboardShown() { return viewH() < restH - 140; }
+  function setKb(on) { root.classList.toggle('kb-open', !!on); }
+
+  // Centre the focused field in the part of the screen the keyboard leaves free.
   function centreField(el) {
-    if (!el || !document.documentElement.classList.contains('kb-open')) return;
-    const vv = window.visualViewport;
-    const visibleH = vv ? vv.height : window.innerHeight;
-    const top = NAV_H, bottom = visibleH;
+    if (!el || !root.classList.contains('kb-open')) return;
     const r = el.getBoundingClientRect();
-    // For a tall box (address/notes) aim at its first lines, not its middle.
     const focusY = r.top + Math.min(r.height / 2, 48);
-    const target = top + (bottom - top) / 2;
+    const target = NAV_H + (viewH() - NAV_H) / 2;
     const delta = focusY - target;
     if (Math.abs(delta) > 6) window.scrollBy({ top: delta, behavior: 'smooth' });
   }
-  let focusedField = null;
+  // Keyboard went away (or never came, e.g. a hardware keyboard): show the bar.
+  function keyboardGone() {
+    setKb(false);
+    focusedField = null;
+    const a = document.activeElement;
+    if (isField(a)) a.blur();   // so tapping the same field again re-triggers focusin
+  }
+
   document.addEventListener('focusin', e => {
     if (!isField(e.target)) return;
     focusedField = e.target;
-    document.documentElement.classList.add('kb-open');
+    setKb(true);                 // hide the bar straight away so it never jumps
     [60, 300, 600].forEach(ms => setTimeout(() => { if (focusedField === e.target) centreField(e.target); }, ms));
+    // If no keyboard actually appears (desktop, hardware keyboard), put the bar back.
+    clearTimeout(settleTimer);
+    settleTimer = setTimeout(() => { if (focusedField && !keyboardShown()) setKb(false); }, 900);
   });
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => { if (focusedField) setTimeout(() => centreField(focusedField), 50); });
-  }
   document.addEventListener('focusout', () => {
-    setTimeout(() => { if (!isField(document.activeElement)) { focusedField = null; document.documentElement.classList.remove('kb-open'); } }, 80);
+    setTimeout(() => {
+      if (!isField(document.activeElement)) { focusedField = null; setKb(false); }
+    }, 80);
   });
+  function onViewport() {
+    if (!focusedField) { restH = Math.max(restH, viewH()); return; }
+    if (keyboardShown()) { setKb(true); setTimeout(() => centreField(focusedField), 50); }
+    else if (root.classList.contains('kb-open')) { clearTimeout(settleTimer); keyboardGone(); }
+  }
+  if (vv) vv.addEventListener('resize', onViewport);
+  window.addEventListener('resize', onViewport);
+  window.addEventListener('orientationchange', () => { restH = viewH(); });
+  // Any tap that isn't on a field puts the bar back (belt and braces).
+  document.addEventListener('pointerdown', e => {
+    if (root.classList.contains('kb-open') && !isField(e.target)) { clearTimeout(settleTimer); keyboardGone(); }
+  }, true);
   document.addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.target && e.target.tagName === 'INPUT' && isField(e.target)) e.target.blur();
   });
