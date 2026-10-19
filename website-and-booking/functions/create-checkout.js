@@ -3,7 +3,7 @@ import { isOfferableStart, TURNAROUND_MIN } from './_slots.js';
 import { CLINIC_RULES, CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
 import { resolveCart, formatDuration, cartFitsLocation } from './_services.js';
 import { validateDiscountCode, applyDiscount, reserveDiscountCode, confirmDiscountRedemption, releaseDiscountReservation } from './_discounts.js';
-import { travelZoneFor, travelFeeFor } from './_travel.js';
+import { travelQuote, travelLabelFor } from './_travel.js';
 import { notifyBooking, formatGBP, upperPostcode } from './_notify.js';
 
 export async function onRequestPost(context) {
@@ -98,15 +98,17 @@ export async function onRequestPost(context) {
     }
 
     // Travel fee — home visits only, zone computed server-side from the
-    // postcode, never trusted from the client. Clinic Day bookings have a
-    // fixed venue and never get a travel line. An unparseable postcode
-    // (shouldn't happen — book.html validates the format before letting the
-    // customer continue) falls back to Zone C rather than blocking payment.
+    // postcode (distance from Halima's start point, see _travel.js), never
+    // trusted from the client. Clinic Day bookings have a fixed venue and
+    // never get a travel line. An unknown postcode or an unreachable lookup
+    // (book.html validates before letting the customer continue) falls back
+    // to zone 'Q' (confirmed by WhatsApp) rather than blocking payment.
     let travelZone = null;
     let travelPence = 0;
     if (location === 'mobile') {
-      travelZone = travelZoneFor(travelPostcode) || 'C';
-      travelPence = travelFeeFor(travelZone);
+      const quote = await travelQuote(travelPostcode);
+      travelZone = quote.valid ? quote.zone : 'Q';
+      travelPence = quote.valid ? quote.pence : 0;
     }
 
     let totalAmount = treatmentAmount + travelPence;
@@ -217,7 +219,7 @@ export async function onRequestPost(context) {
         originalAmountLabel: appliedCode ? formatGBP(originalAmount) : '',
         discountRowLabel: appliedCode ? `${appliedCode} discount` : '',
         discountLabel: appliedCode ? `−${formatGBP(discountPenceApplied)}` : '',
-        travelLabel: location === 'mobile' ? (travelZone === 'C' ? 'Confirmed by WhatsApp before the session' : formatGBP(travelPence)) : '',
+        travelLabel: location === 'mobile' ? (travelZone === 'Q' ? 'Confirmed by WhatsApp before the session' : formatGBP(travelPence)) : '',
         travelZone: location === 'mobile' ? travelZone : '',
         travelPence: location === 'mobile' ? travelPence : 0,
         slotConflict,
@@ -253,13 +255,13 @@ export async function onRequestPost(context) {
     params.append('line_items[0][quantity]', '1');
     // Travel is always its own line item for a home visit — never merged into
     // the treatment price, and never discounted (see the comment above where
-    // treatmentAmount is computed). Zone C has no fixed fee, but still gets a
+    // treatmentAmount is computed). Zone Q has no fixed fee, but still gets a
     // £0 line so it's itemised everywhere a real fee would be, rather than
     // silently missing.
     if (location === 'mobile') {
-      const travelName = travelZone === 'A' ? 'Travel — Zone A (Oldham & nearby)'
-        : travelZone === 'B' ? 'Travel — Zone B (Greater Manchester)'
-        : 'Travel — confirmed by WhatsApp before your session';
+      const travelName = travelZone === 'Q'
+        ? 'Travel — confirmed by WhatsApp before your session'
+        : `Travel — ${travelLabelFor(travelZone).toLowerCase()}`;
       params.append('line_items[1][price_data][currency]', 'gbp');
       params.append('line_items[1][price_data][product_data][name]', travelName);
       params.append('line_items[1][price_data][product_data][description]', 'Home-visit travel fee. Never discounted by promotional codes.');

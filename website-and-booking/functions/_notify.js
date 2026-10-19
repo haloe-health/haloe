@@ -7,6 +7,7 @@
 // file from becoming a route.
 
 import { createVideoMeeting } from './_video.js';
+import { travelLabelFor } from './_travel.js';
 import {
   INK, BODY_TEXT, GOLD_DEEP, FONT, FONT_HEADING,
   sendEmail, esc, emailHeader, emailFooter, emailShell, heroRow, infoCard,
@@ -232,9 +233,8 @@ function clientEmailHtml(d) {
 // Plain, information-dense notification for Halima with everything she needs to follow up.
 function halimaEmailHtml(d) {
   const travelZoneLabel = d.location === 'mobile'
-    ? (d.travelZone === 'A' ? `Zone A — ${formatGBP(d.travelPence)}`
-      : d.travelZone === 'B' ? `Zone B — ${formatGBP(d.travelPence)}`
-      : d.travelZone === 'C' ? 'Zone C — travel TBC' : '')
+    ? (d.travelZone === 'Q' ? 'Beyond 16 miles — travel by quote'
+      : d.travelZone ? `${travelLabelFor(d.travelZone)} — ${formatGBP(d.travelPence)}` : '')
     : '';
 
   const inner = `<tr>
@@ -254,11 +254,11 @@ function halimaEmailHtml(d) {
               ${infoCard([
                 { label: 'Location', value: d.location === 'clinic' ? `${locationLabel(d)} — ${d.venue}` : locationLabel(d) },
                 { label: d.location === 'virtual' ? 'Video link' : 'Address', value: d.location === 'clinic' ? CLINIC_VENUE_ADDRESS : d.location === 'virtual' ? (d.videoUrl || '⚠ Not created — send the client a link yourself') : d.address },
-                { label: 'Postcode zone', value: travelZoneLabel },
+                { label: 'Travel distance', value: travelZoneLabel },
                 { label: 'Phone', value: d.phone },
                 { label: 'Email', value: d.email },
                 { label: 'Notes', value: d.notes },
-                { label: 'Travel note', value: d.travelZone === 'C' ? '⚠ Confirm travel cost with the client before the session' : '' },
+                { label: 'Travel note', value: d.travelZone === 'Q' ? '⚠ Confirm travel cost with the client before the session' : '' },
                 { label: 'Time clash', value: d.slotConflict ? '⚠ This time overlaps another booking — the payment landed after the 10-minute hold lapsed. Check /admin and reschedule one of them.' : '' },
               ])}
               <tr>
