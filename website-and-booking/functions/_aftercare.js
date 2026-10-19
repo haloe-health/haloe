@@ -75,16 +75,16 @@ function reminderLayout({ eyebrow, headline, greeting, body, note }) {
 <!--[if mso]><table role="presentation" width="480" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
 <table role="presentation" width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:480px;margin:0 auto;border-collapse:collapse;">
 ${cell(`<img src="${LOGO_URL}" width="172" height="46" alt="haloe" style="display:block;margin:0 auto;width:172px;height:auto;border:0;outline:none;">`, 'padding:32px 0 0;', 'align="center"')}
-${cell('HIJAMA &middot; WELLNESS &middot; MANCHESTER', `padding:12px 0 0;font-family:${FONT};font-size:11px;line-height:16px;letter-spacing:3px;color:${GOLD_DEEP};`, 'align="center" class="gold-text"')}
+${cell('HIJAMA &middot; WELLNESS &middot; MANCHESTER', `padding:12px 0 0;font-family:${FONT};font-size:12px;line-height:18px;letter-spacing:3px;color:${GOLD_DEEP};`, 'align="center" class="gold-text"')}
 ${divider('28px 0')}
-${cell(esc(eyebrow.toUpperCase()), `padding:0 0 8px;font-family:${FONT};font-size:11px;line-height:16px;letter-spacing:2px;font-weight:600;color:${GOLD_DEEP};`, 'align="center" class="gold-text"')}
+${cell(esc(eyebrow.toUpperCase()), `padding:0 0 8px;font-family:${FONT};font-size:12px;line-height:18px;letter-spacing:2px;font-weight:600;color:${GOLD_DEEP};`, 'align="center" class="gold-text"')}
 ${cell(esc(headline), `padding:0 0 24px;font-family:${FONT_HEADING};font-size:28px;line-height:34px;font-weight:normal;color:${INK};`, 'align="center" class="ink"')}
 ${cell(`<p class="ink" style="margin:0 0 12px;font-family:${FONT};font-size:16px;line-height:24px;color:${INK};">${esc(greeting)}</p>
 <p class="body-text" style="margin:0;font-family:${FONT};font-size:16px;line-height:27px;color:${BODY_TEXT};">${esc(body)}</p>
-<p style="margin:20px 0 0;font-family:${FONT};font-size:15px;line-height:24px;color:#8a8174;">${esc(note)}</p>`, 'padding:0 32px;', 'align="left"')}
-${cell(`<table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;border-collapse:separate;"><tr><td class="btn-cell" align="center" bgcolor="${GOLD}" style="border-radius:26px;background-color:${GOLD};background-image:linear-gradient(${GOLD},${GOLD});padding:15px 32px;"><a class="btn-text" href="${APP_URL}" style="display:block;color:${INK};text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:16px;letter-spacing:2px;text-transform:uppercase;font-weight:bold;">OPEN MY AFTERCARE</a></td></tr></table>`, 'padding:32px 0;', 'align="center"')}
+<p style="margin:20px 0 0;font-family:${FONT};font-size:15px;line-height:24px;color:#6B6357;">${esc(note)}</p>`, 'padding:0 32px;', 'align="left"')}
+${cell(`<table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;border-collapse:separate;"><tr><td class="btn-cell" align="center" bgcolor="${GOLD}" style="border-radius:26px;background-color:${GOLD};background-image:linear-gradient(${GOLD},${GOLD});padding:0;"><a class="btn-text" href="${APP_URL}" style="display:block;padding:14px 32px;color:${INK};text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:20px;letter-spacing:1.5px;text-transform:uppercase;font-weight:bold;">OPEN MY AFTERCARE</a></td></tr></table>`, 'padding:32px 0;', 'align="center"')}
 ${divider('0 0 24px')}
-${cell(`<div class="gold-text" style="font-family:${FONT};font-size:12px;line-height:18px;letter-spacing:1px;font-weight:600;color:${GOLD_DEEP};">From haloe</div><div class="body-text" style="font-family:${FONT};font-size:11px;line-height:16px;margin-top:8px;color:${BODY_TEXT};">Manchester</div>`, 'padding:0 0 28px;', 'align="center"')}
+${cell(`<div class="gold-text" style="font-family:${FONT};font-size:13px;line-height:18px;letter-spacing:1px;font-weight:600;color:${GOLD_DEEP};">From haloe</div><div class="body-text" style="font-family:${FONT};font-size:12px;line-height:18px;margin-top:8px;color:${BODY_TEXT};">Manchester</div>`, 'padding:0 0 28px;', 'align="center"')}
 </table>
 <!--[if mso]></td></tr></table><![endif]-->
 </td></tr></table>
