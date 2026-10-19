@@ -125,12 +125,12 @@ export async function onRequestPost(context) {
     const discountLabel = discountCode ? `−${formatGBP(discountPence)}` : '';
 
     // Travel fee — home visits only; create-checkout.js never sets these for
-    // a Clinic Day booking. Zone C has no fixed fee, so it reads as a note
+    // a Clinic Day booking. Zone Q has no fixed fee, so it reads as a note
     // rather than an amount.
     const travelPence = location === 'mobile' ? parseInt(md.travelPence || '0', 10) : 0;
     const travelZone = location === 'mobile' ? (md.travelZone || '') : '';
     const travelLabel = location === 'mobile'
-      ? (travelZone === 'C' ? 'Confirmed by WhatsApp before the session' : formatGBP(travelPence))
+      ? (travelZone === 'Q' ? 'Confirmed by WhatsApp before the session' : formatGBP(travelPence))
       : '';
 
     // Confirm the held slot so it converts from a temporary hold into a firm
