@@ -507,14 +507,14 @@
   .step-nav {
     left: 12px; right: 12px; bottom: calc(10px + min(env(safe-area-inset-bottom, 0px), 14px));
     max-width: 576px; margin: 0 auto; padding: 10px; gap: 10px;
-    background: var(--ink); border-radius: 18px; pointer-events: auto;
+    background: var(--gold); border-radius: 18px; pointer-events: auto;
     box-shadow: 0 10px 30px rgba(31, 23, 34, 0.20), 0 1px 2px rgba(31, 23, 34, 0.12);
   }
   .step-nav .btn { height: 46px; padding: 0 22px; font-weight: 600; }
-  .step-nav .btn-gold { background: var(--gold); color: #0D0D0D; }
-  .step-nav .btn-outline { background: transparent; border: 1px solid rgba(245,240,232,0.28); color: #F5F0E8; font-weight: 500; min-width: 88px; }
-  @media (hover: hover) { .step-nav .btn-outline:hover { background: rgba(245,240,232,0.08); border-color: rgba(245,240,232,0.5); color: #F5F0E8; } }
-  .step-nav .btn:disabled, .step-nav .btn[disabled] { opacity: 0.45; }
+  .step-nav .btn-gold { background: #0D0D0D; color: #F5F0E8; }
+  .step-nav .btn-outline { background: transparent; border: 1px solid rgba(13,13,13,0.35); color: #0D0D0D; font-weight: 500; min-width: 88px; }
+  @media (hover: hover) { .step-nav .btn-outline:hover { background: rgba(13,13,13,0.08); border-color: rgba(13,13,13,0.6); color: #0D0D0D; } .step-nav .btn-gold:hover { background: #26231d; } }
+  .step-nav .btn:disabled, .step-nav .btn[disabled] { opacity: 0.4; }
 </style>
 <script src="/care-copy.js"></script>
 </head>
