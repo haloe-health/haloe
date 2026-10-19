@@ -605,8 +605,8 @@
   .where-grid {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin: 1.923rem 0 1.5rem;
+    gap: 12px;
+    margin: 1.5rem 0 1.5rem;
   }
   @media (min-width: 768px) {
     .where-grid { flex-direction: row; }
@@ -622,7 +622,7 @@
     border-radius: 20px;
     padding: 16px;
     cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     box-shadow: 0 1px 6px rgba(0,0,0,0.07);
   }
   @media (prefers-color-scheme: dark) {
@@ -642,18 +642,24 @@
   }
   .where-card.selected {
     border-color: #a8873a;
-    box-shadow: none;
+    background: #fbf6ea;
+    box-shadow: 0 0 0 1px #a8873a;
+  }
+  @media (prefers-color-scheme: dark) {
+    .where-card.selected { background: rgba(168,135,58,0.12); }
   }
   /* Header row: name + day badge */
   .where-card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
+    gap: 10px;
+    margin-bottom: 8px;
   }
   .where-card-name {
+    flex: 1 1 auto;
     font-family: Poppins, sans-serif;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     color: #1a1208;
     letter-spacing: -0.01em;
@@ -676,54 +682,35 @@
   /* Address + meta lines */
   .where-card-address {
     display: block;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     color: #1a1208;
     line-height: 1.4;
-    margin-bottom: 3px;
+    margin: 0 0 3px 30px;
   }
   @media (prefers-color-scheme: dark) {
     .where-card-address { color: var(--cream); }
   }
   .where-card-meta {
     display: block;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 400;
-    color: #888;
+    color: #75706a;
     line-height: 1.5;
+    margin-left: 30px;
   }
-  /* Footer row: selected label + radio ring */
-  .where-card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px solid #f0ede8;
-  }
-  @media (prefers-color-scheme: dark) {
-    .where-card-footer { border-top-color: var(--hairline-border); }
-  }
-  .where-card-sel-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #a8873a;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  .where-card.selected .where-card-sel-label { opacity: 1; }
   /* Decorative radio dot — real state is on the hidden input */
   .where-radio-ring {
-    width: 20px; height: 20px;
+    width: 22px; height: 22px;
     flex: none;
     border-radius: 999px;
-    border: 1.5px solid #ccc;
+    border: 1.5px solid #b8b0a2;
     display: flex; align-items: center; justify-content: center;
     transition: border-color 0.2s, background 0.2s;
   }
   .where-radio-ring::after {
     content: '';
-    width: 8px; height: 8px;
+    width: 10px; height: 10px;
     border-radius: 999px;
     background: transparent;
     transition: background 0.2s;
@@ -1342,7 +1329,7 @@
   }
   .foot-cta svg { width: 16px; height: 16px; flex: none; }
   .foot-cta:hover:not(:disabled) { filter: brightness(1.08); }
-  .foot-cta:disabled { background: var(--obsidian-floating); color: var(--text-muted); cursor: not-allowed; }
+  .foot-cta:disabled { background: var(--obsidian-floating); color: var(--text-muted); cursor: not-allowed; opacity: 0.85; }
   .foot-cta.hidden { display: none; }
   .footbar.hidden { display: none; }
   body { padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
@@ -1626,6 +1613,42 @@
     .consent-check:checked::after { color: var(--cream); }
   }
 
+
+  /* ---- Compact scale (Oct 2026): every step uses the same tight rhythm so each
+     fits one screen. One block, loaded last — change spacing here. ---- */
+  .book-shell { padding-top: 0.5rem; padding-bottom: 1rem; }
+  .book-main .container { padding-top: 0; }
+  .panel-title { font-size: 24px; margin-bottom: 0.25rem; line-height: 1.15; }
+  .panel-sub { font-size: 14px; line-height: 1.4; margin-bottom: 0.7rem; }
+  @media (max-width: 600px) { .panel-sub { font-size: 14px; } }
+  body { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+  .footbar-inner { padding-top: 0.45rem; padding-bottom: 0.45rem; }
+  .foot-cta { min-height: 44px; padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  @media (max-width: 560px) { .footbar .foot-cta { font-size: 1rem; padding: 0.4rem 1.2rem; } }
+  /* Step 1 */
+  .where-grid { gap: 8px; margin: 0.5rem 0 0.6rem; }
+  .where-card { padding: 12px 14px; }
+  .where-card-header { margin-bottom: 4px; }
+  /* Step 2 */
+  .category-tabs-wrap { margin-bottom: 0.4rem; }
+  .category-tabs { padding: 4px 0; }
+  .service-card { padding: 0.6rem 0.25rem; }
+  /* Step 3 */
+  .date-section { margin-bottom: 0.8rem; }
+  .section-label { margin-bottom: 0.4rem; }
+  .calendar { padding: 0.55rem; }
+  .cal-header { margin-bottom: 0.4rem; }
+  .cal-nav { min-height: 36px; }
+  .cal-grid { gap: 2px; }
+  .cal-day { aspect-ratio: auto; height: 38px; }
+  .cal-day-name { padding: 0.15rem 0; }
+  .time-slot { min-height: 40px; }
+  .time-grid { gap: 0.4rem; }
+  /* Step 4 */
+  .field-block { margin-bottom: 0.6rem; }
+  .field-label { margin-bottom: 0.2rem; }
+  .field-input { height: 2.9rem; }
+  textarea.field-input { height: 4.2rem; min-height: 0; }
 </style>
 </head>
 <body>
@@ -1698,41 +1721,32 @@
       <label class="where-card" id="where-clinic" for="where-clinic-radio" role="radio" aria-checked="false">
         <input type="radio" name="whereLocation" id="where-clinic-radio" value="clinic" onchange="selectLocation('clinic')">
         <div class="where-card-header">
+          <span class="where-radio-ring" aria-hidden="true"></span>
           <span class="where-card-name">Clinic Day</span>
           <span class="where-card-badge where-card-badge--gold">Tuesdays</span>
         </div>
         <span class="where-card-address">Milton Hall, 244 Deansgate, Manchester M3 4BQ</span>
         <span class="where-card-meta">Private treatment room · Reception on arrival · Lift access</span>
-        <div class="where-card-footer">
-          <span class="where-card-sel-label">✓ Selected</span>
-          <span class="where-radio-ring" aria-hidden="true"></span>
-        </div>
       </label>
       <label class="where-card" id="where-mobile" for="where-mobile-radio" role="radio" aria-checked="false">
         <input type="radio" name="whereLocation" id="where-mobile-radio" value="mobile" onchange="selectLocation('mobile')">
         <div class="where-card-header">
+          <span class="where-radio-ring" aria-hidden="true"></span>
           <span class="where-card-name">Home Visit</span>
           <span class="where-card-badge where-card-badge--grey">Mon – Sat</span>
         </div>
         <span class="where-card-address">Halima comes to you</span>
         <span class="where-card-meta">Greater Manchester · Travel fee from <span id="where-mobile-fee"></span> · Full sterile setup brought to you</span>
-        <div class="where-card-footer">
-          <span class="where-card-sel-label">✓ Selected</span>
-          <span class="where-radio-ring" aria-hidden="true"></span>
-        </div>
       </label>
       <label class="where-card" id="where-virtual" for="where-virtual-radio" role="radio" aria-checked="false">
         <input type="radio" name="whereLocation" id="where-virtual-radio" value="virtual" onchange="selectLocation('virtual')">
         <div class="where-card-header">
+          <span class="where-radio-ring" aria-hidden="true"></span>
           <span class="where-card-name">Online</span>
           <span class="where-card-badge where-card-badge--grey">Mon – Sat</span>
         </div>
         <span class="where-card-address">Life coaching by video call</span>
         <span class="where-card-meta">No travel and no address needed · Your video link arrives by email</span>
-        <div class="where-card-footer">
-          <span class="where-card-sel-label">✓ Selected</span>
-          <span class="where-radio-ring" aria-hidden="true"></span>
-        </div>
       </label>
     </div>
 
