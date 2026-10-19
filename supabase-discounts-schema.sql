@@ -150,9 +150,18 @@ create unique index if not exists code_redemptions_active_per_code
 -- max_uses_per_customer = 1 (every gift/audience/reward/competition code
 -- here) at the database level, the same "insert races the unique index"
 -- guarantee as the per-code index above.
+-- enforce_customer (added Oct 2026): audience codes (YASMZEE25 etc.) have no
+-- total cap, so their redemptions are written with enforce_limits = false (the
+-- per-code index above ignores them) but enforce_customer = true, which keeps
+-- the one-use-per-email guarantee in the database. NULL (rows written before
+-- this column, or by older code) means "same as enforce_limits", so nothing
+-- that already worked changes: promo stays unlimited, everything else capped.
+alter table public.code_redemptions add column if not exists enforce_customer boolean;
+
+drop index if exists public.code_redemptions_active_per_customer;
 create unique index if not exists code_redemptions_active_per_customer
   on public.code_redemptions(code_id, customer_email)
-  where status in ('reserved', 'confirmed') and enforce_limits;
+  where status in ('reserved', 'confirmed') and coalesce(enforce_customer, enforce_limits);
 
 -- One redemption per (code, period) for competition codes — a second
 -- GOTW/POTM winner attempt in the same week/month is blocked even though the
