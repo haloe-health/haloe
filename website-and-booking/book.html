@@ -1652,8 +1652,8 @@
 
   /* Typing on a phone: the fixed footer steps aside so the form has the room. */
   .kb-open .footbar { display: none; }
-  .kb-open body { padding-bottom: 24px; }
-  .kb-open { scroll-padding-bottom: 24px; }
+  /* Spare room under the form so even the last field can scroll to the middle. */
+  .kb-open body { padding-bottom: 60vh; }
 </style>
 </head>
 <body>
@@ -3341,13 +3341,34 @@ function goToStep(n) {
    the keyboard so the bar (and Continue) return. */
 (function () {
   const isField = el => el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && !/^(radio|checkbox|button|submit)$/.test(el.type || '');
+  // Centre the focused field in the part of the screen the keyboard leaves
+  // free (below the fixed top bar). Re-run as the keyboard finishes opening,
+  // because the visible height keeps changing for a few hundred ms.
+  const NAV_H = 56;
+  function centreField(el) {
+    if (!el || !document.documentElement.classList.contains('kb-open')) return;
+    const vv = window.visualViewport;
+    const visibleH = vv ? vv.height : window.innerHeight;
+    const top = NAV_H, bottom = visibleH;
+    const r = el.getBoundingClientRect();
+    // For a tall box (address/notes) aim at its first lines, not its middle.
+    const focusY = r.top + Math.min(r.height / 2, 48);
+    const target = top + (bottom - top) / 2;
+    const delta = focusY - target;
+    if (Math.abs(delta) > 6) window.scrollBy({ top: delta, behavior: 'smooth' });
+  }
+  let focusedField = null;
   document.addEventListener('focusin', e => {
     if (!isField(e.target)) return;
+    focusedField = e.target;
     document.documentElement.classList.add('kb-open');
-    setTimeout(() => { try { e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {} }, 250);
+    [60, 300, 600].forEach(ms => setTimeout(() => { if (focusedField === e.target) centreField(e.target); }, ms));
   });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => { if (focusedField) setTimeout(() => centreField(focusedField), 50); });
+  }
   document.addEventListener('focusout', () => {
-    setTimeout(() => { if (!isField(document.activeElement)) document.documentElement.classList.remove('kb-open'); }, 80);
+    setTimeout(() => { if (!isField(document.activeElement)) { focusedField = null; document.documentElement.classList.remove('kb-open'); } }, 80);
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.target && e.target.tagName === 'INPUT' && isField(e.target)) e.target.blur();
