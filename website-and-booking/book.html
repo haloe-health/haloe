@@ -1613,6 +1613,42 @@
     .consent-check:checked::after { color: var(--cream); }
   }
 
+
+  /* ---- Compact scale (Oct 2026): every step uses the same tight rhythm so each
+     fits one screen. One block, loaded last — change spacing here. ---- */
+  .book-shell { padding-top: 0.5rem; padding-bottom: 1rem; }
+  .book-main .container { padding-top: 0; }
+  .panel-title { font-size: 24px; margin-bottom: 0.25rem; line-height: 1.15; }
+  .panel-sub { font-size: 14px; line-height: 1.4; margin-bottom: 0.7rem; }
+  @media (max-width: 600px) { .panel-sub { font-size: 14px; } }
+  body { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+  .footbar-inner { padding-top: 0.45rem; padding-bottom: 0.45rem; }
+  .foot-cta { min-height: 44px; padding-top: 0.4rem; padding-bottom: 0.4rem; }
+  @media (max-width: 560px) { .footbar .foot-cta { font-size: 1rem; padding: 0.4rem 1.2rem; } }
+  /* Step 1 */
+  .where-grid { gap: 8px; margin: 0.5rem 0 0.6rem; }
+  .where-card { padding: 12px 14px; }
+  .where-card-header { margin-bottom: 4px; }
+  /* Step 2 */
+  .category-tabs-wrap { margin-bottom: 0.4rem; }
+  .category-tabs { padding: 4px 0; }
+  .service-card { padding: 0.6rem 0.25rem; }
+  /* Step 3 */
+  .date-section { margin-bottom: 0.8rem; }
+  .section-label { margin-bottom: 0.4rem; }
+  .calendar { padding: 0.55rem; }
+  .cal-header { margin-bottom: 0.4rem; }
+  .cal-nav { min-height: 36px; }
+  .cal-grid { gap: 2px; }
+  .cal-day { aspect-ratio: auto; height: 38px; }
+  .cal-day-name { padding: 0.15rem 0; }
+  .time-slot { min-height: 40px; }
+  .time-grid { gap: 0.4rem; }
+  /* Step 4 */
+  .field-block { margin-bottom: 0.6rem; }
+  .field-label { margin-bottom: 0.2rem; }
+  .field-input { height: 2.9rem; }
+  textarea.field-input { height: 4.2rem; min-height: 0; }
 </style>
 </head>
 <body>
