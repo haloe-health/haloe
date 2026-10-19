@@ -3380,7 +3380,7 @@ function renderSummary() {
       <div class="pass-when">
         <div class="pass-date">${dateStr}</div>
         <div class="pass-time">${state.time}</div>
-        <div class="pass-at">${isClinic() ? `${locationLabel} · ${CLINIC_VENUE_ADDRESS}` : isVirtual() ? `${locationLabel} · link sent by email` : `${locationLabel} · Manchester`}</div>
+        <div class="pass-at">${isClinic() ? `Clinic Day · ${CLINIC_VENUE_ADDRESS}` : isVirtual() ? `${locationLabel} · link sent by email` : `${locationLabel} · Manchester`}</div>
       </div>
       <div class="pass-perf"><span></span></div>
       <div class="pass-what">
