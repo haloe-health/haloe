@@ -129,8 +129,8 @@ console.log('\nMulti-treatment: resolveCart');
 const two = resolveCart([{ name: 'Face Massage', category: 'massage' }, { name: 'Head Massage', category: 'massage' }]);
 ok('two treatments resolve', two.ok);
 eq('combined price £80 (8000p)', two.totalPence, 8000);
-eq('combined duration 90 min', two.totalMin, 90);
-eq('duration label', formatDuration(two.totalMin), '1 hr 30 min');
+eq('combined duration 120 min', two.totalMin, 120);
+eq('duration label', formatDuration(two.totalMin), '2 hours');
 
 const wetTwo = resolveCart([{ name: 'Full Back', category: 'wet' }, { name: 'Head & Scalp', category: 'wet' }]);
 eq('wet pair priced per category (£90 + £70 = 16000p)', wetTwo.totalPence, 16000);
@@ -151,17 +151,17 @@ console.log('\nMulti-treatment: HALOE20 on the combined total');
 const d = applyDiscount(two.totalPence, 20);
 eq('20% off £80 = £16 off, £64 to pay', [d.discountPence, d.finalPence], [1600, 6400]);
 
-console.log('\nMulti-treatment: slots fit the COMBINED duration (Face + Head Massage = 90 min)');
+console.log('\nMulti-treatment: slots fit the COMBINED duration (Face + Head Massage = 120 min)');
 // 10:00–11:00 booked (600–660)
 const slotsTwo = generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy1 });
 ok('9:30 removed (would run to 11:00, into the booking)', !slotsTwo.includes(570));
 ok('11:00 offered (starts as the booking ends)', slotsTwo.includes(660));
-// 11:00–12:00 booked: a lone 45 min treatment fits at 10:00 (ends 10:45); the pair (90 min) does not
+// 11:00–12:00 booked: a lone 45 min treatment fits at 10:00 (ends 10:45); the pair (120 min) does not
 const busy11 = [{ s: 660, e: 720 }];
 ok('a lone 45 min treatment fits at 10:00', generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: 45, busy: busy11 }).includes(600));
-ok('the 90 min pair does NOT fit at 10:00', !generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(600));
-ok('the 90 min pair fits at 9:00 (ends 10:30)', generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(540));
-ok('the 90 min pair does NOT fit at 9:30 (buffer runs it into 11:00)', !generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(570));
+ok('the 120 min pair does NOT fit at 10:00', !generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(600));
+ok('the 120 min pair does NOT fit at 9:00 (120 + 15 buffer runs into the 11:00 booking)', !generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(540));
+ok('the 120 min pair does NOT fit at 9:30', !generateSlots({ location: 'clinic', weekday: CLINIC_DAY, durationMin: two.totalMin, busy: busy11 }).includes(570));
 // 12:00–12:30 booked: a 90 min session can't start 10:30–12:00, but 45 min can start 11:00 → 11:45
 const busyNoon = [{ s: 720, e: 750 }];
 const s90 = generateSlots({ location: 'mobile', weekday: MOBILE_DAY, durationMin: 90, busy: busyNoon });
@@ -186,7 +186,7 @@ eq('60 min  → next 10:30 am', nextAfter900(60), '10:30 am');
 eq('75 min  → next 10:30 am', nextAfter900(75), '10:30 am');
 eq('90 min  → next 11:00 am', nextAfter900(90), '11:00 am');
 eq('105 min → next 11:00 am', nextAfter900(105), '11:00 am');
-eq('Face + Head Massage (90) → next 11:00 am', nextAfter900(two.totalMin), '11:00 am');
+eq('Face + Head Massage (120) → next 11:30 am', nextAfter900(two.totalMin), '11:30 am');
 
 console.log('\nTurnaround buffer: applies to the NEW booking too (gap before the next client)');
 // Someone is booked 12:00–12:45 (+15 → blocked to 13:00 is stored as e=780; here a block starting 12:00).
@@ -224,14 +224,14 @@ ok('home visits ignore the closing rule (a 195 min mobile visit still starts at 
 console.log('\nCheckout rejects a Milton Hall start that breaks the rule (tampered or stale request)');
 globalThis.fetch = async () => { throw new Error('offline (test)'); };   // never reach the network
 const checkout = async (time, location = 'clinic') => {
-  const res = await createCheckout({ request: new Request('https://x.invalid/create-checkout', { method: 'POST', body: JSON.stringify({ treatments: [{ name: 'Head, Scalp & Full Body', category: 'wet' }], customerEmail: 'a@example.invalid', customerName: 'Test', customerPhone: '07000000000', date: 'x', time, location, bookingDate: '2099-12-29', travelPostcode: 'M1 1AA', customerAddress: 'x' }) }), env: {} });
+  const res = await createCheckout({ request: new Request('https://x.invalid/create-checkout', { method: 'POST', body: JSON.stringify({ treatments: [{ name: 'Full Body', category: 'wet' }], customerEmail: 'a@example.invalid', customerName: 'Test', customerPhone: '07000000000', date: 'x', time, location, bookingDate: '2099-12-29', travelPostcode: 'M1 1AA', customerAddress: 'x' }) }), env: {} });
   let body = {}; try { body = await res.json(); } catch (e) {}
   return { status: res.status, error: body.error };
 };
 const bad = await checkout('7:30 pm');
-ok('105 min at 19:30 on a Tuesday → 400 slot_invalid', bad.status === 400 && bad.error === 'slot_invalid');
+ok('90 min at 19:30 on a Tuesday → 400 slot_invalid', bad.status === 400 && bad.error === 'slot_invalid');
 const good = await checkout('7:00 pm');
-ok('105 min at 19:00 (finishes exactly 9pm) is NOT rejected for the rule', good.error !== 'slot_invalid');
+ok('90 min at 19:00 (finishes by 9pm with tidy-up) is NOT rejected for the rule', good.error !== 'slot_invalid');
 const mob = await checkout('7:30 pm', 'mobile');
 ok('the same time as a home visit is not rejected for the rule', mob.error !== 'slot_invalid');
 
@@ -248,7 +248,7 @@ for (const cat of Object.keys(SERVER_SERVICES)) {
   });
 }
 eq('no client/server duration mismatches', durationMismatches, 0);
-ok('every package is 75 min on the server', SERVER_SERVICES.packages.every((p) => p.min === 75));
+ok('every package is 90 min on the server', SERVER_SERVICES.packages.every((p) => p.min === 90));
 
 console.log('\nLife coaching: Milton Hall or online, never a home visit; booked on its own');
 const coachingCart = [{ name: 'Life Coaching Session', category: 'coaching' }];
