@@ -12,7 +12,7 @@
 // PRIVACY: reminders carry no personal health detail — the email is the generic aftercare wording for that day (shared
 // with the app, see ../aftercare-copy.js) and links to the app; the push is a fixed generic line.
 import { sbRequest } from './_supabase.js';
-import { sendEmail, esc, CREAM, GOLD, GOLD_DEEP, INK, BODY_TEXT, FONT, FONT_HEADING, FONT_HEADING_URL, LOGO_URL } from './_email.js';
+import { sendEmail, esc, CREAM, GOLD, GOLD_DEEP, INK, BODY_TEXT, FONT, FONT_HEADING, FONT_HEADING_URL, LOGO_URL, logoMark } from './_email.js';
 import { notifyClient } from './_push.js';
 import { AFTERCARE_COPY } from './_aftercare-copy.js';
 
@@ -74,7 +74,7 @@ function reminderLayout({ eyebrow, headline, greeting, body, note }) {
 <tr><td class="bg-cream" width="100%" align="center" bgcolor="${CREAM}" style="padding:0 16px;${bg}">
 <!--[if mso]><table role="presentation" width="480" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
 <table role="presentation" width="100%" align="center" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:480px;margin:0 auto;border-collapse:collapse;">
-${cell(`<img src="${LOGO_URL}" width="172" height="46" alt="haloe" style="display:block;margin:0 auto;width:172px;height:auto;border:0;outline:none;">`, 'padding:32px 0 0;', 'align="center"')}
+${cell(logoMark(64), 'padding:32px 0 0;', 'align="center"')}
 ${cell('HIJAMA &middot; WELLNESS &middot; MANCHESTER', `padding:12px 0 0;font-family:${FONT};font-size:12px;line-height:18px;letter-spacing:3px;color:${GOLD_DEEP};`, 'align="center" class="gold-text"')}
 ${divider('28px 0')}
 ${cell(esc(eyebrow.toUpperCase()), `padding:0 0 8px;font-family:${FONT};font-size:12px;line-height:18px;letter-spacing:2px;font-weight:600;color:${GOLD_DEEP};`, 'align="center" class="gold-text"')}

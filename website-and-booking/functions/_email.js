@@ -66,6 +66,14 @@ export const FONT_HEADING_URL = 'https://haloe.health/fonts/TAN-ASHFORD.woff2';
 // gives a "Download email-logo@2x.png" link sized/positioned from those
 // measurements. Save its output over this file.
 export const LOGO_URL = 'https://haloe.health/images/email-logo@2x.png';
+// Header mark (Oct 2026): the flower alone on an opaque cream disc (240x240 = 3x of 80), shown at 72px with a small "haloe" under it.
+// The wide pill above rendered far too large in Gmail; this is what the headers use now. Regenerate by rendering haloe-logo-flower.svg on a #F5F0E8 circle.
+export const MARK_URL = 'https://haloe.health/images/email-mark@2x.png';
+export const MARK_SIZE = 72;
+export function logoMark(size = MARK_SIZE) {
+  return `<img src="${MARK_URL}" width="${size}" height="${size}" alt="haloe" style="display:block;margin:0 auto;width:${size}px;height:${size}px;border:0;outline:none;">
+                  <div class="gold-text" style="font-family:${FONT};font-size:12px;line-height:16px;letter-spacing:4px;color:${GOLD_DEEP};margin-top:8px;">haloe</div>`;
+}
 export const LOGO_WIDTH = 344;
 export const LOGO_HEIGHT = 92;
 
@@ -121,9 +129,9 @@ export function emailButton(href, label) {
 export function emailHeader() {
   return `<!-- Header -->
               <tr>
-                <td align="center" width="100%" bgcolor="${CREAM}" style="width:100%;padding:3px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
-                  <img src="${LOGO_URL}" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="haloe" style="display:block;width:${LOGO_WIDTH}px;height:auto;max-width:100%;border:0;outline:none;">
-                  <div style="font-family:${FONT};font-size:12px;letter-spacing:3px;color:${GOLD_DEEP};text-transform:uppercase;margin-top:10px;">Hijama &middot; Wellness &middot; Manchester</div>
+                <td align="center" width="100%" bgcolor="${CREAM}" style="width:100%;padding:24px 0 22px;border-bottom:1px solid ${HAIRLINE};background:${CREAM};">
+                  ${logoMark()}
+                  <div style="font-family:${FONT};font-size:12px;letter-spacing:3px;color:${GOLD_DEEP};text-transform:uppercase;margin-top:14px;">Hijama &middot; Wellness &middot; Manchester</div>
                 </td>
               </tr>`;
 }
