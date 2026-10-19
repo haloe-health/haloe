@@ -161,6 +161,17 @@
   .h .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .day-label { font-size: 13px; font-weight: 500; color: var(--muted); margin: 18px 4px 8px; }
   .empty { text-align: center; color: var(--muted); padding: 28px 12px; }
+  /* states (Oct 2026): empty = what it means + what to do; loading = skeleton, no layout jump; error = calm line + retry */
+  .state { display: grid; gap: 6px; justify-items: center; text-align: center; padding: 20px 12px; }
+  .state b { font-size: 16px; font-weight: 600; color: var(--th-ink, var(--ink)); }
+  .state span { font-size: 15px; line-height: 1.5; color: var(--th-muted, var(--muted)); max-width: 30ch; }
+  .state .btn { margin-top: 10px; }
+  .skel { display: grid; gap: 16px; padding: 24px 16px; }
+  .skel i { display: block; height: 88px; border-radius: 24px; background: var(--fill); animation: skel 1.4s ease-in-out infinite; }
+  .skel i:first-child { height: 40px; width: 55%; border-radius: 12px; }
+  .skel i:nth-child(3) { animation-delay: .2s; } .skel i:nth-child(4) { animation-delay: .4s; }
+  @keyframes skel { 50% { opacity: .45; } }
+  @media (prefers-reduced-motion: reduce) { .skel i { animation: none; } }
 
   /* session rows (Today) */
   .sess .name { font-weight: 600; font-size: 17px; overflow-wrap: anywhere; }
@@ -1560,7 +1571,7 @@ function openSlotsFor(d) { const booked = Math.min(CLINIC_SLOT_COUNT, S.data.boo
 function tasksTile(t) {
   const tasks = tasksFor(t), done = new Set((S.data.tasks || []).map((x) => x.task_key)), nDone = tasks.filter((x) => done.has(x.key)).length;
   return `<section class="tile" id="tasksTile"><div class="th-head"><h2 class="th-title">For your clients</h2><span class="th-count" id="tasksCount">${nDone} of ${tasks.length} done</span></div>` +
-    (tasks.length ? tasks.map((x) => `<button class="task" type="button" data-task="${esc(x.key)}" aria-pressed="${done.has(x.key)}"><span class="ck">${ICON.check}</span><span class="tx"><span class="tt">${esc(x.title)}</span><span class="ts">${esc(x.sub)}</span></span></button>`).join('') : '<p class="th-empty">Nothing to do right now.</p>') + '</section>';
+    (tasks.length ? tasks.map((x) => `<button class="task" type="button" data-task="${esc(x.key)}" aria-pressed="${done.has(x.key)}"><span class="ck">${ICON.check}</span><span class="tx"><span class="tt">${esc(x.title)}</span><span class="ts">${esc(x.sub)}</span></span></button>`).join('') : stateHTML('All caught up', 'Nothing needs doing for your clients right now.')) + '</section>';
 }
 /* ---- "Fill {clinic day}": open times, read only. Tapping the tile opens this sheet; nothing in it navigates anywhere. ---- */
 const CLINIC_FIRST_MIN = 9 * 60, CLINIC_LAST_MIN = 19 * 60 + 30, CLINIC_STEP_MIN = 30;   // mirrors HOURS.clinic[2] in functions/_slots.js
@@ -1631,7 +1642,7 @@ function weekView(t) {
     const line = clinic ? (d <= t ? `Clinic · ${seen} seen` : (d === nextClinicDate() ? 'Next clinic' : 'Clinic') + ` · ${n} of ${CLINIC_SLOT_COUNT} booked`) : (d <= t ? `${n} ${plural(n, 'session')} · ${seen} seen` : `${n} ${plural(n, 'session')} booked`);
     return `<div class="wrow"><span class="wd">${esc(fmtDate(d).replace(/ \w{3}$/, ''))}</span><span class="wl">${esc(line)}</span><span class="wp">${d < t ? 'Done' : d === t ? 'Today' : 'Upcoming'}</span></div>`;
   }).join('');
-  return `<section class="tile"><div class="dstrip">${strip}</div></section><section class="tile"><h2 class="th-title">This week</h2>${rows || '<p class="th-empty">Nothing booked this week.</p>'}</section>` + pairTiles();
+  return `<section class="tile"><div class="dstrip">${strip}</div></section><section class="tile"><h2 class="th-title">This week</h2>${rows || stateHTML('A quiet week', 'Nothing is booked for these days.')}</section>` + pairTiles();
 }
 function monthView(t) {
   const first = t.slice(0, 7) + '-01', ym = t.slice(0, 7);
@@ -1764,7 +1775,7 @@ function viewClients() {
   shell(`<div class="tile-home clients"><div class="th-titlerow"><h1>Clients</h1><span>${all.length} in your book</span></div>${unlinkedCardHTML()}
     <div class="cf-grid">${tiles}</div>${due.length ? rebookSection(due, t) : ''}
     <div class="cl-tools"><input class="search" id="q" type="search" placeholder="Search name, phone or email" value="${esc(S.filter)}" autocomplete="off"><div class="toggle-line"><span>Show test</span><button class="switch-wrap" id="testBtn" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div></div>
-    <section class="tile cl-list"><div class="th-head"><h2 class="th-title">${esc(CF_FILTERS.find((f) => f[0] === fk)[2])}</h2><span class="th-count muted-count">${list.length} shown</span></div>${rows || '<p class="th-empty">No clients match.</p>'}</section></div>`);
+    <section class="tile cl-list"><div class="th-head"><h2 class="th-title">${esc(CF_FILTERS.find((f) => f[0] === fk)[2])}</h2><span class="th-count muted-count">${list.length} shown</span></div>${rows || (all.length ? stateHTML(q ? 'No one matches “' + S.filter.trim() + '”' : 'No one here', q ? 'Check the spelling, or try a phone number.' : 'Tap All clients above to see everyone.') : stateHTML('No clients yet', 'People appear here after they book or send an intake form.'))}</section></div>`);
   document.getElementById('testBtn').onclick = () => setShowTest(!S.showTest);
   const qi = document.getElementById('q');
   qi.oninput = () => { S.filter = qi.value; const pos = qi.selectionStart; render(); const n = document.getElementById('q'); n.focus(); n.setSelectionRange(pos, pos); };
@@ -2036,12 +2047,12 @@ function bookingPerson(id) {
 function viewBrief(key, bid) {
   const p = findPerson(key);
   if (!p && S.briefRetried !== key) {   // e.g. a just-submitted intake opened from an alert: reload the data once per link, then try again
-    S.briefRetried = key; shell('<div class="empty">Loading…</div>');
+    S.briefRetried = key; shell(loadingHTML());
     loadAdminData().then(() => render()).catch(() => render());
     return;
   }
   if (p) S.briefRetried = null;
-  if (!p) { shell(`<button class="back" id="bk">${ICON.back}Back</button><div class="card empty">Client not found.</div>`); document.getElementById('bk').onclick = () => history.back(); return; }
+  if (!p) { shell(`<button class="back" id="bk">${ICON.back}Back</button><div class="card">${stateHTML('Client not found', 'They may have been removed. Go back and pick someone from Clients.')}</div>`); document.getElementById('bk').onclick = () => history.back(); return; }
   const c = p.client, intake = c ? intakeOf(c.id) : null;
   const ciList = checkinsOf(c);
   const flags = buildFlags(c, intake);
@@ -2173,7 +2184,7 @@ function viewCodes() {
   shell(`<div class="tile-home codes"><div class="th-titlerow"><h1>Codes</h1><span>Tap one to make a code</span></div>
     <div class="qt-row">${qt('free', 'qt-gold', 'Free session', 'Free', 'single use')}${qt('half', 'qt-dark', 'Half price', '50%', 'single use')}${qt('haloe', 'qt-white' + (h.ok ? '' : ' off'), 'HALOE20', '20%', esc(h.line))}</div>${ready}
     <div class="st-row"><div class="st"><span class="th-k">Active</span><b>${live.length}</b></div><div class="st"><span class="th-k">Used</span><b>${usedAll}</b></div><div class="st"><span class="th-k">Revenue</span><b>${money(revAll)}</b></div></div>
-    <section class="tile cd-list"><div class="th-head"><h2 class="th-title">All codes</h2><button class="cd-inactive" type="button" id="inactiveBtn" aria-pressed="${!!S.showInactive}">${S.showInactive ? 'Hide inactive' : 'Show inactive'}</button></div>${rowsHTML || '<p class="th-empty">No codes to show.</p>'}</section></div>`);
+    <section class="tile cd-list"><div class="th-head"><h2 class="th-title">All codes</h2><button class="cd-inactive" type="button" id="inactiveBtn" aria-pressed="${!!S.showInactive}">${S.showInactive ? 'Hide inactive' : 'Show inactive'}</button></div>${rowsHTML || stateHTML('No codes to show', S.showInactive ? 'Tap a tile above to make one.' : 'Tap a tile above to make one, or show inactive codes.')}</section></div>`);
   document.querySelectorAll('[data-active]').forEach((b) => {
     b.onclick = async () => {
       const c = S.data.codes.find((x) => x.id === Number(b.dataset.active));
@@ -2277,7 +2288,7 @@ function viewStats() {
     <div class="th-tabs" role="tablist" aria-label="Range">${tabs}</div>
     <section class="tile st-rings"><div class="rwrap">${svg}<div class="rc"><b>${hit}/3</b><span>goals</span></div></div><div class="legend">${legend}</div></section>
     <div class="st-pair"><div class="st-half st-avg"><span class="th-k">Average booking</span><span class="big">${d.n ? money(d.avg) : '—'}</span></div><div class="st-half st-dark"><span class="th-k">Clinic · Mobile</span><span class="big">${d.clinic} · ${d.mobile}</span></div></div>
-    <section class="tile"><h2 class="th-title">Bookings by code</h2>${codeRows || '<p class="th-empty">No bookings in this range.</p>'}</section>
+    <section class="tile"><h2 class="th-title">Bookings by code</h2>${codeRows || stateHTML('No code bookings', 'No one has used a code in this range yet.')}</section>
     <div class="st-checks">${mini('Clients improving', ps.n ? `${ps.lower} / ${ps.n}` : '—', ps.n ? 'latest concern score lower than first' : 'needs 2+ check-ins')}${mini('Average concern change', ps.avg == null ? '—' : signed(ps.avg), ps.n ? `latest vs first · ${ps.n} client${ps.n === 1 ? '' : 's'}` : 'needs 2+ check-ins')}</div></div>`);
   document.querySelectorAll('[data-srange]').forEach((b) => { b.onclick = () => { S.statsRange = b.dataset.srange; render(); }; });
 }
@@ -2513,7 +2524,9 @@ function openPhotoSheet() {
 }
 
 /* A failed first load: one calm line and a way to try again (the session is kept). */
-function loadErrorHTML() { return '<p style="margin:0 0 14px">' + esc(S.error) + '</p><button class="btn ghost" id="retryLoad" type="button">Try again</button>'; }
+function loadErrorHTML() { return '<div class="state" role="alert"><b>Couldn’t load</b><span>' + esc(S.error) + '</span><button class="btn ghost" id="retryLoad" type="button">Try again</button></div>'; }
+function loadingHTML() { return '<div class="skel" role="status" aria-busy="true" aria-label="Loading"><i></i><i></i><i></i><i></i></div>'; }
+function stateHTML(title, hint, btn) { return '<div class="state"><b>' + esc(title) + '</b>' + (hint ? '<span>' + esc(hint) + '</span>' : '') + (btn || '') + '</div>'; }
 document.addEventListener('click', (ev) => { if (ev.target && ev.target.id === 'retryLoad' && S.session) { S.error = null; const sess = S.session; S.session = null; enter(sess); } });
 
 /* ---------- router / boot ---------- */
@@ -2533,7 +2546,7 @@ function render() {
   clearInterval(S.loginTimer);
   document.body.classList.remove('tilebg');
   if (S.admin) {
-    if (!S.data) { shell('<div class="empty">' + (S.error ? loadErrorHTML() : 'Loading…') + '</div>', false); return; }
+    if (!S.data) { shell(S.error ? loadErrorHTML() : loadingHTML(), false); return; }
     route();
     document.body.classList.toggle('tilebg', ['today', 'clients', 'codes', 'stats', 'settings'].includes(S.view));
     if (S.view !== 'codes') { S.codeReady = null; S.quickSel = null; }
@@ -2542,7 +2555,7 @@ function render() {
     return;
   }
   // client
-  if (!S.cdata) { shell('<div class="empty">' + (S.error ? loadErrorHTML() : 'Loading…') + '</div>', false); return; }
+  if (!S.cdata) { shell(S.error ? loadErrorHTML() : loadingHTML(), false); return; }
   route();
   if (!S.cdata.client && !S.cdata.bookings.length && S.view !== 'settings') return viewNoMatch();      // nothing of theirs on file yet (the gear → Settings still works)
   window.scrollTo(0, 0);
