@@ -348,7 +348,8 @@
      ============================================================ */
   .price-grid { display:grid; grid-template-columns:1fr; gap:14px; }
   @media (min-width:600px) { .price-grid { grid-template-columns:repeat(2,1fr); } }
-  @media (min-width:1024px) { .price-grid { grid-template-columns:repeat(4,1fr); } }
+  .price-grid .price-card:last-child:nth-child(odd) { grid-column:1 / -1; }
+  @media (min-width:1024px) { .price-grid { grid-template-columns:repeat(5,1fr); } .price-grid .price-card:last-child:nth-child(odd) { grid-column:auto; } }
   .price-card {
     padding:26px 22px; text-decoration:none; color:var(--text);
     display:flex; flex-direction:column; gap:10px;
@@ -585,6 +586,7 @@
         <h2>Healing rooted in the Sunnah</h2>
         <p>Hijama — wet cupping — is one of the oldest traditions in natural wellbeing, practised for thousands of years and encouraged by the Prophet Muhammad ﷺ. It uses gentle suction and a few small, superficial incisions; most clients describe feeling lighter and more settled afterwards.</p>
         <p>haloe offers three kinds of session — <strong>massage</strong> to ease everyday tension, <strong>dry cupping</strong> (suction only, skin unbroken), and <strong>wet cupping</strong> — hijama itself.</p>
+        <p>Halima also offers <strong>life coaching</strong> — a calm one-to-one conversation, in person at Milton Hall or online by video.</p>
         <p>Run by Halima Yasmin, a CMA and IPHM accredited therapist who graduated with an 88% distinction from The Suuk Academy's L5 Diploma in Health and Cupping Therapy.</p>
         <div class="about-cert-row">
           <span class="trust-pill">L5 Diploma</span>
@@ -668,7 +670,7 @@
     <div class="section-head reveal">
       <span class="section-eyebrow">Pricing</span>
       <h2>Simple, flat pricing</h2>
-      <p>Every price includes unlimited cups and take-home black seed oil aftercare. See the full list and book in the wizard.</p>
+      <p>Cupping prices include unlimited cups and take-home black seed oil aftercare. See the full list and book in the wizard.</p>
     </div>
     <div class="price-grid" id="priceGrid"></div>
     <p class="price-note reveal">See <a href="hijama-manchester.html" class="link-gold">the full hijama &amp; cupping price list</a> for every treatment.</p>
@@ -828,7 +830,7 @@
   <div class="container">
     <div class="cta-card reveal">
       <h2>Ready to feel lighter?</h2>
-      <p>Massage, dry cupping and hijama — mobile across Manchester or every Tuesday at Deansgate.</p>
+      <p>Massage, dry cupping, hijama and life coaching — mobile across Manchester, every Tuesday at Deansgate, or online.</p>
       <div class="cta-benefits">
         <span class="cta-benefit">HALOE20 — 20% off all treatments</span>
         <span class="cta-benefit">Unlimited cups</span>
@@ -1691,7 +1693,8 @@ hbInit();
     { key: 'massage', label: 'Massage', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13c0-4 3-8 8-8s8 4 8 8"/><path d="M4 13a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4"/><path d="M9 13v3M15 13v3"/></svg>' },
     { key: 'dry', label: 'Dry cupping', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8" rx="6" ry="4"/><path d="M6 8v5a6 4 0 0 0 12 0V8"/></svg>' },
     { key: 'wet', label: 'Wet cupping', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4.5 7 9 7 12.5a7 7 0 0 1-14 0C5 12 8.5 7.5 12 3z"/></svg>' },
-    { key: 'packages', label: 'Packages', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M4 12h16M12 8v12M8 8a4 4 0 0 1 8 0"/></svg>' }
+    { key: 'packages', label: 'Packages', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M4 12h16M12 8v12M8 8a4 4 0 0 1 8 0"/></svg>' },
+    { key: 'coaching', label: 'Life coaching', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>' },
   ];
   var grid = document.getElementById('priceGrid');
   if (!grid || typeof SERVICES === 'undefined') return;
