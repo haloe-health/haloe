@@ -2194,7 +2194,7 @@
     <div class="ios-group">
       <div class="ios-row discount-row">
         <label for="discount-code">Have a code?</label>
-        <input type="text" id="discount-code" placeholder="e.g. HALOE20" autocapitalize="characters" oninput="onDiscountCodeInput()">
+        <input type="text" id="discount-code" name="discount_code" placeholder="e.g. HALOE20" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" data-lpignore="true" data-form-type="other" oninput="onDiscountCodeInput()">
         <button type="button" class="discount-apply-btn" id="discount-apply-btn" onclick="applyDiscountCode()">Apply</button>
       </div>
       <p class="field-error" id="discount-error"></p>
