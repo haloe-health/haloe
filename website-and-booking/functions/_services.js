@@ -95,8 +95,12 @@ export function findService(treatmentName, category) {
 // The same treatment twice is collapsed to one; a package (a multi-session
 // product) must be the only thing in the booking.
 export const MAX_TREATMENTS_PER_BOOKING = 6;
-// Booked on their own: a multi-session product, or a conversation rather than a hands-on treatment.
-export const SOLO_CATEGORIES = ['packages', 'coaching'];
+// Booked on their own: a multi-session product (every treatment package, and the six-session coaching package).
+// A single Life Coaching Session is NOT solo (Oct 2026): at Milton Hall it can be booked together with other
+// treatments in one slot. Online it is still coaching-only (see cartFitsLocation).
+export const SOLO_CATEGORIES = ['packages'];
+export const SOLO_NAMES = ['Six-Session Coaching Package'];
+export const isSolo = (x) => SOLO_CATEGORIES.includes(x.category) || SOLO_NAMES.includes(x.name);
 
 export function resolveCart(items) {
   if (!Array.isArray(items) || items.length === 0) return { ok: false, error: 'no_treatments' };
@@ -116,7 +120,7 @@ export function resolveCart(items) {
     });
   }
   if (out.length > MAX_TREATMENTS_PER_BOOKING) return { ok: false, error: 'too_many_treatments' };
-  if (out.length > 1 && out.some(x => SOLO_CATEGORIES.includes(x.category))) return { ok: false, error: 'package_not_combinable' };
+  if (out.length > 1 && out.some(isSolo)) return { ok: false, error: 'package_not_combinable' };
   return {
     ok: true,
     items: out,
