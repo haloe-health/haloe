@@ -136,7 +136,7 @@ The address collected at step 3 is deliberately **kept out of the URL**. It trav
 - Frame benefits as supporting wellbeing or easing symptoms/sensations, not as medical intervention. Prefer "may help with tension, aches, and relaxation" over "treats back pain"; prefer "supports general wellbeing" over "manages anxiety".
 - When editing or adding copy, audit it against this rule before committing. If asked to add a condition-specific claim, push back and reword it into compliant symptom/wellness language.
 - Claims removed in July 2026, for reference on what the rule catches: *"draws out stagnant blood, toxins, and impurities to restore the body's natural balance"* (physiological claim), *"one of the oldest and most powerful forms of natural medicine"* (calls it medicine, asserts potency), and a hero line *"addressing pain, hormonal health, fatigue"* (names conditions).
-- **Outstanding:** the conditions section is still headed **"Conditions *we treat*"** in `index.html`. The word "treat" above a grid of named conditions is the clearest remaining violation on the site. Flagged with Halima; awaiting her decision on the replacement wording.
+- **Resolved (Oct 2026):** the conditions section heading is now **"What people come to us for"** (Halima chose the wording; it replaced "Conditions we treat"). Keep "treat" out of headings above the named-conditions grid.
 
 ## Open issues
 
