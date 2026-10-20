@@ -129,12 +129,12 @@ export function resolveCart(items) {
   };
 }
 
-// Which places a cart may be booked at. Coaching: Milton Hall or online only.
-// Online: coaching only. Everything else: Milton Hall or a home visit.
+// Which places a cart may be booked at. Online: coaching only. Milton Hall and home visits: anything, coaching included
+// (a coaching session can be added to a home visit, or booked alone at home; the travel fee applies as for any home visit).
 export function cartFitsLocation(items, location) {
   const coaching = items.filter(x => x.category === 'coaching').length;
   if (location === 'virtual') return coaching === items.length;
-  if (location === 'mobile') return coaching === 0;
+  if (location === 'mobile') return true;
   return location === 'clinic';
 }
 

@@ -27,7 +27,7 @@ export async function onRequestPost(context) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    // Coaching is Milton Hall or online only; online is coaching only.
+    // Online is coaching only; Milton Hall and home visits take any treatment, coaching included.
     if (!cartFitsLocation(cart.items, location)) {
       return new Response(JSON.stringify({ error: 'treatment_location_mismatch' }), {
         status: 400,

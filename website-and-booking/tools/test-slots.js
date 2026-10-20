@@ -250,7 +250,7 @@ for (const cat of Object.keys(SERVER_SERVICES)) {
 eq('no client/server duration mismatches', durationMismatches, 0);
 ok('every package is 90 min on the server', SERVER_SERVICES.packages.every((p) => p.min === 90));
 
-console.log('\nLife coaching: Milton Hall or online, never a home visit; one session can be combined with other treatments at the clinic');
+console.log('\nLife coaching: Milton Hall, a home visit or online; one session can be combined with other treatments at the clinic');
 const coachingCart = [{ name: 'Life Coaching Session', category: 'coaching' }];
 const rc = resolveCart(coachingCart);
 ok('single session is £75 and 60 min', rc.ok && rc.totalPence === 7500 && rc.totalMin === 60);
@@ -260,7 +260,8 @@ const rcombo = resolveCart([...coachingCart, { name: 'Full Body', category: 'wet
 ok('a coaching session can be combined with a hijama treatment (price and time add up)', rcombo.ok && rcombo.items.length === 2 && rcombo.totalMin === 60 + rcombo.items[1].min && rcombo.totalPence === 7500 + rcombo.items[1].pricePence, rcombo);
 eq('the six-session coaching package cannot be combined', resolveCart([{ name: 'Six-Session Coaching Package', category: 'coaching' }, { name: 'Face Massage', category: 'massage' }]).error, 'package_not_combinable');
 eq('a coaching session + a treatment package cannot be combined', resolveCart([...coachingCart, { name: 'Cycle Comfort', category: 'packages' }]).error, 'package_not_combinable');
-eq('coaching + another treatment is refused as a home visit', cartFitsLocation(rcombo.items, 'mobile'), false);
+eq('coaching + another treatment is fine on a home visit', cartFitsLocation(rcombo.items, 'mobile'), true);
+eq('coaching alone is fine on a home visit', cartFitsLocation(rc.items, 'mobile'), true);
 eq('coaching + another treatment is refused online (online is coaching-only)', cartFitsLocation(rcombo.items, 'virtual'), false);
 eq('coaching + another treatment is fine at the clinic', cartFitsLocation(rcombo.items, 'clinic'), true);
 const coachingCheckout = async (location, time = '7:00 pm') => {
@@ -268,7 +269,7 @@ const coachingCheckout = async (location, time = '7:00 pm') => {
   let body = {}; try { body = await res.json(); } catch (e) {}
   return { status: res.status, error: body.error };
 };
-eq('coaching as a home visit → 400 treatment_location_mismatch', (await coachingCheckout('mobile')).error, 'treatment_location_mismatch');
+ok('coaching as a home visit is no longer rejected for location', (await coachingCheckout('mobile')).error !== 'treatment_location_mismatch');
 ok('coaching online is not rejected for location or slot (Tuesday 2099-12-29 7pm)', !['treatment_location_mismatch', 'slot_invalid'].includes((await coachingCheckout('virtual')).error));
 ok('coaching at the clinic is not rejected for location or slot', !['treatment_location_mismatch', 'slot_invalid'].includes((await coachingCheckout('clinic')).error));
 const massageOnline = await createCheckout({ request: new Request('https://x.invalid/create-checkout', { method: 'POST', body: JSON.stringify({ treatments: [{ name: 'Face Massage', category: 'massage' }], customerEmail: 'a@example.invalid', customerName: 'Test', customerPhone: '07000000000', date: 'x', time: '7:00 pm', location: 'virtual', bookingDate: '2099-12-29' }) }), env: {} });
