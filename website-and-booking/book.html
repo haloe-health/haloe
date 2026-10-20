@@ -1902,6 +1902,12 @@
   .ios-row.discount-row { padding: var(--s4); gap: var(--s4); }
   #discount-code { height: 40px; }
   .discount-apply-btn { padding-left: var(--s4); padding-right: var(--s4); }
+  .discount-row label { width: auto; white-space: nowrap; }
+  /* Focus on a form row: no square box around the bare text field (it sat on top of the label and clipped the text). */
+  .ios-row input:focus-visible, .ios-row select:focus-visible, .ios-row textarea:focus-visible { outline: none; }
+  /* Phones/tablets (no hover): no ring at all when tapping into a field, the caret and keyboard already show where you are.
+     Desktop keyboard users still get the gold row ring. */
+  @media (hover: hover) { .ios-row:has(input:focus-visible, select:focus-visible, textarea:focus-visible) { outline: 2px solid var(--gold-deep); outline-offset: -2px; border-radius: 14px; } }
   .discount-note { margin-top: var(--s2); }
   .cancellation-policy { margin-bottom: var(--s4); }
   .ios-toggle { padding: var(--s3) var(--s4); gap: var(--s4); }
