@@ -2388,7 +2388,10 @@ function selectLocation(loc) {
    Hide the tabs that don't apply to the chosen place, drop any cart item that
    can't be booked there, and move off a tab that has just become unavailable.
    The server enforces the same rule (cartFitsLocation in functions/_services.js). */
-const SOLO_CATEGORIES = ['packages', 'coaching']; // booked on their own, never combined
+const SOLO_CATEGORIES = ['packages'];                       // booked on their own, never combined
+const SOLO_NAMES = ['Six-Session Coaching Package'];        // (mirrors functions/_services.js)
+// A single coaching session CAN be combined with other treatments at Milton Hall; online it is coaching-only (categoryAllowedAt).
+function isSoloItem(cat, i) { const s = SERVICES[cat] && SERVICES[cat][i]; return SOLO_CATEGORIES.includes(cat) || !!(s && SOLO_NAMES.includes(s.name)); }
 function categoryAllowedAt(cat, loc) {
   if (loc === 'virtual') return cat === 'coaching';
   if (loc === 'mobile') return cat !== 'coaching';
@@ -2829,12 +2832,12 @@ function toggleService(i) {
   cartNote = '';
   if (inCart(cat, i)) {
     state.cart = state.cart.filter(c => !(c.cat === cat && c.i === i));
-  } else if (SOLO_CATEGORIES.includes(cat)) {
-    if (state.cart.length) cartNote = cat === 'coaching' ? 'Coaching is booked on its own, so your other selections were removed.' : 'A package is booked on its own, so your other selections were removed.';
+  } else if (isSoloItem(cat, i)) {
+    if (state.cart.length) cartNote = 'A package is booked on its own, so your other selections were removed.';
     state.cart = [{ cat, i }];
   } else {
-    if (state.cart.some(c => SOLO_CATEGORIES.includes(c.cat))) cartNote = 'Your earlier selection was removed — packages and coaching are booked on their own.';
-    state.cart = state.cart.filter(c => !SOLO_CATEGORIES.includes(c.cat)).concat([{ cat, i }]);
+    if (state.cart.some(c => isSoloItem(c.cat, c.i))) cartNote = 'Your earlier selection was removed — a package is booked on its own.';
+    state.cart = state.cart.filter(c => !isSoloItem(c.cat, c.i)).concat([{ cat, i }]);
   }
   clearDiscountForCartChange();
   // A chosen time may not fit the new combined length; loadSlots() (on

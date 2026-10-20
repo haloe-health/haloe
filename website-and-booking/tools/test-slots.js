@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { generateSlots, startGrid, groupSlots, TURNAROUND_MIN, minutesToLabel } from '../functions/_slots.js';
-import { resolveCart, formatDuration, SERVICES as SERVER_SERVICES } from '../functions/_services.js';
+import { resolveCart, cartFitsLocation, formatDuration, SERVICES as SERVER_SERVICES } from '../functions/_services.js';
 import { applyDiscount } from '../functions/_discounts.js';
 import { CLINIC_RULES } from '../functions/_clinic.js';
 import { onRequestPost as createCheckout } from '../functions/create-checkout.js';
@@ -250,13 +250,19 @@ for (const cat of Object.keys(SERVER_SERVICES)) {
 eq('no client/server duration mismatches', durationMismatches, 0);
 ok('every package is 90 min on the server', SERVER_SERVICES.packages.every((p) => p.min === 90));
 
-console.log('\nLife coaching: Milton Hall or online, never a home visit; booked on its own');
+console.log('\nLife coaching: Milton Hall or online, never a home visit; one session can be combined with other treatments at the clinic');
 const coachingCart = [{ name: 'Life Coaching Session', category: 'coaching' }];
 const rc = resolveCart(coachingCart);
 ok('single session is £75 and 60 min', rc.ok && rc.totalPence === 7500 && rc.totalMin === 60);
 const rp = resolveCart([{ name: 'Six-Session Coaching Package', category: 'coaching' }]);
 ok('six-session package is £400 and books a 60 min first session', rp.ok && rp.totalPence === 40000 && rp.totalMin === 60);
-eq('coaching cannot be combined with a massage', resolveCart([...coachingCart, { name: 'Face Massage', category: 'massage' }]).error, 'package_not_combinable');
+const rcombo = resolveCart([...coachingCart, { name: 'Full Body', category: 'wet' }]);
+ok('a coaching session can be combined with a hijama treatment (price and time add up)', rcombo.ok && rcombo.items.length === 2 && rcombo.totalMin === 60 + rcombo.items[1].min && rcombo.totalPence === 7500 + rcombo.items[1].pricePence, rcombo);
+eq('the six-session coaching package cannot be combined', resolveCart([{ name: 'Six-Session Coaching Package', category: 'coaching' }, { name: 'Face Massage', category: 'massage' }]).error, 'package_not_combinable');
+eq('a coaching session + a treatment package cannot be combined', resolveCart([...coachingCart, { name: 'Cycle Comfort', category: 'packages' }]).error, 'package_not_combinable');
+eq('coaching + another treatment is refused as a home visit', cartFitsLocation(rcombo.items, 'mobile'), false);
+eq('coaching + another treatment is refused online (online is coaching-only)', cartFitsLocation(rcombo.items, 'virtual'), false);
+eq('coaching + another treatment is fine at the clinic', cartFitsLocation(rcombo.items, 'clinic'), true);
 const coachingCheckout = async (location, time = '7:00 pm') => {
   const res = await createCheckout({ request: new Request('https://x.invalid/create-checkout', { method: 'POST', body: JSON.stringify({ treatments: coachingCart, customerEmail: 'a@example.invalid', customerName: 'Test', customerPhone: '07000000000', date: 'x', time, location, bookingDate: '2099-12-29', travelPostcode: 'M1 1AA', customerAddress: 'x' }) }), env: {} });
   let body = {}; try { body = await res.json(); } catch (e) {}
