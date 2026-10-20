@@ -47,12 +47,20 @@
     return out;
   };
 
+  // A booking made up only of life coaching ("Life Coaching Session", "Six-Session Coaching Package", or several joined with " + ")
+  // has no aftercare at all: no reminder emails, no timeline, no photo prompt. A mixed booking (coaching + a treatment) still does.
+  const isCoachingOnly = (label) => {
+    const parts = String(label || '').split(' + ').map((x) => x.trim()).filter(Boolean);
+    return parts.length > 0 && parts.every((n) => /coaching/i.test(n));
+  };
+
   g.AFTERCARE_COPY = {
     // The hijama set stays at the top level too (older callers: intro, steps).
     intro: hijama.intro,
     steps: hijama.steps,
     sets: { hijama, massage },
     kindsOf,
+    isCoachingOnly,
     // Shown ONCE, under the hijama timeline (not in every stage). Not shown to a massage-only client.
     photoLine: "Send me a photo if a mark worries you, isn't fading as you'd expect, or is still there at day 14.",
     blister: "A small blister can appear on or near a mark and is usually harmless. Don't pop it. Keep it clean and lightly covered, and send me a photo. If redness spreads, pain increases or you feel unwell, contact your GP or NHS 111.",

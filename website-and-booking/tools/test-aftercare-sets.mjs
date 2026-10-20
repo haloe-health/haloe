@@ -41,6 +41,25 @@ for (const day of [1, 7]) {
 }
 check('subject lines unchanged', reminderEmail('x', 1, 'Face Massage').subject === 'Your aftercare note · day 1' && reminderEmail('x', 7, 'Face Massage').subject === 'Your aftercare note · day 7', 0);
 
+// --- coaching-only bookings have no aftercare ---
+check('isCoachingOnly: a coaching session / package / two coaching items', C.isCoachingOnly('Life Coaching Session') && C.isCoachingOnly('Six-Session Coaching Package') && C.isCoachingOnly('Life Coaching Session + Six-Session Coaching Package'), 0);
+check('isCoachingOnly: a mixed booking still has aftercare', !C.isCoachingOnly('Full Body + Life Coaching Session') && !C.isCoachingOnly('Face Massage') && !C.isCoachingOnly('') && !C.isCoachingOnly(undefined), 0);
+{
+  const { runAftercare } = await import('../functions/_aftercare.js');
+  const sent = []; const real = globalThis.fetch;
+  const mk = (id, t) => ({ id, client_id: null, customer_name: 'Pat Example', customer_email: `p${id}@example.invalid`, treatment: t, done_at: '2026-10-20T10:00:00Z' });
+  globalThis.fetch = async (url, o = {}) => {
+    const u = String(url), res = (j) => ({ ok: true, status: 200, json: async () => j, text: async () => JSON.stringify(j) });
+    if (u.includes('resend.com')) { sent.push(JSON.parse(o.body).to[0]); return res({ id: 'x' }); }
+    if (u.includes('/rest/v1/bookings')) return res([mk(1, 'Life Coaching Session'), mk(2, 'Full Body'), mk(3, 'Full Body + Life Coaching Session')]);
+    if (u.includes('aftercare_reminders') && (o.method || 'GET') === 'POST') return res([{ booking_id: 1 }]);
+    return res([]);
+  };
+  const out = await runAftercare({ SUPABASE_URL: 'https://x.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'k', RESEND_API_KEY: 'k' }, new Date('2026-10-21T12:00:00Z'));
+  globalThis.fetch = real;
+  check('reminders: the coaching-only booking gets no email, the cupping and the mixed ones do', sent.length === 2 && !sent.includes('p1@example.invalid') && sent.includes('p2@example.invalid') && sent.includes('p3@example.invalid') && out.skipped >= 1, { sent, out });
+}
+
 log; console.log = log;
 for (const l of R) console.log(l);
 const bad = R.filter((l) => l.startsWith('FAIL')).length;

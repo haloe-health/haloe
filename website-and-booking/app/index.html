@@ -2399,14 +2399,14 @@ const daysBetween = (fromISO, toISO) => Math.round((Date.parse(toISO + 'T12:00:0
 const kindsForBooking = (b) => { const k = AFTERCARE_COPY.kindsOf(b && b.treatment); return k.length ? k : ['hijama']; };
 /** Set(s) for the guide when nothing is current: her most recent session (done, else booked); hijama if there is none. */
 function aftercareKinds(bookings) {
-  const live = bookings.filter((b) => b.status === 'confirmed');
+  const live = bookings.filter((b) => b.status === 'confirmed' && !AFTERCARE_COPY.isCoachingOnly(b.treatment));   // coaching-only sessions have no aftercare
   const done = live.filter((b) => b.done_at).sort((x, y) => String(y.done_at).localeCompare(String(x.done_at)));
   const latest = done[0] || live.sort((x, y) => String(y.booking_date).localeCompare(String(x.booking_date)))[0];
-  return latest ? kindsForBooking(latest) : ['hijama'];
+  return latest ? kindsForBooking(latest) : (bookings.some((b) => b.status === 'confirmed' && AFTERCARE_COPY.isCoachingOnly(b.treatment)) ? [] : ['hijama']);
 }
 /** Where she is in the 14 days after her most recent session marked done; null when there's nothing to show. */
 function aftercareState(bookings) {
-  const done = bookings.filter((b) => b.done_at && (b.status === 'confirmed')).sort((a, b) => String(b.done_at).localeCompare(String(a.done_at)));
+  const done = bookings.filter((b) => b.done_at && b.status === 'confirmed' && !AFTERCARE_COPY.isCoachingOnly(b.treatment)).sort((a, b) => String(b.done_at).localeCompare(String(a.done_at)));
   if (!done.length) return null;
   const day = daysBetween(ldn(new Date(done[0].done_at)), todayISO());
   if (day < 0 || day > 14) return null;
@@ -2440,6 +2440,7 @@ function aftercareCardHTML(state) {
 }
 function viewAftercare() {
   const state = aftercareState(S.cdata.bookings), kinds = state ? state.kinds : aftercareKinds(S.cdata.bookings), intro = introFor(kinds);
+  if (!kinds.length) { shell(pageHead('Aftercare') + '<div class="card"><div class="section-label">Your timeline</div><p class="muted" style="margin:10px 0 0">Nothing to follow after a coaching session. If you book a treatment, its aftercare guide will appear here.</p><a class="btn block" style="margin-top:16px" href="/book">Book a session</a></div>'); return; }
   shell(pageHead('Aftercare') +
     '<div class="card"><div class="section-label">Your timeline</div><p class="muted small" style="margin:8px 0 0">' + (state ? esc((intro ? intro + ' ' : '') + 'You are on the highlighted step.') : 'Nothing to follow right now. This guide shows what to expect over the 14 days after a session.') + '</p>' + timelineHTML(state, true, kinds) + '</div>' +
     (kinds.includes('hijama') ? '<div class="card blister"><div class="section-label">A small blister?</div><p style="margin:10px 0 0">' + esc(BLISTER_GUIDANCE) + '</p>' + (S.cdata.client ? photoCtaHTML('photoBtnPage', true) : '') + '</div>' : ''));
