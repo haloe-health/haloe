@@ -156,6 +156,7 @@ async function sendReminders(env, now, today, out) {
   }
   for (const { b, day } of due) {
     if (testIds.has(b.client_id) || !b.customer_email) { out.skipped++; continue; }
+    if (AFTERCARE_COPY.isCoachingOnly(b.treatment)) { out.skipped++; continue; }   // a coaching-only booking has no aftercare (no email, no push)
     // claim first: an already-claimed (booking, day) returns no row
     const claimed = await sbRequest(env, {
       path: '/rest/v1/aftercare_reminders?on_conflict=booking_id,day', method: 'POST',
