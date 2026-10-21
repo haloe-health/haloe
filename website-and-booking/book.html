@@ -1283,7 +1283,7 @@
   .btn-primary:disabled { background: var(--obsidian-floating); color: #a89f8c; cursor: not-allowed; opacity: 0.6; transform: none; }
   /* Steps 1–4 are driven from the frosted footer; these stay in the DOM so all
      the existing enable/disable logic keeps working, but aren't shown. */
-  #btn-step1, #btn-step2, #btn-step3, #btn-step4 { display: none; }
+  #btn-step2, #btn-step1, #btn-step3, #btn-step4 { display: none; }
 
   /* ---- Frosted footer bar (Apple buy-flow) ---- */
   .footbar {
@@ -1690,8 +1690,8 @@
     margin: 11px 0 9px;
   }
   @media (prefers-color-scheme: dark) { .panel-title::before { color: var(--gold-light); } }
-  #panel-1 .panel-title::before { content: '01  \00B7  Arrival'; }
-  #panel-2 .panel-title::before { content: '02  \00B7  The session'; }
+  #panel-1 .panel-title::before { content: '01  \00B7  The session'; }
+  #panel-2 .panel-title::before { content: '02  \00B7  Arrival'; }
   #panel-3 .panel-title::before { content: '03  \00B7  Your time'; }
   #panel-4 .panel-title::before { content: '04  \00B7  Your details'; }
   #panel-5 .panel-title::before { content: '05  \00B7  Confirm'; }
@@ -1956,11 +1956,11 @@
   <div class="steps" id="steps">
     <div class="step active" data-step="1">
       <div class="step-dot">1</div>
-      <span class="step-label">Where</span>
+      <span class="step-label">Treatment</span>
     </div>
     <div class="step" data-step="2">
       <div class="step-dot">2</div>
-      <span class="step-label">Treatment</span>
+      <span class="step-label">Where</span>
     </div>
     <div class="step" data-step="3">
       <div class="step-dot">3</div>
@@ -1991,10 +1991,34 @@
 
   <div class="banner banner-error" id="panel-error" role="alert" hidden><p></p></div>
 
-  <!-- STEP 1: Where -->
+  <!-- STEP 1: Choose Treatment -->
   <div class="panel active" id="panel-1">
+    <p class="panel-title">Choose your treatment.</p>
+    <p class="panel-sub">Choose one or more — they're done together in one session. Prices shown are treatment only; travel fee added for home visits.</p>
+
+    <div class="category-tabs-wrap" id="category-tabs-wrap">
+      <div class="category-tabs segmented" id="category-tabs" role="tablist" aria-label="Treatment category">
+        <button class="tab-btn seg-option active" data-cat="massage" role="tab" aria-selected="true" tabindex="0">Massage</button>
+        <button class="tab-btn seg-option" data-cat="dry" role="tab" aria-selected="false" tabindex="-1">Dry Cupping</button>
+        <button class="tab-btn seg-option" data-cat="wet" role="tab" aria-selected="false" tabindex="-1">Hijama</button>
+        <button class="tab-btn seg-option" data-cat="packages" role="tab" aria-selected="false" tabindex="-1">Packages</button>
+        <button class="tab-btn seg-option" data-cat="coaching" role="tab" aria-selected="false" tabindex="-1">Coaching</button>
+      </div>
+    </div>
+    <p class="packages-policy-line hidden" id="packages-policy-line">Packages are paid in full. Free reschedule or full refund up to 48 hours before a session; inside 48 hours, sessions are non-refundable but can be moved once. For more information contact Halima on WhatsApp: <a href="https://wa.me/447474833643" style="color:#a8873a;text-decoration:none;">07474 833643</a></p>
+
+    <div class="service-grid" id="service-grid" role="group" aria-label="Treatments — select one or more"></div>
+
+    <div class="cart-summary hidden" id="cart-summary" aria-live="polite"></div>
+
+    <button class="btn-primary" id="btn-step1" onclick="goToStep(2)" disabled>Continue — Where</button>
+  </div>
+
+  <!-- STEP 2: Where -->
+  <div class="panel" id="panel-2">
+    <button class="btn-back" onclick="goToStep(1)">← Back</button>
     <p class="panel-title">Where would you like your session?</p>
-    <p class="panel-sub">Choose a clinic day appointment, a home visit, or an online coaching session.</p>
+    <p class="panel-sub" id="where-sub">Choose a clinic day appointment or a home visit.</p>
 
     <div class="where-grid" id="where-grid">
       <label class="where-card" id="where-clinic" for="where-clinic-radio" role="radio" aria-checked="false">
@@ -2040,31 +2064,7 @@
       <div class="travel-fee-line hidden" id="travel-fee-line"></div>
     </div>
 
-    <button class="btn-primary" id="btn-step1" onclick="whereContinue()" disabled>Continue</button>
-  </div>
-
-  <!-- STEP 2: Choose Treatment -->
-  <div class="panel" id="panel-2">
-    <button class="btn-back" onclick="goToStep(1)">← Back</button>
-    <p class="panel-title">Choose your treatment.</p>
-    <p class="panel-sub">Choose one or more — they're done together in one session. Prices shown are treatment only; travel fee added for home visits.</p>
-
-    <div class="category-tabs-wrap" id="category-tabs-wrap">
-      <div class="category-tabs segmented" id="category-tabs" role="tablist" aria-label="Treatment category">
-        <button class="tab-btn seg-option active" data-cat="massage" role="tab" aria-selected="true" tabindex="0">Massage</button>
-        <button class="tab-btn seg-option" data-cat="dry" role="tab" aria-selected="false" tabindex="-1">Dry Cupping</button>
-        <button class="tab-btn seg-option" data-cat="wet" role="tab" aria-selected="false" tabindex="-1">Hijama</button>
-        <button class="tab-btn seg-option" data-cat="packages" role="tab" aria-selected="false" tabindex="-1">Packages</button>
-        <button class="tab-btn seg-option" data-cat="coaching" role="tab" aria-selected="false" tabindex="-1">Coaching</button>
-      </div>
-    </div>
-    <p class="packages-policy-line hidden" id="packages-policy-line">Packages are paid in full. Free reschedule or full refund up to 48 hours before a session; inside 48 hours, sessions are non-refundable but can be moved once. For more information contact Halima on WhatsApp: <a href="https://wa.me/447474833643" style="color:#a8873a;text-decoration:none;">07474 833643</a></p>
-
-    <div class="service-grid" id="service-grid" role="group" aria-label="Treatments — select one or more"></div>
-
-    <div class="cart-summary hidden" id="cart-summary" aria-live="polite"></div>
-
-    <button class="btn-primary" id="btn-step2" onclick="goToStep(3)" disabled>Continue — Choose Date & Time</button>
+    <button class="btn-primary" id="btn-step2" onclick="whereContinue()" disabled>Continue — Choose Date &amp; Time</button>
   </div>
 
   <!-- STEP 3: Date & Time -->
@@ -2351,9 +2351,9 @@ let state = {
 // step 5 is reached — see goToStep().
 let pendingDiscountCode = null;
 
-// A package deep link already picks the treatment, so once location is chosen
-// its own confirm step (Treatment) is redundant — skip straight to Date & Time.
-let skipTreatmentConfirm = false;
+// A package deep link already picks the treatment, so skip the Treatment step
+// and open on Where.
+let skipTreatmentConfirm = false; // treatment is step 1 now: a package link lands on Where (step 2)
 
 function selectLocation(loc) {
   state.location = loc;
@@ -2375,7 +2375,7 @@ function selectLocation(loc) {
   // continue past Step 1 until it has a postcode to price travel from
   // (see onTravelPostcodeInput()), so the fee is always visible before the
   // customer gets to Date & Time.
-  document.getElementById('btn-step1').disabled = (loc === 'mobile') ? (state.travelZone === null) : false;
+  document.getElementById('btn-step2').disabled = (loc === 'mobile') ? (state.travelZone === null) : false;
   // Changing location can invalidate a date/time picked under the other
   // location's calendar/slots — drop it rather than carry over a bad pick.
   state.date = null;
@@ -2396,23 +2396,35 @@ function categoryAllowedAt(cat, loc) {
   if (loc === 'virtual') return cat === 'coaching';
   return true; // clinic, or nothing chosen yet
 }
+function cartCoachingOnly() { return state.cart.length > 0 && state.cart.every(c => c.cat === 'coaching'); }
+// Treatment comes first, so the place is what gets narrowed: online is offered
+// only when everything chosen is coaching. If the customer goes back and adds
+// something else while Online is picked, the place is cleared so they re-choose.
 function applyLocationToCatalogue() {
-  document.querySelectorAll('.tab-btn').forEach(b => { b.hidden = !categoryAllowedAt(b.dataset.cat, state.location); });
-  const before = state.cart.length;
-  state.cart = state.cart.filter(c => categoryAllowedAt(c.cat, state.location));
-  if (state.cart.length !== before) clearDiscountForCartChange();
-  if (!categoryAllowedAt(state.category, state.location)) {
-    state.category = state.location === 'virtual' ? 'coaching' : 'massage';
-  }
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    const on = b.dataset.cat === state.category;
-    b.classList.toggle('active', on);
-    b.setAttribute('aria-selected', on ? 'true' : 'false');
-    b.tabIndex = on ? 0 : -1;
-  });
-  const btn2 = document.getElementById('btn-step2');
-  if (btn2) btn2.disabled = state.cart.length === 0;
+  const virtualOk = state.cart.length === 0 || cartCoachingOnly();
+  const vc = document.getElementById('where-virtual');
+  if (vc) vc.style.display = virtualOk ? '' : 'none';
+  const sub = document.getElementById('where-sub');
+  if (sub) sub.textContent = virtualOk && state.cart.length
+    ? 'Choose a clinic day appointment, a home visit, or an online coaching session.'
+    : 'Choose a clinic day appointment or a home visit.';
+  if (state.location === 'virtual' && !virtualOk) clearLocation();
+  const btn1 = document.getElementById('btn-step1');
+  if (btn1) btn1.disabled = state.cart.length === 0;
   renderServices();
+}
+function clearLocation() {
+  state.location = null;
+  ['clinic', 'mobile', 'virtual'].forEach(l => {
+    const card = document.getElementById('where-' + l);
+    if (card) { card.classList.remove('selected'); card.setAttribute('aria-checked', 'false'); }
+    const r = document.getElementById('where-' + l + '-radio');
+    if (r) r.checked = false;
+  });
+  document.getElementById('loc-notice').style.display = 'none';
+  document.getElementById('postcode-block').classList.add('hidden');
+  document.getElementById('btn-step2').disabled = true;
+  state.date = null; state.time = null;
 }
 
 // Live postcode -> travel band/fee, shown on Step 1 before the customer can
@@ -2457,13 +2469,13 @@ function onTravelPostcodeInput() {
         state.travelZone = 'Q';
       }
       renderTravelFeeLine();
-      document.getElementById('btn-step1').disabled = (state.location === 'mobile') ? (state.travelZone === null) : false;
+      document.getElementById('btn-step2').disabled = (state.location === 'mobile') ? (state.travelZone === null) : false;
       syncFooter();
     }, 350);
   }
 
   renderTravelFeeLine();
-  document.getElementById('btn-step1').disabled = (state.location === 'mobile') ? (state.travelZone === null) : false;
+  document.getElementById('btn-step2').disabled = (state.location === 'mobile') ? (state.travelZone === null) : false;
   syncFooter();
 }
 
@@ -2492,7 +2504,7 @@ function renderTravelFeeLine() {
 }
 
 function whereContinue() {
-  goToStep(skipTreatmentConfirm ? 3 : 2);
+  goToStep(3);
 }
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -2542,6 +2554,7 @@ function applyDeepLink() {
   const wantedLocation = params.get('location');
   if (wantedLocation === 'clinic' || wantedLocation === 'mobile' || wantedLocation === 'virtual') {
     selectLocation(wantedLocation);
+    if (wantedLocation === 'virtual') state.category = 'coaching';
   }
 
   // A discount code deep link (e.g. the hero offer box's book.html?code=HALOE20).
@@ -2569,7 +2582,7 @@ function applyDeepLink() {
     if (i !== -1) {
       state.cart = [{ cat, i }];
       matched = true;
-      const btn = document.getElementById('btn-step2');
+      const btn = document.getElementById('btn-step1');
       if (btn) btn.disabled = false;
     }
   }
@@ -2594,6 +2607,7 @@ function init() {
   applyLocationToCatalogue();
   renderCalendar();
   updateRail();
+  if (skipTreatmentConfirm && currentStep === 1) goToStep(2);
 }
 
 // Which step the wizard is on, for the summary rail's progress ring.
@@ -2615,8 +2629,8 @@ function updateRail() {
     : state.location === 'mobile' ? 'Home visit'
     : state.location === 'virtual' ? 'Online (video call)' : '';
   const rows = [
-    ['Where', whereLabel],
     ['Treatment', names.join(' + ')],
+    ['Where', whereLabel],
     ['Duration', svc ? (items.length > 1 ? durationText(totalMin) : (svc.time || durationText(totalMin))) : ''],
     ['Date', dateStr],
     ['Time', state.time || ''],
@@ -2640,22 +2654,18 @@ function updateRail() {
     : state.location === 'virtual' ? 'Online' : '';
   const fs = document.getElementById('foot-sum');
   if (fs) {
-    if (currentStep === 1) {
-      // Nothing to pick a treatment for yet — the Where step gets its own
-      // copy instead of the stale "No treatment selected" default.
-      fs.textContent = state.location === 'clinic' ? `Clinic Day · ${CLINIC_VENUE_NAME}`
-        : state.location === 'mobile' ? 'Home visit · Greater Manchester'
-        : state.location === 'virtual' ? 'Online · video call'
-        : "Choose where you'd like your session";
-    } else if (!svc) {
+    if (!svc) {
       fs.textContent = 'Select a treatment';
-    } else if (currentStep === 2) {
-      // Step 2's bar is just "Select a treatment" / "Face Massage · £40" —
-      // date/time haven't been chosen yet at this point in the flow, and
-      // repeating them here (steps 3+) is handled by the branch below.
+    } else if (currentStep === 1) {
       fs.textContent = items.length > 1
         ? `${items.length} treatments · ${formatPounds(totalPence)}`
         : `${svc.name} · ${priceFmt(netPrice(svc))}`;
+    } else if (currentStep === 2) {
+      // Where: the place once chosen, else the prompt.
+      fs.textContent = state.location === 'clinic' ? `Clinic Day · ${CLINIC_VENUE_NAME}`
+        : state.location === 'mobile' ? 'Home visit · Greater Manchester'
+        : state.location === 'virtual' ? 'Online · video call'
+        : (items.length > 1 ? `${items.length} treatments` : svc.name);
     } else {
       // Steps 3+: the treatment on top, price (plus travel for a home visit)
       // on the second line. Date and time are already on the page above.
@@ -2667,7 +2677,7 @@ function updateRail() {
   // customer always sees what they will pay, not just the treatment.
   const travelOn = isMobile() && state.travelZone;
   if (ft) {
-    if (!svc || (currentStep === 2 && !travelOn)) {
+    if (!svc || (currentStep === 1 && !travelOn)) {
       ft.innerHTML = '';
     } else if (travelOn) {
       ft.textContent = state.travelZone === 'Q'
@@ -2678,11 +2688,11 @@ function updateRail() {
     }
   }
   const fh = document.getElementById('foot-helper');
-  if (fh) fh.classList.toggle('hidden', !(currentStep === 1 && !state.location));
+  if (fh) fh.classList.toggle('hidden', !(currentStep === 2 && !state.location));
   const sc = document.querySelector('.foot-summary-col');
-  if (sc) sc.style.display = currentStep === 1 ? 'none' : '';
+  if (sc) sc.style.display = '';
   const fi = document.querySelector('.footbar-inner');
-  if (fi) fi.style.justifyContent = currentStep === 1 ? 'flex-end' : '';
+  if (fi) fi.style.justifyContent = '';
   syncFooter();
 }
 
@@ -2712,8 +2722,8 @@ function syncFooter() {
   const fh = document.getElementById('foot-helper');
   if (fh) {
     const reasons = {
-      1: state.location === 'mobile' && state.travelZone === null ? 'Enter your postcode to continue' : "Choose where you'd like your session",
-      2: 'Choose at least one treatment',
+      1: 'Choose at least one treatment',
+      2: state.location === 'mobile' && state.travelZone === null ? 'Enter your postcode to continue' : "Choose where you'd like your session",
       3: state.date ? 'Pick a time to continue' : 'Pick a date and time',
       4: 'Finish your details to continue',
     };
@@ -2841,8 +2851,7 @@ function toggleService(i) {
   clearDiscountForCartChange();
   // A chosen time may not fit the new combined length; loadSlots() (on
   // arriving at step 3) drops it if so.
-  document.getElementById('btn-step2').disabled = state.cart.length === 0;
-  renderServices();
+  applyLocationToCatalogue();
   updateRail();
   const row = document.querySelector(`.service-card[data-i="${i}"]`);
   if (row) row.focus();
@@ -2872,8 +2881,7 @@ function removeFromCart(cat, i) {
   state.cart = state.cart.filter(c => !(c.cat === cat && c.i === i));
   cartNote = '';
   clearDiscountForCartChange();
-  document.getElementById('btn-step2').disabled = state.cart.length === 0;
-  renderServices();
+  applyLocationToCatalogue();
   updateRail();
 }
 
@@ -3421,7 +3429,7 @@ function clearPanelError() { const el = document.getElementById('panel-error'); 
 
 async function handlePayment() {
   clearPanelError();
-  if (!state.cart.length) { failPay("Please choose a treatment first.", 2); return; }
+  if (!state.cart.length) { failPay("Please choose a treatment first.", 1); return; }
   const { names, dateStr, locationLabel } = buildSummary();
   const name  = document.getElementById('fullname').value.trim();
   const email = document.getElementById('email').value.trim();
@@ -3443,7 +3451,7 @@ async function handlePayment() {
     failPay("Please enter the full address, including postcode, where your session will take place.", 4); return;
   }
   if (isMobile() && state.travelZone === null) {
-    failPay("Please enter your postcode so we can price travel.", 1); return;
+    failPay("Please enter your postcode so we can price travel.", 2); return;
   }
   const consentCancellation = document.getElementById('consent-cancellation');
   if (!consentCancellation || !consentCancellation.checked) {
@@ -3684,7 +3692,7 @@ function goToStep(n) {
   // so errors don't carry over on Back+Forward.
   if (n !== 4) touchedFields.clear();
   clearPanelError();
-  if (n === 5 && !state.cart.length) { failPay("Please choose a treatment first.", 2); return; }
+  if (n === 5 && !state.cart.length) { failPay("Please choose a treatment first.", 1); return; }
   currentStep = n;
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById(`panel-${n}`).classList.add('active');
@@ -3840,10 +3848,10 @@ let restoringProgress = false;
 function restoreProgress() {
   let p = null;
   try { p = JSON.parse(sessionStorage.getItem(PROGRESS_KEY) || 'null'); } catch (_) {}
-  if (!p || !p.t || Date.now() - p.t > PROGRESS_MAX_AGE_MS || !p.location) return false;
+  if (!p || !p.t || Date.now() - p.t > PROGRESS_MAX_AGE_MS || (!p.location && !(Array.isArray(p.cart) && p.cart.length))) return false;
   restoringProgress = true;
   try {
-    selectLocation(p.location);
+    if (p.location) selectLocation(p.location);
     if (Array.isArray(p.cart)) state.cart = p.cart.filter(c => c && SERVICES[c.cat] && SERVICES[c.cat][c.i]);
     if (p.category && SERVICES[p.category] && categoryAllowedAt(p.category, p.location)) state.category = p.category;
     PROGRESS_FIELDS.forEach(id => { const el = document.getElementById(id); if (el && p.fields && typeof p.fields[id] === 'string') el.value = p.fields[id]; });
@@ -3858,11 +3866,11 @@ function restoreProgress() {
       state.date = new Date(y, m - 1, d); state.calYear = y; state.calMonth = m - 1;
       state.time = p.time || null;
     }
-    document.getElementById('btn-step2').disabled = state.cart.length === 0;
-    document.getElementById('btn-step1').disabled = (state.location === 'mobile') ? (state.travelZone === null) : false;
-    renderServices();
+    document.getElementById('btn-step2').disabled = !state.location || ((state.location === 'mobile') ? (state.travelZone === null) : false);
+    applyLocationToCatalogue();
     let step = Math.min(Math.max(parseInt(p.step, 10) || 1, 1), 5);
-    if (step >= 2 && !state.cart.length) step = 2;
+    if (step >= 2 && !state.cart.length) step = 1;
+    if (step >= 3 && !state.location) step = 2;
     if (step >= 3 && (!state.date || !state.time)) step = Math.min(step, 3);
     if (step > 1) goToStep(step);
   } finally {
