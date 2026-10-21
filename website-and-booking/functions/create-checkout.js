@@ -59,6 +59,7 @@ export async function onRequestPost(context) {
     let appliedPercent = 0;
     let discountPenceApplied = 0;
     let discountRedemptionId = null;
+    let waivesTravel = false;
     if (discountCode) {
       if (!hasSupabase) {
         return new Response(JSON.stringify({ error: 'discount_unavailable' }), {
@@ -78,6 +79,7 @@ export async function onRequestPost(context) {
       discountPenceApplied = applied.discountPence;
       appliedCode = result.code;
       appliedPercent = result.percent;
+      waivesTravel = !!result.waivesTravel;
 
       // Reserved the moment it passes validation — see the file header on
       // _discounts.js for why the INSERT itself is what actually prevents
@@ -109,6 +111,9 @@ export async function onRequestPost(context) {
       const quote = await travelQuote(travelPostcode);
       travelZone = quote.valid ? quote.zone : 'Q';
       travelPence = quote.valid ? quote.pence : 0;
+      // A code flagged waive_travel (Halima covers this client's travel) removes the fee
+      // entirely. Every other code still never touches travel.
+      if (waivesTravel) travelPence = 0;
     }
 
     let totalAmount = treatmentAmount + travelPence;
@@ -219,7 +224,7 @@ export async function onRequestPost(context) {
         originalAmountLabel: appliedCode ? formatGBP(originalAmount) : '',
         discountRowLabel: appliedCode ? `${appliedCode} discount` : '',
         discountLabel: appliedCode ? `−${formatGBP(discountPenceApplied)}` : '',
-        travelLabel: location === 'mobile' ? (travelZone === 'Q' ? 'Confirmed by WhatsApp before the session' : formatGBP(travelPence)) : '',
+        travelLabel: location === 'mobile' ? (waivesTravel ? 'Covered by haloe' : travelZone === 'Q' ? 'Confirmed by WhatsApp before the session' : formatGBP(travelPence)) : '',
         travelZone: location === 'mobile' ? travelZone : '',
         travelPence: location === 'mobile' ? travelPence : 0,
         slotConflict,
@@ -259,7 +264,8 @@ export async function onRequestPost(context) {
     // £0 line so it's itemised everywhere a real fee would be, rather than
     // silently missing.
     if (location === 'mobile') {
-      const travelName = travelZone === 'Q'
+      const travelName = waivesTravel ? 'Travel — covered by haloe'
+        : travelZone === 'Q'
         ? 'Travel — confirmed by WhatsApp before your session'
         : `Travel — ${travelLabelFor(travelZone).toLowerCase()}`;
       params.append('line_items[1][price_data][currency]', 'gbp');

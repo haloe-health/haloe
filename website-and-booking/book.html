@@ -3372,6 +3372,7 @@ function buildSummary() {
 // Travel fee for whatever's currently selected — 0 for clinic (no travel
 // line, ever) or until a mobile booking has a priceable postcode.
 function travelPenceForSelection() {
+  if (state.discount && state.discount.waivesTravel) return 0; // e.g. NESSA-FREE: travel covered
   return (isMobile() && state.travelZone) ? state.travelPence : 0;
 }
 
@@ -3392,7 +3393,7 @@ function renderSummary() {
   const travelRow = isMobile() && state.travelZone ? `
       <div class="pass-extra">
         <span>${travelRowLabel()}</span>
-        <span class="v">${state.travelZone === 'Q' ? 'Confirmed by WhatsApp' : formatPounds(travelPence)}</span>
+        <span class="v">${state.discount && state.discount.waivesTravel ? 'Covered' : state.travelZone === 'Q' ? 'Confirmed by WhatsApp' : formatPounds(travelPence)}</span>
       </div>` : '';
   const totalRow = travelRow ? `
       <div class="pass-extra total">
@@ -3650,6 +3651,7 @@ async function applyDiscountCode(codeOverride) {
         percent: data.percent,
         discountPence: data.discountAmountPence,
         finalPence: data.finalAmountPence,
+        waivesTravel: !!data.waivesTravel,
       };
       if (input) { input.value = data.code; input.disabled = true; }
     } else {
