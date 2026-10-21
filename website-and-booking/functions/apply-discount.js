@@ -53,6 +53,7 @@ export async function onRequestPost(context) {
       originalAmountPence,
       discountAmountPence: discountPence,
       finalAmountPence: finalPence,
+      waivesTravel: !!result.waivesTravel,
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

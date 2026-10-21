@@ -138,7 +138,15 @@ export async function validateDiscountCode(env, rawCode, email, phone, now) {
     if (used && used.length > 0) return { ok: false, reason: 'already_used' };
   }
 
-  return { ok: true, codeId: row.id, code: row.code, percent: row.percent_off, type: row.type, periodKey };
+  // Some free codes (e.g. a client whose home-visit travel Halima covers) also
+  // waive the travel fee. Read separately and fail-safe: if the waive_travel
+  // column hasn't been added yet this is false, so no other code is affected.
+  let waivesTravel = false;
+  try {
+    const w = await sbRequest(env, { path: `/rest/v1/discount_codes?id=eq.${row.id}&select=waive_travel&limit=1`, method: 'GET' });
+    waivesTravel = !!(w && w[0] && w[0].waive_travel);
+  } catch (_) { /* column not added yet */ }
+  return { ok: true, codeId: row.id, code: row.code, percent: row.percent_off, type: row.type, periodKey, waivesTravel };
 }
 
 // Applies a validated percent-off to an amount already in pence, rounding to
