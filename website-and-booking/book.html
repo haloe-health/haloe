@@ -676,7 +676,6 @@
     white-space: nowrap;
   }
   .where-card-badge--gold { background: #f5eddb; color: var(--c-gold-mid); }
-  .where-card-badge--grey { background: #f0ede8; color: var(--text-sand); }
   /* Address + meta lines */
   .where-card-address {
     display: block;
@@ -1672,35 +1671,13 @@
     line-height: 1.15;
     letter-spacing: -0.012em;
     color: var(--cream);
-    margin-bottom: 0;
-  }
-  .panel-title::before {
-    display: block;
-    font-family: 'Poppins', sans-serif;
-    font-size: 10.5px; font-weight: 500;
-    letter-spacing: 0.26em; text-transform: uppercase;
-    color: var(--gold-deep);
-    margin-bottom: 7px;
+    margin-bottom: 8px;
   }
   .panel { padding-top: 6px; }
-  .panel-title::after {
-    content: ''; display: block;
-    width: 34px; height: 1px;
-    background: var(--gold-primary);
-    margin: 11px 0 9px;
-  }
-  @media (prefers-color-scheme: dark) { .panel-title::before { color: var(--gold-light); } }
-  #panel-1 .panel-title::before { content: '01  \00B7  The session'; }
-  #panel-2 .panel-title::before { content: '02  \00B7  Arrival'; }
-  #panel-3 .panel-title::before { content: '03  \00B7  Your time'; }
-  #panel-4 .panel-title::before { content: '04  \00B7  Your details'; }
-  #panel-5 .panel-title::before { content: '05  \00B7  Confirm'; }
   .panel-sub { font-size: 14px; line-height: 1.55; color: var(--text-cashmere); margin-bottom: 0.9rem; }
 
   /* Steps 2-5 stay tight so they still fit one screen. */
   .panel:not(#panel-1) .panel-title { font-size: 25px; }
-  .panel:not(#panel-1) .panel-title::before { margin-bottom: 6px; }
-  .panel:not(#panel-1) .panel-title::after { margin: 11px 0 9px; }
   .panel:not(#panel-1) .panel-sub { margin-bottom: 0.7rem; }
 
   /* Step 1 — the room to breathe */
@@ -1729,11 +1706,18 @@
     font-size: 9.5px; letter-spacing: 0.16em; padding: var(--s1) 9px;
   }
   .where-card-badge--gold { color: var(--gold-deep); border-color: rgba(168,135,58,0.45); }
-  .where-card-badge--grey { color: var(--text-sand); }
   .where-card-address { font-size: 13.5px; font-weight: 500; margin-bottom: 2px; }
   .where-card-meta { font-size: var(--fs-label); line-height: 1.5; color: var(--text-cashmere); }
-  .where-radio-ring { width: 20px; height: 20px; border-width: 1px; border-color: var(--text-sand); }
-  .where-card.selected .where-radio-ring { background: transparent; }
+  .where-radio-ring { width: 20px; height: 20px; border-width: 1.5px; border-color: var(--gold-deep); }
+  .where-radio-ring::after {
+    width: 6px; height: 12px; margin-top: -2px; border-radius: 0;
+    background: transparent;
+    border: solid var(--obsidian-base); border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.15s;
+  }
+  .where-card.selected .where-radio-ring { background: var(--gold-primary); border-color: var(--gold-primary); }
+  .where-card.selected .where-radio-ring::after { background: transparent; transform: rotate(45deg) scale(1); }
   .where-card-header .where-radio-ring { margin-right: 2px; }
 
   /* The one action: an ink pill, gold arrow. Disabled = an outline, so it
@@ -1768,7 +1752,6 @@
   /* Headings: one size for every step title, 12px floor for labels. */
   .panel-title { font-size: var(--fs-title); line-height: 1.15; }
   .panel:not(#panel-1) .panel-title { font-size: var(--fs-title); }
-  .panel-title::before { font-size: var(--fs-label); letter-spacing: 0.2em; margin-bottom: var(--s2); }
   .panel-sub, .panel:not(#panel-1) .panel-sub { font-size: var(--fs-body); line-height: 1.45; margin-bottom: 14px; }
   .section-label, .time-group-label, .time-hint, .time-count { font-size: var(--fs-caption); letter-spacing: 0; }
   .ios-group-label { font-size: var(--fs-label); letter-spacing: 0.06em; }
@@ -1779,16 +1762,18 @@
   .step.active .step-dot { width: 30px; }
   #step-counter { font-size: var(--fs-caption); }
 
-  /* Step 1 — choice cards: 16px padding / 16px corners / 12px gap */
+  /* Where step — choice cards: 12px/16px padding, 16px corners, 12px gap.
+     The intro line repeats the title; it is hidden, not removed, because
+     applyLocationToCatalogue() still writes to #where-sub. */
+  #where-sub { display: none; }
   .where-grid { gap: var(--s3); margin: var(--s1) 0 14px; }
-  .where-card { padding: var(--s4); border-radius: 16px; }
+  .where-card { padding: var(--s3) var(--s4); border-radius: 16px; min-height: 56px; }
   .where-card-header { margin-bottom: 6px; }
   .where-card-name { font-size: var(--fs-heading); }
   .where-card-address { font-size: var(--fs-body); margin-bottom: 3px; }
   .where-card-meta { font-size: var(--fs-caption); line-height: 1.45; }
   .where-card-badge { font-size: var(--fs-label); letter-spacing: 0.06em; padding: 3px 10px; }
   .where-radio-ring { width: 24px; height: 24px; }
-  .where-card.selected .where-radio-ring::after { width: 12px; height: 12px; }
   .where-card-address, .where-card-meta { margin-left: 36px; }
   .where-grid { --where-indent: 36px; }
   .loc-line, #loc-notice { font-size: 13.5px; line-height: 1.45; }
@@ -2028,28 +2013,25 @@
           <span class="where-card-name">Clinic Day</span>
           <span class="where-card-badge where-card-badge--gold">Tuesdays</span>
         </div>
-        <span class="where-card-address">Milton Hall, 244 Deansgate, Manchester M3 4BQ</span>
-        <span class="where-card-meta">Private treatment room · Reception on arrival · Lift access</span>
+        <span class="where-card-address">Milton Hall, 244 Deansgate</span>
+        <span class="where-card-meta">Private room · Lift access</span>
       </label>
       <label class="where-card" id="where-mobile" for="where-mobile-radio" role="radio" aria-checked="false">
         <input type="radio" name="whereLocation" id="where-mobile-radio" value="mobile" onchange="selectLocation('mobile')">
         <div class="where-card-header">
           <span class="where-radio-ring" aria-hidden="true"></span>
           <span class="where-card-name">Home Visit</span>
-          <span class="where-card-badge where-card-badge--grey">Mon – Sat</span>
         </div>
         <span class="where-card-address">Halima comes to you</span>
-        <span class="where-card-meta">Greater Manchester · Travel fee from <span id="where-mobile-fee"></span> · Full sterile setup brought to you</span>
+        <span class="where-card-meta">Greater Manchester · Travel from <span id="where-mobile-fee"></span></span>
       </label>
       <label class="where-card" id="where-virtual" for="where-virtual-radio" role="radio" aria-checked="false">
         <input type="radio" name="whereLocation" id="where-virtual-radio" value="virtual" onchange="selectLocation('virtual')">
         <div class="where-card-header">
           <span class="where-radio-ring" aria-hidden="true"></span>
           <span class="where-card-name">Online</span>
-          <span class="where-card-badge where-card-badge--grey">Mon – Sat</span>
         </div>
         <span class="where-card-address">Life coaching by video call</span>
-        <span class="where-card-meta">No travel and no address needed · Your video link arrives by email</span>
       </label>
     </div>
 
@@ -2673,7 +2655,7 @@ function updateRail() {
     } else if (currentStep === 2) {
       // Where: the place once chosen, else the prompt.
       fs.textContent = state.location === 'clinic' ? `Clinic Day · ${CLINIC_VENUE_NAME}`
-        : state.location === 'mobile' ? 'Home visit · Greater Manchester'
+        : state.location === 'mobile' ? 'Home visit'
         : state.location === 'virtual' ? 'Online · video call'
         : (items.length > 1 ? `${items.length} treatments` : svc.name);
     } else {
@@ -2733,7 +2715,7 @@ function syncFooter() {
   if (fh) {
     const reasons = {
       1: 'Choose at least one treatment',
-      2: state.location === 'mobile' && state.travelZone === null ? 'Enter your postcode to continue' : "Choose where you'd like your session",
+      2: state.location === 'mobile' && state.travelZone === null ? 'Enter your postcode' : 'Choose a place to continue',
       3: state.date ? 'Pick a time to continue' : 'Pick a date and time',
       4: 'Finish your details to continue',
     };
