@@ -2597,7 +2597,17 @@ function applyDeepLink() {
   }
 }
 
+// Back from Stripe Checkout without paying: free the slot hold right away
+// (see functions/release-hold.js), then tidy the ref out of the address bar.
+function releaseHoldFromUrl() {
+  const m = /[?&]release=([0-9a-f.]+)/.exec(location.search);
+  if (!m) return;
+  try { fetch('/release-hold', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ref: m[1] }), keepalive: true }).catch(() => {}); } catch (_) {}
+  try { history.replaceState(null, '', location.pathname); } catch (_) {}
+}
+
 function init() {
+  releaseHoldFromUrl();
   const now = new Date();
   state.calYear = now.getFullYear();
   state.calMonth = now.getMonth();
