@@ -213,3 +213,25 @@ export async function releaseBooking(env, bookingId) {
     prefer: 'return=minimal',
   });
 }
+
+// Signed "release my hold" reference, put on Stripe's cancel_url so a customer
+// who taps Back from Checkout frees their slot at once instead of waiting out
+// the hold. Signed with the Stripe secret so ids can't be guessed to release
+// someone else's hold. ref = `${bookingId}.${discountRedemptionId || 0}.${sig}`.
+async function holdSig(env, payload) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', enc.encode(String(env.STRIPE_SECRET_KEY || '')), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(payload));
+  return [...new Uint8Array(sig)].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
+}
+export async function makeHoldRef(env, bookingId, redemptionId) {
+  const payload = `${bookingId}.${redemptionId || 0}`;
+  return `${payload}.${await holdSig(env, payload)}`;
+}
+// Returns { bookingId, redemptionId } if the ref is genuine, else null.
+export async function parseHoldRef(env, ref) {
+  const m = /^(\d{1,12})\.(\d{1,12})\.([0-9a-f]{32})$/.exec(String(ref || ''));
+  if (!m) return null;
+  if ((await holdSig(env, `${m[1]}.${m[2]}`)) !== m[3]) return null;
+  return { bookingId: m[1], redemptionId: m[2] === '0' ? null : m[2] };
+}

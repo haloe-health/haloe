@@ -1,4 +1,4 @@
-import { reserveSlot, confirmBooking, releaseBooking, slotToMinutes, STRIPE_SESSION_SECONDS } from './_bookings.js';
+import { reserveSlot, confirmBooking, releaseBooking, slotToMinutes, makeHoldRef, STRIPE_SESSION_SECONDS } from './_bookings.js';
 import { isOfferableStart, TURNAROUND_MIN } from './_slots.js';
 import { CLINIC_RULES, CLINIC_VENUE_NAME, CLINIC_VENUE_ADDRESS } from './_clinic.js';
 import { resolveCart, formatDuration, cartFitsLocation } from './_services.js';
@@ -323,7 +323,9 @@ export async function onRequestPost(context) {
       } : {}),
     });
     params.append('success_url', `${origin}/booking-confirmed.html?${successParams.toString()}`);
-    params.append('cancel_url', `${origin}/book.html`);
+    // Back from Checkout releases the hold straight away (see release-hold.js).
+    const holdRef = bookingId ? await makeHoldRef(context.env, bookingId, discountRedemptionId) : null;
+    params.append('cancel_url', holdRef ? `${origin}/book.html?release=${holdRef}` : `${origin}/book.html`);
 
     const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
