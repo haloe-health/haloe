@@ -1804,7 +1804,8 @@ function viewThread(phone) {
   const open = !!lastIn && Date.now() - new Date(lastIn.created_at).getTime() < 24 * 3600 * 1000;
   const name = waName(phone), first = name.replace(/^\+/, '').split(' ')[0];
   const bubbles = ms.map((m) => `<div class="bub ${m.direction}"><div class="bt">${esc(m.body)}</div><div class="bm">${esc(lonTime(m.created_at, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }))}${m.direction === 'out' && m.status === 'failed' ? ' · not delivered' : ''}</div></div>`).join('');
-  shell(`<div class="tile-home inbox thread"><div class="th-titlerow"><h1>${esc(name)}</h1><a class="muted" href="#/inbox">All messages</a></div>
+  shell(`<div class="tile-home inbox thread"><div class="th-titlerow"><h1>${esc(name)}</h1><a class="btn" href="tel:+${esc(phone)}">Call</a></div>
+    <p class="muted" style="margin:-8px 4px 12px"><a href="#/inbox">All messages</a></p>
     <div class="bubs" id="bubs">${bubbles}</div>
     ${open ? `<form class="compose" id="wa-form"><textarea id="wa-text" rows="1" placeholder="Message ${esc(first)}" aria-label="Message"></textarea><button class="btn" id="wa-send" type="submit">Send</button></form>`
       : `<div class="wa-closed"><p>WhatsApp only lets us reply within 24 hours of their last message. To start a new chat, message ${esc(first)} from your own phone.</p><a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(phone)}">Open in WhatsApp</a></div>`}</div>`);
