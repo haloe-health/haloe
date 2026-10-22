@@ -423,6 +423,11 @@
   .tr-note { font-size: 14px; line-height: 1.4; font-weight: 500; color: var(--th-gold-text); }
   .tr .tick { position: static; flex: none; }
   .tr-empty { margin: var(--s5) var(--s1); font-size: 18px; color: var(--th-muted); }
+  .th-tabs.two { grid-template-columns: 1fr 1fr; }
+  .tr-day { margin: 0 0 var(--s4); }
+  .tr-day h2 { margin: 0 var(--s1) var(--s2); font-size: 16px; line-height: 1.4; font-weight: 600; color: var(--th-muted); }
+  .tr-day.now h2 { color: var(--th-gold-text); }
+  .tr-none { margin: 0 var(--s1); font-size: 16px; color: var(--th-muted); opacity: .7; }
   .th-tabs { display: grid; grid-template-columns: repeat(3, 1fr); height: 52px; padding: var(--s1); margin: 0 0 var(--s3); border-radius: 999px; background: var(--th-pill); }
   .th-tabs button { min-height: 44px; border: 0; border-radius: 999px; background: transparent; font: inherit; font-size: 15px; font-weight: 500; color: var(--th-muted); }
   .th-tabs button[aria-selected="true"] { background: var(--th-tile); color: var(--th-ink); font-weight: 600; box-shadow: var(--th-shadow); }
@@ -1687,10 +1692,24 @@ function todayRow(b) {
     <button class="tick" data-tick="${b.id}" aria-pressed="${done}" aria-label="Mark ${esc(b.customer_name)} done">${ICON.check}</button>
   </div>`;
 }
+function todays_(t) {
+  const list = liveOn(t);
+  return list.length ? `<div class="tr-list">${list.map(todayRow).join('')}</div>` : '<p class="tr-empty">No bookings today.</p>';
+}
 function viewToday() {
-  const t = todayISO(), todays = liveOn(t);
-  shell(`<div class="tile-home today"><div class="th-titlerow"><h1>Today</h1><span>${esc(fmtDateLong(t))}</span></div>` +
-    (todays.length ? `<div class="tr-list">${todays.map(todayRow).join('')}</div>` : '<p class="tr-empty">No bookings today.</p>') + '</div>');
+  const t = todayISO(), week = S.todayTab === 'week';
+  const tabs = [['day', 'Today'], ['week', 'This week']].map(([k, l]) => `<button type="button" role="tab" data-ttab="${k}" aria-selected="${(k === 'week') === week}">${l}</button>`).join('');
+  let body;
+  if (week) {
+    const mon = mondayOf(t);
+    body = Array.from({ length: 7 }, (_, i) => addDays(mon, i)).map((d) => {
+      const bs = liveOn(d);
+      return `<div class="tr-day${d === t ? ' now' : ''}"><h2>${esc(fmtDateLong(d))}${d === t ? ' · Today' : ''}</h2>` +
+        (bs.length ? `<div class="tr-list">${bs.map(todayRow).join('')}</div>` : '<p class="tr-none">No bookings</p>') + '</div>';
+    }).join('');
+  } else body = todays_(t);
+  shell(`<div class="tile-home today"><div class="th-titlerow"><h1>${week ? 'This week' : 'Today'}</h1><span>${week ? '' : esc(fmtDateLong(t))}</span></div><div class="th-tabs two" role="tablist" aria-label="View">${tabs}</div>${body}</div>`);
+  document.querySelectorAll('[data-ttab]').forEach((b) => { b.onclick = () => { S.todayTab = b.dataset.ttab; render(); }; });
   document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief + '?b=' + b.dataset.bid; }; });
   document.querySelectorAll('[data-tick]').forEach((b) => {
     b.onclick = async () => {
