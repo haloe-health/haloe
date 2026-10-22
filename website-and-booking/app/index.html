@@ -707,6 +707,82 @@
   .st-half .big { font-size: 24px; }
   .st { height: auto; min-height: 72px; }
   a.listrow, .listrow { min-height: 56px; border-radius: 14px; border: 1px solid var(--edge); box-shadow: none; }
+  /* ===== iOS refresh (Oct 2026): Today / This week, header, nav. Tokens are defined once here; nothing below hard-codes a colour. ===== */
+  :root { --ios-bg: #F7F3EC; --ios-card: #FFFFFF; --ios-text: #1C1A17; --ios-text2: #8A8378; --ios-hair: rgba(28, 26, 23, .08);
+          --ios-gold: #B89B5E; --ios-gold-tint: rgba(184, 155, 94, .12); --ios-success: #8FB39A; --ios-radius: 20px;
+          --ios-shadow: 0 1px 3px rgba(0, 0, 0, .04); --ios-blur-bg: rgba(247, 243, 236, .7); --ios-thumb-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 3px 8px rgba(0, 0, 0, .06); }
+  :root[data-theme="dark"] { --ios-bg: #14120F; --ios-card: #1E1B17; --ios-text: #F5F1EA; --ios-text2: #9A9387; --ios-hair: rgba(245, 241, 234, .10); --ios-blur-bg: rgba(20, 18, 15, .7); --ios-thumb-shadow: 0 1px 3px rgba(0, 0, 0, .5); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ios-bg: #14120F; --ios-card: #1E1B17; --ios-text: #F5F1EA; --ios-text2: #9A9387; --ios-hair: rgba(245, 241, 234, .10); --ios-blur-bg: rgba(20, 18, 15, .7); --ios-thumb-shadow: 0 1px 3px rgba(0, 0, 0, .5); } }
+  body.ios-today { background: var(--ios-bg); }
+  /* 1 · header */
+  body.ios-today .app-head { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: calc(6px + env(safe-area-inset-top)) 16px 6px; background: transparent; border-bottom: 1px solid transparent; transition: background-color 200ms ease, border-color 200ms ease; }
+  body.ios-today.scrolled .app-head { background: var(--ios-blur-bg); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border-bottom-color: var(--ios-hair); }
+  .app-head .brand img { width: 18px; height: 18px; }
+  .app-head .brand span { font-size: 17px; }
+  .app-head .brand { gap: 6px; justify-self: start; min-height: 44px; }
+  .head-title { justify-self: center; font-size: 17px; font-weight: 600; color: var(--ios-text); opacity: 0; transition: opacity 200ms ease; pointer-events: none; }
+  body.scrolled .head-title { opacity: 1; }
+  body.ios-today .head-actions { justify-self: end; }
+  .head-actions .icon-btn { position: relative; width: 38px; height: 38px; }
+  .head-actions .icon-btn::after { content: ''; position: absolute; inset: -3px; }            /* 44px hit area */
+  .head-actions .icon-btn svg { width: 19px; height: 19px; stroke-width: 1.5; }
+  body.ios-today .head-actions .icon-btn { background: var(--ios-card); color: var(--ios-text); box-shadow: var(--ios-shadow); }
+  .ios-title { margin: var(--s2) 0 var(--s4); }
+  .ios-title h1 { margin: 0; font-family: var(--font); font-size: 34px; line-height: 1.15; font-weight: 600; letter-spacing: -0.01em; color: var(--ios-text); }
+  .ios-title p { margin: 2px 0 0; font-size: 15px; line-height: 1.4; font-weight: 400; color: var(--ios-text2); }
+  /* 2 · segmented control: slim sliding thumb */
+  .th-tabs.two { position: relative; height: 36px; padding: 2px; margin: 0 0 var(--s5); border-radius: 999px; background: var(--ios-hair); grid-template-columns: 1fr 1fr; }
+  .th-tabs.two .seg-thumb { position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc((100% - 4px) / 2); border-radius: 999px; background: var(--ios-card); box-shadow: var(--ios-thumb-shadow); transform: translateX(calc(var(--i, 0) * 100%)); transition: transform 250ms cubic-bezier(.2, .9, .3, 1); }
+  .th-tabs.two button { position: relative; z-index: 1; min-height: 32px; font-size: 15px; font-weight: 500; color: var(--ios-text2); background: transparent; box-shadow: none; transition: color 200ms ease; }
+  .th-tabs.two button::before { content: ''; position: absolute; inset: -6px 0; }              /* 44px hit area */
+  .th-tabs.two button[aria-selected="true"] { background: transparent; box-shadow: none; color: var(--ios-text); font-weight: 600; }
+  /* 3 · booking list: one white card per day, inset hairlines */
+  body.ios-today .tr-list { background: var(--ios-card); border: 0; border-radius: var(--ios-radius); box-shadow: var(--ios-shadow); overflow: hidden; }
+  body.ios-today .tr { position: relative; border-top: 0; gap: var(--s2); padding: 0 var(--s3) 0 var(--s4); transition: transform 120ms ease, background-color 120ms ease; }
+  body.ios-today .tr + .tr::before { content: ''; position: absolute; top: 0; left: var(--s4); right: 0; height: 1px; background: var(--ios-hair); }
+  body.ios-today .tr:active { transform: scale(.98); }
+  body.ios-today .tr-main { padding: 14px 0; gap: 2px; }
+  body.ios-today .tr-name { font-size: 17px; font-weight: 600; line-height: 1.3; color: var(--ios-text); }
+  body.ios-today .tr-line { font-size: 15px; font-weight: 400; line-height: 1.35; color: var(--ios-text2); }
+  body.ios-today .tr-day { margin: 0 0 var(--s5); }
+  body.ios-today .tr-day h2 { display: flex; align-items: center; gap: var(--s2); margin: 0 var(--s4) var(--s2); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ios-text2); }
+  body.ios-today .tr-day.now h2 { color: var(--ios-gold); }
+  .tr-today { padding: 2px 8px; border-radius: 999px; background: var(--ios-gold-tint); color: var(--ios-gold); font-size: 11px; font-weight: 600; letter-spacing: .04em; }
+  body.ios-today .tr-none, body.ios-today .tr-quiet { margin: 0 var(--s4) var(--s5); font-size: 15px; color: var(--ios-text2); }
+  body.ios-today .tr-none { margin-bottom: 0; }
+  body.ios-today .tr-empty { margin: var(--s5) var(--s4); font-size: 17px; color: var(--ios-text2); }
+  /* 4 · status cues */
+  .tr-pill { justify-self: start; display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; padding: 3px 9px; border-radius: 999px; background: var(--ios-gold-tint); color: var(--ios-text2); font-size: 12px; font-weight: 400; line-height: 1.3; }
+  .tr-pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--ios-gold); }
+  body.ios-today .tr .tick { width: 44px; height: 44px; border: 1.5px solid var(--ios-hair); border-color: color-mix(in srgb, var(--ios-text2) 45%, transparent); background: transparent; color: transparent; }
+  body.ios-today .tr .tick svg { width: 18px; height: 18px; }
+  body.ios-today .tr .tick[aria-pressed="true"] { background: var(--ios-success); border-color: var(--ios-success); color: #fff; }
+  body.ios-today .tr .tick.pop { animation: ios-pop 300ms cubic-bezier(.3, 1.5, .5, 1); }
+  @keyframes ios-pop { 0% { transform: scale(.9); } 60% { transform: scale(1.05); } 100% { transform: scale(1); } }
+  body.ios-today .tr.done { opacity: .55; }
+  /* 5 · bottom nav: floating pill kept (fewest changes), now labelled, translucent, and the page clears it */
+  :root { --nav-h: 104px; }
+  .navdock { gap: var(--s3); }
+  .navdock .tabbar { gap: 0; padding: 4px; background: color-mix(in srgb, var(--ios-card) 80%, transparent); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--ios-hair); box-shadow: 0 1px 3px rgba(0, 0, 0, .04), 0 8px 24px rgba(0, 0, 0, .08); }
+  .navdock .tabbar button { width: 58px; min-height: 52px; gap: 2px; color: var(--ios-text2); transition: transform 120ms ease, color 200ms ease, background-color 200ms ease; }
+  .navdock .tabbar button:active { transform: scale(.96); }
+  .navdock .tabbar button svg { width: 22px; height: 22px; stroke-width: 1.6; }
+  .navdock .tabbar button span { position: static; width: auto; height: auto; overflow: visible; clip: auto; font-size: 10.5px; font-weight: 500; line-height: 1.2; letter-spacing: .01em; }
+  .navdock .tabbar button[aria-current="page"] { background: var(--ios-gold-tint); color: var(--ios-gold); }
+  .navdock .tabbar button[aria-current="page"] svg { fill: currentColor; fill-opacity: .22; }
+  .navdock .tabbar button[aria-current="page"] span { font-weight: 600; }
+  .nbadge { top: 3px; right: 8px; font-size: 11px; min-width: 16px; height: 16px; line-height: 16px; }
+  .navdock .navplus { width: 48px; height: 48px; background: var(--ios-gold); color: #fff; font-size: 28px; font-weight: 300; box-shadow: 0 1px 3px rgba(0, 0, 0, .08), 0 8px 20px rgba(0, 0, 0, .12); }
+  /* 6 · motion */
+  .wrap.ios-fade { animation: ios-fade 200ms ease; }
+  @keyframes ios-fade { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .wrap.ios-fade, body.ios-today .tr .tick.pop { animation: none; }
+    .th-tabs.two .seg-thumb, body.ios-today .tr, .navdock .tabbar button, body.ios-today .app-head, .head-title { transition: none; }
+    body.ios-today .tr:active, .navdock .tabbar button:active { transform: none; }
+  }
+  @media (max-width: 380px) { .navdock { gap: var(--s2); } .navdock .tabbar button { width: 50px; } .navdock .navplus { width: 48px; } }
+  /* ===== iOS refresh END ===== */
 </style>
 </head>
 <body>
@@ -1196,8 +1272,8 @@ const ICON = {
 function headerHTML(withSettings) {
   return `<header class="app-head">
     <a class="brand" href="#/today" aria-label="haloe"><img src="/haloe-logo-flower.svg" alt=""><span>haloe</span></a>
+    <span class="head-title" id="headTitle" aria-hidden="true"></span>
     <div class="head-actions">
-      <button class="icon-btn" id="themeBtn" aria-label="Toggle light or dark">${themeIcon()}</button>
       ${withSettings ? `<button class="icon-btn${S.view === 'settings' ? ' on' : ''}" id="setBtn" aria-label="Settings"${S.view === 'settings' ? ' aria-current="page"' : ''}>${ICON.gear}</button>` : ''}
     </div></header>`;
 }
@@ -1207,7 +1283,7 @@ function clearSession() {
   S.session = null; S.admin = false; S.isClient = false; S.profile = null;
   S.data = null; S.raw = null; S.cdata = null; S.error = null; S.filter = '';
   S.loginStage = 'form'; S.loginPurpose = 'first'; S.loginEmail = '';   // back to a fresh sign-in screen
-  S.needPassword = false; S.forcePassword = false; S.passwordSkipped = null; S.todayTab = 'day'; S.noteDraft = null;
+  S.needPassword = false; S.forcePassword = false; S.passwordSkipped = null; S.todayTab = 'day'; S.segFrom = null; S.noteDraft = null;
   try { Object.keys(localStorage).filter((k) => /^sb-.+-auth-token/.test(k)).forEach((k) => localStorage.removeItem(k)); } catch (e) {}
   document.querySelectorAll('.sheet-bg, .toast').forEach((el) => el.remove());          // open sheets / toasts hold client names
   if (location.hash) history.replaceState(null, '', location.pathname + location.search); // so Back / reload can't land on a client page
@@ -1517,7 +1593,8 @@ function tabbarHTML() {
 }
 
 function shell(inner, withNav = true) {
-  $root.innerHTML = headerHTML(true) + `<main class="wrap">${inner}</main>` + (withNav ? tabbarHTML() : '');
+  const fadeKey = S.view + ':' + (S.view === 'today' ? S.todayTab : S.threadPhone || ''), fade = S.fadeKey !== fadeKey; S.fadeKey = fadeKey;   // fade only when the screen or tab changes, not on every tick
+  $root.innerHTML = headerHTML(true) + `<main class="wrap${fade ? ' ios-fade' : ''}">${inner}</main>` + (withNav ? tabbarHTML() : '');
   wireHeader();
   document.querySelectorAll('[data-go]').forEach((b) => { b.onclick = () => { location.hash = '#/' + b.dataset.go; }; });
 }
@@ -1734,9 +1811,9 @@ function todayRow(b) {
     <button class="tr-main" type="button" data-brief="${key}" data-bid="${b.id}">
       <span class="tr-name">${esc(b.customer_name)}</span>
       <span class="tr-line">${esc(fmtTime(b.start_min))} · ${esc(treatmentLabel(b))}${dmin ? ' · ' + esc(durLabel(dmin)) : ''}</span>
-      ${isPending(b) ? '<span class="tr-note">Waiting for them to accept a new time</span>' : note ? '<span class="tr-note">' + esc(note) + '</span>' : ''}
+      ${isPending(b) ? '<span class="tr-pill"><i></i>New time sent</span>' : note ? '<span class="tr-pill"><i></i>' + esc(note) + '</span>' : ''}
     </button>
-    <button class="tick" data-tick="${b.id}" aria-pressed="${done}" aria-label="Mark ${esc(b.customer_name)} done">${ICON.check}</button>
+    <button class="tick${S.popId === b.id ? ' pop' : ''}" data-tick="${b.id}" aria-pressed="${done}" aria-label="Mark ${esc(b.customer_name)} done">${ICON.check}</button>
   </div>`;
 }
 function todays_(t) {
@@ -1745,24 +1822,35 @@ function todays_(t) {
 }
 function viewToday() {
   const t = todayISO(), week = S.todayTab === 'week';
+  const segFrom = S.segFrom == null ? (week ? 1 : 0) : S.segFrom; S.segFrom = week ? 1 : 0;       // the thumb starts where it was and slides across
   const tabs = [['day', 'Today'], ['week', 'This week']].map(([k, l]) => `<button type="button" role="tab" data-ttab="${k}" aria-selected="${(k === 'week') === week}">${l}</button>`).join('');
   let body;
   if (week) {
-    const mon = mondayOf(t);
-    body = Array.from({ length: 7 }, (_, i) => addDays(mon, i)).map((d) => {
+    const mon = mondayOf(t), days = Array.from({ length: 7 }, (_, i) => addDays(mon, i)), short = (d) => fmtDate(d).replace(/ \w{3}$/, '').replace(',', '');
+    const parts = []; let quiet = [];
+    const flush = () => { if (quiet.length) { parts.push(`<p class="tr-quiet">${esc(quiet.length > 1 ? short(quiet[0]) + ' – ' + short(quiet[quiet.length - 1]) : short(quiet[0]))} · No bookings</p>`); quiet = []; } };
+    days.forEach((d) => {
       const bs = liveOn(d);
-      return `<div class="tr-day${d === t ? ' now' : ''}"><h2>${esc(fmtDateLong(d))}${d === t ? ' · Today' : ''}</h2>` +
-        (bs.length ? `<div class="tr-list">${bs.map(todayRow).join('')}</div>` : '<p class="tr-none">No bookings</p>') + '</div>';
-    }).join('');
+      if (!bs.length && d !== t) { quiet.push(d); return; }
+      flush();
+      parts.push(`<section class="tr-day${d === t ? ' now' : ''}"><h2>${esc(fmtDateLong(d))}${d === t ? '<span class="tr-today">Today</span>' : ''}</h2>` +
+        (bs.length ? `<div class="tr-list">${bs.map(todayRow).join('')}</div>` : '<p class="tr-none">No bookings</p>') + '</section>');
+    });
+    flush();
+    body = parts.join('');
   } else body = todays_(t);
-  shell(`<div class="tile-home today"><div class="th-titlerow"><h1>${week ? 'This week' : 'Today'}</h1><span>${week ? '' : esc(fmtDateLong(t))}</span></div><div class="th-tabs two" role="tablist" aria-label="View">${tabs}</div>${body}</div>`);
+  const title = week ? 'This week' : 'Today', sub = week ? esc(fmtDateLong(mondayOf(t))) + ' – ' + esc(fmtDateLong(addDays(mondayOf(t), 6))) : esc(fmtDateLong(t));
+  shell(`<div class="tile-home today"><div class="ios-title"><h1>${title}</h1><p>${sub}</p></div><div class="th-tabs two" role="tablist" aria-label="View" style="--i:${segFrom}"><span class="seg-thumb" aria-hidden="true"></span>${tabs}</div>${body}</div>`);
+  requestAnimationFrame(() => requestAnimationFrame(() => { const tb = document.querySelector('.th-tabs.two'); if (tb) tb.style.setProperty('--i', week ? 1 : 0); }));
+  const ht = document.getElementById('headTitle'); if (ht) ht.textContent = title;
+  S.popId = null;                                                                // the tick spring plays once, on the row just ticked
   document.querySelectorAll('[data-ttab]').forEach((b) => { b.onclick = () => { S.todayTab = b.dataset.ttab; render(); }; });
   document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief + '?b=' + b.dataset.bid; }; });
   document.querySelectorAll('[data-tick]').forEach((b) => {
     b.onclick = async () => {
       const id = Number(b.dataset.tick); const bk = S.data.bookings.find((x) => x.id === id);
       const nowDone = !bk.done_at;
-      try { await api.markDone(id, nowDone); bk.done_at = nowDone ? new Date().toISOString() : null; render(); }
+      try { await api.markDone(id, nowDone); bk.done_at = nowDone ? new Date().toISOString() : null; if (nowDone) { S.popId = id; try { navigator.vibrate && navigator.vibrate(10); } catch (e) {} } render(); }
       catch (e) { toastMsg(friendly(e, 'save')); }
     };
   });
@@ -2799,8 +2887,9 @@ function route() {
   S.threadPhone = S.view === 'inbox' && parts[1] ? parts[1] : null;
   if (S.view !== 'brief') S.briefRetried = null;
 }
+window.addEventListener('scroll', () => document.body.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
 function render() {
-  if (!S.session) { document.body.classList.remove('tilebg'); return viewLogin(); }
+  if (!S.session) { document.body.classList.remove('tilebg', 'ios-today', 'scrolled'); return viewLogin(); }
   if (S.needPassword) return viewCreatePassword();
   clearInterval(S.loginTimer);
   document.body.classList.remove('tilebg');
@@ -2809,6 +2898,7 @@ function render() {
     route();
     if (!S.voiceTried) { S.voiceTried = true; initVoice(); }
     clearInterval(S.inboxTimer);
+    document.body.classList.toggle('ios-today', S.view === 'today');
     document.body.classList.toggle('tilebg', ['today', 'inbox', 'clients', 'codes', 'stats', 'settings'].includes(S.view));
     if (S.view !== 'codes') { S.codeReady = null; S.quickSel = null; }
     window.scrollTo(0, 0);
