@@ -6,8 +6,8 @@
    so rem would shrink the content. */
 @font-face {
   font-family: 'Tan Ashford';
-  src: url('fonts/TAN-ASHFORD.woff2') format('woff2'),
-       url('fonts/TAN-ASHFORD.woff') format('woff');
+  src: url('/fonts/TAN-ASHFORD.woff2') format('woff2'),
+       url('/fonts/TAN-ASHFORD.woff') format('woff');
   font-weight: normal; font-style: normal; font-display: swap;
 }
 
