@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>haloe</title>
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://thxunrygrrxcdjhgshjw.supabase.co; connect-src 'self' https://thxunrygrrxcdjhgshjw.supabase.co; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://thxunrygrrxcdjhgshjw.supabase.co; connect-src 'self' https://thxunrygrrxcdjhgshjw.supabase.co https://*.twilio.com wss://*.twilio.com; media-src 'self' https://*.twilio.com blob: data:; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="theme-color" content="#F5F0E8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#16140F" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="/app/manifest.webmanifest">
@@ -520,6 +520,15 @@
   .compose .btn { min-height: 44px; }
   .wa-closed { padding: var(--s4); border-radius: 16px; background: var(--th-tile); border: 1px solid var(--edge); }
   .wa-closed p { margin: 0 0 var(--s3); font-size: 16px; line-height: 1.5; color: var(--th-muted); }
+  /* ---- Call sheet ---- */
+  .call-sheet { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: var(--s5); background: var(--th-page, var(--page-bg)); background-attachment: fixed; }
+  .cs-in { width: 100%; max-width: 360px; display: grid; justify-items: center; gap: var(--s3); text-align: center; }
+  .av.big { width: 96px; height: 96px; font-size: 40px; }
+  .cs-name { font-size: 24px; font-weight: 600; line-height: 1.3; color: var(--ink); }
+  .cs-status { font-size: 18px; color: var(--muted); min-height: 28px; }
+  .cs-btns { display: flex; gap: var(--s3); margin-top: var(--s4); width: 100%; }
+  .cs-btns .btn { flex: 1; min-height: 52px; font-size: 18px; }
+  .btn.danger { background: #B3392F; color: #fff; border-color: #B3392F; }
   /* compact dock (half size): icons only, labels kept for screen readers */
   .navdock { width: auto; gap: var(--s2); }
   .navdock .tabbar { flex: none; gap: 2px; padding: 4px; grid-auto-flow: column; grid-template-columns: none; }
@@ -1194,6 +1203,7 @@ function headerHTML(withSettings) {
 }
 /** Wipe every trace of the signed-in session from this page and this device. Never waits on the network. */
 function clearSession() {
+  voiceStop();
   S.session = null; S.admin = false; S.isClient = false; S.profile = null;
   S.data = null; S.raw = null; S.cdata = null; S.error = null; S.filter = '';
   S.loginStage = 'form'; S.loginPurpose = 'first'; S.loginEmail = '';   // back to a fresh sign-in screen
@@ -1758,6 +1768,112 @@ function viewToday() {
   });
 }
 
+/* ---- In-app calling (Twilio Voice, in the browser). Calls go out from the haloe number and are never recorded.
+ * Falls back to the phone dialler (tel:) whenever calling isn't set up or can't start. Admin only. ---- */
+const VOICE_SDK = 'https://cdn.jsdelivr.net/npm/@twilio/voice-sdk@2.11.2/dist/twilio.min.js';
+let voiceDevice = null, voiceReady = null, voiceCall = null, voiceTick = null;
+function loadVoiceSdk() {
+  if (window.Twilio && window.Twilio.Device) return Promise.resolve();
+  return new Promise((ok, no) => { const el = document.createElement('script'); el.src = VOICE_SDK; el.onload = ok; el.onerror = () => no(new Error('sdk')); document.head.appendChild(el); });
+}
+async function voiceToken() {
+  const res = await timedFetch('/voice-token', { method: 'POST', headers: { Authorization: 'Bearer ' + (S.session && S.session.access_token) } });
+  if (!res.ok) throw new Error('token ' + res.status);
+  return (await res.json()).token;
+}
+/** Registers this device so calls to the haloe number ring here while the app is open. Resolves false if calling isn't set up. */
+function initVoice() {
+  if (voiceReady) return voiceReady;
+  voiceReady = (async () => {
+    try {
+      const token = await voiceToken();
+      await loadVoiceSdk();
+      voiceDevice = new Twilio.Device(token, { codecPreferences: ['opus', 'pcmu'], closeProtection: true });
+      voiceDevice.on('tokenWillExpire', async () => { try { voiceDevice.updateToken(await voiceToken()); } catch (e) {} });
+      voiceDevice.on('incoming', showIncoming);
+      voiceDevice.on('error', () => {});
+      await voiceDevice.register();
+      return true;
+    } catch (e) { voiceDevice = null; return false; }
+  })();
+  return voiceReady;
+}
+function voiceStop() {
+  try { if (voiceCall) voiceCall.disconnect(); if (voiceDevice) voiceDevice.destroy(); } catch (e) {}
+  voiceDevice = null; voiceReady = null; voiceCall = null; clearInterval(voiceTick);
+  document.querySelectorAll('.call-sheet').forEach((el) => el.remove());
+}
+function callSheet(name, status, buttons) {
+  let el = document.querySelector('.call-sheet');
+  if (!el) { el = document.createElement('div'); el.className = 'call-sheet'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); document.body.appendChild(el); }
+  el.innerHTML = `<div class="cs-in"><div class="av big">${esc(initialOf(name.replace(/^\+/, '')))}</div><div class="cs-name">${esc(name)}</div><div class="cs-status" id="cs-status" aria-live="polite">${esc(status)}</div><div class="cs-btns">${buttons}</div></div>`;
+  return el;
+}
+function endCallSheet(msg) {
+  clearInterval(voiceTick); voiceCall = null;
+  const el = document.querySelector('.call-sheet'); if (!el) return;
+  const st = el.querySelector('#cs-status'); if (st) st.textContent = msg || 'Call ended';
+  const b = el.querySelector('.cs-btns'); if (b) b.innerHTML = '<button class="btn" type="button" data-cs-close>Close</button>';
+  const c = el.querySelector('[data-cs-close]'); if (c) c.onclick = () => el.remove();
+  setTimeout(() => { if (el.isConnected && (!st || /ended|declined|missed/i.test(st.textContent))) el.remove(); }, 2500);
+}
+function wireCall(call, name) {
+  voiceCall = call;
+  const el = document.querySelector('.call-sheet'), st = () => document.getElementById('cs-status');
+  call.on('ringing', () => { if (st()) st().textContent = 'Ringing…'; });
+  call.on('accept', () => {
+    const t0 = Date.now(); clearInterval(voiceTick);
+    const show = () => { const sec = Math.floor((Date.now() - t0) / 1000); if (st()) st().textContent = 'Connected · ' + String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0'); };
+    show(); voiceTick = setInterval(show, 1000);
+    callSheet(name, 'Connected · 00:00', '<button class="btn ghost" type="button" id="cs-mute" aria-pressed="false">Mute</button><button class="btn danger" type="button" id="cs-end">End call</button>');
+    show(); voiceTick = setInterval(show, 1000);
+    document.getElementById('cs-end').onclick = () => call.disconnect();
+    document.getElementById('cs-mute').onclick = (e) => { const m = !call.isMuted(); call.mute(m); e.currentTarget.setAttribute('aria-pressed', String(m)); e.currentTarget.textContent = m ? 'Unmute' : 'Mute'; };
+  });
+  call.on('disconnect', () => endCallSheet('Call ended'));
+  call.on('cancel', () => endCallSheet('Missed call'));
+  call.on('reject', () => endCallSheet('Call declined'));
+  call.on('error', () => endCallSheet('The call couldn’t connect'));
+}
+/** Place a call from the app. If in-app calling isn't available, open the phone dialler instead. */
+async function startCall(phone, name) {
+  const tel = 'tel:' + String(phone).replace(/[^\d+]/g, '');
+  if (voiceCall) return;
+  if (navigator.onLine === false) { toastMsg('You appear to be offline. Please check your connection and try again.'); return; }
+  const e164 = '+' + waNumber(phone);
+  callSheet(name || e164, 'Connecting…', '<button class="btn danger" type="button" id="cs-end">Cancel</button>');
+  document.getElementById('cs-end').onclick = () => { if (voiceCall) voiceCall.disconnect(); else endCallSheet('Call ended'); };
+  const ready = await initVoice();
+  if (!ready) { document.querySelectorAll('.call-sheet').forEach((el) => el.remove()); location.href = tel; return; }
+  try {
+    try { const m = await navigator.mediaDevices.getUserMedia({ audio: true }); m.getTracks().forEach((t) => t.stop()); }
+    catch (e) { endCallSheet('Allow the microphone to call from the app'); return; }
+    const call = await voiceDevice.connect({ params: { To: e164 } });
+    wireCall(call, name || e164);
+    callSheet(name || e164, 'Calling…', '<button class="btn danger" type="button" id="cs-end">Cancel</button>');
+    document.getElementById('cs-end').onclick = () => call.disconnect();
+  } catch (err) { endCallSheet('The call couldn’t connect'); }
+}
+function showIncoming(call) {
+  const from = (call.parameters && call.parameters.From) || '';
+  const digitsFrom = String(from).replace(/\D/g, ''), c = S.data && S.data.clients.find((x) => waLast10(x.phone) === digitsFrom.slice(-10));
+  const name = c ? c.full_name : (digitsFrom ? '+' + digitsFrom : 'Unknown number');
+  if (voiceCall) { call.reject(); return; }
+  callSheet(name, 'Incoming call', '<button class="btn danger" type="button" id="cs-no">Decline</button><button class="btn" type="button" id="cs-yes">Answer</button>');
+  voiceCall = call;
+  document.getElementById('cs-no').onclick = () => { call.reject(); endCallSheet('Call declined'); };
+  document.getElementById('cs-yes').onclick = async () => {
+    try { const m = await navigator.mediaDevices.getUserMedia({ audio: true }); m.getTracks().forEach((t) => t.stop()); } catch (e) { call.reject(); endCallSheet('Allow the microphone to answer'); return; }
+    wireCall(call, name); call.accept();
+  };
+  call.on('cancel', () => endCallSheet('Missed call'));
+}
+document.addEventListener('click', (e) => {
+  const a = e.target.closest && e.target.closest('[data-call]');
+  if (!a || !S.admin) return;                 // clients and signed-out pages keep the normal tel: link
+  e.preventDefault(); startCall(a.dataset.call, a.dataset.callname);
+});
+
 /* ---- Inbox: WhatsApp through the haloe business number (Twilio). Admin only; stored in whatsapp_messages. ---- */
 const waLast10 = (p) => String(p || '').replace(/\D/g, '').slice(-10);
 const msgsOf = () => (S.data && S.data.messages) || [];
@@ -1804,7 +1920,7 @@ function viewThread(phone) {
   const open = !!lastIn && Date.now() - new Date(lastIn.created_at).getTime() < 24 * 3600 * 1000;
   const name = waName(phone), first = name.replace(/^\+/, '').split(' ')[0];
   const bubbles = ms.map((m) => `<div class="bub ${m.direction}"><div class="bt">${esc(m.body)}</div><div class="bm">${esc(lonTime(m.created_at, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }))}${m.direction === 'out' && m.status === 'failed' ? ' · not delivered' : ''}</div></div>`).join('');
-  shell(`<div class="tile-home inbox thread"><div class="th-titlerow"><h1>${esc(name)}</h1><a class="btn" href="tel:+${esc(phone)}">Call</a></div>
+  shell(`<div class="tile-home inbox thread"><div class="th-titlerow"><h1>${esc(name)}</h1><a class="btn" href="tel:+${esc(phone)}" data-call="+${esc(phone)}" data-callname="${esc(name)}">Call</a></div>
     <p class="muted" style="margin:-8px 4px 12px"><a href="#/inbox">All messages</a></p>
     <div class="bubs" id="bubs">${bubbles}</div>
     ${open ? `<form class="compose" id="wa-form"><textarea id="wa-text" rows="1" placeholder="Message ${esc(first)}" aria-label="Message"></textarea><button class="btn" id="wa-send" type="submit">Send</button></form>`
@@ -2229,7 +2345,7 @@ function viewBrief(key, bid) {
         <div class="fact"><div class="k">Signature</div><div class="v">${intake && intake.signature_path ? 'On file' : intake ? 'Not on file' : '—'}</div></div>
       </div>
       ${intake && intake.signature_path ? `<div class="sig"><img class="thumb" id="sigImg" alt="Signature" hidden><span class="small muted" id="sigNote">Loading signature…</span></div>` : ''}
-      <div class="contact" style="flex-wrap:wrap">${p.phone ? `<a class="btn" href="tel:${esc(p.phone.replace(/[^\d+]/g, ''))}">Call</a><a class="btn ghost" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}${c ? '<button class="btn ghost" id="ciBtn" type="button">Check-in</button>' : ''}</div>
+      <div class="contact" style="flex-wrap:wrap">${p.phone ? `<a class="btn" href="tel:${esc(p.phone.replace(/[^\d+]/g, ''))}" data-call="${esc(p.phone)}" data-callname="${esc(p.name || '')}">Call</a><a class="btn ghost" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}${c ? '<button class="btn ghost" id="ciBtn" type="button">Check-in</button>' : ''}</div>
     </div>
     ${act}
     <div class="card"><div class="section-label">Conditions, medication, allergies</div><div class="kv rows" style="margin-top:12px">
@@ -2691,6 +2807,7 @@ function render() {
   if (S.admin) {
     if (!S.data) { shell(S.error ? loadErrorHTML() : loadingHTML(), false); return; }
     route();
+    if (!S.voiceTried) { S.voiceTried = true; initVoice(); }
     clearInterval(S.inboxTimer);
     document.body.classList.toggle('tilebg', ['today', 'inbox', 'clients', 'codes', 'stats', 'settings'].includes(S.view));
     if (S.view !== 'codes') { S.codeReady = null; S.quickSel = null; }
