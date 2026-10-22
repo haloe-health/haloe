@@ -708,11 +708,11 @@
   .st { height: auto; min-height: 72px; }
   a.listrow, .listrow { min-height: 56px; border-radius: 14px; border: 1px solid var(--edge); box-shadow: none; }
   /* ===== iOS refresh (Oct 2026): Today / This week, header, nav. Tokens are defined once here; nothing below hard-codes a colour. ===== */
-  :root { --ios-bg: #F7F3EC; --ios-card: #FFFFFF; --ios-text: #1C1A17; --ios-text2: #8A8378; --ios-hair: rgba(28, 26, 23, .08);
+  :root { --ios-bg: #F7F3EC; --ios-card: #FFFFFF; --ios-text: #1C1A17; --ios-text2: #5E574D; --ios-hair: rgba(28, 26, 23, .08);
           --ios-gold: #B89B5E; --ios-gold-tint: rgba(184, 155, 94, .12); --ios-success: #8FB39A; --ios-radius: 20px;
           --ios-shadow: 0 1px 3px rgba(0, 0, 0, .04); --ios-blur-bg: rgba(247, 243, 236, .7); --ios-thumb-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 3px 8px rgba(0, 0, 0, .06); }
-  :root[data-theme="dark"] { --ios-bg: #14120F; --ios-card: #1E1B17; --ios-text: #F5F1EA; --ios-text2: #9A9387; --ios-hair: rgba(245, 241, 234, .10); --ios-blur-bg: rgba(20, 18, 15, .7); --ios-thumb-shadow: 0 1px 3px rgba(0, 0, 0, .5); }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ios-bg: #14120F; --ios-card: #1E1B17; --ios-text: #F5F1EA; --ios-text2: #9A9387; --ios-hair: rgba(245, 241, 234, .10); --ios-blur-bg: rgba(20, 18, 15, .7); --ios-thumb-shadow: 0 1px 3px rgba(0, 0, 0, .5); } }
+  :root[data-theme="dark"] { --ios-bg: #14120F; --ios-card: #1E1B17; --ios-text: #F5F1EA; --ios-text2: #B8B1A5; --ios-hair: rgba(245, 241, 234, .10); --ios-blur-bg: rgba(20, 18, 15, .7); --ios-thumb-shadow: 0 1px 3px rgba(0, 0, 0, .5); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ios-bg: #14120F; --ios-card: #1E1B17; --ios-text: #F5F1EA; --ios-text2: #B8B1A5; --ios-hair: rgba(245, 241, 234, .10); --ios-blur-bg: rgba(20, 18, 15, .7); --ios-thumb-shadow: 0 1px 3px rgba(0, 0, 0, .5); } }
   body.ios-today { background: var(--ios-bg); }
   /* 1 · header */
   body.ios-today .app-head { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: calc(6px + env(safe-area-inset-top)) 16px 6px; background: transparent; border-bottom: 1px solid transparent; transition: background-color 200ms ease, border-color 200ms ease; }
