@@ -412,6 +412,17 @@
   body.tilebg { background: var(--th-page); background-attachment: fixed; }
   body.tilebg .app-head { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
   body.tilebg .icon-btn { background: var(--th-glass); }
+  /* ---- Today: plain list, sized like Gmail (16px names and lines, 14px notes, 72px+ rows, hairlines) ---- */
+  .tr-list { background: var(--th-tile); border-radius: 16px; border: 1px solid var(--edge); overflow: hidden; }
+  .tr { display: flex; align-items: center; gap: var(--s2); padding: 0 var(--s2) 0 var(--s4); border-top: 1px solid var(--edge); }
+  .tr:first-child { border-top: 0; }
+  .tr.done { opacity: .5; }
+  .tr-main { flex: 1; min-width: 0; display: grid; gap: 2px; padding: var(--s3) 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+  .tr-name { font-size: 18px; line-height: 1.35; font-weight: 600; color: var(--th-ink); }
+  .tr-line { font-size: 16px; line-height: 1.4; color: var(--th-muted); }
+  .tr-note { font-size: 14px; line-height: 1.4; font-weight: 500; color: var(--th-gold-text); }
+  .tr .tick { position: static; flex: none; }
+  .tr-empty { margin: var(--s5) var(--s1); font-size: 18px; color: var(--th-muted); }
   .th-tabs { display: grid; grid-template-columns: repeat(3, 1fr); height: 52px; padding: var(--s1); margin: 0 0 var(--s3); border-radius: 999px; background: var(--th-pill); }
   .th-tabs button { min-height: 44px; border: 0; border-radius: 999px; background: transparent; font: inherit; font-size: 15px; font-weight: 500; color: var(--th-muted); }
   .th-tabs button[aria-selected="true"] { background: var(--th-tile); color: var(--th-ink); font-weight: 600; box-shadow: var(--th-shadow); }
@@ -1661,30 +1672,26 @@ function monthView(t) {
   }
   return `<section class="tile"><h2 class="th-title">${esc(label)}</h2><div class="mgrid mh">${'MTWTFSS'.split('').map((l) => `<span>${l}</span>`).join('')}</div><div class="mgrid">${cells}</div></section>` + pairTiles();
 }
+/** Today = today's bookings only, one plain row each (name, time, treatment). Everything else lives in the brief. */
+function todayRow(b) {
+  const intake = b.client_id ? intakeOf(b.client_id) : null;
+  const dmin = bookingDurationMin(b), done = !!b.done_at;
+  const key = b.client_id ? 'c/' + b.client_id : 'b/' + b.id;
+  const note = !intake ? 'Intake not completed' : trimStr(intake.current_medications) ? 'Medication listed' : '';
+  return `<div class="tr${done ? ' done' : ''}">
+    <button class="tr-main" type="button" data-brief="${key}" data-bid="${b.id}">
+      <span class="tr-name">${esc(b.customer_name)}</span>
+      <span class="tr-line">${esc(fmtTime(b.start_min))} · ${esc(treatmentLabel(b))}${dmin ? ' · ' + esc(durLabel(dmin)) : ''}</span>
+      ${isPending(b) ? '<span class="tr-note">Waiting for them to accept a new time</span>' : note ? '<span class="tr-note">' + esc(note) + '</span>' : ''}
+    </button>
+    <button class="tick" data-tick="${b.id}" aria-pressed="${done}" aria-label="Mark ${esc(b.customer_name)} done">${ICON.check}</button>
+  </div>`;
+}
 function viewToday() {
-  const t = todayISO(), tab = S.todayTab || 'day';
-  const tabs = [['day', 'Day'], ['week', 'Week'], ['month', 'Month']].map(([k, l]) => `<button type="button" role="tab" data-ttab="${k}" aria-selected="${tab === k}">${l}</button>`).join('');
-  shell(`<div class="tile-home today"><div class="th-tabs" role="tablist" aria-label="View">${tabs}</div>${tab === 'week' ? weekView(t) : tab === 'month' ? monthView(t) : dayView(t)}</div>`);
-  document.querySelectorAll('[data-ttab]').forEach((b) => { b.onclick = () => { S.todayTab = b.dataset.ttab; render(); }; });
-  const fillTile = document.getElementById('fillTile'); if (fillTile) fillTile.onclick = () => openFillSheet(nextClinicDate());
-  document.querySelectorAll('[data-task]').forEach((b) => {
-    b.onclick = async () => {
-      const key = b.dataset.task, on = b.getAttribute('aria-pressed') !== 'true';
-      const list = S.data.tasks || (S.data.tasks = []), had = list.some((x) => x.task_key === key);
-      if (on && !had) list.push({ task_key: key }); if (!on) S.data.tasks = list.filter((x) => x.task_key !== key);
-      if (S.raw && S.raw !== S.data) S.raw.tasks = S.data.tasks;
-      b.setAttribute('aria-pressed', String(on));
-      const all = [...document.querySelectorAll('[data-task]')]; document.getElementById('tasksCount').textContent = all.filter((x) => x.getAttribute('aria-pressed') === 'true').length + ' of ' + all.length + ' done';
-      try { await api.setTask(key, on); }
-      catch (e) { toastMsg(friendly(e, 'save')); const l2 = S.data.tasks || []; S.data.tasks = on ? l2.filter((x) => x.task_key !== key) : l2.concat([{ task_key: key }]); if (S.raw && S.raw !== S.data) S.raw.tasks = S.data.tasks; render(); }
-    };
-  });
-  fitMeds();
-  document.querySelectorAll('[data-why]').forEach((w) => {       // tap her concern to expand / collapse it (does not open the brief)
-    w.onclick = (e) => { e.stopPropagation(); const open = w.getAttribute('aria-expanded') !== 'true'; w.setAttribute('aria-expanded', String(open)); w.querySelector('.wtxt').textContent = '“' + (open ? w.dataset.full : w.dataset.first) + '”'; };
-  });
+  const t = todayISO(), todays = liveOn(t);
+  shell(`<div class="tile-home today"><div class="th-titlerow"><h1>Today</h1><span>${esc(fmtDateLong(t))}</span></div>` +
+    (todays.length ? `<div class="tr-list">${todays.map(todayRow).join('')}</div>` : '<p class="tr-empty">No bookings today.</p>') + '</div>');
   document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief + '?b=' + b.dataset.bid; }; });
-  document.querySelectorAll('[data-cancel]').forEach((b) => { b.onclick = () => openCancelBooking(Number(b.dataset.cancel)); });
   document.querySelectorAll('[data-tick]').forEach((b) => {
     b.onclick = async () => {
       const id = Number(b.dataset.tick); const bk = S.data.bookings.find((x) => x.id === id);
