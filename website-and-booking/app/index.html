@@ -492,6 +492,13 @@
   .navdock .tabbar { position: static; transform: none; flex: 1; min-width: 0; width: auto; background: var(--th-nav); }
   .navdock .tabbar button[aria-current="page"] { background: var(--th-sand); color: var(--th-gold-text); }
   .navplus { flex: none; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--th-gold); color: #1C1812; font-size: 30px; line-height: 1; font-weight: 300; text-decoration: none; box-shadow: 0 8px 30px rgba(40, 30, 10, .18), 0 1px 2px rgba(40, 30, 10, .1); }
+  /* compact dock (half size): icons only, labels kept for screen readers */
+  .navdock { width: auto; gap: var(--s2); }
+  .navdock .tabbar { flex: none; gap: 2px; padding: 4px; }
+  .navdock .tabbar button { min-height: 44px; width: 48px; padding: 0; }
+  .navdock .tabbar button svg { width: 22px; height: 22px; }
+  .navdock .tabbar button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .navdock .navplus { width: 44px; height: 44px; font-size: 26px; }
   /* ============ Clients: tile screen ============ */
   /* Clients (salon-app layout): title, search, two chips, a stack of cards */
   .cl-search { width: 100%; min-height: 44px; margin: 0 0 var(--s3); padding: 11px 13px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--th-muted) 28%, transparent); background: var(--card); color: var(--ink); font: inherit; font-size: 16px; }
