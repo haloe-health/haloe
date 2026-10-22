@@ -587,3 +587,26 @@ alter table public.unlinked_signins add column if not exists dismissed_at timest
 grant update (dismissed_at) on public.unlinked_signins to authenticated;
 drop policy if exists admin_dismiss_unlinked on public.unlinked_signins;
 create policy admin_dismiss_unlinked on public.unlinked_signins for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- WhatsApp inbox — migration "whatsapp_messages", 22 Oct 2026 ---------------------------------
+-- One row per WhatsApp message, both directions, through the Twilio business number. Admin-only: clients and anon
+-- can't read or write. Writes come only from the Functions (service role): /whatsapp-send (outbound) and
+-- /whatsapp-incoming (Twilio webhook). The admin may mark messages read (read_at) from the app.
+-- `phone` is the client's number as digits with country code, no '+' (e.g. 447474833643).
+create table if not exists public.whatsapp_messages (
+  id         bigint generated always as identity primary key,
+  phone      text not null,
+  client_id  bigint references public.clients(id) on delete set null,
+  direction  text not null check (direction in ('in', 'out')),
+  body       text not null,
+  twilio_sid text unique,
+  status     text,                       -- out: queued / sent / failed; in: received
+  read_at    timestamptz,                -- in: when the admin opened the thread
+  created_at timestamptz not null default now()
+);
+create index if not exists whatsapp_messages_phone_idx on public.whatsapp_messages (phone, created_at);
+alter table public.whatsapp_messages enable row level security;
+grant select, update on public.whatsapp_messages to authenticated;
+grant select, insert, update, delete on public.whatsapp_messages to service_role;
+create policy whatsapp_select on public.whatsapp_messages for select to authenticated using (public.is_admin());
+create policy whatsapp_mark_read on public.whatsapp_messages for update to authenticated using (public.is_admin()) with check (public.is_admin());

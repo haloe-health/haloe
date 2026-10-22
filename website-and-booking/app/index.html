@@ -493,9 +493,36 @@
   .navdock .tabbar { position: static; transform: none; flex: 1; min-width: 0; width: auto; background: var(--th-nav); }
   .navdock .tabbar button[aria-current="page"] { background: var(--th-sand); color: var(--th-gold-text); }
   .navplus { flex: none; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--th-gold); color: #1C1812; font-size: 30px; line-height: 1; font-weight: 300; text-decoration: none; box-shadow: 0 8px 30px rgba(40, 30, 10, .18), 0 1px 2px rgba(40, 30, 10, .1); }
+  /* ---- Inbox (WhatsApp): same sizing as Today — 18px names, 16px lines, 14px times ---- */
+  .tabbar button { position: relative; }
+  .nbadge { position: absolute; top: 2px; right: 4px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--th-gold); color: #1C1812; font-size: 14px; font-style: normal; font-weight: 600; line-height: 18px; text-align: center; }
+  .ib { display: flex; align-items: center; gap: var(--s3); width: 100%; padding: var(--s3) var(--s4); border: 0; border-top: 1px solid var(--edge); background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+  .tr-list > .ib:first-child { border-top: 0; }
+  .ib .av { width: 44px; height: 44px; font-size: 18px; }
+  .ib-main { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  .ib-top { display: flex; justify-content: space-between; gap: var(--s3); align-items: baseline; }
+  .ib-name { font-size: 18px; line-height: 1.35; font-weight: 500; color: var(--th-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ib.unread .ib-name { font-weight: 700; }
+  .ib-time { flex: none; font-size: 14px; color: var(--th-muted); }
+  .ib-snip { font-size: 16px; line-height: 1.4; color: var(--th-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ib.unread .ib-snip { color: var(--th-ink); font-weight: 500; }
+  .ib-dot { flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--th-gold); }
+  .bubs { display: grid; gap: var(--s2); padding-bottom: var(--s3); }
+  .bub { max-width: 84%; display: grid; gap: 2px; }
+  .bub.in { justify-self: start; } .bub.out { justify-self: end; }
+  .bub .bt { padding: var(--s3) var(--s4); border-radius: 18px; font-size: 16px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .bub.in .bt { background: var(--th-tile); border: 1px solid var(--edge); border-bottom-left-radius: 6px; }
+  .bub.out .bt { background: var(--th-gold); color: #1C1812; border-bottom-right-radius: 6px; }
+  .bub .bm { font-size: 14px; color: var(--th-muted); padding: 0 var(--s2); }
+  .bub.out .bm { text-align: right; }
+  .compose { position: sticky; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) - 8px); display: flex; gap: var(--s2); align-items: flex-end; padding: var(--s2); border-radius: 24px; background: var(--th-tile); border: 1px solid var(--edge); }
+  .compose textarea { flex: 1; min-height: 44px; max-height: 140px; padding: 10px 12px; border: 0; background: transparent; color: var(--th-ink); font: inherit; font-size: 16px; line-height: 1.4; resize: none; outline: none; }
+  .compose .btn { min-height: 44px; }
+  .wa-closed { padding: var(--s4); border-radius: 16px; background: var(--th-tile); border: 1px solid var(--edge); }
+  .wa-closed p { margin: 0 0 var(--s3); font-size: 16px; line-height: 1.5; color: var(--th-muted); }
   /* compact dock (half size): icons only, labels kept for screen readers */
   .navdock { width: auto; gap: var(--s2); }
-  .navdock .tabbar { flex: none; gap: 2px; padding: 4px; }
+  .navdock .tabbar { flex: none; gap: 2px; padding: 4px; grid-auto-flow: column; grid-template-columns: none; }
   .navdock .tabbar button { min-height: 44px; width: 48px; padding: 0; }
   .navdock .tabbar button svg { width: 22px; height: 22px; }
   .navdock .tabbar button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -793,10 +820,11 @@ const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession
 const api = {
   async load() {
     const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
-    const [clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked, tasks, nudges] = await Promise.all([
+    const [clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked, tasks, nudges, messages] = await Promise.all([
       q('clients'), q('intake_forms'), q('bookings'), q('discount_codes'), q('collaborators'), q('code_redemptions'), q('session_notes'), q('check_ins'), q('photo_submissions'), q('unlinked_signins'), q('admin_tasks'), q('rebook_nudges'),
+      q('whatsapp_messages').catch(() => []),     // table arrives with supabase-app-schema.sql; the app still works without it
     ]);
-    return { clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked, tasks, nudges };
+    return { clients, intakes, bookings, codes, collabs, redemptions, notes, checkins, photos, unlinked, tasks, nudges, messages };
   },
   // Today → "For your clients": a ticked task is a row in admin_tasks (admin-only), un-ticking deletes it.
   // Rebook nudges: one log row per tap on "Send rebook nudge" (admin-only table). The weekly count and the streak come from this log.
@@ -1140,6 +1168,7 @@ function buildFlags(client, intake) {
 /* ---------- views ---------- */
 const ICON = {
   today: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>',
+  inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11.5a7.5 7.5 0 0 1-10.9 6.7L4 19.5l1.4-4.3A7.5 7.5 0 1 1 20.5 11.5z"/></svg>',
   clients: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.6 3.8-5.5 7.5-5.5s6.7 1.9 7.5 5.5"/></svg>',
   codes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12.5V5.5a2 2 0 0 1 2-2h7l8 8-9 9-8-8z"/><circle cx="8.5" cy="8.5" r="1.3"/></svg>',
   stats: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>',
@@ -1472,9 +1501,9 @@ function viewNoMatch() {
 }
 
 function tabbarHTML() {
-  const items = S.isClient ? [['home', 'Home'], ['aftercare', 'Aftercare'], ['progress', 'Progress'], ['book', 'Book']] : [['today', 'Today'], ['clients', 'Clients'], ['codes', 'Codes'], ['stats', 'Stats']];
+  const items = S.isClient ? [['home', 'Home'], ['aftercare', 'Aftercare'], ['progress', 'Progress'], ['book', 'Book']] : [['today', 'Today'], ['inbox', 'Inbox'], ['clients', 'Clients'], ['codes', 'Codes'], ['stats', 'Stats']];
   return `<div class="navdock"><div class="tabbar" role="navigation" aria-label="Main">${items.map(([k, l]) =>
-    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span></button>`).join('')}</div>${S.isClient ? '' : '<a class="navplus" href="/book?location=clinic" target="_blank" rel="noopener" aria-label="Book a session">+</a>'}</div>`;
+    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span>${k === 'inbox' && unreadCount() ? '<i class="nbadge">' + unreadCount() + '</i>' : ''}</button>`).join('')}</div>${S.isClient ? '' : '<a class="navplus" href="/book?location=clinic" target="_blank" rel="noopener" aria-label="Book a session">+</a>'}</div>`;
 }
 
 function shell(inner, withNav = true) {
@@ -1727,6 +1756,79 @@ function viewToday() {
       catch (e) { toastMsg(friendly(e, 'save')); }
     };
   });
+}
+
+/* ---- Inbox: WhatsApp through the haloe business number (Twilio). Admin only; stored in whatsapp_messages. ---- */
+const waLast10 = (p) => String(p || '').replace(/\D/g, '').slice(-10);
+const msgsOf = () => (S.data && S.data.messages) || [];
+const unreadCount = () => msgsOf().filter((m) => m.direction === 'in' && !m.read_at).length;
+const waName = (phone) => { const c = S.data.clients.find((x) => waLast10(x.phone) === waLast10(phone)); return c ? c.full_name : '+' + phone; };
+const lonTime = (ts, opts) => new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', ...opts }).format(new Date(ts));
+const msgStamp = (ts) => (lonTime(ts, { day: 'numeric', month: 'short', year: 'numeric' }) === lonTime(Date.now(), { day: 'numeric', month: 'short', year: 'numeric' }) ? lonTime(ts, { hour: '2-digit', minute: '2-digit', hour12: false }) : lonTime(ts, { day: 'numeric', month: 'short' }));
+function threadList() {
+  const by = new Map();
+  msgsOf().forEach((m) => { if (!by.has(m.phone)) by.set(m.phone, []); by.get(m.phone).push(m); });
+  return [...by.entries()].map(([phone, ms]) => {
+    ms.sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+    return { phone, ms, last: ms[ms.length - 1], unread: ms.filter((m) => m.direction === 'in' && !m.read_at).length };
+  }).sort((a, b) => String(b.last.created_at).localeCompare(String(a.last.created_at)));
+}
+async function refreshMessages() {
+  const { data, error } = await sb.from('whatsapp_messages').select('*').order('created_at', { ascending: true });
+  if (error || !data) return false;
+  const changed = data.length !== msgsOf().length || data.some((m, i) => (msgsOf()[i] || {}).id !== m.id);
+  S.raw.messages = data; applyTest();
+  return changed;
+}
+function viewInbox() {
+  if (S.threadPhone) return viewThread(S.threadPhone);
+  const list = threadList();
+  const rows = list.map((t) => {
+    const mine = t.last.direction === 'out', name = waName(t.phone);
+    return `<button class="ib${t.unread ? ' unread' : ''}" type="button" data-thread="${esc(t.phone)}"><span class="av">${esc(initialOf(name.replace(/^\+/, '')))}</span><span class="ib-main"><span class="ib-top"><span class="ib-name">${esc(name)}</span><span class="ib-time">${esc(msgStamp(t.last.created_at))}</span></span><span class="ib-snip">${mine ? 'You: ' : ''}${esc(firstLineOf(t.last.body))}</span></span>${t.unread ? '<i class="ib-dot" aria-label="Unread"></i>' : ''}</button>`;
+  }).join('');
+  shell(`<div class="tile-home inbox"><div class="th-titlerow"><h1>Inbox</h1><span>WhatsApp</span></div>` +
+    (list.length ? `<div class="tr-list">${rows}</div>` : '<p class="tr-empty">No messages yet. When a client writes to the haloe WhatsApp number, it appears here.</p>') + '</div>');
+  document.querySelectorAll('[data-thread]').forEach((b) => { b.onclick = () => { location.hash = '#/inbox/' + b.dataset.thread; }; });
+  clearInterval(S.inboxTimer);
+  S.inboxTimer = setInterval(async () => { if (S.view === 'inbox' && !S.threadPhone && await refreshMessages()) viewInbox(); }, 15000);
+}
+function viewThread(phone) {
+  const ms = msgsOf().filter((m) => m.phone === phone).sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+  const unread = ms.filter((m) => m.direction === 'in' && !m.read_at);
+  if (unread.length) {   // opening it reads it: update locally now, tell the database quietly
+    const now = new Date().toISOString(); unread.forEach((m) => { m.read_at = now; });
+    sb.from('whatsapp_messages').update({ read_at: now }).eq('phone', phone).eq('direction', 'in').is('read_at', null).then(() => {}, () => {});
+  }
+  const lastIn = [...ms].reverse().find((m) => m.direction === 'in');
+  const open = !!lastIn && Date.now() - new Date(lastIn.created_at).getTime() < 24 * 3600 * 1000;
+  const name = waName(phone), first = name.replace(/^\+/, '').split(' ')[0];
+  const bubbles = ms.map((m) => `<div class="bub ${m.direction}"><div class="bt">${esc(m.body)}</div><div class="bm">${esc(lonTime(m.created_at, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }))}${m.direction === 'out' && m.status === 'failed' ? ' · not delivered' : ''}</div></div>`).join('');
+  shell(`<div class="tile-home inbox thread"><div class="th-titlerow"><h1>${esc(name)}</h1><a class="muted" href="#/inbox">All messages</a></div>
+    <div class="bubs" id="bubs">${bubbles}</div>
+    ${open ? `<form class="compose" id="wa-form"><textarea id="wa-text" rows="1" placeholder="Message ${esc(first)}" aria-label="Message"></textarea><button class="btn" id="wa-send" type="submit">Send</button></form>`
+      : `<div class="wa-closed"><p>WhatsApp only lets us reply within 24 hours of their last message. To start a new chat, message ${esc(first)} from your own phone.</p><a class="btn" target="_blank" rel="noopener" href="https://wa.me/${esc(phone)}">Open in WhatsApp</a></div>`}</div>`);
+  const bubs = document.getElementById('bubs'); if (bubs) bubs.lastElementChild && bubs.lastElementChild.scrollIntoView({ block: 'end' });
+  clearInterval(S.inboxTimer);
+  S.inboxTimer = setInterval(async () => { const t = document.getElementById('wa-text'); if (S.view === 'inbox' && S.threadPhone === phone && !(t && t.value) && await refreshMessages()) viewThread(phone); }, 15000);
+  const form = document.getElementById('wa-form'); if (!form) return;
+  const ta = document.getElementById('wa-text');
+  ta.oninput = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 140) + 'px'; };
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const text = ta.value.trim(); if (!text) return;
+    const btn = document.getElementById('wa-send'); btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      const res = await timedFetch('/whatsapp-send', { method: 'POST', headers: { Authorization: 'Bearer ' + (S.session && S.session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ phone, text }) });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toastMsg(j.error === 'outside_window' ? 'That chat has closed. Message them from your own phone.' : j.error === 'not_configured' ? 'WhatsApp isn’t connected yet.' : 'That didn’t send. Please try again in a minute.');
+        btn.disabled = false; btn.textContent = 'Send'; return;
+      }
+      if (j.message) { S.raw.messages = msgsOf().concat([j.message]); applyTest(); } else await refreshMessages();
+      viewThread(phone);
+    } catch (err) { toastMsg(friendly(err, 'send')); btn.disabled = false; btn.textContent = 'Send'; }
+  };
 }
 
 /* ---- Clients ---- */
@@ -2569,7 +2671,7 @@ function stateHTML(title, hint, btn) { return '<div class="state"><b>' + esc(tit
 document.addEventListener('click', (ev) => { if (ev.target && ev.target.id === 'retryLoad' && S.session) { S.error = null; const sess = S.session; S.session = null; enter(sess); } });
 
 /* ---------- router / boot ---------- */
-const ADMIN_VIEWS = ['today', 'clients', 'codes', 'stats', 'settings'], CLIENT_VIEWS = ['home', 'progress', 'book', 'aftercare', 'settings'];
+const ADMIN_VIEWS = ['today', 'inbox', 'clients', 'codes', 'stats', 'settings'], CLIENT_VIEWS = ['home', 'progress', 'book', 'aftercare', 'settings'];
 function route() {
   const h = (location.hash || (S.isClient ? '#/home' : '#/today')).replace(/^#\//, '');
   const [path, qs] = h.split('?');
@@ -2577,6 +2679,7 @@ function route() {
   if (!S.isClient && parts[0] === 'brief') { S.view = 'brief'; S.briefKey = parts[1] + '/' + parts[2]; S.briefBid = new URLSearchParams(qs || '').get('b'); }
   else if (S.isClient) S.view = CLIENT_VIEWS.includes(parts[0]) ? parts[0] : 'home';
   else S.view = ADMIN_VIEWS.includes(parts[0]) ? parts[0] : 'today';
+  S.threadPhone = S.view === 'inbox' && parts[1] ? parts[1] : null;
   if (S.view !== 'brief') S.briefRetried = null;
 }
 function render() {
@@ -2587,10 +2690,11 @@ function render() {
   if (S.admin) {
     if (!S.data) { shell(S.error ? loadErrorHTML() : loadingHTML(), false); return; }
     route();
-    document.body.classList.toggle('tilebg', ['today', 'clients', 'codes', 'stats', 'settings'].includes(S.view));
+    clearInterval(S.inboxTimer);
+    document.body.classList.toggle('tilebg', ['today', 'inbox', 'clients', 'codes', 'stats', 'settings'].includes(S.view));
     if (S.view !== 'codes') { S.codeReady = null; S.quickSel = null; }
     window.scrollTo(0, 0);
-    ({ today: viewToday, clients: viewClients, codes: viewCodes, stats: viewStats, settings: viewSettings, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
+    ({ today: viewToday, inbox: viewInbox, clients: viewClients, codes: viewCodes, stats: viewStats, settings: viewSettings, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
     return;
   }
   // client
