@@ -50,6 +50,86 @@
   "slogan": "Hijama and cupping in Manchester"
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does it hurt?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The suction feels like a firm tug. The wet cupping pricks feel like a quick, light scratch. Most clients find the whole session relaxing, and some fall asleep. You're talked through every step before it happens."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does it cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Prices are flat and shown on each session above and in full on the booking page: massage from £40, dry cupping from £50, hijama from £70 and life coaching from £75. Cupping sessions include unlimited cups and black seed oil to take home. Home visits: travel from £20, set by distance and shown before you pay. Or come to our Tuesday clinic on Deansgate — no travel fee."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you treat men and women?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. haloe serves women and men, with the same private room, the same standards and the same care for modesty in every session."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What should I wear?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Loose, comfortable clothes you can move in. For back and shoulder sessions a top that opens or lifts easily helps. Only the area being treated is uncovered, and only for as long as it needs to be."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What should I do before and after?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Eat lightly beforehand and stay hydrated. Afterwards, rest, keep drinking water, and keep the area clean, dry and warm for 24 hours. Marks are normal and usually fade within 14 days."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are you insured and accredited?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Halima is fully insured, CMA and IPHM accredited, and holds a Level 5 Diploma in Health and Cupping Therapy from The Suuk Academy (88% distinction)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is the clinic, and do you do home visits?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every Tuesday at Milton Hall, 244 Deansgate, Manchester M3 4BQ, in a private treatment room. On other days (Monday to Saturday, 10am to 8pm) Halima comes to you at home across Greater Manchester. Coaching is also available online."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is any area not treated?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For modesty and professional care, I do not treat the area between the navel and the knees on male clients. That area stays covered throughout the session. Everything else is treated as booked."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if I need to cancel or move my session?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full."
+      }
+    }
+  ]
+}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <!-- Playfair Display is gone from the site entirely (Sep 2026) — the hero
      headline (the one heading that isn't Poppins) uses the self-hosted Tan
@@ -386,11 +466,10 @@
      ============================================================ */
   .price-grid { display:grid; grid-template-columns:1fr; gap:14px; }
   @media (min-width:600px) { .price-grid { grid-template-columns:repeat(2,1fr); } }
-  .price-grid .price-card:last-child:nth-child(odd) { grid-column:1 / -1; }
-  @media (min-width:1024px) { .price-grid { grid-template-columns:repeat(5,1fr); } .price-grid .price-card:last-child:nth-child(odd) { grid-column:auto; } }
+  @media (min-width:1024px) { .price-grid { grid-template-columns:repeat(4,1fr); gap:var(--s4); } }
   .price-card {
     padding:26px 22px; text-decoration:none; color:var(--text);
-    display:flex; flex-direction:column; gap:10px;
+    display:flex; flex-direction:column; gap:10px; min-height:100%;
     transition:transform 0.15s ease, box-shadow 0.15s ease;
   }
   .price-card:hover, .price-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
@@ -399,10 +478,13 @@
     display:flex; align-items:center; justify-content:center;
   }
   .price-icon svg { width:22px; height:22px; }
-  .price-card h3 { font-size:1.05rem; }
-  .price-from { color:var(--text-muted); font-size:0.92rem; }
-  .price-from strong { color:var(--text); font-size:1.3rem; font-family:'Poppins', sans-serif; font-weight:600; }
-  .price-arrow { margin-top:auto; align-self:flex-end; color:var(--gold-deep); font-size:1.2rem; }
+  .price-card h3 { font-size:1.1rem; }
+  .price-desc { font-size:0.92rem; color:var(--c-ink-warm); line-height:1.5; }
+  .price-from { color:var(--text-muted); font-size:0.92rem; margin-top:4px; }
+  .price-from strong { color:var(--text); font-size:1.35rem; font-family:'Poppins', sans-serif; font-weight:600; }
+  .price-was { color:var(--text-muted); font-size:0.95rem; margin-right:2px; }
+  .price-dur { color:var(--text-muted); font-size:0.88rem; white-space:nowrap; }
+  .price-book { margin-top:auto; padding-top:14px; font-weight:600; color:var(--gold-deep); font-size:0.95rem; }
   .price-note { margin-top:20px; font-size:0.82rem; color:var(--text-muted); }
 
   /* ============================================================
@@ -416,6 +498,9 @@
   .process-card h4 { font-size:1rem; }
   .process-card p { margin-top:var(--s2); font-size:0.9rem; }
   /* "What happens in your session" — five steps + "Does it hurt?" (moved here from before-your-session.html, Oct 2026) */
+  .hurt-card { margin-top:var(--s4); padding:var(--s5) 22px; border-left:4px solid var(--gold); }
+  .hurt-card h3 { font-size:1.35rem; margin:6px 0 10px; }
+  .hurt-card p { font-size:1rem; line-height:1.6; color:var(--c-ink-warm); max-width:62ch; }
   .process-steps { margin-top:14px; padding:var(--s5) 22px; }
   .process-steps h3 { font-size:1.125rem; margin-bottom:var(--s4); }
   .session-steps { list-style:none; counter-reset:step; margin:0; padding:0; }
@@ -718,12 +803,12 @@
 <section id="pricing">
   <div class="container">
     <div class="section-head reveal">
-      <span class="section-eyebrow">Pricing</span>
-      <h2>Simple, flat pricing</h2>
-      <p>Cupping prices include unlimited cups and take-home black seed oil aftercare. See the full list and book in the wizard.</p>
+      <span class="section-eyebrow">Sessions</span>
+      <h2>Four ways to be looked after.</h2>
+      <p>Prices are flat and shown before you book. Cupping sessions include unlimited cups and black seed oil to take home.</p>
     </div>
     <div class="price-grid" id="priceGrid"></div>
-    <p class="price-note reveal">See <a href="hijama-manchester.html" class="link-gold">the full hijama &amp; cupping price list</a> for every treatment.</p>
+    <p class="price-note reveal">Prefer a course? <a href="book.html?cat=packages" class="link-gold">See the packages</a>, four to eight sessions spaced over the season. Or read <a href="hijama-manchester.html" class="link-gold">the full price list</a>.</p>
   </div>
 </section>
 
@@ -756,20 +841,23 @@
       <div class="process-card card reveal">
         <div class="process-num">04</div>
         <h4>Your Plan</h4>
-        <p>Most clients benefit from regular sessions. We'll build a personalised schedule around your goals.</p>
+        <p>Many clients come back on a rhythm that suits them. We'll shape a schedule around what you came in with.</p>
       </div>
+    </div>
+    <div class="hurt-card card reveal" id="does-it-hurt">
+      <span class="section-eyebrow">The question everyone asks</span>
+      <h3>Does it hurt?</h3>
+      <p>The suction feels like a firm tug. The wet cupping pricks feel like a quick, light scratch. Most clients find the whole session relaxing, and some fall asleep. Nothing happens without Halima telling you first.</p>
     </div>
     <div class="process-steps card reveal">
       <h3>What happens in your session</h3>
       <ol class="session-steps">
-        <li>We talk first — health form &amp; a chat about what you need</li>
-        <li>Warm &amp; relax — massage to settle the muscles</li>
-        <li>Cups applied — suction lifts the skin gently</li>
-        <li>Gentle draw — tiny pricks (wet cupping only)</li>
-        <li>Soothe &amp; rest — black seed oil, then quiet rest time</li>
+        <li>We talk first: your health form, and what you've come in with</li>
+        <li>Warm and relax: massage to settle the muscles</li>
+        <li>Cups applied: suction lifts the skin gently</li>
+        <li>Gentle draw: tiny pricks (wet cupping only)</li>
+        <li>Soothe and rest: black seed oil, then quiet time</li>
       </ol>
-      <h4>Does it hurt?</h4>
-      <p>The suction feels like a firm tug. The wet cupping pricks feel like a quick light scratch. Most clients find the whole session relaxing — some fall asleep.</p>
     </div>
   </div>
 </section>
@@ -822,32 +910,44 @@
   <div class="container">
     <div class="section-head reveal">
       <span class="section-eyebrow">FAQ</span>
-      <h2>Questions, answered</h2>
+      <h2>Fair questions, answered.</h2>
     </div>
     <div class="faq-list">
       <div class="faq-item reveal">
-        <button class="faq-q" aria-expanded="false">Does hijama hurt?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Most clients feel mild discomfort at most. Cups create a gentle suction, and only wet cupping uses a few small, superficial incisions. Sessions are unhurried and you're guided through every step.</div></div>
+        <button class="faq-q" aria-expanded="false">Does it hurt?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">The suction feels like a firm tug. The wet cupping pricks feel like a quick, light scratch. Most clients find the whole session relaxing, and some fall asleep. You're talked through every step before it happens.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q" aria-expanded="false">How much does it cost?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Prices are flat and shown on each session above and in full on the booking page: massage from £40, dry cupping from £50, hijama from £70 and life coaching from £75. Cupping sessions include unlimited cups and black seed oil to take home. Home visits: travel from £20, set by distance and shown before you pay. Or come to our Tuesday clinic on Deansgate — no travel fee.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q" aria-expanded="false">Do you treat men and women?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Yes. haloe serves women and men, with the same private room, the same standards and the same care for modesty in every session.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q" aria-expanded="false">What should I wear?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Loose, comfortable clothes you can move in. For back and shoulder sessions a top that opens or lifts easily helps. Only the area being treated is uncovered, and only for as long as it needs to be.</div></div>
       </div>
       <div class="faq-item reveal">
         <button class="faq-q" aria-expanded="false">What should I do before and after?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Eat lightly beforehand and stay hydrated. Afterwards, rest, keep drinking water, and avoid cold water on the treated area for 24 hours. Marks can last up to 10 days — that's completely normal.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">Eat lightly beforehand and stay hydrated. Afterwards, rest, keep drinking water, and keep the area clean, dry and warm for 24 hours. Marks are normal and usually fade within 14 days.</div></div>
       </div>
       <div class="faq-item reveal">
-        <button class="faq-q" aria-expanded="false">Are you insured?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Yes — Halima is fully insured, CMA and IPHM accredited, and holds an L5 Diploma in Health and Cupping Therapy.</div></div>
+        <button class="faq-q" aria-expanded="false">Are you insured and accredited?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Yes. Halima is fully insured, CMA and IPHM accredited, and holds a Level 5 Diploma in Health and Cupping Therapy from The Suuk Academy (88% distinction).</div></div>
       </div>
       <div class="faq-item reveal">
-        <button class="faq-q" aria-expanded="false">Where is the clinic?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Every Tuesday at Milton Hall, 244 Deansgate, Manchester M3 4BQ. Outside of that, Halima visits you at home anywhere across Greater Manchester.</div></div>
+        <button class="faq-q" aria-expanded="false">Where is the clinic, and do you do home visits?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Every Tuesday at Milton Hall, 244 Deansgate, Manchester M3 4BQ, in a private treatment room. On other days (Monday to Saturday, 10am to 8pm) Halima comes to you at home across Greater Manchester. Coaching is also available online.</div></div>
       </div>
       <div class="faq-item reveal">
         <button class="faq-q" aria-expanded="false">Is any area not treated?<span class="faq-chevron">⌄</span></button>
         <div class="faq-a"><div class="faq-a-inner">For modesty and professional care, I do not treat the area between the navel and the knees on male clients. That area stays covered throughout the session. Everything else is treated as booked.</div></div>
       </div>
       <div class="faq-item reveal">
-        <button class="faq-q" aria-expanded="false">How quickly can I book?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Booking takes about two minutes online, with real-time availability for both home visits and the Tuesday clinic day. You'll get a confirmation and a health form to complete before your session.</div></div>
+        <button class="faq-q" aria-expanded="false">What if I need to cancel or move my session?<span class="faq-chevron">⌄</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</div></div>
       </div>
     </div>
   </div>
@@ -1750,23 +1850,37 @@ hbInit();
 // ------------------------------------------------------------------
 (function () {
   var CATS = [
-    { key: 'massage', label: 'Massage', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13c0-4 3-8 8-8s8 4 8 8"/><path d="M4 13a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4"/><path d="M9 13v3M15 13v3"/></svg>' },
-    { key: 'dry', label: 'Dry cupping', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8" rx="6" ry="4"/><path d="M6 8v5a6 4 0 0 0 12 0V8"/></svg>' },
-    { key: 'wet', label: 'Wet cupping', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4.5 7 9 7 12.5a7 7 0 0 1-14 0C5 12 8.5 7.5 12 3z"/></svg>' },
-    { key: 'packages', label: 'Packages', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M4 12h16M12 8v12M8 8a4 4 0 0 1 8 0"/></svg>' },
-    { key: 'coaching', label: 'Life coaching', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>' },
+    { key: 'massage',  label: 'Massage',      desc: 'Hands-on, unhurried, and fully private.',           icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13c0-4 3-8 8-8s8 4 8 8"/><path d="M4 13a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4"/><path d="M9 13v3M15 13v3"/></svg>' },
+    { key: 'dry',      label: 'Dry cupping',  desc: 'Gentle suction, with the skin left unbroken.',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8" rx="6" ry="4"/><path d="M6 8v5a6 4 0 0 0 12 0V8"/></svg>' },
+    { key: 'wet',      label: 'Hijama',       desc: 'Wet cupping, explained step by step as we go.',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4.5 7 9 7 12.5a7 7 0 0 1-14 0C5 12 8.5 7.5 12 3z"/></svg>' },
+    { key: 'coaching', label: 'Life coaching', desc: 'A calm one-to-one, at the clinic or online.',        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>' },
   ];
+  // "1 hr 30 min" / "45 min" / "2 hours" → minutes. Packages carry sessionMin.
+  function minutesOf(svc) {
+    if (svc.sessionMin) return svc.sessionMin;
+    var t = String(svc.time || ''), h = /(\d+)\s*h/.exec(t), m = /(\d+)\s*min/.exec(t);
+    return (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0);
+  }
+  function fmtMin(n) {
+    if (!n) return '';
+    var h = Math.floor(n / 60), m = n % 60;
+    return h ? (h + ' hr' + (m ? ' ' + m + ' min' : '')) : (m + ' min');
+  }
   var grid = document.getElementById('priceGrid');
   if (!grid || typeof SERVICES === 'undefined') return;
   grid.innerHTML = CATS.map(function (c) {
     var items = SERVICES[c.key] || [];
     if (!items.length) return '';
-    var min = Math.min.apply(null, items.map(netPrice));
+    var net = Math.min.apply(null, items.map(netPrice));
+    var list = Math.min.apply(null, items.map(function (x) { return x.price; }));
+    var mins = Math.min.apply(null, items.map(minutesOf).filter(Boolean));
+    var was = list > net ? '<s class="price-was">£' + list + '</s> ' : '';
     return '<a href="book.html?cat=' + c.key + '" class="price-card card reveal">' +
       '<span class="price-icon">' + c.icon + '</span>' +
       '<h3>' + c.label + '</h3>' +
-      '<p class="price-from">from <strong>£' + min + '</strong></p>' +
-      '<span class="price-arrow">→</span></a>';
+      '<p class="price-desc">' + c.desc + '</p>' +
+      '<p class="price-from">from ' + was + '<strong>£' + net + '</strong>' + (mins ? ' <span class="price-dur">· ' + fmtMin(mins) + '</span>' : '') + '</p>' +
+      '<span class="price-book">Book ' + c.label.toLowerCase() + ' <span aria-hidden="true">→</span></span></a>';
   }).join('');
   // Newly-injected .reveal cards need their own observer, since the page-load
   // one above already finished querying the DOM before this ran.
