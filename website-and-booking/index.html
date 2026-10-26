@@ -375,9 +375,13 @@
     .hero-grid { display:block; width:100%; padding:0 22px calc(118px + env(safe-area-inset-bottom,0px)); }
     .hero-sub-more { display:none; }
     .hero-figure { position:absolute; inset:0; z-index:-1; margin:0; }
+    /* The source photo is square with the face ~40% down, so a plain
+       top-aligned cover left it mid-screen under the headline. Making the
+       image 18% taller than the hero and pinning it to the BOTTOM crops
+       the top of the room instead, lifting her face into the top third. */
     .hero-figure img {
-      width:100%; height:100%; aspect-ratio:auto; object-position:50% 0%;
-      border-radius:0; box-shadow:none;
+      position:absolute; left:0; bottom:0; width:100%; height:118%;
+      aspect-ratio:auto; object-position:50% 100%; border-radius:0; box-shadow:none;
     }
     .hero-figure::after {
       content:''; position:absolute; inset:0;
