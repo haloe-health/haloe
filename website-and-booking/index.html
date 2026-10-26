@@ -357,7 +357,50 @@
     width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; object-position:50% 30%;
     border-radius:var(--card-radius); display:block; box-shadow:var(--card-shadow);
   }
-  @media (max-width:899px) { .hero-figure img { aspect-ratio:1/1; } }
+  .hero-brand { display:none; }
+  /* Phone hero (Oct 2026, Halima's pick from six mock-ups): the photo fills
+     the first screen edge to edge and the copy sits at the bottom over a
+     dark fade, like the Instagram post that brought the visitor here. The
+     DOM is the desktop one — only CSS changes — so the picture/srcset and
+     the reveal observer are untouched. The hero's own Book button is hidden
+     here because the fixed .mobile-bar already IS a gold Book button at the
+     bottom of the screen; two stacked gold pills read as clutter. The
+     height is 100svh (not vh — iOS Safari's toolbars) minus the bar's
+     fixed part, so the trust line is never under it. */
+  @media (max-width:899px) {
+    .hero {
+      position:relative; padding:0; min-height:100svh; display:flex; align-items:flex-end;
+      background:#120f0b; color:#F5F0E8; isolation:isolate; overflow:hidden;
+    }
+    .hero-grid { display:block; width:100%; padding:0 22px calc(118px + env(safe-area-inset-bottom,0px)); }
+    .hero-sub-more { display:none; }
+    .hero-figure { position:absolute; inset:0; z-index:-1; margin:0; }
+    .hero-figure img {
+      width:100%; height:100%; aspect-ratio:auto; object-position:50% 0%;
+      border-radius:0; box-shadow:none;
+    }
+    .hero-figure::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0) 26%, rgba(12,9,5,0.10) 44%, rgba(12,9,5,0.86) 72%, rgba(12,9,5,0.96) 100%);
+    }
+    .hero-brand {
+      display:block; position:absolute; top:22px; left:22px; z-index:1;
+      font-family:'Tan Ashford', Georgia, serif; font-size:1.55rem; color:#F5F0E8; text-decoration:none; line-height:1;
+    }
+    .hero-title { font-size:clamp(3rem,14vw,4.2rem); line-height:0.96; margin:0; color:#F5F0E8; max-width:9ch; }
+    .hero-title em { color:var(--gold); }
+    .hero-sub { margin-top:14px; max-width:32ch; font-size:1.02rem; line-height:1.5; color:#EFE6D6; }
+    .hero-actions { margin-top:18px; }
+    .hero-actions .btn-pill { display:none; }
+    .hero-secondary { color:#F5F0E8; text-decoration-color:var(--gold); min-height:40px; }
+    .hero-trust { margin-top:14px; gap:6px 14px; font-size:0.8rem; color:#D9CFBD; justify-content:flex-start; }
+    .hero-trust li::before { background:var(--gold); width:5px; height:5px; }
+    .hero-trust li:first-child::before { display:none; }
+    .hero-trust-link { color:inherit; }
+    .hero-trust-link::before { content:'\2605\2605\2605\2605\2605'; color:var(--gold); letter-spacing:1px; font-size:0.72rem; margin-right:6px; }
+    /* The reveal fade would slide the whole backdrop up on load — keep the photo still. */
+    .hero-figure.reveal { opacity:1; transform:none; transition:none; }
+  }
   .promo-banner {
     width:100%; background:var(--c-gold-mid); color:var(--c-white);
     text-align:center; font-family:'Poppins',sans-serif; font-size:var(--fs-caption); font-weight:500;
@@ -628,7 +671,10 @@
      reserved space and the scroll-padding both need to match. */
   .mobile-bar {
     position:fixed; bottom:0; left:0; right:0; z-index:90;
-    background:var(--header-bg); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    /* --header-bg was never defined, so the bar was blur-only and its dark
+       WhatsApp ring vanished over the phone hero's photo; a real cream wash
+       (dark-mode variant below) keeps it legible on every background. */
+    background:rgba(245,240,232,0.88); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
     border-top:1px solid var(--hairline);
     padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));
     display:flex; flex-direction:column; gap:6px;
@@ -644,6 +690,7 @@
   }
   .mobile-bar-row .icon-btn:hover { background:var(--hairline); transform:translateY(-2px); }
   .mobile-bar-row .icon-btn svg { width:24px; height:24px; }
+  @media (prefers-color-scheme: dark) { .mobile-bar { background:rgba(18,15,11,0.88); } }
   @media (min-width:768px) { .mobile-bar { display:none; } }
   /* 56px pill + helper line + 6px gap + 10px/16px top/bottom padding —
      measured at ~110px rendered, 112px reserved for a small buffer. Both
@@ -688,10 +735,11 @@
      HERO
      ============================================================ -->
 <section class="hero">
+  <a href="/" class="hero-brand" aria-label="haloe home">haloe</a>
   <div class="container hero-grid">
     <div class="hero-copy">
       <h1 class="hero-title reveal">Feel <em>lighter.</em></h1>
-      <p class="hero-sub reveal">Hijama, dry cupping, massage and coaching in a quiet, private room on Deansgate, or at home across Greater Manchester. Every step explained before we begin.</p>
+      <p class="hero-sub reveal">Hijama, dry cupping, massage and coaching in a quiet, private room on Deansgate, or at home across Greater Manchester.<span class="hero-sub-more"> Every step explained before we begin.</span></p>
       <div class="hero-actions reveal">
         <a href="book.html" class="btn-pill btn-gold">Book a session</a>
         <a href="#pricing" class="hero-secondary">See the sessions</a>
