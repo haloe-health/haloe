@@ -63,7 +63,7 @@ const SERVICES = {
    applied on top of this full price rather than stacking with a promo.
    netPrice() is still the amount actually displayed and charged — nothing
    should read svc.price directly for money, in case a promo returns later. */
-const PROMO_DISCOUNT = 0;
+const PROMO_DISCOUNT = 0.2; // Introductory pricing (Oct 2026): 20% off, shown struck through. Mirror in functions/_services.js and index.html's HB_PROMO_DISCOUNT.
 
 function netPrice(svc) {
   // Round at the pence level so sub-£1 prices (e.g. the 50p test treatment)

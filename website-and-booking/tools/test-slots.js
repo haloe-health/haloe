@@ -5,7 +5,9 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { generateSlots, startGrid, groupSlots, TURNAROUND_MIN, minutesToLabel } from '../functions/_slots.js';
-import { resolveCart, cartFitsLocation, formatDuration, SERVICES as SERVER_SERVICES } from '../functions/_services.js';
+import { resolveCart, cartFitsLocation, formatDuration, SERVICES as SERVER_SERVICES, netPrice } from '../functions/_services.js';
+// Prices are asserted through netPrice() so the tests follow PROMO_DISCOUNT (0.2 since Oct 2026).
+const P = (cat, name) => Math.round(netPrice(SERVER_SERVICES[cat].find((x) => x.name === name)) * 100);
 import { applyDiscount } from '../functions/_discounts.js';
 import { CLINIC_RULES } from '../functions/_clinic.js';
 import { onRequestPost as createCheckout } from '../functions/create-checkout.js';
@@ -128,18 +130,18 @@ ok('First available is 11:00', withFullBack[0] === 660);
 console.log('\nMulti-treatment: resolveCart');
 const two = resolveCart([{ name: 'Face Massage', category: 'massage' }, { name: 'Head Massage', category: 'massage' }]);
 ok('two treatments resolve', two.ok);
-eq('combined price £80 (8000p)', two.totalPence, 8000);
+eq('combined price = Face + Head Massage', two.totalPence, P('massage','Face Massage') + P('massage','Head Massage'));
 eq('combined duration 120 min', two.totalMin, 120);
 eq('duration label', formatDuration(two.totalMin), '2 hours');
 
 const wetTwo = resolveCart([{ name: 'Full Back', category: 'wet' }, { name: 'Head & Scalp', category: 'wet' }]);
-eq('wet pair priced per category (£90 + £70 = 16000p)', wetTwo.totalPence, 16000);
+eq('wet pair priced per category', wetTwo.totalPence, P('wet','Full Back') + P('wet','Head & Scalp'));
 eq('wet pair 120 min', wetTwo.totalMin, 120);
 const crossCat = resolveCart([{ name: 'Full Back', category: 'dry' }, { name: 'Full Back', category: 'wet' }]);
-eq('same name in dry + wet are two distinct treatments (£80 + £90)', crossCat.totalPence, 17000);
+eq('same name in dry + wet are two distinct treatments', crossCat.totalPence, P('dry','Full Back') + P('wet','Full Back'));
 
 const single = resolveCart([{ name: 'Full Back', category: 'wet' }]);
-eq('single treatment unchanged: £90, 60 min', [single.totalPence, single.totalMin], [9000, 60]);
+eq('single treatment unchanged: net price, 60 min', [single.totalPence, single.totalMin], [P('wet','Full Back'), 60]);
 eq('duplicate is collapsed', resolveCart([{ name: 'Face Massage', category: 'massage' }, { name: 'Face Massage', category: 'massage' }]).items.length, 1);
 eq('unknown treatment rejected', resolveCart([{ name: 'Nope', category: 'massage' }]).error, 'unknown_treatment');
 eq('wrong category rejected (no fallback)', resolveCart([{ name: 'Face Massage', category: 'wet' }]).error, 'unknown_treatment');
@@ -148,7 +150,7 @@ eq('package cannot be combined', resolveCart([{ name: 'Cycle Comfort', category:
 ok('a package alone is fine', resolveCart([{ name: 'Cycle Comfort', category: 'packages' }]).ok);
 
 console.log('\nMulti-treatment: HALOE20 on the combined total');
-const d = applyDiscount(two.totalPence, 20);
+const d = applyDiscount(8000, 20);
 eq('20% off £80 = £16 off, £64 to pay', [d.discountPence, d.finalPence], [1600, 6400]);
 
 console.log('\nMulti-treatment: slots fit the COMBINED duration (Face + Head Massage = 120 min)');
@@ -253,11 +255,11 @@ ok('every package is 90 min on the server', SERVER_SERVICES.packages.every((p) =
 console.log('\nLife coaching: Milton Hall, a home visit or online; one session can be combined with other treatments at the clinic');
 const coachingCart = [{ name: 'Life Coaching Session', category: 'coaching' }];
 const rc = resolveCart(coachingCart);
-ok('single session is £75 and 60 min', rc.ok && rc.totalPence === 7500 && rc.totalMin === 60);
+ok('single session is the net coaching price and 60 min', rc.ok && rc.totalPence === P('coaching','Life Coaching Session') && rc.totalMin === 60);
 const rp = resolveCart([{ name: 'Six-Session Coaching Package', category: 'coaching' }]);
-ok('six-session package is £400 and books a 60 min first session', rp.ok && rp.totalPence === 40000 && rp.totalMin === 60);
+ok('six-session package is the net package price and books a 60 min first session', rp.ok && rp.totalPence === P('coaching','Six-Session Coaching Package') && rp.totalMin === 60);
 const rcombo = resolveCart([...coachingCart, { name: 'Full Body', category: 'wet' }]);
-ok('a coaching session can be combined with a hijama treatment (price and time add up)', rcombo.ok && rcombo.items.length === 2 && rcombo.totalMin === 60 + rcombo.items[1].min && rcombo.totalPence === 7500 + rcombo.items[1].pricePence, rcombo);
+ok('a coaching session can be combined with a hijama treatment (price and time add up)', rcombo.ok && rcombo.items.length === 2 && rcombo.totalMin === 60 + rcombo.items[1].min && rcombo.totalPence === P('coaching','Life Coaching Session') + rcombo.items[1].pricePence, rcombo);
 eq('the six-session coaching package cannot be combined', resolveCart([{ name: 'Six-Session Coaching Package', category: 'coaching' }, { name: 'Face Massage', category: 'massage' }]).error, 'package_not_combinable');
 eq('a coaching session + a treatment package cannot be combined', resolveCart([...coachingCart, { name: 'Cycle Comfort', category: 'packages' }]).error, 'package_not_combinable');
 eq('coaching + another treatment is fine on a home visit', cartFitsLocation(rcombo.items, 'mobile'), true);

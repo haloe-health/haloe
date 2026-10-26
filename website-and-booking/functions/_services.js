@@ -54,7 +54,7 @@ export const SERVICES = {
 // Same as services-data.js — ended Sep 2026, kept at 0 in step with that
 // file. HALOE20 (functions/_discounts.js) is the only discount left,
 // applied on top of this full price server-side in create-checkout.js.
-const PROMO_DISCOUNT = 0;
+const PROMO_DISCOUNT = 0.2; // keep equal to services-data.js and index.html HB_PROMO_DISCOUNT
 
 export function netPrice(svc) {
   // Round at the pence level (see services-data.js for the rationale).
