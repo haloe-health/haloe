@@ -469,21 +469,33 @@
   /* ============================================================
      CONDITIONS
      ============================================================ */
-  .cond-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  /* Oct 2026 (Halima's pick, "three across"): on phones the grid is three
+     small tiles per row so the whole section, intro included, fits one
+     screen; the intro is one line and the hijama link sits under the grid. */
+  .cond-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
   @media (min-width:768px) { .cond-grid { grid-template-columns:repeat(4,1fr); gap:var(--s4); } }
   .cond-card {
-    padding:22px var(--s4); text-align:center; cursor:pointer; border:none;
-    display:flex; flex-direction:column; align-items:center; gap:10px;
+    padding:14px 8px; text-align:center; cursor:pointer; border:none;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
     transition:transform 0.15s ease, box-shadow 0.15s ease;
     width:100%;
   }
+  @media (min-width:768px) { .cond-card { padding:22px var(--s4); gap:10px; } }
+  @media (max-width:767px) { #conditions .section-head { margin-bottom:var(--s4); } }
+  .cond-more { margin-top:14px; font-size:0.9rem; font-weight:600; }
+  .cond-more a { text-decoration:underline; text-underline-offset:4px; text-decoration-color:var(--gold); }
   .cond-card:hover, .cond-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
   .cond-icon {
-    width:52px; height:52px; border-radius:50%; border:1.5px solid var(--gold);
+    width:38px; height:38px; border-radius:50%; border:1.5px solid var(--gold);
     display:flex; align-items:center; justify-content:center; color:var(--gold-deep);
   }
-  .cond-icon svg { width:24px; height:24px; }
-  .cond-card h3 { font-size:0.92rem; font-weight:600; color:var(--text); line-height:1.3; }
+  .cond-icon svg { width:18px; height:18px; }
+  .cond-card h3 { font-size:0.8rem; font-weight:500; color:var(--text); line-height:1.25; }
+  @media (min-width:768px) {
+    .cond-icon { width:52px; height:52px; }
+    .cond-icon svg { width:24px; height:24px; }
+    .cond-card h3 { font-size:0.92rem; font-weight:600; line-height:1.3; }
+  }
   .cond-hint { text-align:center; color:var(--gold-deep); font-size:0.85rem; font-weight:600; margin-top:-16px; margin-bottom:28px; }
 
   /* Condition modal — restyled light */
@@ -799,7 +811,7 @@
     <div class="section-head reveal">
       <span class="section-eyebrow">Come as you are</span>
       <h2>What people come to us for</h2>
-      <p>Most clients arrive with something small they've lived with for a while. Tap the one that sounds like you to see how a session is shaped around it, and book straight in. Curious about hijama itself? Read about <a href="hijama-manchester.html" class="link-gold">hijama in Manchester</a>.</p>
+      <p>Tap what sounds like you and see how a session is shaped around it.</p>
     </div>
     <div class="cond-grid" id="condGrid">
       <button class="cond-card card reveal" type="button" data-cond="hormonal">
@@ -820,7 +832,7 @@
       </button>
       <button class="cond-card card reveal" type="button" data-cond="pain">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
-        <h3>Tight shoulders, back or neck</h3>
+        <h3>Tight shoulders or neck</h3>
       </button>
       <button class="cond-card card reveal" type="button" data-cond="skin">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 6 5 10 5 13.5a7 7 0 0 0 14 0C19 10 17 6 12 3z"/><path d="M12 8v11"/></svg></span>
@@ -832,9 +844,10 @@
       </button>
       <a href="book.html" class="cond-card card reveal">
         <span class="cond-icon" style="background:var(--gold);border-color:var(--gold);color:var(--ink);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        <h3>View all treatments</h3>
+        <h3>All treatments</h3>
       </a>
     </div>
+    <p class="cond-more"><a href="hijama-manchester.html" class="link-gold">What is hijama?</a></p>
   </div>
 </section>
 
