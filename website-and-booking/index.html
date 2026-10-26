@@ -535,14 +535,19 @@
   /* ============================================================
      PRICING
      ============================================================ */
-  .price-grid { display:grid; grid-template-columns:1fr; gap:14px; }
-  @media (min-width:600px) { .price-grid { grid-template-columns:repeat(2,1fr); } }
+  /* Oct 2026 (Halima's pick, "two across"): on phones the four session
+     cards sit 2x2, compact — no icon, no Book line, smaller type — so the
+     section fits one screen. From 600px the cards grow back to the fuller
+     layout; four across from 1024px. */
+  .price-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (min-width:600px) { .price-grid { gap:14px; } }
   @media (min-width:1024px) { .price-grid { grid-template-columns:repeat(4,1fr); gap:var(--s4); } }
   .price-card {
-    padding:26px 22px; text-decoration:none; color:var(--text);
-    display:flex; flex-direction:column; gap:10px; min-height:100%;
+    padding:16px 14px; text-decoration:none; color:var(--text);
+    display:flex; flex-direction:column; gap:6px; min-height:100%;
     transition:transform 0.15s ease, box-shadow 0.15s ease;
   }
+  @media (min-width:600px) { .price-card { padding:26px 22px; gap:10px; } }
   .price-card:hover, .price-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
   .price-icon {
     width:44px; height:44px; border-radius:12px; background:var(--gold-soft); color:var(--gold-deep);
@@ -557,6 +562,17 @@
   .price-dur { color:var(--text-muted); font-size:0.88rem; white-space:nowrap; }
   .price-book { margin-top:auto; padding-top:14px; font-weight:600; color:var(--gold-deep); font-size:0.95rem; }
   .price-note { margin-top:20px; font-size:0.82rem; color:var(--text-muted); }
+  @media (max-width:599px) {
+    .price-icon, .price-book { display:none; }
+    .price-card h3 { font-size:0.98rem; }
+    .price-desc { font-size:0.8rem; line-height:1.4; }
+    .price-from { font-size:0.82rem; margin-top:auto; padding-top:8px; }
+    .price-from strong { font-size:1rem; }
+    .price-was { font-size:0.8rem; }
+    .price-dur { font-size:0.78rem; }
+    #pricing .section-head { margin-bottom:var(--s4); }
+    #pricing .section-head p { display:none; }
+  }
 
   /* ============================================================
      PROCESS ("What to expect")
