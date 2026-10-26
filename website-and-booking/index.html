@@ -141,16 +141,8 @@
      texture rather than barely-visible noise; dimmed to 0.05 in dark mode
      since the same gold stroke shows up more strongly against a dark
      charcoal background at equal opacity. */
-  body::before {
-    content:'';
-    position:fixed; inset:0; z-index:0;
-    background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAiIGhlaWdodD0iMTYwIiB2aWV3Qm94PSIwIDAgMTYwIDE2MCI+CiAgPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOGE2YTJjIiBzdHJva2Utd2lkdGg9IjEuMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjQsNiA0MCwxNSA0MCwzMyAyNCw0MiA4LDMzIDgsMTUiLz4KICAgIDxwYXRoIGQ9Ik0xMDggMjIgYTE2IDExIDAgMSAwIDAuMSAwIi8+CiAgICA8cGF0aCBkPSJNMTAwIDIyIHEwIDggNCA4Ii8+CiAgICA8cGF0aCBkPSJNMTE2IDIyIHEwIDggLTQgOCIvPgogICAgPGxpbmUgeDE9IjEwOCIgeTE9IjMzIiB4Mj0iMTA4IiB5Mj0iNDAiLz4KICAgIDxwYXRoIGQ9Ik00MCAxMDAgQyAyOCAxMTIgMjggMTMwIDQwIDE0MiBDIDUyIDEzMCA1MiAxMTIgNDAgMTAwIFoiLz4KICAgIDxwYXRoIGQ9Ik00MCAxMTIgTDQwIDE0MiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxMjgsOTYgMTQ0LDEwNSAxNDQsMTIzIDEyOCwxMzIgMTEyLDEyMyAxMTIsMTA1Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjgsMTIwIDI0LDEyOSAyNCwxNDcgOCwxNTYgLTgsMTQ3IC04LDEyOSIvPgogIDwvZz4KPC9zdmc+");
-    background-repeat:repeat;
-    background-size:160px 160px;
-    opacity:0.10;
-    pointer-events:none;
-  }
-  @media (prefers-color-scheme: dark) { body::before { opacity:0.05; } }
+  /* The repeating hexagon/leaf texture (body::before) was removed in
+     Oct 2026 at Halima's request — plain cream background. */
   main, footer.site-footer { position:relative; z-index:1; }
 
   h1, h2, h3, h4 { font-family:var(--font-heading); font-weight:600; color:var(--text); }
