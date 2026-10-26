@@ -435,14 +435,18 @@
   .about-cert-row { display:flex; flex-wrap:wrap; gap:var(--s2); margin-top:6px; }
   /* Standards strip (Oct 2026) — four concrete details, the Equinox
      "eucalyptus towels" idea: specifics instead of the word "standards". */
-  .standards { list-style:none; margin:var(--s4) 0 0; padding:0; display:grid; grid-template-columns:1fr; gap:12px; }
-  @media (min-width:768px) { .standards { grid-template-columns:repeat(2,1fr); gap:14px 24px; } }
+  /* About (Oct 2026, Halima's pick of six mock-ups: "the standards lead").
+     The section is the four standards as a 2x2 grid of small tiles, then
+     ONE sentence covering Sunnah + practitioner + credentials. The old two
+     paragraphs and the four credential pills said the same things twice. */
+  .standards { list-style:none; margin:var(--s4) 0 0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (min-width:768px) { .standards { grid-template-columns:repeat(4,1fr); gap:14px; } }
   .standards li {
-    position:relative; padding:14px 16px 14px 34px; border-radius:14px; background:var(--cream);
-    font-size:0.95rem; line-height:1.5; color:var(--c-ink-warm);
+    padding:16px 14px; border-radius:16px; background:var(--cream);
+    font-size:0.88rem; line-height:1.45; color:var(--c-ink-warm);
   }
-  .standards li::before { content:''; position:absolute; left:14px; top:21px; width:8px; height:8px; border-radius:50%; background:var(--gold); }
-  .standards strong { color:var(--text); font-weight:600; }
+  .standards strong { display:block; color:var(--text); font-weight:600; font-size:0.95rem; margin-bottom:4px; }
+  .about-line { margin-top:var(--s4); }
   /* Arrival (Oct 2026) — Clinic Day told as three beats. */
   .arrival { list-style:none; margin:var(--s3) 0 var(--s4); padding:0; display:grid; gap:14px; }
   .arrival li { display:flex; gap:14px; align-items:flex-start; font-size:0.97rem; line-height:1.55; color:var(--c-ink-warm); }
@@ -772,22 +776,15 @@
   <div class="container">
     <div class="about-card card reveal">
       <div class="about-copy">
-        <span class="section-eyebrow">About haloe</span>
-        <h2>Explained to you, never done to you.</h2>
-        <p>Hijama, or wet cupping, is one of the oldest practices in natural wellbeing and a Sunnah of the Prophet Muhammad صلى الله عليه وسلم. haloe practises it to modern professional standards: a private room, sterile single-use equipment, and every step talked through before it happens.</p>
-        <p>Sessions are run by Halima Yasmin, CMA and IPHM accredited, with a Level 5 Diploma in Health and Cupping Therapy (88% distinction, The Suuk Academy). Massage, dry cupping, hijama and one-to-one life coaching, at Milton Hall on Deansgate or at home across Greater Manchester.</p>
-        <div class="about-cert-row">
-          <span class="trust-pill">Level 5 Diploma</span>
-          <span class="trust-pill">CMA accredited</span>
-          <span class="trust-pill">IPHM accredited</span>
-          <span class="trust-pill">Fully insured</span>
-        </div>
+        <span class="section-eyebrow">In every session</span>
+        <h2>Four things you can count on.</h2>
         <ul class="standards" aria-label="Our standards">
-          <li><strong>Single-use blades.</strong> Opened in front of you, disposed of after you.</li>
-          <li><strong>Unlimited cups.</strong> The session is sized to you, not to a count.</li>
-          <li><strong>Black seed oil to take home.</strong> Aftercare starts before you leave.</li>
-          <li><strong>A room behind a key-coded door.</strong> Nobody walks in.</li>
+          <li><strong>Single-use blades</strong>Opened in front of you, disposed of after you.</li>
+          <li><strong>Unlimited cups</strong>Sized to you, not to a count.</li>
+          <li><strong>Black seed oil</strong>Aftercare starts before you leave.</li>
+          <li><strong>A key-coded room</strong>Nobody walks in.</li>
         </ul>
+        <p class="about-line">Hijama is a Sunnah of the Prophet Muhammad صلى الله عليه وسلم, practised here to modern professional standards by Halima Yasmin: Level 5 Diploma in Health and Cupping Therapy, CMA and IPHM accredited, fully insured.</p>
         <div style="margin-top:20px;"><a href="book.html" class="btn-pill btn-gold">Book a session</a></div>
       </div>
     </div>
