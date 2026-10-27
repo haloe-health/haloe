@@ -1981,6 +1981,18 @@
   .time-slot { background: var(--cs-card); border: 0; border-radius: 14px; color: var(--cs-ink); font-weight: 400; }
   .time-slot.selected { background: var(--cs-sel); color: var(--cs-ink); font-weight: 500; box-shadow: inset 0 0 0 2px #B8924A; }
   .time-slot.taken { opacity: .45; background: transparent; color: var(--cs-mute); }
+  /* -- calm pass: step 4 (Your details) -- */
+  .field-label { color: var(--cs-mute); font-weight: 400; font-size: 14px; }
+  .field-optional { opacity: .8; }
+  .form-field input, .form-field select, .form-field textarea, #panel-4 input[type="text"], #panel-4 input[type="tel"], #panel-4 input[type="email"], #panel-4 select, #panel-4 textarea { background: var(--cs-card); border: 0; border-radius: 16px; color: var(--cs-ink); }
+  #panel-4 input:not([type=checkbox]):focus, #panel-4 select:focus, #panel-4 textarea:focus { outline: none; box-shadow: inset 0 0 0 2px #B8924A; }
+  #panel-4 .s4-eyebrow-label { color: var(--cs-mute); letter-spacing: 0; text-transform: none; font-weight: 400; font-size: 13px; }
+  .consent-row { border-bottom-color: rgba(42,38,32,.08); }
+  .consent-check { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--cs-line); background: transparent; }
+  .consent-check:checked { background: var(--cs-ink); border-color: var(--cs-ink); }
+  .consent-check:checked::after { color: var(--cs-tick); }
+  .consent-text { color: var(--cs-ink); font-weight: 300; }
+  #panel-4 .s4-location, #panel-4 .s4-location-card { background: var(--cs-card); border: 0; border-radius: 20px; }
   .footbar .foot-cta { background: var(--cs-page); color: var(--cs-ink); font-weight: 500; }
   .footbar .foot-cta svg { color: var(--cs-ink); }
   .footbar .foot-cta:disabled { background: rgba(247,243,234,.16); color: rgba(247,243,234,.6); opacity: 1; }
@@ -2796,7 +2808,7 @@ function syncFooter() {
       1: 'Choose at least one treatment',
       2: state.location === 'mobile' && state.travelZone === null ? 'Enter your postcode' : 'Choose a place to continue',
       3: state.date ? 'Pick a time to continue' : 'Pick a date and time',
-      4: 'Finish your details to continue',
+      4: 'Fill in your details',
     };
     const why = cta.disabled ? reasons[currentStep] : '';
     fh.textContent = why;
