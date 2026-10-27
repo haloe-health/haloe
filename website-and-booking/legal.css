@@ -11,7 +11,7 @@
 .article{background:#fff;border-radius:28px;padding:8px 24px;counter-reset:sec;margin:0 0 24px}
 .article > .card{background:none;box-shadow:none;border-radius:0;padding:24px 0;margin:0;border:0;border-top:1px solid rgba(13,13,13,.09);counter-increment:sec}
 .article > .card:first-child{border-top:0}
-.article .card .section-label{display:block;font-family:'Poppins',sans-serif;font-weight:600;text-transform:none;letter-spacing:-.01em;font-size:20px;line-height:1.15;color:var(--ink);margin:0 0 12px}
+.article .card .section-label{display:block;font-family:'Tan Ashford',Georgia,serif;font-weight:normal;text-transform:none;letter-spacing:0;font-size:22px;line-height:1.15;color:var(--ink);margin:0 0 12px}
 .article .card .section-label::before{content:counter(sec,decimal-leading-zero);display:block;font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--gold-deep);margin-bottom:10px}
 .article .card p{font-size:16px;line-height:1.65;color:var(--muted)}
 .article .card p strong{color:var(--ink);font-weight:600}
