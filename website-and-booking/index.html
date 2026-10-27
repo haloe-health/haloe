@@ -390,10 +390,9 @@
     /* The pendant does not move (sway removed 27 Oct 2026 at Halima's request). */
     /* Phone: "Feel" in gold, "lighter." in cream (Halima, 27 Oct 2026). */
     .hero-title { font-size:clamp(3rem,14vw,4.2rem); line-height:1; margin:0; color:var(--gold); max-width:9ch; }
-    .hero-title em { color:#F5F0E8; -webkit-text-stroke:0; }
-    /* "Feel" gets a black outline on the phone (Halima, 27 Oct 2026). paint-order keeps the stroke
-       outside the letters so the gold isn't thinned. */
-    .hero-title { -webkit-text-stroke:3px #0D0D0D; paint-order:stroke fill; }
+    .hero-title em { color:#F5F0E8; }
+    /* Phone: a soft dark glow behind both words lifts "Feel" off the cream scarf (Halima's pick, 27 Oct 2026). */
+    .hero-title { text-shadow:0 2px 16px rgba(10,6,2,0.6), 0 1px 2px rgba(10,6,2,0.35); }
     .hero-sub { margin-top:14px; max-width:32ch; font-size:1.02rem; line-height:1.5; color:#EFE6D6; }
     .hero-actions { margin-top:18px; }
     .hero-actions .btn-pill { display:none; }
