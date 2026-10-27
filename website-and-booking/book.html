@@ -294,7 +294,8 @@
   .book-main .container { max-width: none; margin: 0; padding: 0.5rem 0 0; }
 
   /* Step 2: calendar and times side by side inside the main column */
-  .dt-cols { display: grid; grid-template-columns: minmax(0, 240px) 1fr; gap: 1.75rem; align-items: start; }
+  /* Stacked (calendar, then times): the 560px column is too narrow for both side by side — 7 day columns need ~330px. */
+  .dt-cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; align-items: start; }
   .dt-cols .date-section { margin: 0; }
   .time-hint { font-size: 0.92rem; color: var(--text-muted); line-height: 1.6; }
   @media (max-width: 720px) { .dt-cols { grid-template-columns: 1fr; } }
