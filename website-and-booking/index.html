@@ -699,6 +699,16 @@
   .faq-dots b { width:6px; height:6px; border-radius:50%; background:rgba(13,13,13,0.25); transition:background 0.2s ease, transform 0.2s ease; }
   .faq-dots b.on { background:var(--ink); transform:scale(1.25); }
   @media (min-width:768px) { .faq-card { width:320px; } }
+  /* Arrows + mouse drag (27 Oct 2026): a mouse can't swipe, and the track has no
+     scrollbar, so on a computer the later questions were unreachable. */
+  .faq-nav { display:flex; align-items:center; justify-content:center; gap:14px; margin-top:6px; }
+  .faq-nav .faq-dots { margin-top:0; }
+  .faq-arrow { width:44px; height:44px; border-radius:50%; border:1.5px solid rgba(13,13,13,0.35); background:transparent; color:var(--ink); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
+  .faq-arrow svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  .faq-arrow:disabled { opacity:0.3; cursor:default; }
+  .faq-track.dragging { cursor:grabbing; scroll-snap-type:none; user-select:none; }
+  @media (hover:hover) and (pointer:fine) { .faq-track { cursor:grab; } .faq-arrow:not(:disabled):hover { background:var(--ink); color:var(--gold); } }
+
 
   /* ============================================================
      CLINIC DAY
@@ -1160,7 +1170,11 @@
     </div>
   </div>
   <div class="container">
-    <div class="faq-dots" id="faqDots" aria-hidden="true"></div>
+    <div class="faq-nav">
+      <button type="button" class="faq-arrow" id="faqPrev" aria-label="Previous question"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="faq-dots" id="faqDots" aria-hidden="true"></div>
+      <button type="button" class="faq-arrow" id="faqNext" aria-label="Next question"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
   </div>
 </section>
 
@@ -2058,8 +2072,19 @@ hbInit();
     });
     for (var i = 0; i < ds.length; i++) ds[i].classList.toggle('on', i === best);
   }
-  track.addEventListener('scroll', function () { requestAnimationFrame(sync); }, { passive: true });
-  sync();
+  var prev = document.getElementById('faqPrev'), next = document.getElementById('faqNext');
+  function current() { var mid = track.scrollLeft + track.clientWidth / 2, best = 0, bd = Infinity; cards.forEach(function (c, i) { var d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid); if (d < bd) { bd = d; best = i; } }); return best; }
+  function go(i) { i = Math.max(0, Math.min(cards.length - 1, i)); cards[i].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
+  function ends() { var max = track.scrollWidth - track.clientWidth; if (prev) prev.disabled = track.scrollLeft <= 4; if (next) next.disabled = track.scrollLeft >= max - 4; }
+  if (prev) prev.addEventListener('click', function () { go(current() - 1); });
+  if (next) next.addEventListener('click', function () { go(current() + 1); });
+  track.addEventListener('scroll', function () { requestAnimationFrame(sync); requestAnimationFrame(ends); }, { passive: true });
+  // Click-and-drag with a mouse (touch already swipes natively).
+  var down = false, sx = 0, sl = 0, moved = false;
+  track.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse' || e.button !== 0) return; down = true; moved = false; sx = e.clientX; sl = track.scrollLeft; });
+  window.addEventListener('pointermove', function (e) { if (!down) return; var dx = e.clientX - sx; if (!moved && Math.abs(dx) > 5) { moved = true; track.classList.add('dragging'); } if (moved) track.scrollLeft = sl - dx; });
+  window.addEventListener('pointerup', function () { if (!down) return; down = false; if (moved) { track.classList.remove('dragging'); go(current()); } });
+  sync(); ends();
 })();
 </script>
 
