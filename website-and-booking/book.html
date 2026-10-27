@@ -2022,6 +2022,8 @@
   @media (hover: hover) { .footbar .foot-cta:hover:not(:disabled) { background: #fff; color: var(--cs-ink); border-color: transparent; opacity: 1; } }
   .footbar .foot-cta:active:not(:disabled) { background: var(--cs-sel); color: var(--cs-ink); border-color: transparent; }
   .footbar .foot-cta:disabled { background: rgba(247,243,234,.16); color: rgba(247,243,234,.6); opacity: 1; }
+  /* Dark mode: the bar is cream and the button dark, so the hover must stay dark (the light-mode #fff hover made cream text vanish on white). */
+  @media (hover: hover) and (prefers-color-scheme: dark) { .footbar .foot-cta:hover:not(:disabled) { background: #2C261B; color: var(--cs-ink); border-color: transparent; opacity: 1; } }
   @media (prefers-color-scheme: dark) { .footbar .foot-cta { background: var(--cs-page); color: var(--cs-ink); } .footbar .foot-cta:disabled { background: rgba(20,17,13,.14); color: rgba(20,17,13,.55); } }
   #panel-1 .service-card:focus:not(:focus-visible) { outline: none; }
   #panel-1 .packages-policy-line { color: var(--cs-mute); font-size: 13px; font-weight: 300; line-height: 1.5; margin: 6px 0 4px; }
