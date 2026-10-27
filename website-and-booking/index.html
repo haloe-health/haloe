@@ -48,7 +48,20 @@
   "telephone": "+447474833643",
   "email": "halima@haloe.health",
   "priceRange": "££",
-  "sameAs": ["https://instagram.com/haloe.health"],
+  "@id": "https://haloe.health/#business",
+  "sameAs": ["https://instagram.com/haloe.health", "https://www.tiktok.com/@haloe.health", "https://www.youtube.com/@haloe.health"],
+  "founder": { "@type": "Person", "name": "Halima Yasmin", "jobTitle": "Hijama and cupping practitioner, massage therapist and life coach", "url": "https://haloe.health/" },
+  "availableLanguage": "English",
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "haloe sessions",
+    "itemListElement": [
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hijama (wet cupping)", "url": "https://haloe.health/hijama-manchester" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Dry cupping", "url": "https://haloe.health/cupping-manchester" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Massage", "url": "https://haloe.health/massage-manchester" } },
+      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Life coaching", "url": "https://haloe.health/life-coaching-manchester" } }
+    ]
+  },
   "openingHoursSpecification": [
     { "@type": "OpeningHoursSpecification", "dayOfWeek": "Tuesday", "opens": "09:00", "closes": "19:00", "description": "Clinic day at Milton Hall, Deansgate" },
     { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Wednesday","Thursday","Friday","Saturday"], "opens": "10:00", "closes": "20:00", "description": "Home visits across Greater Manchester" }
