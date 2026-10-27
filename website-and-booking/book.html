@@ -3860,6 +3860,7 @@ function goToStep(n) {
   let restH = viewH();          // height with no keyboard, learned while nothing is focused
   let focusedField = null;
   let settleTimer = null;
+  let kbSeen = false;           // true once the keyboard has actually been seen up for this focus
 
   function keyboardShown() { return viewH() < restH - 140; }
   function setKb(on) { root.classList.toggle('kb-open', !!on); }
@@ -3874,16 +3875,18 @@ function goToStep(n) {
     if (Math.abs(delta) > 6) window.scrollBy({ top: delta, behavior: 'smooth' });
   }
   // Keyboard went away (or never came, e.g. a hardware keyboard): show the bar.
+  // Never blur the field here: while the keyboard is still sliding up, the first
+  // resize events can look like "keyboard gone", and a blur() would dismiss the
+  // keyboard the instant it opens (the field then never accepts typing).
   function keyboardGone() {
     setKb(false);
-    focusedField = null;
-    const a = document.activeElement;
-    if (isField(a)) a.blur();   // so tapping the same field again re-triggers focusin
+    kbSeen = false;
   }
 
   document.addEventListener('focusin', e => {
     if (!isField(e.target)) return;
     focusedField = e.target;
+    kbSeen = false;
     setKb(true);                 // hide the bar straight away so it never jumps
     [60, 300, 600].forEach(ms => setTimeout(() => { if (focusedField === e.target) centreField(e.target); }, ms));
     // If no keyboard actually appears (desktop, hardware keyboard), put the bar back.
@@ -3897,8 +3900,8 @@ function goToStep(n) {
   });
   function onViewport() {
     if (!focusedField) { restH = Math.max(restH, viewH()); return; }
-    if (keyboardShown()) { setKb(true); setTimeout(() => centreField(focusedField), 50); }
-    else if (root.classList.contains('kb-open')) { clearTimeout(settleTimer); keyboardGone(); }
+    if (keyboardShown()) { kbSeen = true; setKb(true); setTimeout(() => centreField(focusedField), 50); }
+    else if (kbSeen && root.classList.contains('kb-open')) { clearTimeout(settleTimer); keyboardGone(); }
   }
   if (vv) vv.addEventListener('resize', onViewport);
   window.addEventListener('resize', onViewport);
