@@ -83,7 +83,7 @@ check('owner notification does not repeat it', !mails.slice(1).some((x) => x.htm
 
 // ---- FAQs (static text must equal the shared constants)
 const idx = read('index.html'), hm = read('hijama-manchester.html');
-check('homepage FAQ has the question and the exact answer', idx.includes(`>${CARE_COPY.faqQuestion}<span class="faq-chevron">`) && idx.includes(`<div class="faq-a-inner">${CARE_COPY.faqAnswer}</div>`), 0);
+check('homepage FAQ has the question and the exact answer', idx.includes(`<h3>${CARE_COPY.faqQuestion}</h3>`) && idx.includes(`<p>${CARE_COPY.faqAnswer}</p>`), 0);
 check('Hijama Manchester FAQ has the question and the exact answer', hm.includes(`<summary>${CARE_COPY.faqQuestion}</summary>\n      <p>${CARE_COPY.faqAnswer}</p>`), 0);
 const ld = JSON.parse(hm.match(/<script type="application\/ld\+json">\s*(\{[\s\S]*?"FAQPage"[\s\S]*?\})\s*<\/script>/)[1]);
 const q = ld.mainEntity.find((e) => e.name === CARE_COPY.faqQuestion);
