@@ -4,7 +4,7 @@
    No names, emails, phone numbers or health details are ever sent — only page views,
    the treatment price and the booking total. Not loaded on /intake or /app on purpose. */
 (function () {
-  var CFG = { META_PIXEL_ID: '', GA4_ID: '' };
+  var CFG = { META_PIXEL_ID: '1458867292869954', GA4_ID: '' };
   var KEY = 'haloe_consent';
   function get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
   function set(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
