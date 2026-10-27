@@ -1940,6 +1940,30 @@
   .footbar-inner { background: var(--cs-bar); color: var(--cs-bar-text); box-shadow: 0 8px 28px rgba(42,38,32,.18); }
   .foot-label, .foot-total { color: var(--cs-bar-text); }
   .foot-total { font-weight: 500; font-size: 17px; }
+  /* -- calm pass: step 2 (Where) and shared form groups -- */
+  .step.active .step-dot, .step.done .step-dot { background: var(--cs-ink); }
+  .step.done .step-dot { opacity: .35; }
+  .foot-total .was, .foot-total s { display: none; }
+  .where-grid { display: grid; gap: 10px; margin-top: 14px; }
+  .where-card { background: var(--cs-card); border: 0; box-shadow: none; border-radius: 20px; padding: 18px; transition: background .15s; }
+  .where-card.selected { background: var(--cs-sel); }
+  .where-card-header { display: flex; align-items: center; gap: 10px; }
+  .where-card-name { order: 1; flex: 1; font-weight: 500; font-size: 16px; color: var(--cs-ink); }
+  .where-card-badge { order: 2; background: transparent !important; border: 0 !important; color: var(--cs-mute) !important; font-size: 12px; letter-spacing: .06em; padding: 0; }
+  .where-radio-ring { order: 3; width: 28px; height: 28px; border: 1.5px solid var(--cs-line); background: transparent; flex: none; }
+  .where-card.selected .where-radio-ring { background: var(--cs-ink); border-color: var(--cs-ink); }
+  .where-card.selected .where-radio-ring::after { content: ''; width: 6px; height: 12px; border: solid var(--cs-tick); border-width: 0 2px 2px 0; border-radius: 0; background: none; transform: rotate(45deg) translate(-1px, -1px); }
+  .where-card.selected, .where-card:has(input:checked) { border: 0; box-shadow: none; }
+  .where-card-address, .where-card-meta { padding-left: 0; margin-left: 0; display: block; }
+  .postcode-row input::placeholder { text-transform: none; letter-spacing: 0; }
+  .where-card-address { color: var(--cs-ink); font-weight: 400; font-size: 15px; margin-top: 8px; }
+  .where-card-meta { color: var(--cs-mute); font-weight: 300; font-size: 13px; }
+  .loc-line { color: var(--cs-mute); font-weight: 300; font-size: 13px; }
+  .ios-group { background: var(--cs-card); border: 0; border-radius: 20px; box-shadow: none; }
+  .ios-row { border-bottom-color: rgba(42,38,32,.08); padding: 14px 18px; }
+  .ios-row label { color: var(--cs-mute); font-weight: 400; font-size: 15px; }
+  .ios-row input, .ios-row select, .ios-row textarea { color: var(--cs-ink); }
+  .travel-fee-line { color: var(--cs-ink); }
   .footbar .foot-cta { background: var(--cs-page); color: var(--cs-ink); font-weight: 500; }
   .footbar .foot-cta svg { color: var(--cs-ink); }
   .footbar .foot-cta:disabled { background: rgba(247,243,234,.16); color: rgba(247,243,234,.6); opacity: 1; }
