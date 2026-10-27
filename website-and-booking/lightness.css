@@ -1,0 +1,62 @@
+/* haloe "lightness" motion (27 Oct 2026): slow drifting feathers, a light
+   sweep across gold buttons and the hero word, and gold lines that sweep in
+   under section labels. Transform/opacity only, no libraries. Everything is
+   off under prefers-reduced-motion and when the visitor has Data Saver on.
+   Shared by index and the four landing pages. Not on /book, /intake or /app. */
+:root { --feather: #C8A96E; --sweep: rgba(255,250,236,0.55); --glint: #E3C98A; }
+@media (prefers-color-scheme: dark) { :root { --feather: #D7BC82; --sweep: rgba(255,246,222,0.4); --glint: #FFF6DC; } }
+
+/* Feathers: a fixed, click-through layer above the page, very faint. */
+.feather-layer { position:fixed; inset:0; z-index:3; pointer-events:none; overflow:hidden; }
+.feather {
+  position:absolute; top:-90px; left:var(--x,50%); width:var(--s,22px); height:calc(var(--s,22px) * 2.7);
+  color:var(--feather); opacity:0; will-change:transform,opacity;
+  animation:featherFall var(--d,34s) linear var(--delay,0s) infinite;
+}
+.feather svg { width:100%; height:100%; display:block; animation:featherSway var(--sw,6s) ease-in-out var(--delay,0s) infinite alternate; transform-origin:50% 20%; }
+@keyframes featherFall {
+  0%   { transform:translate3d(0,-10vh,0); opacity:0; }
+  8%   { opacity:var(--o,0.2); }
+  88%  { opacity:var(--o,0.2); }
+  100% { transform:translate3d(var(--drift,60px),112vh,0); opacity:0; }
+}
+@keyframes featherSway { from { transform:rotate(-26deg); } to { transform:rotate(26deg); } }
+
+/* Light sweep across the hero's gold word, once, shortly after load. */
+.hero-title em {
+  background:linear-gradient(100deg, currentColor 0%, currentColor 42%, var(--glint) 50%, currentColor 58%, currentColor 100%);
+  background-size:260% 100%; background-position:100% 0;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  animation:wordSweep 2.2s cubic-bezier(.4,.1,.2,1) 0.7s 1 both;
+  /* inline padding widens the clip box so tall letters (l, h, g) aren't cut off */
+  padding:0.22em 0.08em; margin:-0.22em -0.08em; -webkit-box-decoration-break:clone; box-decoration-break:clone;
+}
+@keyframes wordSweep { from { background-position:100% 0; } to { background-position:0% 0; } }
+
+/* Gold buttons: a soft sheen passes over now and then, and on hover. */
+.btn-gold {
+  background-image:linear-gradient(110deg, transparent 38%, var(--sweep) 50%, transparent 62%);
+  background-size:260% 100%; background-repeat:no-repeat; background-position:130% 0;
+}
+.hero-actions .btn-gold { animation:btnSheen 7s ease-in-out 3s infinite; }
+@keyframes btnSheen { 0%,78% { background-position:130% 0; } 100% { background-position:-30% 0; } }
+@media (hover:hover) and (pointer:fine) {
+  .btn-gold:hover { background-position:-30% 0; transition:background-position 0.8s ease; }
+}
+
+/* Section labels: a thin gold line sweeps out under the label as it appears. */
+.section-eyebrow { position:relative; }
+.reveal .section-eyebrow::after, .section-head .section-eyebrow::after {
+  content:''; display:block; height:2px; width:44px; margin-top:8px; background:var(--feather);
+  transform:scaleX(0); transform-origin:left center; transition:transform 0.9s cubic-bezier(.22,.61,.36,1) 0.15s;
+}
+.reveal.in-view .section-eyebrow::after, .section-head.in-view .section-eyebrow::after { transform:scaleX(1); }
+.faq-section .section-eyebrow::after { background:var(--ink); opacity:.6; }
+.clinic-copy .section-eyebrow::after { display:none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .feather-layer { display:none; }
+  .hero-title em { animation:none; background:none; -webkit-text-fill-color:currentColor; }
+  .btn-gold, .hero-actions .btn-gold { animation:none; background-image:none; }
+  .reveal .section-eyebrow::after, .section-head .section-eyebrow::after { transform:scaleX(1); transition:none; }
+}
