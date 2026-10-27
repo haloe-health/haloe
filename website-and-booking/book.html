@@ -1931,7 +1931,7 @@
   #panel-1 .svc-name { font-weight: 400; font-size: 16px; color: var(--cs-ink); }
   #panel-1 .svc-meta-line { color: var(--cs-mute); font-weight: 300; font-size: 13px; }
   #panel-1 .svc-price { font-weight: 400; font-size: 16px; color: var(--cs-ink); }
-  #panel-1 .svc-price .was { display: none; }
+  #panel-1 .svc-price .was { color: var(--cs-mute); font-weight: 300; font-size: 13px; margin-right: 6px; text-decoration: line-through; }
   #panel-1 .svc-dur-tag { color: var(--cs-mute); font-weight: 300; font-size: 13px; background: none; border: 0; padding: 0; }
   #panel-1 .service-card .svc-right-col { text-align: right; }
   #panel-1 .cart-summary { background: transparent; padding: 0; margin-top: 12px; }
@@ -1943,7 +1943,7 @@
   /* -- calm pass: step 2 (Where) and shared form groups -- */
   .step.active .step-dot, .step.done .step-dot { background: var(--cs-ink); }
   .step.done .step-dot { opacity: .35; }
-  .foot-total .was, .foot-total s { display: none; }
+  .footbar .was { color: rgba(247,243,234,.6); font-weight: 300; font-size: .82em; margin-right: 6px; text-decoration: line-through; }
   .where-grid { display: grid; gap: 10px; margin-top: 14px; }
   .where-card { background: var(--cs-card); border: 0; box-shadow: none; border-radius: 20px; padding: 18px; transition: background .15s; }
   .where-card.selected { background: var(--cs-sel); }
@@ -2010,6 +2010,8 @@
   .pay-btn.pay-primary:disabled, #btn-full.pay-btn:disabled { background: var(--cs-ink); color: var(--cs-page); opacity: .28; }
   .footbar .foot-cta { background: var(--cs-page); color: var(--cs-ink); font-weight: 500; }
   .footbar .foot-cta svg { color: var(--cs-ink); }
+  @media (hover: hover) { .footbar .foot-cta:hover:not(:disabled) { background: #fff; color: var(--cs-ink); border-color: transparent; opacity: 1; } }
+  .footbar .foot-cta:active:not(:disabled) { background: var(--cs-sel); color: var(--cs-ink); border-color: transparent; }
   .footbar .foot-cta:disabled { background: rgba(247,243,234,.16); color: rgba(247,243,234,.6); opacity: 1; }
   @media (prefers-color-scheme: dark) { .footbar .foot-cta { background: var(--cs-page); color: var(--cs-ink); } .footbar .foot-cta:disabled { background: rgba(20,17,13,.14); color: rgba(20,17,13,.55); } }
   #panel-1 .service-card:focus:not(:focus-visible) { outline: none; }
@@ -2756,9 +2758,7 @@ function updateRail() {
     if (!svc) {
       fs.textContent = 'Select a treatment';
     } else if (currentStep === 1) {
-      fs.textContent = items.length > 1
-        ? `${items.length} treatments · ${formatPounds(totalPence)}`
-        : `${svc.name} · ${priceFmt(netPrice(svc))}`;
+      fs.textContent = items.length > 1 ? `${items.length} treatments` : svc.name;
     } else if (currentStep === 2) {
       // Where: the place once chosen, else the prompt.
       fs.textContent = state.location === 'clinic' ? `Clinic Day · ${CLINIC_VENUE_NAME}`
@@ -2776,14 +2776,17 @@ function updateRail() {
   // customer always sees what they will pay, not just the treatment.
   const travelOn = isMobile() && state.travelZone;
   if (ft) {
-    if (!svc || (currentStep === 1 && !travelOn)) {
+    if (!svc) {
       ft.innerHTML = '';
     } else if (travelOn) {
       ft.textContent = state.travelZone === 'Q'
         ? `${formatPounds(totalPence)} + travel by WhatsApp`
         : `${formatPounds(totalPence + state.travelPence)} incl. ${formatPounds(state.travelPence)} travel`;
     } else {
-      ft.innerHTML = items.length > 1 ? formatPounds(totalPence) : priceHtml(svc);
+      const listP = items.reduce((n, { svc: x }) => n + Math.round(x.price * 100), 0);
+      ft.innerHTML = items.length > 1
+        ? (listP > totalPence ? `<s class="was">${formatPounds(listP)}</s> ` : '') + formatPounds(totalPence)
+        : priceHtml(svc);
     }
   }
   const fh = document.getElementById('foot-helper');
