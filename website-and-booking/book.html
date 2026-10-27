@@ -1886,6 +1886,8 @@
   .pass-extra, .pass-extra.total { padding-top: var(--s3); padding-bottom: var(--s3); }
   .ios-group { margin-bottom: var(--s3); }
   .ios-row.discount-row { padding: var(--s4); gap: var(--s4); }
+  /* Focus ring on the code row must follow the card's 20px corners, or the card's overflow:hidden clips it. */
+  @media (hover: hover) { .ios-row.discount-row:has(input:focus-visible) { border-radius: 20px; outline: 0; box-shadow: inset 0 0 0 2px var(--gold-deep); } }
   #discount-code { height: 40px; }
   .discount-apply-btn { padding-left: var(--s4); padding-right: var(--s4); }
   .discount-row label { width: auto; white-space: nowrap; }
