@@ -839,6 +839,19 @@
   .footer-col p { margin-bottom: var(--s2); }
   .footer-col a:hover { text-decoration: underline; }
   .mobile-bar { transition: opacity 180ms ease, visibility 180ms; }
+
+  /* Dark mode text fixes (27 Oct 2026): several rules used fixed dark ink
+     (--c-ink-warm, #1C1A16) and the footer/price cards used fixed cream, so
+     in dark mode that text sat dark-on-dark or cream-on-cream. The tokens
+     and surfaces below flip only under prefers-color-scheme: dark. */
+  @media (prefers-color-scheme: dark) {
+    html:root { --c-ink-warm: #E8DFCF; --c-gold-deep: #D7BC82; --gold-deep: #D7BC82; }
+    .feel-card b { color: var(--text); }
+    .site-footer { background: var(--bg); }
+    .footer-social a { border-color: rgba(245,240,232,0.28); }
+    #pricing .price-card { background: var(--surface); }
+    .review-avatar-alt { background: var(--surface); }
+  }
 </style>
 <link rel="stylesheet" href="/tokens.css">
 <link rel="stylesheet" href="/ui.css">
