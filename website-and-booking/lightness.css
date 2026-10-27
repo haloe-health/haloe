@@ -1,21 +1,13 @@
 /* haloe "lightness" motion (27 Oct 2026): a light
-   sweep across gold buttons and the hero word, and gold lines that sweep in
+   sweep across gold buttons and gold lines that sweep in
    under section labels. Transform/opacity only, no libraries. Everything is
    off under prefers-reduced-motion and when the visitor has Data Saver on.
    Shared by index and the four landing pages. Not on /book, /intake or /app. */
 :root { --feather: #C8A96E; --sweep: rgba(255,250,236,0.55); --glint: #E3C98A; }
 @media (prefers-color-scheme: dark) { :root { --feather: #D7BC82; --sweep: rgba(255,246,222,0.4); --glint: #FFF6DC; } }
 
-/* Light sweep across the hero's gold word, once, shortly after load. */
-.hero-title em {
-  background:linear-gradient(100deg, currentColor 0%, currentColor 42%, var(--glint) 50%, currentColor 58%, currentColor 100%);
-  background-size:260% 100%; background-position:100% 0;
-  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
-  animation:wordSweep 2.2s cubic-bezier(.4,.1,.2,1) 0.7s 1 both;
-  /* inline padding widens the clip box so tall letters (l, h) and the long tail of the g aren't cut off */
-  padding:0.22em 0.1em 0.55em; margin:-0.22em -0.1em -0.55em; -webkit-box-decoration-break:clone; box-decoration-break:clone;
-}
-@keyframes wordSweep { from { background-position:100% 0; } to { background-position:0% 0; } }
+/* The hero word no longer has a light sweep (27 Oct 2026): background-clip:text
+   clipped the tops of the l and h and the dot of the i in Tan Ashford. */
 
 /* Gold buttons: a soft sheen passes over now and then, and on hover. */
 .btn-gold {
@@ -39,7 +31,6 @@
 .clinic-copy .section-eyebrow::after { display:none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-title em { animation:none; background:none; -webkit-text-fill-color:currentColor; }
   .btn-gold, .hero-actions .btn-gold { animation:none; background-image:none; }
   .reveal .section-eyebrow::after, .section-head .section-eyebrow::after { transform:scaleX(1); transition:none; }
 }
