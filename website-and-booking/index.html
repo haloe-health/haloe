@@ -682,7 +682,8 @@
   /* ============================================================
      REVIEWS
      ============================================================ */
-  .reviews-head { display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-bottom:28px; }
+  .reviews-head { display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-bottom:20px; }
+  .reviews-sub { margin-top:6px; font-size:0.92rem; color:var(--text-muted); }
   .google-badge {
     display:inline-flex; align-items:center; gap:var(--s2); background:var(--surface);
     border-radius:999px; padding:var(--s2) var(--s4); box-shadow:var(--card-shadow);
@@ -691,11 +692,21 @@
   .google-badge svg { width:16px; height:16px; color:var(--gold-deep); }
   .review-grid { display:grid; grid-template-columns:1fr; gap:14px; }
   @media (min-width:768px) { .review-grid { grid-template-columns:repeat(3,1fr); } }
-  .review-card { padding:22px 20px; transition:transform 0.15s ease, box-shadow 0.15s ease; }
+  /* Reviews laid out like Google's own (Oct 2026, Halima's pick of six):
+     initials in a circle, name, stars · Google, then the text. The long
+     review is trimmed to its clearest sentences; wording is the client's. */
+  .review-card { padding:16px 18px; transition:transform 0.15s ease, box-shadow 0.15s ease; }
   .review-card:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
-  .review-stars { color:var(--gold); font-size:0.95rem; letter-spacing:2px; }
-  .review-card p { margin-top:var(--s3); font-size:0.92rem; font-style:italic; }
-  .review-name { margin-top:14px; font-size:0.82rem; font-weight:600; color:var(--gold-deep); }
+  .review-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .review-avatar {
+    width:38px; height:38px; border-radius:50%; flex:none; background:var(--gold); color:var(--ink);
+    display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:0.82rem;
+  }
+  .review-avatar-alt { background:var(--cream); color:var(--gold-deep); }
+  .review-who { font-weight:600; font-size:0.95rem; line-height:1.2; }
+  .review-sub { font-size:0.74rem; color:var(--text-muted); margin-top:2px; }
+  .review-stars { color:var(--gold); font-size:0.78rem; letter-spacing:1px; }
+  .review-card p { margin:0; font-size:0.92rem; line-height:1.5; color:var(--text); }
 
   /* ============================================================
      FAQ
@@ -1064,7 +1075,8 @@
     <div class="reviews-head reveal">
       <div>
         <span class="section-eyebrow">Reviews</span>
-        <h2>Rated 5.0 from 7 Google reviews</h2>
+        <h2>What clients say</h2>
+        <p class="reviews-sub">Rated 5.0 from 7 Google reviews.</p>
       </div>
       <span class="google-badge">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6 6.6.6-5 4.4 1.5 6.5L12 16l-5.9 3.5L7.5 13l-5-4.4 6.6-.6z"/></svg>
@@ -1072,24 +1084,27 @@
       </span>
     </div>
     <div class="review-grid">
-      <div class="review-card card reveal">
-        <div class="review-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>"Very professional and always making sure I was comfortable throughout the entire session. Even provided me with aftercare treatment for free! Will return."</p>
-        <div class="review-name">— Curtis B.</div>
-      </div>
-      <div class="review-card card reveal">
-        <div class="review-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>"I had such a wonderful experience at Haloe! I recently had Hijama done on my back, and I couldn’t be happier with the service. From the moment I arrived, I felt welcomed, comfortable and completely at ease. Everything was explained clearly, and the treatment was carried out with great professionalism and care."</p>
-        <p>"The clinic was clean, calming and extremely hygienic. It was clear that the team genuinely cares about its clients. I left feeling really positive about the experience and so glad I chose Haloe."</p>
-        <p>"I would highly recommend Haloe to anyone considering Hijama. The service was absolutely brilliant from start to finish, and I’ll definitely be returning!"</p>
-        <p>"A big thank you to Halima for being so lovely, professional and caring throughout the whole experience. I really appreciate everything and can’t thank you enough!"</p>
-        <div class="review-name">— Cláudio S.</div>
-      </div>
-      <div class="review-card card reveal">
-        <div class="review-stars" role="img" aria-label="5 out of 5 stars">★★★★★</div>
-        <p>"Very good, I felt fresh the next day. Very professional and friendly service."</p>
-        <div class="review-name">— Alex A.</div>
-      </div>
+      <article class="review-card card reveal">
+        <header class="review-head">
+          <span class="review-avatar" aria-hidden="true">CB</span>
+          <div><div class="review-who">Curtis B.</div><div class="review-sub"><span class="review-stars" role="img" aria-label="5 out of 5 stars">★★★★★</span> · Google</div></div>
+        </header>
+        <p>Very professional and always making sure I was comfortable throughout the entire session. Even provided me with aftercare treatment for free! Will return.</p>
+      </article>
+      <article class="review-card card reveal">
+        <header class="review-head">
+          <span class="review-avatar review-avatar-alt" aria-hidden="true">CS</span>
+          <div><div class="review-who">Cláudio S.</div><div class="review-sub"><span class="review-stars" role="img" aria-label="5 out of 5 stars">★★★★★</span> · Google</div></div>
+        </header>
+        <p>From the moment I arrived, I felt welcomed, comfortable and completely at ease. Everything was explained clearly. The clinic was clean, calming and extremely hygienic. I would highly recommend Haloe to anyone considering Hijama.</p>
+      </article>
+      <article class="review-card card reveal">
+        <header class="review-head">
+          <span class="review-avatar review-avatar-alt" aria-hidden="true">AA</span>
+          <div><div class="review-who">Alex A.</div><div class="review-sub"><span class="review-stars" role="img" aria-label="5 out of 5 stars">★★★★★</span> · Google</div></div>
+        </header>
+        <p>Very good, I felt fresh the next day. Very professional and friendly service.</p>
+      </article>
     </div>
   </div>
 </section>
