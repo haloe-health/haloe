@@ -2014,6 +2014,8 @@
   .discount-row, #panel-5 .ios-group { background: var(--cs-card); }
   .care-card { background: var(--cs-sel); color: var(--cs-ink); border-radius: 20px; padding-left: var(--s4); }
   .care-card::before { display: none; }
+  /* The base .care-h/.care-b colour is a fixed dark brown (for the old cream card) and vanished on the dark card in dark mode. */
+  .care-h, .care-b { color: var(--cs-ink); }
   .ios-toggle input:checked + .switch { background: var(--cs-ink); }
   .pay-btn.pay-primary, #btn-full.pay-btn { background: var(--cs-ink); color: var(--cs-page); border: 0; font-weight: 500; border-radius: 28px; }
   .pay-btn.pay-primary:disabled, #btn-full.pay-btn:disabled { background: var(--cs-ink); color: var(--cs-page); opacity: .28; }
