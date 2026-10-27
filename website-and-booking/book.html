@@ -2234,6 +2234,7 @@
           <option value="">Please select</option>
           <option>Instagram</option>
           <option>TikTok</option>
+          <option>Facebook</option>
           <option>Friend or family</option>
           <option>Google search</option>
           <option>Word of mouth</option>
@@ -3528,6 +3529,7 @@ function clearPanelError() { const el = document.getElementById('panel-error'); 
 
 async function handlePayment() {
   clearPanelError();
+  try { if (window.haloeTrack) haloeTrack('InitiateCheckout', { value: cartTotalPence() / 100 }); } catch (e) {}
   if (!state.cart.length) { failPay("Please choose a treatment first.", 1); return; }
   const { names, dateStr, locationLabel } = buildSummary();
   const name  = document.getElementById('fullname').value.trim();
@@ -4004,5 +4006,6 @@ if (document.readyState === 'loading') {
     <button class="foot-cta" id="foot-cta" onclick="footerContinue()" disabled><span id="foot-cta-label">Continue</span><svg id="foot-cta-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
   </div>
 </div>
+<script src="/tracking.js" defer></script>
 </body>
 </html>

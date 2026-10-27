@@ -226,6 +226,7 @@
   // Derived from the amount actually charged — every booking is paid in full.
   const gbp = (pence) => '£' + (pence / 100).toFixed(2).replace(/\.00$/, '');
   const paid = gbp(amount);
+  window.addEventListener('load', function () { try { var k = 'haloe_pt_' + location.search; if (!sessionStorage.getItem(k) && window.haloeTrack && amount > 0) { sessionStorage.setItem(k, '1'); window.haloeTrack('Purchase', { value: amount / 100, id: params.get('bookingId') || k }); } } catch (e) {} });
 
   const durationLabel = (min) => { const h = Math.floor(min / 60), m = min % 60; return h && m ? `${h} hr ${m} min` : h ? (h === 1 ? '1 hour' : `${h} hours`) : `${m} min`; };
   const bits = [treatmentList.length > 1 ? `${treatmentList.length} treatments` : treatment, [date, time].filter(Boolean).join(', ')].filter(Boolean);
@@ -289,5 +290,6 @@
   try { sessionStorage.removeItem('haloe_address'); sessionStorage.removeItem('haloe_booking_progress'); } catch (e) {}
 </script>
 
+<script src="/tracking.js" defer></script>
 </body>
 </html>
