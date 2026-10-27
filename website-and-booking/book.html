@@ -1909,6 +1909,43 @@
   .foot-cta { min-height: 48px; height: 48px; gap: var(--s2); }
   .footbar .foot-cta { gap: var(--s2); }
   body { padding-bottom: calc(96px + min(env(safe-area-inset-bottom, 0px), 16px)); }
+
+  /* ===== Calm pass (Oct 2026): quieter, easier on the eyes — soft sand page, white cards,
+     plain Poppins title, one dark accent (the tick and the bar). Last in the cascade on purpose. ===== */
+  :root { --cs-page:#F7F3EA; --cs-card:#FFFFFF; --cs-sel:#EFE7D3; --cs-ink:#2A2620; --cs-mute:#8A8272; --cs-line:#D4CDBD; --cs-bar:#2A2620; --cs-bar-text:#F7F3EA; --cs-tick:#F7F3EA; }
+  @media (prefers-color-scheme: dark) { :root { --cs-page:#14110D; --cs-card:#1F1B15; --cs-sel:#2E2819; --cs-ink:#F1EBDD; --cs-mute:#A79E8C; --cs-line:#4A4334; --cs-bar:#F1EBDD; --cs-bar-text:#14110D; --cs-tick:#14110D; } }
+  body { background: var(--cs-page); color: var(--cs-ink); }
+  .panel-title { font-family: 'Poppins', sans-serif; font-weight: 500; font-size: 26px; letter-spacing: -0.01em; line-height: 1.2; color: var(--cs-ink); margin-bottom: 6px; }
+  .panel:not(#panel-1) .panel-title { font-size: 26px; }
+  .panel-sub, #panel-1 .panel-sub { color: var(--cs-mute); font-weight: 300; font-size: 14px; }
+  #panel-1 .category-tabs-wrap { background: transparent; box-shadow: none; }
+  #panel-1 .category-tabs { background: transparent; border: 0; border-radius: 0; padding: 4px 0; gap: 6px; box-shadow: none; }
+  #panel-1 .category-tabs .seg-option { background: transparent; color: var(--cs-mute); border: 0; box-shadow: none; border-radius: 22px; min-height: 40px; padding: 8px 16px; font-weight: 400; }
+  #panel-1 .category-tabs .seg-option.active { background: var(--cs-ink); color: var(--cs-page); font-weight: 500; }
+  #panel-1 .service-grid { display: grid; gap: 10px; margin-top: 10px; }
+  #panel-1 .service-card { background: var(--cs-card); border: 0; box-shadow: none; border-radius: 20px; padding: 18px; align-items: center; gap: 14px; transition: background .15s; }
+  #panel-1 .service-card.selected { background: var(--cs-sel); }
+  #panel-1 .service-card .svc-ring { order: 3; width: 28px; height: 28px; margin: 0; border: 1.5px solid var(--cs-line); background: transparent; }
+  #panel-1 .service-card.selected .svc-ring { background: var(--cs-ink); border-color: var(--cs-ink); }
+  #panel-1 .service-card .svc-ring svg { color: var(--cs-tick); }
+  #panel-1 .svc-name { font-weight: 400; font-size: 16px; color: var(--cs-ink); }
+  #panel-1 .svc-meta-line { color: var(--cs-mute); font-weight: 300; font-size: 13px; }
+  #panel-1 .svc-price { font-weight: 400; font-size: 16px; color: var(--cs-ink); }
+  #panel-1 .svc-price .was { display: none; }
+  #panel-1 .svc-dur-tag { color: var(--cs-mute); font-weight: 300; font-size: 13px; background: none; border: 0; padding: 0; }
+  #panel-1 .service-card .svc-right-col { text-align: right; }
+  #panel-1 .cart-summary { background: transparent; padding: 0; margin-top: 12px; }
+  #panel-1 .cart-summary .cart-title, #panel-1 .cart-summary .cart-row, #panel-1 .cart-summary .cart-total { display: none; }
+  #panel-1 .cart-note { color: var(--cs-mute); font-size: 13px; }
+  .footbar-inner { background: var(--cs-bar); color: var(--cs-bar-text); box-shadow: 0 8px 28px rgba(42,38,32,.18); }
+  .foot-label, .foot-total { color: var(--cs-bar-text); }
+  .foot-total { font-weight: 500; font-size: 17px; }
+  .footbar .foot-cta { background: var(--cs-page); color: var(--cs-ink); font-weight: 500; }
+  .footbar .foot-cta svg { color: var(--cs-ink); }
+  .footbar .foot-cta:disabled { background: rgba(247,243,234,.16); color: rgba(247,243,234,.6); opacity: 1; }
+  @media (prefers-color-scheme: dark) { .footbar .foot-cta { background: var(--cs-page); color: var(--cs-ink); } .footbar .foot-cta:disabled { background: rgba(20,17,13,.14); color: rgba(20,17,13,.55); } }
+  #panel-1 .service-card:focus:not(:focus-visible) { outline: none; }
+  #panel-1 .packages-policy-line { color: var(--cs-mute); font-size: 13px; font-weight: 300; line-height: 1.5; margin: 6px 0 4px; }
 </style>
 <link rel="stylesheet" href="/tokens.css">
 <link rel="stylesheet" href="/ui.css">
