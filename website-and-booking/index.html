@@ -29,7 +29,7 @@
   "@context": "https://schema.org",
   "@type": "HealthAndBeautyBusiness",
   "name": "haloe",
-  "description": "Hijama and cupping wellness service for women and men, supporting relaxation, circulation and general wellbeing. Mobile across Greater Manchester, plus a weekly Tuesday clinic day at Milton Hall, Deansgate. CMA and IPHM accredited.",
+  "description": "Hijama, dry cupping, massage and life coaching for women and men in Manchester. A private room at Milton Hall, Deansgate every Tuesday, and home visits across Greater Manchester. CMA and IPHM accredited.",
   "url": "https://haloe.health/",
   "logo": "https://haloe.health/favicon.svg",
   "image": "https://haloe.health/images/og-image.jpg",
@@ -45,9 +45,89 @@
       "addressCountry": "GB"
     }
   },
-  "knowsAbout": ["Hijama", "Cupping", "Wellness", "Relaxation massage"],
+  "telephone": "+447474833643",
+  "email": "halima@haloe.health",
+  "priceRange": "££",
+  "sameAs": ["https://instagram.com/haloe.health"],
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Tuesday", "opens": "09:00", "closes": "19:00", "description": "Clinic day at Milton Hall, Deansgate" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Wednesday","Thursday","Friday","Saturday"], "opens": "10:00", "closes": "20:00", "description": "Home visits across Greater Manchester" }
+  ],
+  "knowsAbout": ["Hijama", "Cupping", "Wellness", "Relaxation massage", "Life coaching"],
   "hasCredential": "CMA (Complementary Medical Association) accredited; IPHM (International Practitioners of Holistic Medicine) accredited",
   "slogan": "Hijama and cupping in Manchester"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How much does it cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Prices are shown on each session above and in full on the booking page, with the 20% introductory price already applied. Home visits add travel from £20, shown before you pay; the Tuesday clinic on Deansgate has no travel fee."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you treat men and women?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. haloe serves women and men, with the same private room, the same standards and the same care for modesty in every session."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What should I wear?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Loose, comfortable clothes you can move in. For back and shoulder sessions a top that opens or lifts easily helps. Only the area being treated is uncovered, and only for as long as it needs to be."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What should I do before and after?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Eat lightly beforehand and stay hydrated. Afterwards, rest, keep drinking water, and keep the area clean, dry and warm for 24 hours. Marks are normal and usually fade within 14 days."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are you insured and accredited?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Halima is fully insured, CMA and IPHM accredited, and holds a Level 5 Diploma in Health and Cupping Therapy from The Suuk Academy (88% distinction)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is the clinic, and do you do home visits?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every Tuesday at Milton Hall, 244 Deansgate, Manchester M3 4BQ, in a private treatment room. On other days (Monday to Saturday, 10am to 8pm) Halima comes to you at home across Greater Manchester. Coaching is also available online."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is any area not treated?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For modesty and professional care, I do not treat the area between the navel and the knees on male clients. That area stays covered throughout the session. Everything else is treated as booked."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if I need to cancel or move my session?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full."
+      }
+    }
+  ]
 }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -141,16 +221,8 @@
      texture rather than barely-visible noise; dimmed to 0.05 in dark mode
      since the same gold stroke shows up more strongly against a dark
      charcoal background at equal opacity. */
-  body::before {
-    content:'';
-    position:fixed; inset:0; z-index:0;
-    background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAiIGhlaWdodD0iMTYwIiB2aWV3Qm94PSIwIDAgMTYwIDE2MCI+CiAgPGcgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOGE2YTJjIiBzdHJva2Utd2lkdGg9IjEuMyIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjQsNiA0MCwxNSA0MCwzMyAyNCw0MiA4LDMzIDgsMTUiLz4KICAgIDxwYXRoIGQ9Ik0xMDggMjIgYTE2IDExIDAgMSAwIDAuMSAwIi8+CiAgICA8cGF0aCBkPSJNMTAwIDIyIHEwIDggNCA4Ii8+CiAgICA8cGF0aCBkPSJNMTE2IDIyIHEwIDggLTQgOCIvPgogICAgPGxpbmUgeDE9IjEwOCIgeTE9IjMzIiB4Mj0iMTA4IiB5Mj0iNDAiLz4KICAgIDxwYXRoIGQ9Ik00MCAxMDAgQyAyOCAxMTIgMjggMTMwIDQwIDE0MiBDIDUyIDEzMCA1MiAxMTIgNDAgMTAwIFoiLz4KICAgIDxwYXRoIGQ9Ik00MCAxMTIgTDQwIDE0MiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSIxMjgsOTYgMTQ0LDEwNSAxNDQsMTIzIDEyOCwxMzIgMTEyLDEyMyAxMTIsMTA1Ii8+CiAgICA8cG9seWdvbiBwb2ludHM9IjgsMTIwIDI0LDEyOSAyNCwxNDcgOCwxNTYgLTgsMTQ3IC04LDEyOSIvPgogIDwvZz4KPC9zdmc+");
-    background-repeat:repeat;
-    background-size:160px 160px;
-    opacity:0.10;
-    pointer-events:none;
-  }
-  @media (prefers-color-scheme: dark) { body::before { opacity:0.05; } }
+  /* The repeating hexagon/leaf texture (body::before) was removed in
+     Oct 2026 at Halima's request — plain cream background. */
   main, footer.site-footer { position:relative; z-index:1; }
 
   h1, h2, h3, h4 { font-family:var(--font-heading); font-weight:600; color:var(--text); }
@@ -247,10 +319,85 @@
   .hero-title {
     font-family:'Tan Ashford', Georgia, serif;
     font-weight:normal; font-synthesis:none; letter-spacing:-0.025em;
-    font-size:clamp(1.5rem,6vw,3.6rem); line-height:1.18; margin-top:20px;
+    font-size:clamp(2.7rem,11vw,3.6rem); line-height:1.08; margin-top:12px;
   }
   .hero-title em { font-style:normal; color:var(--gold-deep); }
-  .hero-sub { margin-top:14px; max-width:52ch; font-size:1.02rem; color:var(--c-ink-warm); }
+  .hero-sub { margin-top:24px; max-width:46ch; font-size:1.05rem; line-height:1.55; color:var(--c-ink-warm); }
+  /* Hero layout (Oct 2026): copy left, photo right from 900px; stacked on
+     phones with the photo under the copy. One gold Book button, one quiet
+     text link, then a trust line — nothing else competes with Book. */
+  .hero-grid { display:grid; grid-template-columns:1fr; gap:var(--s5); align-items:center; }
+  @media (min-width:900px) {
+    .hero { padding-top:40px; padding-bottom:var(--s5); }
+    .hero-grid { grid-template-columns:1.05fr 1fr; gap:48px; }
+    .hero-title { font-size:clamp(2.6rem,5.2vw,4.4rem); margin-top:0; }
+  }
+  .hero-actions { display:flex; flex-wrap:wrap; align-items:center; gap:18px; margin-top:26px; }
+  .hero-actions .btn-pill { min-width:200px; }
+  .hero-secondary {
+    font-weight:600; color:var(--text); text-decoration:underline;
+    text-underline-offset:4px; text-decoration-color:var(--gold); min-height:44px; display:inline-flex; align-items:center;
+  }
+  .hero-trust {
+    list-style:none; margin:22px 0 0; padding:0;
+    display:flex; flex-wrap:wrap; gap:8px 18px; font-size:0.86rem; font-weight:600; color:var(--c-ink-warm);
+  }
+  .hero-trust li { display:inline-flex; align-items:center; gap:8px; }
+  .hero-trust li::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--gold); flex:none; }
+  .hero-trust-link { color:inherit; text-decoration:underline; text-underline-offset:3px; text-decoration-color:var(--gold); }
+  .hero-figure img {
+    width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; object-position:50% 30%;
+    border-radius:var(--card-radius); display:block; box-shadow:var(--card-shadow);
+  }
+  .hero-brand, .hero-flower { display:none; }
+  /* Phone hero (Oct 2026, Halima's pick from six mock-ups): the photo fills
+     the first screen edge to edge and the copy sits at the bottom over a
+     dark fade, like the Instagram post that brought the visitor here. The
+     DOM is the desktop one — only CSS changes — so the picture/srcset and
+     the reveal observer are untouched. The hero's own Book button is hidden
+     here because the fixed .mobile-bar already IS a gold Book button at the
+     bottom of the screen; two stacked gold pills read as clutter. The
+     height is 100svh (not vh — iOS Safari's toolbars) minus the bar's
+     fixed part, so the trust line is never under it. */
+  @media (max-width:899px) {
+    .hero {
+      position:relative; padding:0; min-height:100svh; display:flex; align-items:flex-end;
+      background:#120f0b; color:#F5F0E8; isolation:isolate; overflow:hidden;
+    }
+    .hero-grid { display:block; width:100%; padding:0 22px calc(118px + env(safe-area-inset-bottom,0px)); }
+    .hero-sub-more { display:none; }
+    .hero-figure { position:absolute; inset:0; z-index:-1; margin:0; }
+    /* The source photo is square with the face ~40% down, so a plain
+       top-aligned cover left it mid-screen under the headline. Making the
+       image 18% taller than the hero and pinning it to the BOTTOM crops
+       the top of the room instead, lifting her face into the top third. */
+    .hero-figure img {
+      position:absolute; left:0; bottom:0; width:100%; height:118%;
+      aspect-ratio:auto; object-position:50% 100%; border-radius:0; box-shadow:none;
+    }
+    .hero-figure::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0) 26%, rgba(12,9,5,0.10) 44%, rgba(12,9,5,0.86) 72%, rgba(12,9,5,0.96) 100%);
+    }
+    .hero-flower { display:block; position:absolute; top:18px; right:22px; z-index:1; width:44px; height:44px; }
+    .hero-brand {
+      display:block; position:absolute; top:22px; left:22px; z-index:1;
+      font-family:'Tan Ashford', Georgia, serif; font-size:1.55rem; color:#F5F0E8; text-decoration:none; line-height:1;
+    }
+    .hero-title { font-size:clamp(3rem,14vw,4.2rem); line-height:0.96; margin:0; color:#F5F0E8; max-width:9ch; }
+    .hero-title em { color:#F5F0E8; }
+    .hero-sub { margin-top:14px; max-width:32ch; font-size:1.02rem; line-height:1.5; color:#EFE6D6; }
+    .hero-actions { margin-top:18px; }
+    .hero-actions .btn-pill { display:none; }
+    .hero-secondary { color:#F5F0E8; text-decoration-color:var(--gold); min-height:40px; }
+    .hero-trust { margin-top:14px; gap:6px 14px; font-size:0.8rem; color:#D9CFBD; justify-content:flex-start; }
+    .hero-trust li::before { background:var(--gold); width:5px; height:5px; }
+    .hero-trust li:first-child::before { display:none; }
+    .hero-trust-link { color:inherit; }
+    .hero-trust-link::before { content:'\2605\2605\2605\2605\2605'; color:var(--gold); letter-spacing:1px; font-size:0.72rem; margin-right:6px; }
+    /* The reveal fade would slide the whole backdrop up on load — keep the photo still. */
+    .hero-figure.reveal { opacity:1; transform:none; transition:none; }
+  }
   .promo-banner {
     width:100%; background:var(--c-gold-mid); color:var(--c-white);
     text-align:center; font-family:'Poppins',sans-serif; font-size:var(--fs-caption); font-weight:500;
@@ -276,8 +423,43 @@
   .about-card { padding:var(--s6) var(--s5); display:flex; flex-direction:column; gap:var(--s4); }
   .about-card p { font-size:0.98rem; }
   .about-copy .section-eyebrow { margin-top:var(--s4); }
-  .about-copy h2 { margin-top:var(--s2); }
+  .about-copy h2 { margin-top:var(--s2); margin-bottom:var(--s3); }
+  .about-card p + p { margin-top:10px; }
   .about-cert-row { display:flex; flex-wrap:wrap; gap:var(--s2); margin-top:6px; }
+  /* Standards strip (Oct 2026) — four concrete details, the Equinox
+     "eucalyptus towels" idea: specifics instead of the word "standards". */
+  /* About (Oct 2026, Halima's pick of six mock-ups: "the standards lead").
+     The section is the four standards as a 2x2 grid of small tiles, then
+     ONE sentence covering Sunnah + practitioner + credentials. The old two
+     paragraphs and the four credential pills said the same things twice. */
+  .standards { list-style:none; margin:var(--s4) 0 0; padding:0; display:grid; grid-template-columns:repeat(4,1fr); gap:6px; text-align:center; }
+  @media (min-width:768px) { .standards { gap:var(--s4); } }
+  .standards li { font-size:0.72rem; line-height:1.35; color:var(--c-ink-warm); }
+  .standards strong { display:block; color:var(--text); font-weight:600; font-size:0.8rem; line-height:1.2; margin-bottom:3px; }
+  /* Round badges (Oct 2026, Halima's pick "four round badges", with icons
+     drawn to her brief: a No.11 blade, a cluster of cups, nigella seeds, a
+     door keypad). */
+  .std-icon {
+    width:60px; height:60px; border-radius:50%; margin:0 auto 10px;
+    background:var(--cream); border:1.5px solid var(--gold); color:var(--gold-deep);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .std-icon svg { width:30px; height:30px; }
+  @media (min-width:768px) {
+    .standards li { font-size:0.9rem; }
+    .standards strong { font-size:1rem; margin-bottom:4px; }
+    .std-icon { width:84px; height:84px; margin-bottom:14px; }
+    .std-icon svg { width:40px; height:40px; }
+  }
+  .about-line { margin-top:var(--s4); }
+  /* Arrival (Oct 2026) — Clinic Day told as three beats. */
+  .arrival { list-style:none; margin:var(--s3) 0 var(--s4); padding:0; display:grid; gap:14px; }
+  .arrival li { display:flex; gap:14px; align-items:flex-start; font-size:0.97rem; line-height:1.55; color:var(--c-ink-warm); }
+  .arrival strong { color:var(--text); font-weight:600; }
+  .arrival-n {
+    flex:none; width:32px; height:32px; border-radius:50%; border:1.5px solid var(--gold);
+    display:inline-flex; align-items:center; justify-content:center; color:var(--gold-deep); font-weight:600; font-size:0.9rem; margin-top:1px;
+  }
   @media (min-width:1024px) {
     .about-card { padding:48px; flex-direction:row; align-items:center; gap:48px; }
     .about-card .about-copy { flex:1.3; }
@@ -292,40 +474,59 @@
   /* ============================================================
      CONDITIONS
      ============================================================ */
-  .cond-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  /* Conditions → Focused sessions (Oct 2026). Each tile is a product: the
+     feeling as the headline, one line saying what the session is, the live
+     "from £" price (filled from SERVICES.focused by the script below) and an
+     arrow — and the tap goes straight to book.html with that session
+     preselected (the old pop-up is gone). Two across on phones, four from 768px. */
+  .cond-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   @media (min-width:768px) { .cond-grid { grid-template-columns:repeat(4,1fr); gap:var(--s4); } }
   .cond-card {
-    padding:22px var(--s4); text-align:center; cursor:pointer; border:none;
-    display:flex; flex-direction:column; align-items:center; gap:10px;
+    padding:14px 14px 12px; text-align:left; cursor:pointer; border:none; text-decoration:none; color:var(--text);
+    display:flex; flex-direction:column; align-items:flex-start; gap:6px; width:100%; position:relative;
     transition:transform 0.15s ease, box-shadow 0.15s ease;
-    width:100%;
   }
+  .cond-card:active { transform:scale(0.97); transition-duration:0.08s; }
+  .cond-icon {
+    width:36px; height:36px; border-radius:50%; border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; color:var(--gold-deep); margin-bottom:4px;
+  }
+  .cond-icon svg { width:18px; height:18px; }
+  .cond-card h3 { font-size:0.95rem; font-weight:600; color:var(--text); line-height:1.25; }
+  .cond-what { font-size:0.78rem; line-height:1.35; color:var(--c-ink-warm); }
+  .cond-price { margin-top:auto; padding-top:8px; width:100%; display:flex; align-items:center; justify-content:space-between; }
+  .cond-from { font-size:0.82rem; font-weight:600; color:var(--text); }
+  .cond-from s { color:var(--text-muted); font-weight:400; margin-right:4px; }
+  .cond-go {
+    width:26px; height:26px; border-radius:50%; background:var(--gold); color:var(--ink);
+    display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem; line-height:1;
+  }
+  @media (min-width:768px) {
+    .cond-card { padding:20px 18px 16px; gap:8px; }
+    .cond-icon { width:44px; height:44px; }
+    .cond-icon svg { width:22px; height:22px; }
+    .cond-card h3 { font-size:1.05rem; }
+    .cond-what { font-size:0.88rem; }
+    .cond-from { font-size:0.92rem; }
+  }
+  @media (max-width:767px) { #conditions .section-head { margin-bottom:var(--s4); } }
+  .cond-more { margin-top:10px; text-align:center; font-size:0.9rem; font-weight:600; }
+  .cond-more a { text-decoration:underline; text-underline-offset:4px; text-decoration-color:var(--gold); }
   .cond-card:hover, .cond-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
   .cond-icon {
-    width:52px; height:52px; border-radius:50%; border:1.5px solid var(--gold);
+    width:38px; height:38px; border-radius:50%; border:1.5px solid var(--gold);
     display:flex; align-items:center; justify-content:center; color:var(--gold-deep);
   }
-  .cond-icon svg { width:24px; height:24px; }
-  .cond-card h3 { font-size:0.92rem; font-weight:600; color:var(--text); line-height:1.3; }
+  .cond-icon svg { width:18px; height:18px; }
+  .cond-card h3 { font-size:0.8rem; font-weight:500; color:var(--text); line-height:1.25; }
+  @media (min-width:768px) {
+    .cond-icon { width:52px; height:52px; }
+    .cond-icon svg { width:24px; height:24px; }
+    .cond-card h3 { font-size:0.92rem; font-weight:600; line-height:1.3; }
+  }
   .cond-hint { text-align:center; color:var(--gold-deep); font-size:0.85rem; font-weight:600; margin-top:-16px; margin-bottom:28px; }
 
   /* Condition modal — restyled light */
-  .cond-overlay {
-    position:fixed; inset:0; z-index:300;
-    background:rgba(13,13,13,0.45);
-    display:flex; align-items:flex-end; justify-content:center;
-    opacity:0; visibility:hidden; transition:opacity 0.25s ease, visibility 0.25s;
-  }
-  .cond-overlay.open { opacity:1; visibility:visible; }
-  @media (min-width:768px) { .cond-overlay { align-items:center; } }
-  .cond-modal {
-    background:var(--surface); border-radius:24px 24px 0 0; width:100%; max-width:560px;
-    max-height:85vh; overflow-y:auto; padding:var(--s6) var(--s5);
-    transform:translateY(24px); transition:transform 0.25s ease;
-  }
-  .cond-overlay.open .cond-modal { transform:translateY(0); }
-  @media (min-width:768px) { .cond-modal { border-radius:24px; padding:40px; } }
-  @media (prefers-reduced-motion: reduce) { .cond-overlay, .cond-modal { transition:none; } }
   .cond-modal-top { display:flex; justify-content:space-between; align-items:flex-start; gap:var(--s4); }
   .cond-modal-icon {
     width:56px; height:56px; border-radius:50%; border:1.5px solid var(--gold);
@@ -346,51 +547,135 @@
   /* ============================================================
      PRICING
      ============================================================ */
-  .price-grid { display:grid; grid-template-columns:1fr; gap:14px; }
-  @media (min-width:600px) { .price-grid { grid-template-columns:repeat(2,1fr); } }
-  .price-grid .price-card:last-child:nth-child(odd) { grid-column:1 / -1; }
-  @media (min-width:1024px) { .price-grid { grid-template-columns:repeat(5,1fr); } .price-grid .price-card:last-child:nth-child(odd) { grid-column:auto; } }
+  /* Oct 2026 (Halima's pick, "two across"): on phones the four session
+     cards sit 2x2, compact — no icon, no Book line, smaller type — so the
+     section fits one screen. From 600px the cards grow back to the fuller
+     layout; four across from 1024px. */
+  .price-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (min-width:600px) { .price-grid { gap:14px; } }
+  @media (min-width:1024px) { .price-grid { grid-template-columns:repeat(4,1fr); gap:var(--s4); } }
   .price-card {
-    padding:26px 22px; text-decoration:none; color:var(--text);
-    display:flex; flex-direction:column; gap:10px;
+    padding:16px 14px; text-decoration:none; color:var(--text);
+    display:flex; flex-direction:column; gap:6px; min-height:100%;
     transition:transform 0.15s ease, box-shadow 0.15s ease;
   }
+  @media (min-width:600px) { .price-card { padding:26px 22px; gap:10px; } }
   .price-card:hover, .price-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
   .price-icon {
     width:44px; height:44px; border-radius:12px; background:var(--gold-soft); color:var(--gold-deep);
     display:flex; align-items:center; justify-content:center;
   }
   .price-icon svg { width:22px; height:22px; }
-  .price-card h3 { font-size:1.05rem; }
-  .price-from { color:var(--text-muted); font-size:0.92rem; }
-  .price-from strong { color:var(--text); font-size:1.3rem; font-family:'Poppins', sans-serif; font-weight:600; }
-  .price-arrow { margin-top:auto; align-self:flex-end; color:var(--gold-deep); font-size:1.2rem; }
+  .price-card h3 { font-size:1.1rem; }
+  .price-desc { font-size:0.92rem; color:var(--c-ink-warm); line-height:1.5; }
+  .price-from { color:var(--text-muted); font-size:0.92rem; margin-top:4px; }
+  .price-from strong { color:var(--text); font-size:1.35rem; font-family:'Poppins', sans-serif; font-weight:600; }
+  .price-was { color:var(--text-muted); font-size:0.95rem; margin-right:2px; }
+  .price-dur { color:var(--text-muted); font-size:0.88rem; white-space:nowrap; }
+  .price-book { margin-top:auto; padding-top:14px; font-weight:600; color:var(--gold-deep); font-size:0.95rem; }
   .price-note { margin-top:20px; font-size:0.82rem; color:var(--text-muted); }
+  /* Sessions on a black band (Oct 2026, Halima's ask): the section is
+     full-bleed near-black with cream type and gold eyebrow; the four cards
+     stay white so the prices lift off the dark. */
+  #pricing { background:#0D0D0D; padding-top:var(--s6); padding-bottom:var(--s6); }
+  #pricing .section-eyebrow { color:var(--gold); opacity:1; }
+  #pricing .section-head h2 { color:#F5F0E8; }
+  #pricing .section-head p { color:rgba(245,240,232,0.75); }
+  #pricing .price-card { background:#F7F2EA; box-shadow:none; }
+  #pricing .price-note { color:rgba(245,240,232,0.7); }
+  #pricing .price-note .link-gold { color:var(--gold); }
+  @media (min-width:768px) { #pricing { padding-top:56px; padding-bottom:56px; } }
+  @media (max-width:599px) {
+    .price-icon, .price-book { display:none; }
+    .price-card h3 { font-size:0.98rem; }
+    .price-desc { font-size:0.8rem; line-height:1.4; }
+    .price-from { font-size:0.82rem; margin-top:auto; padding-top:8px; }
+    .price-from strong { font-size:1rem; }
+    .price-was { font-size:0.8rem; }
+    .price-dur { font-size:0.78rem; }
+    #pricing .section-head { margin-bottom:var(--s4); }
+    #pricing .section-head p { display:none; }
+  }
 
   /* ============================================================
      PROCESS ("What to expect")
      ============================================================ */
-  .process-grid { display:grid; grid-template-columns:1fr; gap:14px; }
-  @media (min-width:768px) { .process-grid { grid-template-columns:repeat(2,1fr); } }
-  @media (min-width:1024px) { .process-grid { grid-template-columns:repeat(4,1fr); } }
-  .process-card { padding:var(--s5) 22px; }
-  .process-num { font-family:'Poppins', sans-serif; font-weight:600; font-size:1.6rem; color:var(--gold); margin-bottom:var(--s2); }
-  .process-card h4 { font-size:1rem; }
-  .process-card p { margin-top:var(--s2); font-size:0.9rem; }
+  /* Journey (Oct 2026, Halima's pick of six: "checklist, you are here").
+     One card, four rows joined by a vertical line, step 1 filled gold with
+     a "You are here" tag, the rest outlined. Replaced four stacked cards
+     that read as a list, not a journey. */
+  .journey { list-style:none; margin:0; padding:6px 18px; }
+  .journey-step { display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--hairline); position:relative; }
+  .journey-step:first-child { border-top:0; }
+  .journey-step::before { content:''; position:absolute; left:13px; top:46px; bottom:-16px; width:2px; background:var(--hairline); }
+  .journey-step:last-child::before { display:none; }
+  .journey-n {
+    flex:none; width:28px; height:28px; border-radius:50%; margin-top:1px;
+    border:1.5px solid var(--gold); color:var(--gold-deep); background:var(--surface);
+    display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:0.82rem; position:relative; z-index:1;
+  }
+  .journey-step.is-here .journey-n { background:var(--gold); border-color:var(--gold); color:var(--ink); }
+  .journey-step h3 { font-size:1rem; line-height:1.3; }
+  .journey-step p { margin-top:4px; font-size:0.9rem; line-height:1.5; color:var(--c-ink-warm); }
+  .journey-here {
+    display:inline-block; vertical-align:middle; margin-left:6px; padding:2px 8px; border-radius:999px;
+    background:var(--gold-soft); color:var(--gold-deep); font-size:0.7rem; font-weight:600; letter-spacing:0.02em;
+  }
+  @media (min-width:900px) {
+    .journey { display:grid; grid-template-columns:repeat(4,1fr); padding:var(--s5) 22px; gap:0; }
+    .journey-step { flex-direction:column; gap:12px; padding:0 22px 0 0; border-top:0; }
+    .journey-step::before { left:40px; right:-8px; top:13px; bottom:auto; width:auto; height:2px; }
+    .journey-step:last-child::before { display:none; }
+  }
   /* "What happens in your session" — five steps + "Does it hurt?" (moved here from before-your-session.html, Oct 2026) */
-  .process-steps { margin-top:14px; padding:var(--s5) 22px; }
-  .process-steps h3 { font-size:1.125rem; margin-bottom:var(--s4); }
-  .session-steps { list-style:none; counter-reset:step; margin:0; padding:0; }
-  .session-steps li { position:relative; counter-increment:step; padding:2px 0 0 44px; margin-bottom:14px; min-height:30px; font-size:0.95rem; line-height:1.5; color:var(--text); }
-  .session-steps li:last-child { margin-bottom:0; }
-  .session-steps li::before { content:counter(step); position:absolute; left:0; top:0; width:30px; height:30px; border-radius:50%; background:var(--gold-soft); color:var(--gold-deep); font-weight:600; font-size:0.85rem; display:flex; align-items:center; justify-content:center; }
-  .process-steps h4 { margin:22px 0 6px; font-size:1rem; }
-  .process-steps h4 + p { margin:0; font-size:0.92rem; color:var(--text-muted); }
+  /* "Does it hurt?" as a WhatsApp-style thread (Oct 2026, Halima's pick of six): teal header
+     with her photo, the reader's question on the right in pale green with
+     blue ticks, her replies on the left in white with tails and times, and a
+     "message" bar that opens WhatsApp. Replaced the hurt card + five-step
+     card. The asker is the reader (no name, no praise), not a client. */
+  /* The thread sits inside a phone-shaped frame, narrower than the page,
+     under its own heading — so it reads as "a message from Halima" rather
+     than a full-width panel. */
+  .chat-intro { margin-top:var(--s6); margin-bottom:var(--s4); }
+  .chat-card {
+    margin:0 auto; padding:0; overflow:hidden; background:#E5DDD5; max-width:340px;
+    border-radius:28px; box-shadow:0 18px 40px rgba(13,13,13,0.12); font-size:0.88rem;
+  }
+  .chat-head { display:flex; align-items:center; gap:12px; padding:14px 16px; background:#075E54; color:#fff; }
+  .chat-name { font-weight:600; font-size:0.95rem; }
+  .chat-status { font-size:0.78rem; color:rgba(255,255,255,0.8); }
+  .chat-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; object-position:50% 22%; flex:none; }
+  .chat { display:flex; flex-direction:column; gap:8px; padding:14px 12px 10px; }
+  .chat-day { text-align:center; margin-bottom:4px; }
+  .chat-day span { display:inline-block; background:rgba(255,255,255,0.85); color:#54656F; font-size:0.72rem; font-weight:600; letter-spacing:0.04em; padding:4px 10px; border-radius:999px; }
+  .chat-row { display:flex; }
+  .chat-them { justify-content:flex-end; }
+  .chat-me { justify-content:flex-start; }
+  .chat-bubble {
+    position:relative; padding:8px 11px 17px; border-radius:16px; font-size:0.88rem; line-height:1.45; max-width:80%;
+    box-shadow:0 1px 1px rgba(0,0,0,0.06);
+  }
+  .chat-them .chat-bubble { background:#DCF8C6; color:#111; border-bottom-right-radius:4px; }
+  .chat-me .chat-bubble { background:#fff; color:#111; border-bottom-left-radius:4px; }
+  .chat-bubble::after { content:''; position:absolute; bottom:0; width:10px; height:12px; }
+  .chat-them .chat-bubble::after { right:-6px; background:#DCF8C6; clip-path:polygon(0 0, 100% 100%, 0 100%); }
+  .chat-me .chat-bubble::after { left:-6px; background:#fff; clip-path:polygon(100% 0, 100% 100%, 0 100%); }
+  .chat-meta { position:absolute; right:10px; bottom:4px; font-size:0.66rem; color:rgba(13,13,13,0.5); display:inline-flex; align-items:center; gap:3px; }
+  .chat-me .chat-meta { color:rgba(0,0,0,0.45); }
+  .chat-ticks { display:inline-block; width:14px; height:8px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9' fill='none' stroke='%2334B7F1' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 5l2.5 2.5L9 2M6 7.5L7.5 9 15 2'/%3E%3C/svg%3E") no-repeat center/contain; }
+  .chat-input {
+    display:flex; align-items:center; justify-content:space-between; margin:4px 12px 12px; padding:6px 6px 6px 14px;
+    background:#fff; border-radius:999px; color:#6B6B6B; font-size:0.85rem; text-decoration:none;
+  }
+  .chat-send { width:32px; height:32px; border-radius:50%; background:#25D366; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:600; }
+  @media (min-width:768px) { .chat-intro { text-align:center; margin-left:auto; margin-right:auto; } .chat-card { max-width:360px; } }
 
   /* ============================================================
      REVIEWS
      ============================================================ */
-  .reviews-head { display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-bottom:28px; }
+  .reviews-head { display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-bottom:20px; }
+  .reviews-sub { margin-top:6px; font-size:0.92rem; color:var(--text-muted); }
   .google-badge {
     display:inline-flex; align-items:center; gap:var(--s2); background:var(--surface);
     border-radius:999px; padding:var(--s2) var(--s4); box-shadow:var(--card-shadow);
@@ -399,82 +684,116 @@
   .google-badge svg { width:16px; height:16px; color:var(--gold-deep); }
   .review-grid { display:grid; grid-template-columns:1fr; gap:14px; }
   @media (min-width:768px) { .review-grid { grid-template-columns:repeat(3,1fr); } }
-  .review-card { padding:22px 20px; transition:transform 0.15s ease, box-shadow 0.15s ease; }
+  /* Reviews laid out like Google's own (Oct 2026, Halima's pick of six):
+     initials in a circle, name, stars · Google, then the text. The long
+     review is trimmed to its clearest sentences; wording is the client's. */
+  .review-card { padding:16px 18px; transition:transform 0.15s ease, box-shadow 0.15s ease; }
   .review-card:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
-  .review-stars { color:var(--gold); font-size:0.95rem; letter-spacing:2px; }
-  .review-card p { margin-top:var(--s3); font-size:0.92rem; font-style:italic; }
-  .review-name { margin-top:14px; font-size:0.82rem; font-weight:600; color:var(--gold-deep); }
+  .review-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .review-avatar {
+    width:38px; height:38px; border-radius:50%; flex:none; background:var(--gold); color:var(--ink);
+    display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:0.82rem;
+  }
+  .review-avatar-alt { background:var(--cream); color:var(--gold-deep); }
+  .review-who { font-weight:600; font-size:0.95rem; line-height:1.2; }
+  .review-sub { font-size:0.74rem; color:var(--text-muted); margin-top:2px; }
+  .review-stars { color:var(--gold); font-size:0.78rem; letter-spacing:1px; }
+  .review-card p { margin:0; font-size:0.92rem; line-height:1.5; color:var(--text); }
 
   /* ============================================================
      FAQ
      ============================================================ */
-  .faq-section { background:var(--gold); }
+  /* FAQ as flashcards (Oct 2026, Halima's pick): one question per card,
+     "n of 8", answer on the card; a horizontal scroll-snap rail with dots
+     that follow the scroll. Replaced the gold accordion. "Does it hurt?"
+     left the FAQ because the chat above answers it. */
+  .faq-section { background:var(--gold); padding-bottom:var(--s5); }
   .faq-section .section-eyebrow { color:var(--ink); opacity:0.7; }
+  .faq-section .section-head { margin-bottom:var(--s4); }
   .faq-section .section-head h2 { color:var(--ink); }
-  .faq-list { display:flex; flex-direction:column; gap:var(--s3); }
-  .faq-item { background:var(--surface); border-radius:var(--card-radius); overflow:hidden; }
-  .faq-q {
-    width:100%; text-align:left; background:none; border:none; cursor:pointer;
-    padding:18px 20px; display:flex; justify-content:space-between; align-items:center; gap:var(--s4);
-    font-weight:600; font-size:0.98rem; color:var(--text); min-height:44px;
+  .faq-track { overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; -webkit-overflow-scrolling:touch; outline-offset:-2px; }
+  .faq-track::-webkit-scrollbar { display:none; }
+  .faq-rail { display:flex; gap:12px; padding:4px max(16px, calc((100vw - 1120px) / 2 + 24px)) 8px; }
+  .faq-card {
+    flex:none; width:min(78vw, 300px); min-height:190px; padding:18px 18px 16px; scroll-snap-align:center;
+    display:flex; flex-direction:column; gap:6px;
   }
-  .faq-q .faq-chevron { flex:none; transition:transform 0.25s ease; color:var(--gold-deep); }
-  .faq-item.open .faq-q .faq-chevron { transform:rotate(180deg); }
-  .faq-a { max-height:0; overflow:hidden; transition:max-height 0.3s ease; }
-  .faq-a-inner { padding:0 20px 18px; font-size:0.92rem; color:var(--text-muted); }
-  @media (prefers-reduced-motion: reduce) { .faq-a, .faq-q .faq-chevron { transition:none; } }
+  .faq-n { font-size:0.72rem; font-weight:600; letter-spacing:0.04em; color:var(--text-muted); }
+  .faq-card h3 { font-size:1rem; line-height:1.3; }
+  .faq-card p { font-size:0.88rem; line-height:1.5; color:var(--c-ink-warm); margin-top:2px; }
+  .faq-dots { display:flex; gap:6px; justify-content:center; margin-top:14px; }
+  .faq-dots b { width:6px; height:6px; border-radius:50%; background:rgba(13,13,13,0.25); transition:background 0.2s ease, transform 0.2s ease; }
+  .faq-dots b.on { background:var(--ink); transform:scale(1.25); }
+  @media (min-width:768px) { .faq-card { width:320px; } }
 
   /* ============================================================
      CLINIC DAY
      ============================================================ */
-  .clinic-card { padding:var(--s6) var(--s5); display:flex; flex-direction:column; gap:var(--s4); }
-  .clinic-facts { display:flex; flex-wrap:wrap; gap:var(--s2); }
-  .clinic-address { color:var(--text-muted); font-size:0.92rem; }
+  /* Clinic Day, "map first" (Oct 2026, Halima's pick of six): a stylised
+     street sketch with a gold pin (decorative, it links to Google Maps),
+     the address as the heading, one arrival paragraph, fact pills, and
+     Book a Tuesday + Directions. The three-step arrival list is gone; the
+     journey card and the chat already cover the hour itself. */
+  .clinic-card { padding:12px 12px var(--s5); display:flex; flex-direction:column; gap:var(--s4); }
+  .clinic-map { display:block; border-radius:16px; overflow:hidden; aspect-ratio:12/5; background:#EEE6D8; }
+  .clinic-map svg { width:100%; height:100%; display:block; }
+  .clinic-copy { padding:0 8px; }
+  .clinic-copy h2 { margin-top:4px; }
+  .clinic-copy p { margin-top:8px; }
+  .clinic-facts { display:flex; flex-wrap:wrap; gap:var(--s2); margin-top:12px; }
+  .clinic-address { color:var(--text-muted); font-size:0.88rem; }
+  .clinic-cta { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
   @media (min-width:1024px) {
-    .clinic-card { flex-direction:row; align-items:center; gap:40px; padding:48px; }
-    .clinic-card .clinic-copy { flex:1; }
-    .clinic-card .clinic-cta { flex:none; }
+    .clinic-card { flex-direction:row; align-items:stretch; gap:32px; padding:16px; }
+    .clinic-map { flex:0 0 44%; aspect-ratio:auto; min-height:260px; }
+    .clinic-card .clinic-copy { flex:1; padding:16px 16px 16px 0; }
   }
 
   /* ============================================================
      BIG CTA
      ============================================================ */
-  .cta-card {
-    background:var(--gold); border-radius:var(--card-radius);
-    padding:40px var(--s5); text-align:center;
-  }
-  .cta-card p { margin-top:10px; color:var(--ink); opacity:0.75; }
-  .cta-benefits { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:22px; }
-  .cta-benefit { background:var(--ink); color:var(--cream); border-radius:999px; padding:var(--s2) var(--s4); font-size:0.8rem; font-weight:600; }
-  .cta-card .btn-pill { margin-top:26px; }
+  /* Closing card (Oct 2026): black, headline in Tan Ashford, one line, Book
+     + WhatsApp. Replaced the gold card with four black pills. */
+  .cta-card { background:#0D0D0D; color:#F5F0E8; border-radius:var(--card-radius); padding:40px var(--s5); text-align:center; }
+  .cta-next { display:inline-block; background:rgba(255,255,255,0.08); color:var(--gold); border-radius:999px; padding:6px 12px; font-size:0.78rem; font-weight:600; }
+  .cta-card h2 { color:#F5F0E8; font-family:'Tan Ashford', Georgia, serif; font-weight:normal; font-synthesis:none; letter-spacing:-0.02em; font-size:clamp(2.2rem,9vw,3.2rem); line-height:1.18; margin-top:12px; }
+  .cta-card p { margin:14px auto 0; max-width:34ch; color:rgba(245,240,232,0.75); }
+  .cta-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:22px; }
+  .cta-card .btn-outline { border-color:rgba(245,240,232,0.5); color:#F5F0E8; }
+  .cta-card .btn-outline:hover { background:rgba(255,255,255,0.08); }
 
   /* ============================================================
      FOOTER
      ============================================================ */
-  .site-footer { background:var(--ink); color:var(--cream); padding:56px 0 28px; }
-  .footer-top { display:flex; flex-direction:column; gap:var(--s6); }
-  @media (min-width:768px) { .footer-top { flex-direction:row; justify-content:space-between; } }
-  /* Same lock-up fix as .brand above (see its comment, including the
-     Sep 2026 crop fix) — font-size on the container, icon sized/offset in
-     em against that same reference. */
-  .footer-brand { display:flex; align-items:center; gap:calc(1.17em * 0.35); font-size:1.4rem; }
-  .footer-brand-icon {
-    height:1.17em; width:1.17em; flex:none;
-    display:flex; align-items:center; justify-content:center;
-    overflow:hidden;
-    transform:translateY(-0.2918em);
+  /* Footer (Oct 2026, Halima's pick of six: "centred, cream" + socials).
+     Wordmark, address, WhatsApp, four social icons, three links, small
+     print. The longer page links sit in one muted line at the very end so
+     search engines still find them. */
+  .site-footer { background:var(--cream); color:var(--text); padding:44px 0 28px; text-align:center; }
+  .footer-brand { display:inline-flex; align-items:center; justify-content:center; gap:6px; font-size:1.7rem; }
+  .footer-brand-icon { display:inline-flex; align-items:center; justify-content:center; width:2.2em; height:2.2em; flex:none; margin:-0.5em 0; }
+  .footer-brand-icon img { width:100%; height:100%; display:block; }
+  .footer-brand span { font-family:var(--font-wordmark); font-style:normal; font-size:1em; line-height:1; position:relative; top:0.08em; }
+  .footer-line { margin-top:10px; font-size:0.92rem; color:var(--c-ink-warm); }
+  .footer-line + .footer-line { margin-top:4px; }
+  .footer-line a { color:inherit; text-decoration:none; }
+  .footer-social { display:flex; justify-content:center; gap:10px; margin-top:16px; }
+  .footer-social a {
+    width:44px; height:44px; border-radius:50%; border:1.5px solid rgba(13,13,13,0.18); color:var(--text);
+    display:inline-flex; align-items:center; justify-content:center;
   }
-  .footer-brand-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
-  .footer-brand span { font-family:var(--font-wordmark); font-style:normal; font-size:1em; line-height:1; }
-  .footer-col h5 { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:var(--s3); }
-  /* Was #C8C2B7 / #8E887F — greys outside the gold/ink/cream palette;
-     swapped for cream at reduced opacity, same muted-on-dark hierarchy,
-     no colour outside the approved set. */
-  .footer-col a, .footer-col p { display:block; color:rgba(245,240,232,0.75); text-decoration:none; font-size:0.9rem; margin-bottom:var(--s2); }
-  .footer-col a:hover { color:var(--gold); }
-  .footer-cols { display:grid; grid-template-columns:repeat(2,1fr); gap:var(--s5); }
-  @media (min-width:768px) { .footer-cols { grid-template-columns:repeat(3,1fr); gap:40px; } }
-  .footer-bottom { margin-top:40px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); font-size:0.8rem; color:rgba(245,240,232,0.55); }
+  .footer-social a:hover { border-color:var(--gold); color:var(--gold-deep); }
+  .footer-social svg { width:20px; height:20px; }
+  .footer-links { margin-top:16px; font-size:0.86rem; font-weight:600; }
+  .footer-links a { color:var(--text); text-decoration:none; }
+  .footer-links a:hover { color:var(--gold-deep); }
+  .footer-bottom { margin-top:18px; font-size:0.78rem; color:var(--text-muted); }
+  .footer-legal { margin-top:6px; font-size:0.78rem; }
+  .footer-legal a { color:var(--text-muted); text-decoration:underline; text-underline-offset:3px; }
+  .footer-legal a:hover { color:var(--gold-deep); }
+  .footer-more { margin-top:8px; font-size:0.74rem; line-height:1.6; color:var(--text-muted); }
+  .footer-more a { color:inherit; text-decoration:none; }
+  .footer-more a:hover { color:var(--gold-deep); }
 
   /* ============================================================
      STICKY MOBILE BOTTOM BAR
@@ -497,7 +816,10 @@
      reserved space and the scroll-padding both need to match. */
   .mobile-bar {
     position:fixed; bottom:0; left:0; right:0; z-index:90;
-    background:var(--header-bg); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    /* --header-bg was never defined, so the bar was blur-only and its dark
+       WhatsApp ring vanished over the phone hero's photo; a real cream wash
+       (dark-mode variant below) keeps it legible on every background. */
+    background:rgba(245,240,232,0.88); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
     border-top:1px solid var(--hairline);
     padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px));
     display:flex; flex-direction:column; gap:6px;
@@ -513,6 +835,7 @@
   }
   .mobile-bar-row .icon-btn:hover { background:var(--hairline); transform:translateY(-2px); }
   .mobile-bar-row .icon-btn svg { width:24px; height:24px; }
+  @media (prefers-color-scheme: dark) { .mobile-bar { background:rgba(18,15,11,0.88); } }
   @media (min-width:768px) { .mobile-bar { display:none; } }
   /* 56px pill + helper line + 6px gap + 10px/16px top/bottom padding —
      measured at ~110px rendered, 112px reserved for a small buffer. Both
@@ -534,15 +857,13 @@
   /* ---- Accessibility + scale pass (Oct 2026): contrast, 12px minimum, 44px targets.
      Shared rules (focus rings, states, tokens) come from tokens.css / ui.css. ---- */
   .promo-banner { background: var(--c-gold); color: var(--c-ink); font-size: var(--fs-caption); }
-  .section-eyebrow, .footer-col h5 { font-size: var(--fs-label); letter-spacing: 0.14em; }
+  .section-eyebrow, .footer-col .footer-h { font-size: var(--fs-label); letter-spacing: 0.14em; }
   .section-eyebrow { color: var(--c-gold-deep); }
   .faq-section .section-eyebrow { color: var(--c-ink); opacity: 1; }
   .process-num { color: var(--c-gold-deep); }
   .footer-col a { display: flex; align-items: center; min-height: 44px; margin-bottom: 0; }
   .footer-col p { margin-bottom: var(--s2); }
   .footer-col a:hover { text-decoration: underline; }
-  /* the condition pop-up sits inside <main>, below the sticky bar's layer — hide the bar while it is open so the pop-up's own Book button is reachable */
-  body:has(.cond-overlay.open) .mobile-bar { opacity: 0; visibility: hidden; pointer-events: none; }
   .mobile-bar { transition: opacity 180ms ease, visibility 180ms; }
 </style>
 <link rel="stylesheet" href="/tokens.css">
@@ -550,7 +871,6 @@
 </head>
 <body>
 
-<div class="promo-banner">Launch offer: 20% off all treatments until 31 October 2026. Use code HALOE20 at checkout.</div>
 
 <main>
 
@@ -558,12 +878,29 @@
      HERO
      ============================================================ -->
 <section class="hero">
-  <div class="container">
-    <h1 class="hero-title reveal">Ancient healing.<br><em>Modern standards.</em></h1>
-    <p class="hero-sub reveal"><span style="font-weight:600;">Massage, dry cupping and hijama across Manchester.</span> Rooted in the prophetic tradition. Practised to modern professional standards.</p>
-    <!-- The "Rather talk?" WhatsApp line was removed (Sep 2026) — the
-         sticky bottom bar already gives every mobile visitor a WhatsApp
-         entry point, so this was a third path to the same place. -->
+  <a href="/" class="hero-brand" aria-label="haloe home">haloe</a>
+  <img src="haloe-logo-flower.svg" alt="" class="hero-flower" width="44" height="44">
+  <div class="container hero-grid">
+    <div class="hero-copy">
+      <h1 class="hero-title reveal">Feel <em>lighter.</em></h1>
+      <p class="hero-sub reveal">Hijama, dry cupping, massage and coaching in a quiet, private room on Deansgate, or at home across Greater Manchester.<span class="hero-sub-more"> Every step explained before we begin.</span></p>
+      <div class="hero-actions reveal">
+        <a href="book.html" class="btn-pill btn-gold">Book a session</a>
+        <a href="#pricing" class="hero-secondary">See the sessions</a>
+      </div>
+      <ul class="hero-trust reveal" aria-label="Credentials">
+        <li>CMA &amp; IPHM accredited</li>
+        <li>Fully insured</li>
+        <li><a href="#reviews" class="hero-trust-link">5.0 on Google</a></li>
+      </ul>
+    </div>
+    <div class="hero-figure reveal">
+      <picture>
+        <source type="image/webp" srcset="images/halima-hero-640.webp 640w, images/halima-hero.webp 1408w" sizes="(min-width: 900px) 46vw, 100vw">
+        <source type="image/jpeg" srcset="images/halima-hero-640.jpg 640w, images/halima-hero.jpg 1408w" sizes="(min-width: 900px) 46vw, 100vw">
+        <img src="images/halima-hero.jpg" width="1408" height="1408" alt="Halima Yasmin, founder of haloe, seated with a cup of tea in a candlelit room" fetchpriority="high" decoding="async">
+      </picture>
+    </div>
   </div>
 </section>
 
@@ -575,25 +912,27 @@
   <div class="container">
     <div class="about-card card reveal">
       <div class="about-copy">
-        <div class="about-figure">
-          <picture>
-            <source type="image/webp" srcset="images/halima-hero-640.webp 640w, images/halima-hero.webp 1408w" sizes="(min-width: 1024px) 360px, 280px">
-            <source type="image/jpeg" srcset="images/halima-hero-640.jpg 640w, images/halima-hero.jpg 1408w" sizes="(min-width: 1024px) 360px, 280px">
-            <img src="images/halima-hero.jpg" width="1408" height="1408" alt="Halima Yasmin, founder of haloe, seated with a cup of tea" loading="lazy">
-          </picture>
-        </div>
-        <span class="section-eyebrow">About haloe</span>
-        <h2>Healing rooted in the Sunnah</h2>
-        <p>Hijama — wet cupping — is one of the oldest traditions in natural wellbeing, practised for thousands of years and encouraged by the Prophet Muhammad ﷺ. It uses gentle suction and a few small, superficial incisions; most clients describe feeling lighter and more settled afterwards.</p>
-        <p>haloe offers three kinds of session — <strong>massage</strong> to ease everyday tension, <strong>dry cupping</strong> (suction only, skin unbroken), and <strong>wet cupping</strong> — hijama itself.</p>
-        <p>Halima also offers <strong>life coaching</strong> — a calm one-to-one conversation, in person at Milton Hall or online by video.</p>
-        <p>Run by Halima Yasmin, a CMA and IPHM accredited therapist who graduated with an 88% distinction from The Suuk Academy's L5 Diploma in Health and Cupping Therapy.</p>
-        <div class="about-cert-row">
-          <span class="trust-pill">L5 Diploma</span>
-          <span class="trust-pill">CMA Accredited</span>
-          <span class="trust-pill">IPHM Accredited</span>
-          <span class="trust-pill">Fully Insured</span>
-        </div>
+        <span class="section-eyebrow">In every session</span>
+        <h2>Four things you can count on.</h2>
+        <ul class="standards" aria-label="Our standards">
+          <li>
+            <span class="std-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"><path d="M19.5 1.8 L12.2 12.6 L11.2 21.8 L5.4 21.8 L4.8 17.6 L7.4 12.2 Z"/><rect x="7.2" y="13.6" width="2.2" height="5.6" rx="1"/></svg></span>
+            <strong>Single-use blades</strong>Opened in front of you, disposed of after you.
+          </li>
+          <li>
+            <span class="std-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6.5" cy="6.5" r="3"/><circle cx="14" cy="4.8" r="2.3"/><circle cx="19.5" cy="9" r="2.2"/><circle cx="11.5" cy="11.5" r="3.4"/><circle cx="4.5" cy="14.5" r="2.2"/><circle cx="18.5" cy="16" r="3"/><circle cx="10" cy="19.5" r="2.4"/><circle cx="15.5" cy="21" r="1.4"/></svg></span>
+            <strong>Unlimited cups</strong>Sized to you, not to a count.
+          </li>
+          <li>
+            <span class="std-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round"><path d="M9.5 3.5 L13.8 5.2 L13.2 10.6 L8.6 9.4 Z"/><path d="M15.6 9.8 L20.2 12.4 L17.6 17.2 L13.6 14.6 Z"/><path d="M5.2 13.2 L10.2 14.2 L10.6 19.6 L6.2 18.8 Z"/><path d="M9.5 3.5 L13.2 10.6 M15.6 9.8 L17.6 17.2 M5.2 13.2 L10.6 19.6" fill="none" stroke="var(--cream)" stroke-width=".9"/></svg></span>
+            <strong>Black seed oil</strong>Aftercare starts before you leave.
+          </li>
+          <li>
+            <span class="std-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><g fill="currentColor" stroke="none"><rect x="8" y="5.5" width="3" height="2" rx=".6"/><rect x="13" y="5.5" width="3" height="2" rx=".6"/><rect x="8" y="9" width="3" height="2" rx=".6"/><rect x="13" y="9" width="3" height="2" rx=".6"/><rect x="8" y="12.5" width="3" height="2" rx=".6"/><rect x="13" y="12.5" width="3" height="2" rx=".6"/></g><circle cx="12" cy="18" r="1.6"/></svg></span>
+            <strong>A key-coded room</strong>Nobody walks in.
+          </li>
+        </ul>
+        <p class="about-line">Hijama is a Sunnah of the Prophet Muhammad صلى الله عليه وسلم, practised here to modern professional standards by Halima Yasmin: Level 5 Diploma in Health and Cupping Therapy, CMA and IPHM accredited, fully insured.</p>
         <div style="margin-top:20px;"><a href="book.html" class="btn-pill btn-gold">Book a session</a></div>
       </div>
     </div>
@@ -606,61 +945,63 @@
 <section id="conditions">
   <div class="container">
     <div class="section-head reveal">
-      <span class="section-eyebrow">Who it helps</span>
+      <span class="section-eyebrow">Come as you are</span>
       <h2>What people come to us for</h2>
-      <p>Tap any condition to see how haloe can help, and book straight into the right treatment. Curious about hijama specifically? Read more about <a href="hijama-manchester.html" class="link-gold">hijama in Manchester</a>.</p>
+      <p>Each one is a session of its own. Tap what sounds like you to book it.</p>
     </div>
     <div class="cond-grid" id="condGrid">
-      <button class="cond-card card reveal" type="button" data-cond="hormonal">
+      <a href="book.html?cat=focused&amp;svc=Cycle%20Comfort%20session" class="cond-card card reveal" data-svc="Cycle Comfort session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><path d="M12 2c1.8 2 1.8 4-0 6M12 2c-1.8 2-1.8 4 0 6M22 12c-2 1.8-4 1.8-6 0M22 12c-2-1.8-4-1.8-6 0M12 22c1.8-2 1.8-4 0-6M12 22c-1.8-2-1.8-4 0-6M2 12c2-1.8 4-1.8 6 0M2 12c2 1.8 4 1.8 6 0"/></svg></span>
-        <h3>Hormonal &amp; Menstrual</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="spiritual">
+        <h3>A cycle that feels off</h3>
+        <p class="cond-what">Lower back and abdomen hijama</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Sunnah%20session" class="cond-card card reveal" data-svc="Sunnah session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></span>
-        <h3>Spiritual Wellbeing</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="stress">
+        <h3>Hijama as Sunnah</h3>
+        <p class="cond-what">Sunnah points, head and upper back</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Calm%20session" class="cond-card card reveal" data-svc="Calm session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 6.5a5.5 5.5 0 0 1 0 11M12 3a9 9 0 0 1 0 18"/></svg></span>
-        <h3>Stress &amp; Anxiety</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="detox">
+        <h3>Can&#39;t switch off</h3>
+        <p class="cond-what">Dry cupping and a head massage</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Reset%20session" class="cond-card card reveal" data-svc="Reset session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 6 8 6 11.5A6 6 0 0 1 6 14.5C6 11 9 7 12 3z"/></svg></span>
-        <h3>Reset &amp; Renewal</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="pain">
+        <h3>Wanting a reset</h3>
+        <p class="cond-what">Full body hijama, unhurried</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Shoulders%20and%20neck%20session" class="cond-card card reveal" data-svc="Shoulders and neck session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
-        <h3>Chronic Pain &amp; Tension</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="skin">
+        <h3>Tight shoulders or neck</h3>
+        <p class="cond-what">Targeted cupping, neck and upper back</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Skin%20session" class="cond-card card reveal" data-svc="Skin session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 6 5 10 5 13.5a7 7 0 0 0 14 0C19 10 17 6 12 3z"/><path d="M12 8v11"/></svg></span>
-        <h3>Skin &amp; Beauty</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="fatigue">
+        <h3>Dull, tired skin</h3>
+        <p class="cond-what">Face and scalp dry cupping</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Energy%20session" class="cond-card card reveal" data-svc="Energy session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6z"/></svg></span>
-        <h3>Fatigue &amp; Low Energy</h3>
-      </button>
-      <a href="book.html" class="cond-card card reveal">
+        <h3>Always tired</h3>
+        <p class="cond-what">Full back hijama with the scalp</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html" class="cond-card card reveal cond-all">
         <span class="cond-icon" style="background:var(--gold);border-color:var(--gold);color:var(--ink);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-        <h3>View all treatments</h3>
+        <h3>All treatments</h3>
+        <p class="cond-what">Massage, cupping, hijama and coaching</p>
+        <span class="cond-price"><span class="cond-from" data-price-all></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
       </a>
     </div>
+    <p class="cond-more"><a href="hijama-manchester.html" class="link-gold">What is hijama?</a></p>
   </div>
 </section>
-
-<!-- Condition modal (restyled light; same data/behaviour as before) -->
-<div class="cond-overlay" id="condOverlay">
-  <div class="cond-modal">
-    <div class="cond-modal-top">
-      <span class="cond-modal-icon" id="condIcon"></span>
-      <button class="cond-modal-close" id="condClose" aria-label="Close">&times;</button>
-    </div>
-    <h3 id="condTitle"></h3>
-    <h4 id="condHeading"></h4>
-    <p id="condBody"></p>
-    <div class="cond-modal-tags" id="condTags"></div>
-    <a href="book.html" id="condCta" class="btn-pill btn-gold cond-modal-cta">Book This Treatment</a>
-  </div>
-</div>
 
 <!-- ============================================================
      PRICING — read live from services-data.js, never hardcoded
@@ -668,12 +1009,12 @@
 <section id="pricing">
   <div class="container">
     <div class="section-head reveal">
-      <span class="section-eyebrow">Pricing</span>
-      <h2>Simple, flat pricing</h2>
-      <p>Cupping prices include unlimited cups and take-home black seed oil aftercare. See the full list and book in the wizard.</p>
+      <span class="section-eyebrow">Sessions</span>
+      <h2>Four ways to be looked after.</h2>
+      <p>Prices are flat and shown before you book. Cupping sessions include unlimited cups and black seed oil to take home.</p>
     </div>
     <div class="price-grid" id="priceGrid"></div>
-    <p class="price-note reveal">See <a href="hijama-manchester.html" class="link-gold">the full hijama &amp; cupping price list</a> for every treatment.</p>
+    <p class="price-note reveal">Prefer a course? <a href="book.html?cat=packages" class="link-gold">See the packages</a>, four to eight sessions spaced over the season. Or read <a href="hijama-manchester.html" class="link-gold">the full price list</a>.</p>
   </div>
 </section>
 
@@ -687,52 +1028,71 @@
       <span class="section-eyebrow">Your journey</span>
       <h2>What to expect</h2>
     </div>
-    <div class="process-grid">
-      <div class="process-card card reveal">
-        <div class="process-num">01</div>
-        <h4>Book &amp; Intake</h4>
-        <p>Fill in the booking form. A health intake form is sent before every session — your safety is non-negotiable.</p>
-      </div>
-      <div class="process-card card reveal">
-        <div class="process-num">02</div>
-        <h4>Your Session</h4>
-        <p>Private, clean, dignified. Cups placed and a single-use blade used for wet cupping. You're guided through every step.</p>
-      </div>
-      <div class="process-card card reveal">
-        <div class="process-num">03</div>
-        <h4>Aftercare</h4>
-        <p>Rest, hydrate, avoid cold water for 24 hours. Marks may last up to 10 days — this is normal and expected.</p>
-      </div>
-      <div class="process-card card reveal">
-        <div class="process-num">04</div>
-        <h4>Your Plan</h4>
-        <p>Most clients benefit from regular sessions. We'll build a personalised schedule around your goals.</p>
-      </div>
+    <ol class="journey card reveal" aria-label="Your journey, four steps">
+      <li class="journey-step is-here">
+        <span class="journey-n" aria-hidden="true">1</span>
+        <div>
+          <h3>Book and tell us about you <span class="journey-here">You are here</span></h3>
+          <p>Pick a time online, at the clinic or at home. A short health form comes before your session so nothing is a surprise on the day.</p>
+        </div>
+      </li>
+      <li class="journey-step">
+        <span class="journey-n" aria-hidden="true">2</span>
+        <div>
+          <h3>Your session</h3>
+          <p>Private and unhurried. Cups are placed, and for wet cupping a single-use blade is opened in front of you. Every step is explained before it happens.</p>
+        </div>
+      </li>
+      <li class="journey-step">
+        <span class="journey-n" aria-hidden="true">3</span>
+        <div>
+          <h3>The days after</h3>
+          <p>Rest, drink water and keep the area clean and dry for 24 hours. Marks are normal and usually fade within two weeks.</p>
+        </div>
+      </li>
+      <li class="journey-step">
+        <span class="journey-n" aria-hidden="true">4</span>
+        <div>
+          <h3>Your rhythm</h3>
+          <p>Many clients come back on a rhythm that suits them. We'll shape it around what you came in with.</p>
+        </div>
+      </li>
+    </ol>
+    <div class="section-head reveal chat-intro" id="does-it-hurt">
+      <span class="section-eyebrow">The question everyone asks</span>
+      <h2>Does it hurt?</h2>
+      <p>Answered the way Halima answers it on WhatsApp every week.</p>
     </div>
-    <div class="process-steps card reveal">
-      <h3>What happens in your session</h3>
-      <ol class="session-steps">
-        <li>We talk first — health form &amp; a chat about what you need</li>
-        <li>Warm &amp; relax — massage to settle the muscles</li>
-        <li>Cups applied — suction lifts the skin gently</li>
-        <li>Gentle draw — tiny pricks (wet cupping only)</li>
-        <li>Soothe &amp; rest — black seed oil, then quiet rest time</li>
-      </ol>
-      <h4>Does it hurt?</h4>
-      <p>The suction feels like a firm tug. The wet cupping pricks feel like a quick light scratch. Most clients find the whole session relaxing — some fall asleep.</p>
+    <div class="chat-card card reveal" aria-label="A short exchange with Halima">
+      <div class="chat-head">
+        <img src="images/halima-hero-640.jpg" alt="" class="chat-avatar" width="40" height="40" loading="lazy">
+        <div><div class="chat-name">Halima</div><div class="chat-status">online</div></div>
+      </div>
+      <div class="chat">
+        <div class="chat-day"><span>Today</span></div>
+        <div class="chat-row chat-them"><div class="chat-bubble">Hi Halima, I'd like to book but I'm a bit nervous. Does it hurt?<span class="chat-meta">10:42 <i class="chat-ticks" aria-hidden="true"></i></span></div></div>
+        <div class="chat-row chat-me"><div class="chat-bubble">Honestly, less than you'd think. The cups feel like a firm tug. The wet cupping pricks are a quick, light scratch, lighter than a paper cut.<span class="chat-meta">10:47</span></div></div>
+        <div class="chat-row chat-me"><div class="chat-bubble">I tell you before every single step, and nothing happens until you're ready. Most people relax, and a few fall asleep by the time the black seed oil goes on.<span class="chat-meta">10:47</span></div></div>
+        <div class="chat-row chat-me"><div class="chat-bubble">The hour goes: we talk first, then massage, then cups, tiny pricks if it's wet cupping, then black seed oil and rest.<span class="chat-meta">10:48</span></div></div>
+      </div>
+      <a href="https://wa.me/447474833643" class="chat-input" target="_blank" rel="noopener"><span>Ask Halima anything</span><span class="chat-send" aria-hidden="true">&uarr;</span></a>
     </div>
   </div>
 </section>
 
 <!-- ============================================================
-     REVIEWS — placeholders until real reviews are supplied
+     REVIEWS — real Google reviews, word for word (5.0 from 7, Oct 2026).
+     Only reviews that describe the experience are shown; ones that make
+     health-outcome claims are left out on purpose (see Compliance in CLAUDE.md).
+     Update the count/rating in the heading when new reviews arrive.
      ============================================================ -->
-<section id="reviews" style="display:none">
+<section id="reviews">
   <div class="container">
     <div class="reviews-head reveal">
       <div>
         <span class="section-eyebrow">Reviews</span>
-        <h2>Rated [X.X] from [Y] Google reviews</h2>
+        <h2>What clients say</h2>
+        <p class="reviews-sub">Rated 5.0 from 7 Google reviews.</p>
       </div>
       <span class="google-badge">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6 6.6.6-5 4.4 1.5 6.5L12 16l-5.9 3.5L7.5 13l-5-4.4 6.6-.6z"/></svg>
@@ -740,21 +1100,27 @@
       </span>
     </div>
     <div class="review-grid">
-      <div class="review-card card reveal">
-        <div class="review-stars">★★★★★</div>
-        <p>"Placeholder review text — swap in a real client review here."</p>
-        <div class="review-name">— Placeholder Name</div>
-      </div>
-      <div class="review-card card reveal">
-        <div class="review-stars">★★★★★</div>
-        <p>"Placeholder review text — swap in a real client review here."</p>
-        <div class="review-name">— Placeholder Name</div>
-      </div>
-      <div class="review-card card reveal">
-        <div class="review-stars">★★★★★</div>
-        <p>"Placeholder review text — swap in a real client review here."</p>
-        <div class="review-name">— Placeholder Name</div>
-      </div>
+      <article class="review-card card reveal">
+        <header class="review-head">
+          <span class="review-avatar" aria-hidden="true">CB</span>
+          <div><div class="review-who">Curtis B.</div><div class="review-sub"><span class="review-stars" role="img" aria-label="5 out of 5 stars">★★★★★</span> · Google</div></div>
+        </header>
+        <p>Very professional and always making sure I was comfortable throughout the entire session. Even provided me with aftercare treatment for free! Will return.</p>
+      </article>
+      <article class="review-card card reveal">
+        <header class="review-head">
+          <span class="review-avatar review-avatar-alt" aria-hidden="true">CS</span>
+          <div><div class="review-who">Cláudio S.</div><div class="review-sub"><span class="review-stars" role="img" aria-label="5 out of 5 stars">★★★★★</span> · Google</div></div>
+        </header>
+        <p>From the moment I arrived, I felt welcomed, comfortable and completely at ease. Everything was explained clearly. The clinic was clean, calming and extremely hygienic. I would highly recommend Haloe to anyone considering Hijama.</p>
+      </article>
+      <article class="review-card card reveal">
+        <header class="review-head">
+          <span class="review-avatar review-avatar-alt" aria-hidden="true">AA</span>
+          <div><div class="review-who">Alex A.</div><div class="review-sub"><span class="review-stars" role="img" aria-label="5 out of 5 stars">★★★★★</span> · Google</div></div>
+        </header>
+        <p>Very good, I felt fresh the next day. Very professional and friendly service.</p>
+      </article>
     </div>
   </div>
 </section>
@@ -762,38 +1128,59 @@
 <!-- ============================================================
      FAQ
      ============================================================ -->
-<section class="faq-section">
+<section class="faq-section" id="faq">
   <div class="container">
     <div class="section-head reveal">
       <span class="section-eyebrow">FAQ</span>
-      <h2>Questions, answered</h2>
+      <h2>Swipe through the usual questions.</h2>
     </div>
-    <div class="faq-list">
-      <div class="faq-item reveal">
-        <button class="faq-q" aria-expanded="false">Does hijama hurt?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Most clients feel mild discomfort at most. Cups create a gentle suction, and only wet cupping uses a few small, superficial incisions. Sessions are unhurried and you're guided through every step.</div></div>
-      </div>
-      <div class="faq-item reveal">
-        <button class="faq-q" aria-expanded="false">What should I do before and after?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Eat lightly beforehand and stay hydrated. Afterwards, rest, keep drinking water, and avoid cold water on the treated area for 24 hours. Marks can last up to 10 days — that's completely normal.</div></div>
-      </div>
-      <div class="faq-item reveal">
-        <button class="faq-q" aria-expanded="false">Are you insured?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Yes — Halima is fully insured, CMA and IPHM accredited, and holds an L5 Diploma in Health and Cupping Therapy.</div></div>
-      </div>
-      <div class="faq-item reveal">
-        <button class="faq-q" aria-expanded="false">Where is the clinic?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Every Tuesday at Milton Hall, 244 Deansgate, Manchester M3 4BQ. Outside of that, Halima visits you at home anywhere across Greater Manchester.</div></div>
-      </div>
-      <div class="faq-item reveal">
-        <button class="faq-q" aria-expanded="false">Is any area not treated?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">For modesty and professional care, I do not treat the area between the navel and the knees on male clients. That area stays covered throughout the session. Everything else is treated as booked.</div></div>
-      </div>
-      <div class="faq-item reveal">
-        <button class="faq-q" aria-expanded="false">How quickly can I book?<span class="faq-chevron">⌄</span></button>
-        <div class="faq-a"><div class="faq-a-inner">Booking takes about two minutes online, with real-time availability for both home visits and the Tuesday clinic day. You'll get a confirmation and a health form to complete before your session.</div></div>
-      </div>
+  </div>
+  <div class="faq-track" id="faqTrack" tabindex="0" aria-roledescription="carousel" aria-label="Frequently asked questions">
+    <div class="faq-rail">
+      <article class="faq-card card" aria-label="Question 1 of 8">
+        <span class="faq-n">1 of 8</span>
+        <h3>How much does it cost?</h3>
+        <p>Prices are shown on each session above and in full on the booking page, with the 20% introductory price already applied. Home visits add travel from £20, shown before you pay; the Tuesday clinic on Deansgate has no travel fee.</p>
+      </article>
+      <article class="faq-card card" aria-label="Question 2 of 8">
+        <span class="faq-n">2 of 8</span>
+        <h3>Do you treat men and women?</h3>
+        <p>Yes. haloe serves women and men, with the same private room, the same standards and the same care for modesty in every session.</p>
+      </article>
+      <article class="faq-card card" aria-label="Question 3 of 8">
+        <span class="faq-n">3 of 8</span>
+        <h3>What should I wear?</h3>
+        <p>Loose, comfortable clothes you can move in. For back and shoulder sessions a top that opens or lifts easily helps. Only the area being treated is uncovered, and only for as long as it needs to be.</p>
+      </article>
+      <article class="faq-card card" aria-label="Question 4 of 8">
+        <span class="faq-n">4 of 8</span>
+        <h3>What should I do before and after?</h3>
+        <p>Eat lightly beforehand and stay hydrated. Afterwards, rest, keep drinking water, and keep the area clean, dry and warm for 24 hours. Marks are normal and usually fade within 14 days.</p>
+      </article>
+      <article class="faq-card card" aria-label="Question 5 of 8">
+        <span class="faq-n">5 of 8</span>
+        <h3>Are you insured and accredited?</h3>
+        <p>Yes. Halima is fully insured, CMA and IPHM accredited, and holds a Level 5 Diploma in Health and Cupping Therapy from The Suuk Academy (88% distinction).</p>
+      </article>
+      <article class="faq-card card" aria-label="Question 6 of 8">
+        <span class="faq-n">6 of 8</span>
+        <h3>Where is the clinic, and do you do home visits?</h3>
+        <p>Every Tuesday at Milton Hall, 244 Deansgate, Manchester M3 4BQ, in a private treatment room. On other days (Monday to Saturday, 10am to 8pm) Halima comes to you at home across Greater Manchester. Coaching is also available online.</p>
+      </article>
+      <article class="faq-card card" aria-label="Question 7 of 8">
+        <span class="faq-n">7 of 8</span>
+        <h3>Is any area not treated?</h3>
+        <p>For modesty and professional care, I do not treat the area between the navel and the knees on male clients. That area stays covered throughout the session. Everything else is treated as booked.</p>
+      </article>
+      <article class="faq-card card" aria-label="Question 8 of 8">
+        <span class="faq-n">8 of 8</span>
+        <h3>What if I need to cancel or move my session?</h3>
+        <p>Free reschedule or full refund up to 48 hours before your session. Inside 48 hours, sessions are non-refundable but can be moved once. No-shows are charged in full.</p>
+      </article>
     </div>
+  </div>
+  <div class="container">
+    <div class="faq-dots" id="faqDots" aria-hidden="true"></div>
   </div>
 </section>
 
@@ -803,21 +1190,30 @@
 <section id="clinic-day">
   <div class="container">
     <div class="clinic-card card reveal">
+      <a class="clinic-map" href="https://maps.google.com/?q=Milton+Hall,+244+Deansgate,+Manchester+M3+4BQ" target="_blank" rel="noopener" aria-label="Open Milton Hall, 244 Deansgate in Google Maps">
+        <svg viewBox="0 0 360 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+          <rect width="360" height="150" fill="#EEE6D8"/>
+          <g fill="#E3D9C6"><rect x="24" y="18" width="70" height="44" rx="4"/><rect x="24" y="86" width="52" height="48" rx="4"/><rect x="262" y="16" width="78" height="40" rx="4"/><rect x="258" y="90" width="84" height="46" rx="4"/><rect x="118" y="100" width="60" height="40" rx="4"/><rect x="206" y="104" width="34" height="34" rx="4"/></g>
+          <g stroke="#FBF7F0" stroke-linecap="round" fill="none"><path d="M150 -10 L190 170" stroke-width="22"/><path d="M-10 78 L370 66" stroke-width="12"/><path d="M-10 150 L250 -14" stroke-width="7"/><path d="M226 -10 L252 160" stroke-width="7"/></g>
+          <text x="196" y="40" font-family="Poppins, sans-serif" font-size="9" font-weight="600" fill="#9A8B6E" transform="rotate(78 196 40)">DEANSGATE</text>
+          <g transform="translate(170 72)"><path d="M0 -26 C-12 -26 -18 -17 -18 -8 C-18 4 0 22 0 22 C0 22 18 4 18 -8 C18 -17 12 -26 0 -26 Z" fill="#C8A96E" stroke="#fff" stroke-width="3"/><circle r="6" cy="-9" fill="#fff"/></g>
+        </svg>
+      </a>
       <div class="clinic-copy">
-        <span class="section-eyebrow">Weekly Clinic Day</span>
-        <h2>Tuesdays at Milton Hall</h2>
-        <p>Every Tuesday, Halima holds a full day of appointments at Milton Hall on Deansgate — a private treatment room, not a shared space. A receptionist greets you and the room itself is behind a key-coded door, so your session stays just as private as a home visit.</p>
-        <p style="margin-top:12px;">The building has lift and stair access throughout. Sessions are paid in full at the time of booking — no address to arrange, no travel fee to work out.</p>
+        <span class="section-eyebrow">Tuesdays</span>
+        <h2>Milton Hall, 244 Deansgate</h2>
+        <p>Give your name at the concierge and ask for haloe. Lift or stairs up to a private treatment room behind a key-coded door. Nothing to pay at the desk: it was settled when you booked.</p>
         <div class="clinic-facts">
           <span class="trust-pill">Private treatment room</span>
           <span class="trust-pill">Key-coded door</span>
           <span class="trust-pill">Lift &amp; stairs</span>
-          <span class="trust-pill">Full payment at booking</span>
+          <span class="trust-pill">Paid when you book</span>
         </div>
         <p class="clinic-address">Milton Hall, 244 Deansgate, Manchester, M3 4BQ</p>
-      </div>
-      <div class="clinic-cta">
-        <a href="book.html?location=clinic" class="btn-pill btn-gold">Book a Tuesday</a>
+        <div class="clinic-cta">
+          <a href="book.html?location=clinic" class="btn-pill btn-gold">Book a Tuesday</a>
+          <a href="https://maps.google.com/?q=Milton+Hall,+244+Deansgate,+Manchester+M3+4BQ" class="btn-pill btn-outline" target="_blank" rel="noopener">Directions</a>
+        </div>
       </div>
     </div>
   </div>
@@ -829,15 +1225,13 @@
 <section>
   <div class="container">
     <div class="cta-card reveal">
-      <h2>Ready to feel lighter?</h2>
-      <p>Massage, dry cupping, hijama and life coaching — mobile across Manchester, every Tuesday at Deansgate, or online.</p>
-      <div class="cta-benefits">
-        <span class="cta-benefit">HALOE20 — 20% off all treatments</span>
-        <span class="cta-benefit">Unlimited cups</span>
-        <span class="cta-benefit">Black seed oil aftercare</span>
-        <span class="cta-benefit">Paid in full, no deposit</span>
+      <span class="cta-next" id="ctaNext">Next clinic · Tuesday</span>
+      <h2>Feel lighter this Tuesday.</h2>
+      <p>A full day of appointments on Deansgate. Home visits the rest of the week.</p>
+      <div class="cta-actions">
+        <a href="book.html?location=clinic" class="btn-pill btn-gold">Book a Tuesday</a>
+        <a href="book.html?location=mobile" class="btn-pill btn-outline">Home visit</a>
       </div>
-      <a href="book.html" class="btn-pill" style="background:var(--ink);color:var(--cream);">Book your session</a>
     </div>
   </div>
 </section>
@@ -1258,12 +1652,21 @@ const HB_SERVICES = {
     {name:'Digestion & Comfort',time:'6 sessions of 1 hr 30 min · over 24 wks',   pkgMeta:'6 sessions · over 24 wks',   pkgDur:'1 hr 30 min',price:480,desc:'Six sessions focused on the abdomen and lower back.'},
     {name:'Circulation & Energy',time:'8 sessions of 1 hr 30 min · over 18 wks',  pkgMeta:'8 sessions · over 18 wks',   pkgDur:'1 hr 30 min',price:600,desc:'Eight full-body sessions over eighteen weeks.'},
     {name:"Women's Cycle Care", time:'8 sessions of 1 hr 30 min · over 16 wks',   pkgMeta:'8 sessions · over 16 wks',   pkgDur:'1 hr 30 min',price:600,desc:"Eight sessions across the cycle — our most complete women's course."},
-  ]
+  ],
+  focused:[
+    {name:'Cycle Comfort session',time:'1 hour',price:90},
+    {name:'Sunnah session',time:'1 hour',price:80},
+    {name:'Calm session',time:'1 hour',price:70},
+    {name:'Reset session',time:'1 hr 30 min',price:120},
+    {name:'Shoulders and neck session',time:'1 hour',price:80},
+    {name:'Skin session',time:'1 hour',price:85},
+    {name:'Energy session',time:'1 hour',price:90},
+  ],
 };
 /* Promotional discount — ended Sep 2026, kept in step with PROMO_DISCOUNT
    (services-data.js) and functions/_services.js, all now 0. hbNet() just
    returns svc.price; HALOE20 is the only discount left. */
-const HB_PROMO_DISCOUNT = 0;
+const HB_PROMO_DISCOUNT = 0.2; // keep equal to services-data.js PROMO_DISCOUNT
 function hbNet(svc){ return Math.round(svc.price * (1 - HB_PROMO_DISCOUNT)); }
 
 /* ---- Weekly Clinic Day config ----
@@ -1503,36 +1906,22 @@ hbInit();
      ============================================================ -->
 <footer class="site-footer">
   <div class="container">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <span class="footer-brand-icon"><img src="haloe-logo-flower.svg" alt=""></span>
-        <span>haloe</span>
-      </div>
-      <div class="footer-cols">
-        <div class="footer-col">
-          <h5>Contact</h5>
-          <a href="https://wa.me/447474833643" target="_blank" rel="noopener">WhatsApp</a>
-          <a href="https://instagram.com/haloe.health" target="_blank" rel="noopener">Instagram</a>
-        </div>
-        <div class="footer-col">
-          <h5>Hours</h5>
-          <p>Clinic Day: Tuesdays, 9am–7pm</p>
-          <p>Home visits: Mon–Sat, 10am–8pm</p>
-        </div>
-        <div class="footer-col">
-          <h5>Explore</h5>
-          <a href="#about">About</a>
-          <a href="#conditions">Conditions</a>
-          <a href="#clinic-day">Clinic Day</a>
-          <a href="#process">What to Expect</a>
-          <a href="hijama-manchester.html">Hijama in Manchester</a>
-          <a href="book.html">Book</a>
-        </div>
-      </div>
+    <div class="footer-brand">
+      <span class="footer-brand-icon"><img src="haloe-logo-flower.svg" alt=""></span>
+      <span>haloe</span>
     </div>
-    <div class="footer-bottom">
-      © 2026 haloe · Halima Yasmin · CMA &amp; IPHM Accredited · Fully Insured · Manchester
+    <p class="footer-line">Milton Hall, 244 Deansgate, Manchester M3 4BQ · Tuesdays</p>
+    <p class="footer-line"><a href="https://wa.me/447474833643" target="_blank" rel="noopener">WhatsApp 07474 833643</a></p>
+    <div class="footer-social" aria-label="Social">
+      <a href="https://instagram.com/haloe.health" target="_blank" rel="noopener" aria-label="Instagram @haloe.health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+      <a href="https://www.tiktok.com/@haloe.health" target="_blank" rel="noopener" aria-label="TikTok @haloe.health"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h2.4c.3 2.3 1.7 3.9 4.1 4.1v2.5c-1.6 0-3-.5-4.1-1.3v6.9a5.5 5.5 0 1 1-5.5-5.5c.3 0 .6 0 .9.1v2.6a2.9 2.9 0 1 0 2.2 2.8V3z"/></svg></a>
+      <a href="https://www.youtube.com/@haloe.health" target="_blank" rel="noopener" aria-label="YouTube @haloe.health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 8.2c.2-1.6 1.2-2.6 2.8-2.7C8.4 5.3 10.3 5.2 12 5.2s3.6.1 5.7.3c1.6.1 2.6 1.1 2.8 2.7.2 1.3.3 2.6.3 3.8s-.1 2.5-.3 3.8c-.2 1.6-1.2 2.6-2.8 2.7-2.1.2-4 .3-5.7.3s-3.6-.1-5.7-.3c-1.6-.1-2.6-1.1-2.8-2.7A26 26 0 0 1 3.2 12c0-1.2.1-2.5.3-3.8z"/><path d="M10 9.3v5.4l4.6-2.7z" fill="currentColor" stroke="none"/></svg></a>
+      <a href="mailto:halima@haloe.health" aria-label="Email halima@haloe.health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></a>
     </div>
+    <p class="footer-links"><a href="#pricing">Sessions</a> · <a href="#reviews">Reviews</a> · <a href="before-your-session.html">Before your session</a></p>
+    <p class="footer-bottom">© haloe 2026 · Halima Yasmin · CMA &amp; IPHM accredited · Fully insured</p>
+    <p class="footer-legal"><a href="terms.html">Terms and conditions</a> · <a href="privacy.html">Privacy policy</a></p>
+    <nav class="footer-more" aria-label="More pages"><a href="hijama-manchester.html">Hijama in Manchester</a> · <a href="cupping-manchester.html">Dry cupping</a> · <a href="massage-manchester.html">Massage</a> · <a href="life-coaching-manchester.html">Life coaching</a></nav>
   </div>
 </footer>
 
@@ -1575,112 +1964,26 @@ hbInit();
 })();
 
 // ------------------------------------------------------------------
-// Condition cards → modal, same data + deep-link contract as before:
-// cta.href becomes book.html?cat=<category>&svc=<exact treatment name>,
-// matched by applyDeepLink() in book.html.
+// Focused-session tiles: fill "from £" from SERVICES.focused (struck list
+// price when the introductory discount is on). Never hardcode a price here.
 // ------------------------------------------------------------------
 (function () {
-  var ICONS = {
-    hormonal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><path d="M12 2c1.8 2 1.8 4-0 6M12 2c-1.8 2-1.8 4 0 6M22 12c-2 1.8-4 1.8-6 0M22 12c-2-1.8-4-1.8-6 0M12 22c1.8-2 1.8-4 0-6M12 22c-1.8-2-1.8-4 0-6M2 12c2-1.8 4-1.8 6 0M2 12c2 1.8 4 1.8 6 0"/></svg>',
-    spiritual: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>',
-    stress: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 6.5a5.5 5.5 0 0 1 0 11M12 3a9 9 0 0 1 0 18"/></svg>',
-    detox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 6 8 6 11.5A6 6 0 0 1 6 14.5C6 11 9 7 12 3z"/></svg>',
-    pain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>',
-    skin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 6 5 10 5 13.5a7 7 0 0 0 14 0C19 10 17 6 12 3z"/><path d="M12 8v11"/></svg>',
-    fatigue: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6z"/></svg>'
-  };
-  var data = {
-    hormonal: {
-      title: 'Hormonal & Menstrual Health',
-      heading: 'A session timed around your cycle',
-      body: "Many women choose to time their hijama sessions around their monthly cycle, with cupping placed on the back or lower abdomen. Clients often describe feeling calmer and more settled afterwards. The Women's Cycle Care package (8 sessions over 16 weeks) and Cycle Comfort package (4 sessions over roughly three cycles) are both built around this rhythm.",
-      tags: ["Women's Cycle Care", 'Cycle Comfort Package', '8–16 weeks', 'Wet & dry cupping'],
-      cta: { cat: 'packages', svc: "Women's Cycle Care" }
-    },
-    spiritual: {
-      title: 'Spiritual Wellbeing',
-      heading: 'Prophetic medicine. Modern care.',
-      body: "Al-Hijama is a Sunnah — a practice of the Prophet ﷺ. For many Muslim clients, receiving hijama in a private space with a modest practitioner who understands their faith is itself part of the healing. haloe exists precisely for this. Every session is delivered with care, dignity, and full respect for your values.",
-      tags: ['Private space', 'Sunnah practice', 'Modest environment'],
-      cta: { cat: 'wet' }
-    },
-    stress: {
-      title: 'Stress & Anxiety',
-      heading: 'Rest, release, restore',
-      body: "Many clients describe a profound calm that settles in during and after a cupping session. The Stress & Sleep package (6 sessions over 24 weeks) offers a sustained, structured course of care, pairing wet and dry cupping with follow-up consultations and a herbal oil kit to support your wellbeing between sessions.",
-      tags: ['Stress & Sleep Package', '6 sessions', '24 weeks', 'Herbal oil kit included'],
-      cta: { cat: 'packages', svc: 'Stress & Sleep' }
-    },
-    detox: {
-      title: 'Reset & Renewal',
-      heading: "A rhythm to reset by",
-      body: "Many clients build wet cupping into a regular rhythm as part of looking after themselves day to day. The Digestion & Comfort package (6 sessions over 24 weeks) pairs wet and dry cupping with a simple wellbeing journal, so you can see how you're getting on over time.",
-      tags: ['Digestion & Comfort Package', '6 sessions', '24 weeks', 'Wellbeing journal'],
-      cta: { cat: 'packages', svc: 'Digestion & Comfort' }
-    },
-    pain: {
-      title: 'Chronic Pain & Tension',
-      heading: 'Sessions focused on tension and tightness',
-      body: "The Pain & Mobility package places cupping on the back, shoulders and other tight areas, with unlimited cups each visit. Clients often describe feeling looser and more at ease afterwards. Four sessions over 8–12 weeks, with a follow-up consultation along the way.",
-      tags: ['Pain & Mobility Package', '4 sessions', 'Headache & Tension Package', 'Unlimited cups'],
-      cta: { cat: 'packages', svc: 'Pain & Mobility' }
-    },
-    skin: {
-      title: 'Skin & Beauty',
-      heading: 'A session for face and scalp',
-      body: "Face and head cupping uses gentle suction across the skin, paired with a take-home black seed oil bottle as part of your aftercare. Clients often say their skin feels smoother and more refreshed afterwards.",
-      tags: ['Face cupping', 'Head cupping', 'Black seed oil aftercare', 'Dry cupping only'],
-      cta: { cat: 'dry', svc: 'Face Cupping' }
-    },
-    fatigue: {
-      title: 'Fatigue & Low Energy',
-      heading: 'A structured course across the season',
-      body: "The Circulation & Energy package (8 sessions over 18 weeks) is haloe's most comprehensive course, with cupping across the full body each visit. Clients often describe feeling lighter and more refreshed afterwards.",
-      tags: ['Circulation & Energy Package', '8 sessions', '18 weeks', 'Priority booking'],
-      cta: { cat: 'packages', svc: 'Circulation & Energy' }
-    }
-  };
-
-  var overlay = document.getElementById('condOverlay');
-
-  function openModal(key) {
-    var d = data[key];
-    if (!d) return;
-    document.getElementById('condIcon').innerHTML = ICONS[key] || '';
-    document.getElementById('condTitle').textContent = d.title;
-    document.getElementById('condHeading').textContent = d.heading;
-    document.getElementById('condBody').textContent = d.body;
-    var tags = document.getElementById('condTags');
-    tags.innerHTML = '';
-    d.tags.forEach(function (t) {
-      var span = document.createElement('span');
-      span.className = 'cond-modal-tag';
-      span.textContent = t;
-      tags.appendChild(span);
-    });
-    var cta = document.getElementById('condCta');
-    var q = 'book.html';
-    if (d.cta && d.cta.cat) {
-      q += '?cat=' + encodeURIComponent(d.cta.cat);
-      if (d.cta.svc) q += '&svc=' + encodeURIComponent(d.cta.svc);
-    }
-    cta.href = q;
-    cta.textContent = d.cta && d.cta.svc ? 'Book ' + d.cta.svc : 'Book This Treatment';
-
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
+  if (typeof SERVICES === 'undefined' || !SERVICES.focused) return;
+  function fmt(svc) {
+    var net = netPrice(svc);
+    var mins = /1 hr 30/.test(svc.time) ? '90 min' : /2 hours/.test(svc.time) ? '2 hr' : /45/.test(svc.time) ? '45 min' : '60 min';
+    return (svc.price > net ? '<s>£' + svc.price + '</s>' : '') + '£' + net + ' · ' + mins;
   }
-  function closeModal() {
-    overlay.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  document.querySelectorAll('.cond-card[data-cond]').forEach(function (el) {
-    el.addEventListener('click', function () { openModal(el.dataset.cond); });
+  document.querySelectorAll('.cond-card[data-svc]').forEach(function (el) {
+    var svc = SERVICES.focused.find(function (x) { return x.name === el.dataset.svc; });
+    var out = el.querySelector('[data-price]');
+    if (svc && out) out.innerHTML = fmt(svc);
   });
-  document.getElementById('condClose').addEventListener('click', closeModal);
-  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+  var all = document.querySelector('[data-price-all]');
+  if (all) {
+    var cheapest = [].concat(SERVICES.massage, SERVICES.dry, SERVICES.wet).reduce(function (m, x) { return netPrice(x) < netPrice(m) ? x : m; });
+    all.textContent = 'from £' + netPrice(cheapest);
+  }
 })();
 
 // ------------------------------------------------------------------
@@ -1690,23 +1993,37 @@ hbInit();
 // ------------------------------------------------------------------
 (function () {
   var CATS = [
-    { key: 'massage', label: 'Massage', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13c0-4 3-8 8-8s8 4 8 8"/><path d="M4 13a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4"/><path d="M9 13v3M15 13v3"/></svg>' },
-    { key: 'dry', label: 'Dry cupping', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8" rx="6" ry="4"/><path d="M6 8v5a6 4 0 0 0 12 0V8"/></svg>' },
-    { key: 'wet', label: 'Wet cupping', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4.5 7 9 7 12.5a7 7 0 0 1-14 0C5 12 8.5 7.5 12 3z"/></svg>' },
-    { key: 'packages', label: 'Packages', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M4 12h16M12 8v12M8 8a4 4 0 0 1 8 0"/></svg>' },
-    { key: 'coaching', label: 'Life coaching', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>' },
+    { key: 'massage',  label: 'Massage',      desc: 'Hands-on, unhurried, and fully private.',           icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13c0-4 3-8 8-8s8 4 8 8"/><path d="M4 13a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4"/><path d="M9 13v3M15 13v3"/></svg>' },
+    { key: 'dry',      label: 'Dry cupping',  desc: 'Gentle suction, with the skin left unbroken.',       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="8" rx="6" ry="4"/><path d="M6 8v5a6 4 0 0 0 12 0V8"/></svg>' },
+    { key: 'wet',      label: 'Hijama',       desc: 'Wet cupping, explained step by step as we go.',      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 4.5 7 9 7 12.5a7 7 0 0 1-14 0C5 12 8.5 7.5 12 3z"/></svg>' },
+    { key: 'coaching', label: 'Life coaching', desc: 'A calm one-to-one, at the clinic or online.',        icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>' },
   ];
+  // "1 hr 30 min" / "45 min" / "2 hours" → minutes. Packages carry sessionMin.
+  function minutesOf(svc) {
+    if (svc.sessionMin) return svc.sessionMin;
+    var t = String(svc.time || ''), h = /(\d+)\s*h/.exec(t), m = /(\d+)\s*min/.exec(t);
+    return (h ? +h[1] * 60 : 0) + (m ? +m[1] : 0);
+  }
+  function fmtMin(n) {
+    if (!n) return '';
+    var h = Math.floor(n / 60), m = n % 60;
+    return h ? (h + ' hr' + (m ? ' ' + m + ' min' : '')) : (m + ' min');
+  }
   var grid = document.getElementById('priceGrid');
   if (!grid || typeof SERVICES === 'undefined') return;
   grid.innerHTML = CATS.map(function (c) {
     var items = SERVICES[c.key] || [];
     if (!items.length) return '';
-    var min = Math.min.apply(null, items.map(netPrice));
+    var net = Math.min.apply(null, items.map(netPrice));
+    var list = Math.min.apply(null, items.map(function (x) { return x.price; }));
+    var mins = Math.min.apply(null, items.map(minutesOf).filter(Boolean));
+    var was = list > net ? '<s class="price-was">£' + list + '</s> ' : '';
     return '<a href="book.html?cat=' + c.key + '" class="price-card card reveal">' +
       '<span class="price-icon">' + c.icon + '</span>' +
       '<h3>' + c.label + '</h3>' +
-      '<p class="price-from">from <strong>£' + min + '</strong></p>' +
-      '<span class="price-arrow">→</span></a>';
+      '<p class="price-desc">' + c.desc + '</p>' +
+      '<p class="price-from">from ' + was + '<strong>£' + net + '</strong>' + (mins ? ' <span class="price-dur">· ' + fmtMin(mins) + '</span>' : '') + '</p>' +
+      '<span class="price-book">Book ' + c.label.toLowerCase() + ' <span aria-hidden="true">→</span></span></a>';
   }).join('');
   // Newly-injected .reveal cards need their own observer, since the page-load
   // one above already finished querying the DOM before this ran.
@@ -1726,26 +2043,43 @@ hbInit();
 })();
 
 // ------------------------------------------------------------------
-// FAQ accordion — animates open via max-height, one open at a time.
+// Closing card: the next clinic Tuesday (today counts if it is Tuesday),
+// on/after HB_CLINIC_START_DATE. Never claims availability.
 // ------------------------------------------------------------------
 (function () {
-  document.querySelectorAll('.faq-item').forEach(function (item) {
-    var btn = item.querySelector('.faq-q');
-    var panel = item.querySelector('.faq-a');
-    btn.addEventListener('click', function () {
-      var isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item.open').forEach(function (other) {
-        if (other !== item) {
-          other.classList.remove('open');
-          other.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
-          other.querySelector('.faq-a').style.maxHeight = null;
-        }
-      });
-      item.classList.toggle('open', !isOpen);
-      btn.setAttribute('aria-expanded', String(!isOpen));
-      panel.style.maxHeight = !isOpen ? panel.scrollHeight + 'px' : null;
-    });
+  var el = document.getElementById('ctaNext');
+  if (!el || typeof HB_CLINIC_WEEKDAY === 'undefined') return;
+  var d = new Date(); d.setHours(0, 0, 0, 0);
+  var start = HB_CLINIC_START_DATE ? new Date(HB_CLINIC_START_DATE + 'T00:00:00') : null;
+  if (start && d < start) d = start;
+  while (d.getDay() !== HB_CLINIC_WEEKDAY) d.setDate(d.getDate() + 1);
+  el.textContent = 'Next clinic · ' + d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+})();
+
+// ------------------------------------------------------------------
+// FAQ flashcards — dots follow the scroll-snapped card; tapping a dot
+// scrolls to it. No autoplay.
+// ------------------------------------------------------------------
+(function () {
+  var track = document.getElementById('faqTrack'), dots = document.getElementById('faqDots');
+  if (!track || !dots) return;
+  var cards = Array.prototype.slice.call(track.querySelectorAll('.faq-card'));
+  cards.forEach(function (c, i) {
+    var d = document.createElement('b');
+    d.addEventListener('click', function () { c.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); });
+    dots.appendChild(d);
   });
+  var ds = dots.children;
+  function sync() {
+    var mid = track.scrollLeft + track.clientWidth / 2, best = 0, bd = Infinity;
+    cards.forEach(function (c, i) {
+      var cm = c.offsetLeft + c.offsetWidth / 2, dist = Math.abs(cm - mid);
+      if (dist < bd) { bd = dist; best = i; }
+    });
+    for (var i = 0; i < ds.length; i++) ds[i].classList.toggle('on', i === best);
+  }
+  track.addEventListener('scroll', function () { requestAnimationFrame(sync); }, { passive: true });
+  sync();
 })();
 </script>
 

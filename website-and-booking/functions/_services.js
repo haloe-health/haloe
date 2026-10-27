@@ -35,6 +35,15 @@ export const SERVICES = {
     { name: 'Full Body', price: 120, min: 90 },
     { name: 'Head, Scalp & Full Body', price: 150, min: 120 },
   ],
+  focused: [
+    { name: 'Cycle Comfort session', price: 90, min: 60 },
+    { name: 'Sunnah session', price: 80, min: 60 },
+    { name: 'Calm session', price: 70, min: 60 },
+    { name: 'Reset session', price: 120, min: 90 },
+    { name: 'Shoulders and neck session', price: 80, min: 60 },
+    { name: 'Skin session', price: 85, min: 60 },
+    { name: 'Energy session', price: 90, min: 60 },
+  ],
   coaching: [
     { name: 'Life Coaching Session', price: 75, min: 60 },
     { name: 'Six-Session Coaching Package', price: 400, min: 60 },
@@ -54,7 +63,7 @@ export const SERVICES = {
 // Same as services-data.js — ended Sep 2026, kept at 0 in step with that
 // file. HALOE20 (functions/_discounts.js) is the only discount left,
 // applied on top of this full price server-side in create-checkout.js.
-const PROMO_DISCOUNT = 0;
+const PROMO_DISCOUNT = 0.2; // keep equal to services-data.js and index.html HB_PROMO_DISCOUNT
 
 export function netPrice(svc) {
   // Round at the pence level (see services-data.js for the rationale).
