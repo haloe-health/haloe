@@ -755,8 +755,8 @@
   /* Closing card (Oct 2026): black, headline in Tan Ashford, one line, Book
      + WhatsApp. Replaced the gold card with four black pills. */
   .cta-card { background:#0D0D0D; color:#F5F0E8; border-radius:var(--card-radius); padding:40px var(--s5); text-align:center; }
-  .cta-card .section-eyebrow { color:var(--gold); opacity:1; }
-  .cta-card h2 { color:#F5F0E8; font-family:'Tan Ashford', Georgia, serif; font-weight:normal; font-synthesis:none; letter-spacing:-0.02em; font-size:clamp(2.2rem,9vw,3.2rem); line-height:1.18; margin-top:10px; }
+  .cta-next { display:inline-block; background:rgba(255,255,255,0.08); color:var(--gold); border-radius:999px; padding:6px 12px; font-size:0.78rem; font-weight:600; }
+  .cta-card h2 { color:#F5F0E8; font-family:'Tan Ashford', Georgia, serif; font-weight:normal; font-synthesis:none; letter-spacing:-0.02em; font-size:clamp(2.2rem,9vw,3.2rem); line-height:1.18; margin-top:12px; }
   .cta-card p { margin:14px auto 0; max-width:34ch; color:rgba(245,240,232,0.75); }
   .cta-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:22px; }
   .cta-card .btn-outline { border-color:rgba(245,240,232,0.5); color:#F5F0E8; }
@@ -1225,12 +1225,12 @@
 <section>
   <div class="container">
     <div class="cta-card reveal">
-      <span class="section-eyebrow">Ready when you are</span>
+      <span class="cta-next" id="ctaNext">Next clinic · Tuesday</span>
       <h2>Feel lighter this Tuesday.</h2>
-      <p>Introductory pricing is already applied. Book in two minutes, or message Halima first.</p>
+      <p>A full day of appointments on Deansgate. Home visits the rest of the week.</p>
       <div class="cta-actions">
-        <a href="book.html" class="btn-pill btn-gold">Book a session</a>
-        <a href="https://wa.me/447474833643" class="btn-pill btn-outline" target="_blank" rel="noopener">WhatsApp</a>
+        <a href="book.html?location=clinic" class="btn-pill btn-gold">Book a Tuesday</a>
+        <a href="book.html?location=mobile" class="btn-pill btn-outline">Home visit</a>
       </div>
     </div>
   </div>
@@ -1652,7 +1652,7 @@ const HB_SERVICES = {
     {name:'Digestion & Comfort',time:'6 sessions of 1 hr 30 min · over 24 wks',   pkgMeta:'6 sessions · over 24 wks',   pkgDur:'1 hr 30 min',price:480,desc:'Six sessions focused on the abdomen and lower back.'},
     {name:'Circulation & Energy',time:'8 sessions of 1 hr 30 min · over 18 wks',  pkgMeta:'8 sessions · over 18 wks',   pkgDur:'1 hr 30 min',price:600,desc:'Eight full-body sessions over eighteen weeks.'},
     {name:"Women's Cycle Care", time:'8 sessions of 1 hr 30 min · over 16 wks',   pkgMeta:'8 sessions · over 16 wks',   pkgDur:'1 hr 30 min',price:600,desc:"Eight sessions across the cycle — our most complete women's course."},
-  ]
+  ],
   focused:[
     {name:'Cycle Comfort session',time:'1 hour',price:90},
     {name:'Sunnah session',time:'1 hour',price:80},
@@ -2040,6 +2040,20 @@ hbInit();
   } else {
     grid.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in-view'); });
   }
+})();
+
+// ------------------------------------------------------------------
+// Closing card: the next clinic Tuesday (today counts if it is Tuesday),
+// on/after HB_CLINIC_START_DATE. Never claims availability.
+// ------------------------------------------------------------------
+(function () {
+  var el = document.getElementById('ctaNext');
+  if (!el || typeof HB_CLINIC_WEEKDAY === 'undefined') return;
+  var d = new Date(); d.setHours(0, 0, 0, 0);
+  var start = HB_CLINIC_START_DATE ? new Date(HB_CLINIC_START_DATE + 'T00:00:00') : null;
+  if (start && d < start) d = start;
+  while (d.getDay() !== HB_CLINIC_WEEKDAY) d.setDate(d.getDate() + 1);
+  el.textContent = 'Next clinic · ' + d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
 })();
 
 // ------------------------------------------------------------------
