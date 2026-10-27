@@ -1986,6 +1986,7 @@
         <button class="tab-btn seg-option active" data-cat="massage" role="tab" aria-selected="true" tabindex="0">Massage</button>
         <button class="tab-btn seg-option" data-cat="dry" role="tab" aria-selected="false" tabindex="-1">Dry Cupping</button>
         <button class="tab-btn seg-option" data-cat="wet" role="tab" aria-selected="false" tabindex="-1">Hijama</button>
+        <button class="tab-btn seg-option" data-cat="focused" role="tab" aria-selected="false" tabindex="-1">Focused</button>
         <button class="tab-btn seg-option" data-cat="packages" role="tab" aria-selected="false" tabindex="-1">Packages</button>
         <button class="tab-btn seg-option" data-cat="coaching" role="tab" aria-selected="false" tabindex="-1">Coaching</button>
       </div>
@@ -3344,7 +3345,7 @@ function buildSummary() {
   const items = cartItems();
   if (!items.length) return {};
   const names = items.map(x => x.svc.name);
-  const catLabel = items.length > 1 ? '' : { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', packages: 'Package', coaching: 'Life coaching' }[items[0].cat];
+  const catLabel = items.length > 1 ? '' : { massage: 'Massage', dry: 'Dry Cupping', wet: 'Wet / Hijama', focused: 'Focused session', packages: 'Package', coaching: 'Life coaching' }[items[0].cat];
   const dateStr = state.date ? state.date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '';
   const locationLabel = isClinic() ? `Clinic Day — ${CLINIC_VENUE_NAME}` : isVirtual() ? 'Online (video call)' : 'Home visit';
   const name = document.getElementById('fullname').value.trim();

@@ -36,6 +36,17 @@ const SERVICES = {
     { name: 'Full Body', time: '1 hr 30 min', price: 120, desc: 'Whole-body hijama, or wet cupping, for an all-over reset.' },
     { name: 'Head, Scalp & Full Body', time: '2 hours', price: 150, desc: 'The complete hijama (wet cupping) session, head to toe.' },
   ],
+  // Focused sessions (Oct 2026): the seven "What people come to us for" tiles
+  // on the homepage, bookable on their own. Clinic or home visit, not online.
+  focused: [
+    { name: 'Cycle Comfort session', time: '1 hour', price: 90, desc: "Hijama on the lower back, sacrum and abdomen, at a slow pace, for when your cycle feels off." },
+    { name: 'Sunnah session', time: '1 hour', price: 80, desc: "Hijama on the Sunnah points of the head and upper back." },
+    { name: 'Calm session', time: '1 hour', price: 70, desc: "Dry cupping and a head massage, for when you can't switch off." },
+    { name: 'Reset session', time: '1 hr 30 min', price: 120, desc: "Full body hijama, unhurried, for when you want to start again." },
+    { name: 'Shoulders and neck session', time: '1 hour', price: 80, desc: "Targeted cupping across the neck, shoulders and upper back." },
+    { name: 'Skin session', time: '1 hour', price: 85, desc: "Dry cupping over the face and scalp to lift and refresh dull, tired skin." },
+    { name: 'Energy session', time: '1 hour', price: 90, desc: "Full back hijama with the scalp, for when you're always tired." },
+  ],
   // Life coaching (Oct 2026): in person at Milton Hall OR online by video —
   // never a home visit. Each is booked on its own (not combinable). Prices and
   // length come from the brand document. The six-session package books its

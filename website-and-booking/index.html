@@ -357,7 +357,7 @@
     width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; object-position:50% 30%;
     border-radius:var(--card-radius); display:block; box-shadow:var(--card-shadow);
   }
-  .hero-brand { display:none; }
+  .hero-brand, .hero-flower { display:none; }
   /* Phone hero (Oct 2026, Halima's pick from six mock-ups): the photo fills
      the first screen edge to edge and the copy sits at the bottom over a
      dark fade, like the Instagram post that brought the visitor here. The
@@ -387,6 +387,7 @@
       content:''; position:absolute; inset:0;
       background:linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0) 26%, rgba(12,9,5,0.10) 44%, rgba(12,9,5,0.86) 72%, rgba(12,9,5,0.96) 100%);
     }
+    .hero-flower { display:block; position:absolute; top:18px; right:22px; z-index:1; width:44px; height:44px; }
     .hero-brand {
       display:block; position:absolute; top:22px; left:22px; z-index:1;
       font-family:'Tan Ashford', Georgia, serif; font-size:1.55rem; color:#F5F0E8; text-decoration:none; line-height:1;
@@ -481,34 +482,42 @@
   /* ============================================================
      CONDITIONS
      ============================================================ */
-  /* Oct 2026 (Halima's pick, "three across"): on phones the grid is three
-     small tiles per row so the whole section, intro included, fits one
-     screen; the intro is one line and the hijama link sits under the grid. */
-  .cond-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  /* Conditions → Focused sessions (Oct 2026). Each tile is a product: the
+     feeling as the headline, one line saying what the session is, the live
+     "from £" price (filled from SERVICES.focused by the script below) and an
+     arrow — and the tap goes straight to book.html with that session
+     preselected (the old pop-up is gone). Two across on phones, four from 768px. */
+  .cond-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   @media (min-width:768px) { .cond-grid { grid-template-columns:repeat(4,1fr); gap:var(--s4); } }
   .cond-card {
-    padding:14px 8px; text-align:center; cursor:pointer; border:none;
-    display:flex; flex-direction:column; align-items:center; gap:8px;
+    padding:14px 14px 12px; text-align:left; cursor:pointer; border:none; text-decoration:none; color:var(--text);
+    display:flex; flex-direction:column; align-items:flex-start; gap:6px; width:100%; position:relative;
     transition:transform 0.15s ease, box-shadow 0.15s ease;
-    width:100%;
   }
-  @media (min-width:768px) { .cond-card { padding:22px var(--s4); gap:10px; } }
-  @media (max-width:767px) { #conditions .section-head { margin-bottom:var(--s4); } }
-  /* Selected state (Oct 2026, Halima's pick "one shown selected"): the first
-     tile loads already selected — gold ring, soft fill, tick — so visitors
-     see the on/off state before touching anything; tapping any tile moves
-     the state to it and opens its pop-up. A press scales the tile down
-     briefly so it feels like a button, not a card. */
-  .cond-card { position:relative; }
   .cond-card:active { transform:scale(0.97); transition-duration:0.08s; }
-  .cond-card.is-selected { box-shadow:0 0 0 2px var(--gold), var(--card-shadow); background:#FBF4E6; }
-  .cond-card.is-selected::after {
-    content:''; position:absolute; top:8px; right:8px; width:18px; height:18px; border-radius:50%; background:var(--gold);
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230D0D0D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");
-    background-size:11px; background-repeat:no-repeat; background-position:center;
+  .cond-icon {
+    width:36px; height:36px; border-radius:50%; border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center; color:var(--gold-deep); margin-bottom:4px;
   }
-  @media (min-width:768px) { .cond-card.is-selected::after { top:12px; right:12px; width:22px; height:22px; background-size:13px; } }
-  .cond-hint-tap { margin-top:12px; text-align:center; font-size:0.85rem; font-weight:600; color:var(--gold-deep); }
+  .cond-icon svg { width:18px; height:18px; }
+  .cond-card h3 { font-size:0.95rem; font-weight:600; color:var(--text); line-height:1.25; }
+  .cond-what { font-size:0.78rem; line-height:1.35; color:var(--c-ink-warm); }
+  .cond-price { margin-top:auto; padding-top:8px; width:100%; display:flex; align-items:center; justify-content:space-between; }
+  .cond-from { font-size:0.82rem; font-weight:600; color:var(--text); }
+  .cond-from s { color:var(--text-muted); font-weight:400; margin-right:4px; }
+  .cond-go {
+    width:26px; height:26px; border-radius:50%; background:var(--gold); color:var(--ink);
+    display:inline-flex; align-items:center; justify-content:center; font-size:0.95rem; line-height:1;
+  }
+  @media (min-width:768px) {
+    .cond-card { padding:20px 18px 16px; gap:8px; }
+    .cond-icon { width:44px; height:44px; }
+    .cond-icon svg { width:22px; height:22px; }
+    .cond-card h3 { font-size:1.05rem; }
+    .cond-what { font-size:0.88rem; }
+    .cond-from { font-size:0.92rem; }
+  }
+  @media (max-width:767px) { #conditions .section-head { margin-bottom:var(--s4); } }
   .cond-more { margin-top:10px; text-align:center; font-size:0.9rem; font-weight:600; }
   .cond-more a { text-decoration:underline; text-underline-offset:4px; text-decoration-color:var(--gold); }
   .cond-card:hover, .cond-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
@@ -526,22 +535,6 @@
   .cond-hint { text-align:center; color:var(--gold-deep); font-size:0.85rem; font-weight:600; margin-top:-16px; margin-bottom:28px; }
 
   /* Condition modal — restyled light */
-  .cond-overlay {
-    position:fixed; inset:0; z-index:300;
-    background:rgba(13,13,13,0.45);
-    display:flex; align-items:flex-end; justify-content:center;
-    opacity:0; visibility:hidden; transition:opacity 0.25s ease, visibility 0.25s;
-  }
-  .cond-overlay.open { opacity:1; visibility:visible; }
-  @media (min-width:768px) { .cond-overlay { align-items:center; } }
-  .cond-modal {
-    background:var(--surface); border-radius:24px 24px 0 0; width:100%; max-width:560px;
-    max-height:85vh; overflow-y:auto; padding:var(--s6) var(--s5);
-    transform:translateY(24px); transition:transform 0.25s ease;
-  }
-  .cond-overlay.open .cond-modal { transform:translateY(0); }
-  @media (min-width:768px) { .cond-modal { border-radius:24px; padding:40px; } }
-  @media (prefers-reduced-motion: reduce) { .cond-overlay, .cond-modal { transition:none; } }
   .cond-modal-top { display:flex; justify-content:space-between; align-items:flex-start; gap:var(--s4); }
   .cond-modal-icon {
     width:56px; height:56px; border-radius:50%; border:1.5px solid var(--gold);
@@ -802,8 +795,6 @@
   .footer-col a { display: flex; align-items: center; min-height: 44px; margin-bottom: 0; }
   .footer-col p { margin-bottom: var(--s2); }
   .footer-col a:hover { text-decoration: underline; }
-  /* the condition pop-up sits inside <main>, below the sticky bar's layer — hide the bar while it is open so the pop-up's own Book button is reachable */
-  body:has(.cond-overlay.open) .mobile-bar { opacity: 0; visibility: hidden; pointer-events: none; }
   .mobile-bar { transition: opacity 180ms ease, visibility 180ms; }
 </style>
 <link rel="stylesheet" href="/tokens.css">
@@ -819,6 +810,7 @@
      ============================================================ -->
 <section class="hero">
   <a href="/" class="hero-brand" aria-label="haloe home">haloe</a>
+  <img src="haloe-logo-flower.svg" alt="" class="hero-flower" width="44" height="44">
   <div class="container hero-grid">
     <div class="hero-copy">
       <h1 class="hero-title reveal">Feel <em>lighter.</em></h1>
@@ -886,61 +878,61 @@
     <div class="section-head reveal">
       <span class="section-eyebrow">Come as you are</span>
       <h2>What people come to us for</h2>
-      <p>Tap what sounds like you and see how a session is shaped around it.</p>
+      <p>Each one is a session of its own. Tap what sounds like you to book it.</p>
     </div>
     <div class="cond-grid" id="condGrid">
-      <button class="cond-card card reveal is-selected" type="button" data-cond="hormonal" aria-pressed="true">
+      <a href="book.html?cat=focused&amp;svc=Cycle%20Comfort%20session" class="cond-card card reveal" data-svc="Cycle Comfort session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><path d="M12 2c1.8 2 1.8 4-0 6M12 2c-1.8 2-1.8 4 0 6M22 12c-2 1.8-4 1.8-6 0M22 12c-2-1.8-4-1.8-6 0M12 22c1.8-2 1.8-4 0-6M12 22c-1.8-2-1.8-4 0-6M2 12c2-1.8 4-1.8 6 0M2 12c2 1.8 4 1.8 6 0"/></svg></span>
         <h3>A cycle that feels off</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="spiritual">
+        <p class="cond-what">Lower back and abdomen hijama</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Sunnah%20session" class="cond-card card reveal" data-svc="Sunnah session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg></span>
         <h3>Hijama as Sunnah</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="stress">
+        <p class="cond-what">Sunnah points, head and upper back</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Calm%20session" class="cond-card card reveal" data-svc="Calm session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 6.5a5.5 5.5 0 0 1 0 11M12 3a9 9 0 0 1 0 18"/></svg></span>
         <h3>Can&#39;t switch off</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="detox">
+        <p class="cond-what">Dry cupping and a head massage</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Reset%20session" class="cond-card card reveal" data-svc="Reset session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 6 8 6 11.5A6 6 0 0 1 6 14.5C6 11 9 7 12 3z"/></svg></span>
         <h3>Wanting a reset</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="pain">
+        <p class="cond-what">Full body hijama, unhurried</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Shoulders%20and%20neck%20session" class="cond-card card reveal" data-svc="Shoulders and neck session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span>
         <h3>Tight shoulders or neck</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="skin">
+        <p class="cond-what">Targeted cupping, neck and upper back</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Skin%20session" class="cond-card card reveal" data-svc="Skin session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 6 5 10 5 13.5a7 7 0 0 0 14 0C19 10 17 6 12 3z"/><path d="M12 8v11"/></svg></span>
         <h3>Dull, tired skin</h3>
-      </button>
-      <button class="cond-card card reveal" type="button" data-cond="fatigue">
+        <p class="cond-what">Face and scalp dry cupping</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html?cat=focused&amp;svc=Energy%20session" class="cond-card card reveal" data-svc="Energy session">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6z"/></svg></span>
         <h3>Always tired</h3>
-      </button>
-      <a href="book.html" class="cond-card card reveal">
+        <p class="cond-what">Full back hijama with the scalp</p>
+        <span class="cond-price"><span class="cond-from" data-price></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
+      </a>
+      <a href="book.html" class="cond-card card reveal cond-all">
         <span class="cond-icon" style="background:var(--gold);border-color:var(--gold);color:var(--ink);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         <h3>All treatments</h3>
+        <p class="cond-what">Massage, cupping, hijama and coaching</p>
+        <span class="cond-price"><span class="cond-from" data-price-all></span><span class="cond-go" aria-hidden="true">&rarr;</span></span>
       </a>
     </div>
-    <p class="cond-hint-tap">Tap another to compare</p>
     <p class="cond-more"><a href="hijama-manchester.html" class="link-gold">What is hijama?</a></p>
   </div>
 </section>
-
-<!-- Condition modal (restyled light; same data/behaviour as before) -->
-<div class="cond-overlay" id="condOverlay">
-  <div class="cond-modal">
-    <div class="cond-modal-top">
-      <span class="cond-modal-icon" id="condIcon"></span>
-      <button class="cond-modal-close" id="condClose" aria-label="Close">&times;</button>
-    </div>
-    <h3 id="condTitle"></h3>
-    <h4 id="condHeading"></h4>
-    <p id="condBody"></p>
-    <div class="cond-modal-tags" id="condTags"></div>
-    <a href="book.html" id="condCta" class="btn-pill btn-gold cond-modal-cta">Book This Treatment</a>
-  </div>
-</div>
 
 <!-- ============================================================
      PRICING — read live from services-data.js, never hardcoded
@@ -1572,6 +1564,15 @@ const HB_SERVICES = {
     {name:'Circulation & Energy',time:'8 sessions of 1 hr 30 min · over 18 wks',  pkgMeta:'8 sessions · over 18 wks',   pkgDur:'1 hr 30 min',price:600,desc:'Eight full-body sessions over eighteen weeks.'},
     {name:"Women's Cycle Care", time:'8 sessions of 1 hr 30 min · over 16 wks',   pkgMeta:'8 sessions · over 16 wks',   pkgDur:'1 hr 30 min',price:600,desc:"Eight sessions across the cycle — our most complete women's course."},
   ]
+  focused:[
+    {name:'Cycle Comfort session',time:'1 hour',price:90},
+    {name:'Sunnah session',time:'1 hour',price:80},
+    {name:'Calm session',time:'1 hour',price:70},
+    {name:'Reset session',time:'1 hr 30 min',price:120},
+    {name:'Shoulders and neck session',time:'1 hour',price:80},
+    {name:'Skin session',time:'1 hour',price:85},
+    {name:'Energy session',time:'1 hour',price:90},
+  ],
 };
 /* Promotional discount — ended Sep 2026, kept in step with PROMO_DISCOUNT
    (services-data.js) and functions/_services.js, all now 0. hbNet() just
@@ -1895,117 +1896,26 @@ hbInit();
 })();
 
 // ------------------------------------------------------------------
-// Condition cards → modal, same data + deep-link contract as before:
-// cta.href becomes book.html?cat=<category>&svc=<exact treatment name>,
-// matched by applyDeepLink() in book.html.
+// Focused-session tiles: fill "from £" from SERVICES.focused (struck list
+// price when the introductory discount is on). Never hardcode a price here.
 // ------------------------------------------------------------------
 (function () {
-  var ICONS = {
-    hormonal: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><path d="M12 2c1.8 2 1.8 4-0 6M12 2c-1.8 2-1.8 4 0 6M22 12c-2 1.8-4 1.8-6 0M22 12c-2-1.8-4-1.8-6 0M12 22c1.8-2 1.8-4 0-6M12 22c-1.8-2-1.8-4 0-6M2 12c2-1.8 4-1.8 6 0M2 12c2 1.8 4 1.8 6 0"/></svg>',
-    spiritual: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>',
-    stress: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M12 6.5a5.5 5.5 0 0 1 0 11M12 3a9 9 0 0 1 0 18"/></svg>',
-    detox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 6 8 6 11.5A6 6 0 0 1 6 14.5C6 11 9 7 12 3z"/></svg>',
-    pain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>',
-    skin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C7 6 5 10 5 13.5a7 7 0 0 0 14 0C19 10 17 6 12 3z"/><path d="M12 8v11"/></svg>',
-    fatigue: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6z"/></svg>'
-  };
-  var data = {
-    hormonal: {
-      title: "A cycle that feels off",
-      heading: "A session timed around your cycle",
-      body: "Many women choose to time hijama around their monthly cycle, with cups placed on the back or lower abdomen. Clients often describe feeling calmer and more settled in the days after. The Women's Cycle Care package (8 sessions over 16 weeks) and the Cycle Comfort package (4 sessions over roughly three cycles) are both built around that rhythm.",
-      tags: ["Women's Cycle Care", 'Cycle Comfort Package', '8–16 weeks', 'Wet & dry cupping'],
-      cta: { cat: 'packages', svc: "Women's Cycle Care" }
-    },
-    spiritual: {
-      title: "Hijama as Sunnah",
-      heading: "Prophetic tradition. Modern standards.",
-      body: "Al-Hijama is a Sunnah of the Prophet صلى الله عليه وسلم. Many Muslim clients want it done in a private room by a modest practitioner who understands their faith, with sterile single-use equipment and nothing rushed. That is what haloe is for. Every session is delivered with care, dignity and respect for your values.",
-      tags: ['Private space', 'Sunnah practice', 'Modest environment'],
-      cta: { cat: 'wet' }
-    },
-    stress: {
-      title: "Can't switch off",
-      heading: "Rest, release, restore",
-      body: "Clients often describe a deep calm that settles in during and after a cupping session, and sleeping more easily that night. The Stress & Sleep package (6 sessions over 24 weeks) is a slower, structured course of wet and dry cupping, with follow-up conversations and a herbal oil kit for the weeks in between.",
-      tags: ['Stress & Sleep Package', '6 sessions', '24 weeks', 'Herbal oil kit included'],
-      cta: { cat: 'packages', svc: 'Stress & Sleep' }
-    },
-    detox: {
-      title: "Wanting a reset",
-      heading: "A rhythm to reset by",
-      body: "Many clients build hijama into a regular rhythm, the way others keep a standing appointment with a trainer. The Digestion & Comfort package (6 sessions over 24 weeks) pairs wet and dry cupping with a simple wellbeing journal, so you can see how you're getting on over time.",
-      tags: ['Digestion & Comfort Package', '6 sessions', '24 weeks', 'Wellbeing journal'],
-      cta: { cat: 'packages', svc: 'Digestion & Comfort' }
-    },
-    pain: {
-      title: "Tight shoulders, back or neck",
-      heading: "Sessions focused on tension and tightness",
-      body: "The Pain & Mobility package places cups on the back, shoulders and other tight areas, with unlimited cups each visit. Clients often describe feeling looser and more at ease afterwards. Four sessions over 8 to 12 weeks, with a follow-up conversation along the way.",
-      tags: ['Pain & Mobility Package', '4 sessions', '8–12 weeks', 'Unlimited cups'],
-      cta: { cat: 'packages', svc: 'Pain & Mobility' }
-    },
-    skin: {
-      title: "Dull, tired skin",
-      heading: "A session for face and scalp",
-      body: "Face and head cupping uses gentle suction across the skin, with a take-home bottle of black seed oil as part of your aftercare. Clients often say their skin feels smoother and more refreshed afterwards. Dry cupping only, so the skin stays unbroken.",
-      tags: ['Face cupping', 'Head cupping', 'Black seed oil aftercare', 'Dry cupping only'],
-      cta: { cat: 'dry', svc: 'Face Cupping' }
-    },
-    fatigue: {
-      title: "Always tired",
-      heading: "A structured course across the season",
-      body: "The Circulation & Energy package (8 sessions over 18 weeks) is haloe's most complete course, with cupping across the full body each visit. Clients often describe feeling lighter and more refreshed afterwards. Tiredness isn't a personality trait.",
-      tags: ['Circulation & Energy Package', '8 sessions', '18 weeks', 'Priority booking'],
-      cta: { cat: 'packages', svc: 'Circulation & Energy' }
-    }
-  };
-
-  var overlay = document.getElementById('condOverlay');
-
-  function openModal(key) {
-    var d = data[key];
-    if (!d) return;
-    document.getElementById('condIcon').innerHTML = ICONS[key] || '';
-    document.getElementById('condTitle').textContent = d.title;
-    document.getElementById('condHeading').textContent = d.heading;
-    document.getElementById('condBody').textContent = d.body;
-    var tags = document.getElementById('condTags');
-    tags.innerHTML = '';
-    d.tags.forEach(function (t) {
-      var span = document.createElement('span');
-      span.className = 'cond-modal-tag';
-      span.textContent = t;
-      tags.appendChild(span);
-    });
-    var cta = document.getElementById('condCta');
-    var q = 'book.html';
-    if (d.cta && d.cta.cat) {
-      q += '?cat=' + encodeURIComponent(d.cta.cat);
-      if (d.cta.svc) q += '&svc=' + encodeURIComponent(d.cta.svc);
-    }
-    cta.href = q;
-    cta.textContent = d.cta && d.cta.svc ? 'Book ' + d.cta.svc : 'Book This Treatment';
-
-    overlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
+  if (typeof SERVICES === 'undefined' || !SERVICES.focused) return;
+  function fmt(svc) {
+    var net = netPrice(svc);
+    var mins = /1 hr 30/.test(svc.time) ? '90 min' : /2 hours/.test(svc.time) ? '2 hr' : /45/.test(svc.time) ? '45 min' : '60 min';
+    return (svc.price > net ? '<s>£' + svc.price + '</s>' : '') + '£' + net + ' · ' + mins;
   }
-  function closeModal() {
-    overlay.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  var condCards = document.querySelectorAll('.cond-card[data-cond]');
-  condCards.forEach(function (el) {
-    el.addEventListener('click', function () {
-      condCards.forEach(function (c) { c.classList.remove('is-selected'); c.setAttribute('aria-pressed', 'false'); });
-      el.classList.add('is-selected'); el.setAttribute('aria-pressed', 'true');
-      openModal(el.dataset.cond);
-    });
+  document.querySelectorAll('.cond-card[data-svc]').forEach(function (el) {
+    var svc = SERVICES.focused.find(function (x) { return x.name === el.dataset.svc; });
+    var out = el.querySelector('[data-price]');
+    if (svc && out) out.innerHTML = fmt(svc);
   });
-  document.getElementById('condClose').addEventListener('click', closeModal);
-  overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+  var all = document.querySelector('[data-price-all]');
+  if (all) {
+    var cheapest = [].concat(SERVICES.massage, SERVICES.dry, SERVICES.wet).reduce(function (m, x) { return netPrice(x) < netPrice(m) ? x : m; });
+    all.textContent = 'from £' + netPrice(cheapest);
+  }
 })();
 
 // ------------------------------------------------------------------

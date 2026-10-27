@@ -35,6 +35,15 @@ export const SERVICES = {
     { name: 'Full Body', price: 120, min: 90 },
     { name: 'Head, Scalp & Full Body', price: 150, min: 120 },
   ],
+  focused: [
+    { name: 'Cycle Comfort session', price: 90, min: 60 },
+    { name: 'Sunnah session', price: 80, min: 60 },
+    { name: 'Calm session', price: 70, min: 60 },
+    { name: 'Reset session', price: 120, min: 90 },
+    { name: 'Shoulders and neck session', price: 80, min: 60 },
+    { name: 'Skin session', price: 85, min: 60 },
+    { name: 'Energy session', price: 90, min: 60 },
+  ],
   coaching: [
     { name: 'Life Coaching Session', price: 75, min: 60 },
     { name: 'Six-Session Coaching Package', price: 400, min: 60 },
