@@ -592,13 +592,33 @@
   /* ============================================================
      PROCESS ("What to expect")
      ============================================================ */
-  .process-grid { display:grid; grid-template-columns:1fr; gap:14px; }
-  @media (min-width:768px) { .process-grid { grid-template-columns:repeat(2,1fr); } }
-  @media (min-width:1024px) { .process-grid { grid-template-columns:repeat(4,1fr); } }
-  .process-card { padding:var(--s5) 22px; }
-  .process-num { font-family:'Poppins', sans-serif; font-weight:600; font-size:1.6rem; color:var(--gold); margin-bottom:var(--s2); }
-  .process-card h3 { font-size:1rem; }
-  .process-card p { margin-top:var(--s2); font-size:0.9rem; }
+  /* Journey (Oct 2026, Halima's pick of six: "checklist, you are here").
+     One card, four rows joined by a vertical line, step 1 filled gold with
+     a "You are here" tag, the rest outlined. Replaced four stacked cards
+     that read as a list, not a journey. */
+  .journey { list-style:none; margin:0; padding:6px 18px; }
+  .journey-step { display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--hairline); position:relative; }
+  .journey-step:first-child { border-top:0; }
+  .journey-step::before { content:''; position:absolute; left:13px; top:46px; bottom:-16px; width:2px; background:var(--hairline); }
+  .journey-step:last-child::before { display:none; }
+  .journey-n {
+    flex:none; width:28px; height:28px; border-radius:50%; margin-top:1px;
+    border:1.5px solid var(--gold); color:var(--gold-deep); background:var(--surface);
+    display:inline-flex; align-items:center; justify-content:center; font-weight:600; font-size:0.82rem; position:relative; z-index:1;
+  }
+  .journey-step.is-here .journey-n { background:var(--gold); border-color:var(--gold); color:var(--ink); }
+  .journey-step h3 { font-size:1rem; line-height:1.3; }
+  .journey-step p { margin-top:4px; font-size:0.9rem; line-height:1.5; color:var(--c-ink-warm); }
+  .journey-here {
+    display:inline-block; vertical-align:middle; margin-left:6px; padding:2px 8px; border-radius:999px;
+    background:var(--gold-soft); color:var(--gold-deep); font-size:0.7rem; font-weight:600; letter-spacing:0.02em;
+  }
+  @media (min-width:900px) {
+    .journey { display:grid; grid-template-columns:repeat(4,1fr); padding:var(--s5) 22px; gap:0; }
+    .journey-step { flex-direction:column; gap:12px; padding:0 22px 0 0; border-top:0; }
+    .journey-step::before { left:40px; right:-8px; top:13px; bottom:auto; width:auto; height:2px; }
+    .journey-step:last-child::before { display:none; }
+  }
   /* "What happens in your session" — five steps + "Does it hurt?" (moved here from before-your-session.html, Oct 2026) */
   .hurt-card { margin-top:var(--s4); padding:var(--s5) 22px; border-left:4px solid var(--gold); }
   .hurt-card h3 { font-size:1.35rem; margin:6px 0 10px; }
@@ -923,28 +943,36 @@
       <span class="section-eyebrow">Your journey</span>
       <h2>What to expect</h2>
     </div>
-    <div class="process-grid">
-      <div class="process-card card reveal">
-        <div class="process-num">01</div>
-        <h3>Book &amp; Intake</h3>
-        <p>Fill in the booking form. A health intake form is sent before every session — your safety is non-negotiable.</p>
-      </div>
-      <div class="process-card card reveal">
-        <div class="process-num">02</div>
-        <h3>Your Session</h3>
-        <p>Private, clean, dignified. Cups placed and a single-use blade used for wet cupping. You're guided through every step.</p>
-      </div>
-      <div class="process-card card reveal">
-        <div class="process-num">03</div>
-        <h3>Aftercare</h3>
-        <p>Rest, hydrate, avoid cold water for 24 hours. Marks may last up to 10 days — this is normal and expected.</p>
-      </div>
-      <div class="process-card card reveal">
-        <div class="process-num">04</div>
-        <h3>Your Plan</h3>
-        <p>Many clients come back on a rhythm that suits them. We'll shape a schedule around what you came in with.</p>
-      </div>
-    </div>
+    <ol class="journey card reveal" aria-label="Your journey, four steps">
+      <li class="journey-step is-here">
+        <span class="journey-n" aria-hidden="true">1</span>
+        <div>
+          <h3>Book and tell us about you <span class="journey-here">You are here</span></h3>
+          <p>Pick a time online, at the clinic or at home. A short health form comes before your session so nothing is a surprise on the day.</p>
+        </div>
+      </li>
+      <li class="journey-step">
+        <span class="journey-n" aria-hidden="true">2</span>
+        <div>
+          <h3>Your session</h3>
+          <p>Private and unhurried. Cups are placed, and for wet cupping a single-use blade is opened in front of you. Every step is explained before it happens.</p>
+        </div>
+      </li>
+      <li class="journey-step">
+        <span class="journey-n" aria-hidden="true">3</span>
+        <div>
+          <h3>The days after</h3>
+          <p>Rest, drink water and keep the area clean and dry for 24 hours. Marks are normal and usually fade within two weeks.</p>
+        </div>
+      </li>
+      <li class="journey-step">
+        <span class="journey-n" aria-hidden="true">4</span>
+        <div>
+          <h3>Your rhythm</h3>
+          <p>Many clients come back on a rhythm that suits them. We'll shape it around what you came in with.</p>
+        </div>
+      </li>
+    </ol>
     <div class="hurt-card card reveal" id="does-it-hurt">
       <span class="section-eyebrow">The question everyone asks</span>
       <h3>Does it hurt?</h3>
