@@ -1950,7 +1950,9 @@
   /* -- calm pass: step 2 (Where) and shared form groups -- */
   .step.active .step-dot, .step.done .step-dot { background: var(--cs-ink); }
   .step.done .step-dot { opacity: .35; }
-  .footbar .was { color: rgba(247,243,234,.6); font-weight: 300; font-size: .82em; margin-right: 6px; text-decoration: line-through; }
+  .footbar .was { color: var(--cs-bar-text); opacity: .6; font-weight: 300; font-size: .82em; margin-right: 6px; text-decoration: line-through; }
+  /* Postcode: a visible field (not bare text on the card) so it reads as something to tap. */
+  .postcode-row input { background: var(--cs-sel); border-radius: 12px; padding: 0 14px; min-height: 44px; flex: 1 1 auto; min-width: 0; text-align: left; }
   .where-grid { display: grid; gap: 10px; margin-top: 14px; }
   .where-card { background: var(--cs-card); border: 0; box-shadow: none; border-radius: 20px; padding: 18px; transition: background .15s; }
   .where-card.selected { background: var(--cs-sel); }
@@ -2153,9 +2155,9 @@
     <p class="loc-line" id="loc-notice" style="display:none;">Home visits: travel from £20, set by distance and shown before you pay. Or come to our Tuesday clinic on Deansgate &mdash; no travel fee.</p>
 
     <div class="ios-group postcode-block hidden" id="postcode-block">
-      <div class="ios-row postcode-row">
+      <div class="ios-row postcode-row" onclick="document.getElementById('travel-postcode').focus()">
         <label for="travel-postcode">Postcode</label>
-        <input type="text" id="travel-postcode" placeholder="e.g. M1 1AA" autocapitalize="characters" oninput="onTravelPostcodeInput()">
+        <input type="text" id="travel-postcode" placeholder="Tap to enter, e.g. M1 1AA" autocapitalize="characters" autocomplete="postal-code" autocorrect="off" spellcheck="false" enterkeyhint="done" oninput="onTravelPostcodeInput()" onfocus="setTimeout(function(){ try { this.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }.bind(this), 300)">
       </div>
       <p class="field-error" id="travel-postcode-error"></p>
       <div class="travel-fee-line hidden" id="travel-fee-line"></div>
