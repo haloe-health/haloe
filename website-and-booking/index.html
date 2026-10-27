@@ -482,7 +482,22 @@
   }
   @media (min-width:768px) { .cond-card { padding:22px var(--s4); gap:10px; } }
   @media (max-width:767px) { #conditions .section-head { margin-bottom:var(--s4); } }
-  .cond-more { margin-top:14px; font-size:0.9rem; font-weight:600; }
+  /* Selected state (Oct 2026, Halima's pick "one shown selected"): the first
+     tile loads already selected — gold ring, soft fill, tick — so visitors
+     see the on/off state before touching anything; tapping any tile moves
+     the state to it and opens its pop-up. A press scales the tile down
+     briefly so it feels like a button, not a card. */
+  .cond-card { position:relative; }
+  .cond-card:active { transform:scale(0.97); transition-duration:0.08s; }
+  .cond-card.is-selected { box-shadow:0 0 0 2px var(--gold), var(--card-shadow); background:#FBF4E6; }
+  .cond-card.is-selected::after {
+    content:''; position:absolute; top:8px; right:8px; width:18px; height:18px; border-radius:50%; background:var(--gold);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230D0D0D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E");
+    background-size:11px; background-repeat:no-repeat; background-position:center;
+  }
+  @media (min-width:768px) { .cond-card.is-selected::after { top:12px; right:12px; width:22px; height:22px; background-size:13px; } }
+  .cond-hint-tap { margin-top:12px; text-align:center; font-size:0.85rem; font-weight:600; color:var(--gold-deep); }
+  .cond-more { margin-top:10px; text-align:center; font-size:0.9rem; font-weight:600; }
   .cond-more a { text-decoration:underline; text-underline-offset:4px; text-decoration-color:var(--gold); }
   .cond-card:hover, .cond-card:focus-visible { transform:translateY(-2px); box-shadow:0 12px 28px rgba(13,13,13,0.09); }
   .cond-icon {
@@ -830,7 +845,7 @@
       <p>Tap what sounds like you and see how a session is shaped around it.</p>
     </div>
     <div class="cond-grid" id="condGrid">
-      <button class="cond-card card reveal" type="button" data-cond="hormonal">
+      <button class="cond-card card reveal is-selected" type="button" data-cond="hormonal" aria-pressed="true">
         <span class="cond-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.6"/><path d="M12 2c1.8 2 1.8 4-0 6M12 2c-1.8 2-1.8 4 0 6M22 12c-2 1.8-4 1.8-6 0M22 12c-2-1.8-4-1.8-6 0M12 22c1.8-2 1.8-4 0-6M12 22c-1.8-2-1.8-4 0-6M2 12c2-1.8 4-1.8 6 0M2 12c2 1.8 4 1.8 6 0"/></svg></span>
         <h3>A cycle that feels off</h3>
       </button>
@@ -863,6 +878,7 @@
         <h3>All treatments</h3>
       </a>
     </div>
+    <p class="cond-hint-tap">Tap another to compare</p>
     <p class="cond-more"><a href="hijama-manchester.html" class="link-gold">What is hijama?</a></p>
   </div>
 </section>
@@ -1927,8 +1943,13 @@ hbInit();
     document.body.style.overflow = '';
   }
 
-  document.querySelectorAll('.cond-card[data-cond]').forEach(function (el) {
-    el.addEventListener('click', function () { openModal(el.dataset.cond); });
+  var condCards = document.querySelectorAll('.cond-card[data-cond]');
+  condCards.forEach(function (el) {
+    el.addEventListener('click', function () {
+      condCards.forEach(function (c) { c.classList.remove('is-selected'); c.setAttribute('aria-pressed', 'false'); });
+      el.classList.add('is-selected'); el.setAttribute('aria-pressed', 'true');
+      openModal(el.dataset.cond);
+    });
   });
   document.getElementById('condClose').addEventListener('click', closeModal);
   overlay.addEventListener('click', function (e) { if (e.target === overlay) closeModal(); });
