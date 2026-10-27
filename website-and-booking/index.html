@@ -764,30 +764,34 @@
   /* ============================================================
      FOOTER
      ============================================================ */
-  .site-footer { background:var(--ink); color:var(--cream); padding:56px 0 28px; }
-  .footer-top { display:flex; flex-direction:column; gap:var(--s6); }
-  @media (min-width:768px) { .footer-top { flex-direction:row; justify-content:space-between; } }
-  /* Same lock-up fix as .brand above (see its comment, including the
-     Sep 2026 crop fix) — font-size on the container, icon sized/offset in
-     em against that same reference. */
-  .footer-brand { display:flex; align-items:center; gap:calc(1.17em * 0.35); font-size:1.4rem; }
+  /* Footer (Oct 2026, Halima's pick of six: "centred, cream" + socials).
+     Wordmark, address, WhatsApp, four social icons, three links, small
+     print. The longer page links sit in one muted line at the very end so
+     search engines still find them. */
+  .site-footer { background:var(--cream); color:var(--text); padding:44px 0 28px; text-align:center; }
+  .footer-brand { display:inline-flex; align-items:center; justify-content:center; gap:calc(1.17em * 0.35); font-size:1.6rem; }
   .footer-brand-icon {
-    height:1.17em; width:1.17em; flex:none;
-    display:flex; align-items:center; justify-content:center;
-    overflow:hidden;
-    transform:translateY(-0.2918em);
+    display:inline-flex; align-items:center; justify-content:center; width:1.17em; height:1.17em; overflow:hidden; flex:none;
   }
   .footer-brand-icon img { height:140.85%; width:140.85%; display:block; flex:none; }
   .footer-brand span { font-family:var(--font-wordmark); font-style:normal; font-size:1em; line-height:1; }
-  .footer-col .footer-h { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); margin-bottom:var(--s3); }
-  /* Was #C8C2B7 / #8E887F — greys outside the gold/ink/cream palette;
-     swapped for cream at reduced opacity, same muted-on-dark hierarchy,
-     no colour outside the approved set. */
-  .footer-col a, .footer-col p { display:block; color:rgba(245,240,232,0.75); text-decoration:none; font-size:0.9rem; margin-bottom:var(--s2); }
-  .footer-col a:hover { color:var(--gold); }
-  .footer-cols { display:grid; grid-template-columns:repeat(2,1fr); gap:var(--s5); }
-  @media (min-width:768px) { .footer-cols { grid-template-columns:repeat(3,1fr); gap:40px; } }
-  .footer-bottom { margin-top:40px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1); font-size:0.8rem; color:rgba(245,240,232,0.55); }
+  .footer-line { margin-top:10px; font-size:0.92rem; color:var(--c-ink-warm); }
+  .footer-line + .footer-line { margin-top:4px; }
+  .footer-line a { color:inherit; text-decoration:none; }
+  .footer-social { display:flex; justify-content:center; gap:10px; margin-top:16px; }
+  .footer-social a {
+    width:44px; height:44px; border-radius:50%; border:1.5px solid rgba(13,13,13,0.18); color:var(--text);
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .footer-social a:hover { border-color:var(--gold); color:var(--gold-deep); }
+  .footer-social svg { width:20px; height:20px; }
+  .footer-links { margin-top:16px; font-size:0.86rem; font-weight:600; }
+  .footer-links a { color:var(--text); text-decoration:none; }
+  .footer-links a:hover { color:var(--gold-deep); }
+  .footer-bottom { margin-top:18px; font-size:0.78rem; color:var(--text-muted); }
+  .footer-more { margin-top:8px; font-size:0.74rem; line-height:1.6; color:var(--text-muted); }
+  .footer-more a { color:inherit; text-decoration:none; }
+  .footer-more a:hover { color:var(--gold-deep); }
 
   /* ============================================================
      STICKY MOBILE BOTTOM BAR
@@ -1902,43 +1906,21 @@ hbInit();
      ============================================================ -->
 <footer class="site-footer">
   <div class="container">
-    <div class="footer-top">
-      <div class="footer-brand">
-        <span class="footer-brand-icon"><img src="haloe-logo-flower.svg" alt=""></span>
-        <span>haloe</span>
-      </div>
-      <div class="footer-cols">
-        <div class="footer-col">
-          <h3 class="footer-h">Contact</h3>
-          <a href="https://wa.me/447474833643" target="_blank" rel="noopener">WhatsApp 07474 833643</a>
-          <a href="mailto:halima@haloe.health">halima@haloe.health</a>
-          <a href="https://instagram.com/haloe.health" target="_blank" rel="noopener">Instagram @haloe.health</a>
-        </div>
-        <div class="footer-col">
-          <h3 class="footer-h">Find us</h3>
-          <p>Milton Hall, 244 Deansgate<br>Manchester M3 4BQ</p>
-          <p>Clinic: Tuesdays, 9am–7pm</p>
-          <p>Home visits: Mon–Sat, 10am–8pm</p>
-        </div>
-        <div class="footer-col">
-          <h3 class="footer-h">Explore</h3>
-          <a href="#pricing">Sessions &amp; prices</a>
-          <a href="#conditions">What we help with</a>
-          <a href="#process">What to expect</a>
-          <a href="#reviews">Reviews</a>
-          <a href="#clinic-day">Tuesday clinic</a>
-          <a href="hijama-manchester.html">Hijama in Manchester</a>
-          <a href="cupping-manchester.html">Dry cupping in Manchester</a>
-          <a href="massage-manchester.html">Massage in Manchester</a>
-          <a href="life-coaching-manchester.html">Life coaching</a>
-          <a href="before-your-session.html">Before your session</a>
-          <a href="book.html">Book</a>
-        </div>
-      </div>
+    <div class="footer-brand">
+      <span class="footer-brand-icon"><img src="haloe-logo-flower.svg" alt=""></span>
+      <span>haloe</span>
     </div>
-    <div class="footer-bottom">
-      © 2026 haloe · Halima Yasmin · CMA &amp; IPHM Accredited · Fully Insured · Manchester
+    <p class="footer-line">Milton Hall, 244 Deansgate, Manchester M3 4BQ · Tuesdays</p>
+    <p class="footer-line"><a href="https://wa.me/447474833643" target="_blank" rel="noopener">WhatsApp 07474 833643</a></p>
+    <div class="footer-social" aria-label="Social">
+      <a href="https://instagram.com/haloe.health" target="_blank" rel="noopener" aria-label="Instagram @haloe.health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+      <a href="https://www.tiktok.com/@haloe.health" target="_blank" rel="noopener" aria-label="TikTok @haloe.health"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 3h2.4c.3 2.3 1.7 3.9 4.1 4.1v2.5c-1.6 0-3-.5-4.1-1.3v6.9a5.5 5.5 0 1 1-5.5-5.5c.3 0 .6 0 .9.1v2.6a2.9 2.9 0 1 0 2.2 2.8V3z"/></svg></a>
+      <a href="https://www.youtube.com/@haloe.health" target="_blank" rel="noopener" aria-label="YouTube @haloe.health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 8.2c.2-1.6 1.2-2.6 2.8-2.7C8.4 5.3 10.3 5.2 12 5.2s3.6.1 5.7.3c1.6.1 2.6 1.1 2.8 2.7.2 1.3.3 2.6.3 3.8s-.1 2.5-.3 3.8c-.2 1.6-1.2 2.6-2.8 2.7-2.1.2-4 .3-5.7.3s-3.6-.1-5.7-.3c-1.6-.1-2.6-1.1-2.8-2.7A26 26 0 0 1 3.2 12c0-1.2.1-2.5.3-3.8z"/><path d="M10 9.3v5.4l4.6-2.7z" fill="currentColor" stroke="none"/></svg></a>
+      <a href="mailto:halima@haloe.health" aria-label="Email halima@haloe.health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></a>
     </div>
+    <p class="footer-links"><a href="#pricing">Sessions</a> · <a href="#reviews">Reviews</a> · <a href="before-your-session.html">Before your session</a></p>
+    <p class="footer-bottom">© 2026 haloe · CMA &amp; IPHM accredited · Fully insured</p>
+    <nav class="footer-more" aria-label="More pages"><a href="hijama-manchester.html">Hijama in Manchester</a> · <a href="cupping-manchester.html">Dry cupping</a> · <a href="massage-manchester.html">Massage</a> · <a href="life-coaching-manchester.html">Life coaching</a></nav>
   </div>
 </footer>
 
