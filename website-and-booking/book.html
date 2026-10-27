@@ -1920,6 +1920,10 @@
   .panel-sub, #panel-1 .panel-sub { color: var(--cs-mute); font-weight: 300; font-size: 14px; }
   #panel-1 .category-tabs-wrap { background: transparent; box-shadow: none; }
   #panel-1 .category-tabs { background: transparent; border: 0; border-radius: 0; padding: 4px 0; gap: 6px; box-shadow: none; }
+  #panel-1 .category-tabs { display: grid; grid-template-columns: repeat(3, 1fr); overflow: visible; gap: 6px; }
+  #panel-1 .category-tabs .seg-option { flex: none; width: 100%; min-width: 0; box-sizing: border-box; padding: 8px 10px; }
+  #panel-1 .category-tabs { box-sizing: border-box; max-width: 100%; }
+  @media (min-width: 561px) { #panel-1 .category-tabs { margin-inline: 8px; } }
   #panel-1 .category-tabs .seg-option { background: transparent; color: var(--cs-mute); border: 0; box-shadow: none; border-radius: 22px; min-height: 40px; padding: 8px 16px; font-weight: 400; }
   #panel-1 .category-tabs .seg-option.active { background: var(--cs-ink); color: var(--cs-page); font-weight: 500; }
   #panel-1 .service-grid { display: grid; gap: 10px; margin-top: 10px; }
