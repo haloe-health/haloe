@@ -728,7 +728,25 @@
   .clinic-card { padding:12px 12px var(--s5); display:flex; flex-direction:column; gap:var(--s4); }
   .clinic-map { display:block; border-radius:16px; overflow:hidden; aspect-ratio:12/5; background:#EEE6D8; }
   .clinic-map svg { width:100%; height:100%; display:block; }
-  .clinic-map iframe { width:100%; height:100%; min-height:240px; border:0; display:block; }
+  /* Live map (27 Oct 2026): the whole map is one link to Google Maps. The iframe ignores
+     taps so the link gets them; it is nudged up so Google's own "Open in Maps" corner card
+     sits outside the frame (the Google logo and credits at the bottom stay visible). A warm
+     filter plus a cream wash gives it the haloe palette while keeping every real label. */
+  .clinic-map.live { position:relative; cursor:pointer; aspect-ratio:12/6; }
+  .clinic-map.live iframe { position:absolute; left:0; top:-48px; width:100%; height:calc(100% + 48px); border:0; display:block; pointer-events:none;
+    filter:sepia(.5) saturate(.85) hue-rotate(-6deg) contrast(.97) brightness(1.03); }
+  .clinic-map.live::after { content:''; position:absolute; inset:0; pointer-events:none; background:rgba(200,169,110,.14); mix-blend-mode:multiply; }
+  .clinic-map-cta { position:absolute; right:10px; top:10px; z-index:2; display:inline-flex; align-items:center; gap:6px; padding:7px 12px; border-radius:999px;
+    background:rgba(255,252,246,.94); color:#1A1510; font:600 .82rem/1 'Poppins',sans-serif; box-shadow:0 2px 10px rgba(0,0,0,.14); pointer-events:none; }
+  /* haloe pin (Halima's pick, 27 Oct 2026): our flower on a dark badge with a soft gold ring sits over Google's
+     own marker, which the embed always draws at the centre of the frame (the frame is shifted up 48px, hence -24px). */
+  .clinic-pin { position:absolute; left:50%; top:calc(50% - 44px); width:0; height:0; z-index:1; pointer-events:none; }
+  .clinic-pin::before { content:''; position:absolute; left:-44px; top:-44px; width:88px; height:88px; border-radius:50%; background:rgba(200,169,110,.28); border:1.5px solid rgba(200,169,110,.85); animation:pinRing 3.2s ease-out infinite; }
+  .clinic-pin img { max-width:none; position:absolute; left:-26px; top:-26px; width:52px; height:52px; padding:11px; border-radius:50%; background:#14110D; border:3px solid #FFFCF6; box-shadow:0 4px 14px rgba(0,0,0,.35); box-sizing:border-box; }
+  .clinic-pin span { position:absolute; left:0; top:34px; transform:translateX(-50%); background:#14110D; color:#F5F0E8; font:600 .78rem/1 'Poppins',sans-serif; padding:6px 12px; border-radius:99px; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.25); }
+  @keyframes pinRing { 0% { transform:scale(.75); opacity:.9; } 70%,100% { transform:scale(1.15); opacity:0; } }
+  @media (prefers-reduced-motion: reduce) { .clinic-pin::before { animation:none; } }
+  .clinic-map-cta::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--gold); }
   .clinic-copy { padding:0 8px; }
   .clinic-copy h2 { margin-top:4px; }
   .clinic-copy p { margin-top:8px; }
@@ -2116,8 +2134,11 @@ hbInit();
     f.src = 'https://www.google.com/maps?q=Milton+Hall,+244+Deansgate,+Manchester+M3+4BQ&z=16&output=embed';
     f.title = 'Map: Milton Hall, 244 Deansgate, Manchester';
     f.loading = 'lazy'; f.referrerPolicy = 'no-referrer-when-downgrade'; f.setAttribute('allowfullscreen', '');
-    var d = document.createElement('div'); d.className = 'clinic-map'; d.appendChild(f);
-    a.parentNode.replaceChild(d, a);
+    // Keep the link: the whole map is the tap target, the iframe itself ignores taps.
+    var cta = document.createElement('span'); cta.className = 'clinic-map-cta'; cta.textContent = 'Open in Maps';
+    var pin = document.createElement('span'); pin.className = 'clinic-pin'; pin.setAttribute('aria-hidden', 'true');
+    pin.innerHTML = '<img src="/haloe-logo-flower.svg" alt="" width="52" height="52"><span>haloe \u00b7 Tuesdays</span>';
+    a.textContent = ''; a.classList.add('live'); a.appendChild(f); a.appendChild(pin); a.appendChild(cta);
   }
   showMap();
   document.addEventListener('haloe-consent', showMap);
