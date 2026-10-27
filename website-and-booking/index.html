@@ -633,43 +633,17 @@
      blue ticks, her replies on the left in white with tails and times, and a
      "message" bar that opens WhatsApp. Replaced the hurt card + five-step
      card. The asker is the reader (no name, no praise), not a client. */
-  /* The thread sits inside a phone-shaped frame, narrower than the page,
-     under its own heading — so it reads as "a message from Halima" rather
-     than a full-width panel. */
+  /* "Does it hurt?" — three plain cards: what each part feels like. */
   .chat-intro { margin-top:var(--s6); margin-bottom:var(--s4); }
-  .chat-card {
-    margin:0 auto; padding:0; overflow:hidden; background:#E5DDD5; max-width:340px;
-    border-radius:28px; box-shadow:0 18px 40px rgba(13,13,13,0.12); font-size:0.88rem;
-  }
-  .chat-head { display:flex; align-items:center; gap:12px; padding:14px 16px; background:#075E54; color:#fff; }
-  .chat-name { font-weight:600; font-size:0.95rem; }
-  .chat-status { font-size:0.78rem; color:rgba(255,255,255,0.8); }
-  .chat-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; object-position:50% 22%; flex:none; }
-  .chat { display:flex; flex-direction:column; gap:8px; padding:14px 12px 10px; }
-  .chat-day { text-align:center; margin-bottom:4px; }
-  .chat-day span { display:inline-block; background:rgba(255,255,255,0.85); color:#54656F; font-size:0.72rem; font-weight:600; letter-spacing:0.04em; padding:4px 10px; border-radius:999px; }
-  .chat-row { display:flex; }
-  .chat-them { justify-content:flex-end; }
-  .chat-me { justify-content:flex-start; }
-  .chat-bubble {
-    position:relative; padding:8px 11px 17px; border-radius:16px; font-size:0.88rem; line-height:1.45; max-width:80%;
-    box-shadow:0 1px 1px rgba(0,0,0,0.06);
-  }
-  .chat-them .chat-bubble { background:#DCF8C6; color:#111; border-bottom-right-radius:4px; }
-  .chat-me .chat-bubble { background:#fff; color:#111; border-bottom-left-radius:4px; }
-  .chat-bubble::after { content:''; position:absolute; bottom:0; width:10px; height:12px; }
-  .chat-them .chat-bubble::after { right:-6px; background:#DCF8C6; clip-path:polygon(0 0, 100% 100%, 0 100%); }
-  .chat-me .chat-bubble::after { left:-6px; background:#fff; clip-path:polygon(100% 0, 100% 100%, 0 100%); }
-  .chat-meta { position:absolute; right:10px; bottom:4px; font-size:0.66rem; color:rgba(13,13,13,0.5); display:inline-flex; align-items:center; gap:3px; }
-  .chat-me .chat-meta { color:rgba(0,0,0,0.45); }
-  .chat-ticks { display:inline-block; width:14px; height:8px;
-    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9' fill='none' stroke='%2334B7F1' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 5l2.5 2.5L9 2M6 7.5L7.5 9 15 2'/%3E%3C/svg%3E") no-repeat center/contain; }
-  .chat-input {
-    display:flex; align-items:center; justify-content:space-between; margin:4px 12px 12px; padding:6px 6px 6px 14px;
-    background:#fff; border-radius:999px; color:#6B6B6B; font-size:0.85rem; text-decoration:none;
-  }
-  .chat-send { width:32px; height:32px; border-radius:50%; background:#25D366; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:600; }
-  @media (min-width:768px) { .chat-intro { text-align:center; margin-left:auto; margin-right:auto; } .chat-card { max-width:360px; } }
+  .feel-list { display:grid; gap:10px; max-width:520px; margin:0 auto; }
+  .feel-card { display:flex; gap:14px; align-items:flex-start; padding:18px; border-radius:22px; }
+  .feel-ic { width:42px; height:42px; border-radius:50%; background:var(--cream); display:grid; place-items:center; flex:none; }
+  .feel-ic svg { width:22px; height:22px; stroke:var(--gold-deep); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .feel-card b { display:block; font-size:1rem; font-weight:600; color:#1C1A16; }
+  .feel-card p { margin:2px 0 0; font-size:0.92rem; line-height:1.5; color:var(--text-muted); }
+  .feel-more { text-align:center; margin-top:16px; font-size:0.9rem; }
+  .feel-more a { color:var(--gold-deep); text-decoration:underline; text-underline-offset:3px; font-weight:500; }
+  @media (min-width:768px) { .chat-intro { text-align:center; margin-left:auto; margin-right:auto; } }
 
   /* ============================================================
      REVIEWS
@@ -1061,21 +1035,13 @@
     <div class="section-head reveal chat-intro" id="does-it-hurt">
       <span class="section-eyebrow">The question everyone asks</span>
       <h2>Does it hurt?</h2>
-      <p>Answered the way Halima answers it on WhatsApp every week.</p>
+      <p>Honestly, less than you&rsquo;d think. Here&rsquo;s what it feels like.</p>
     </div>
-    <div class="chat-card card reveal" aria-label="A short exchange with Halima">
-      <div class="chat-head">
-        <img src="images/halima-hero-640.jpg" alt="" class="chat-avatar" width="40" height="40" loading="lazy">
-        <div><div class="chat-name">Halima</div><div class="chat-status">online</div></div>
-      </div>
-      <div class="chat">
-        <div class="chat-day"><span>Today</span></div>
-        <div class="chat-row chat-them"><div class="chat-bubble">Hi Halima, I'd like to book but I'm a bit nervous. Does it hurt?<span class="chat-meta">10:42 <i class="chat-ticks" aria-hidden="true"></i></span></div></div>
-        <div class="chat-row chat-me"><div class="chat-bubble">Honestly, less than you'd think. The cups feel like a firm tug. The wet cupping pricks are a quick, light scratch, lighter than a paper cut.<span class="chat-meta">10:47</span></div></div>
-        <div class="chat-row chat-me"><div class="chat-bubble">I tell you before every single step, and nothing happens until you're ready. Most people relax, and a few fall asleep by the time the black seed oil goes on.<span class="chat-meta">10:47</span></div></div>
-        <div class="chat-row chat-me"><div class="chat-bubble">The hour goes: we talk first, then massage, then cups, tiny pricks if it's wet cupping, then black seed oil and rest.<span class="chat-meta">10:48</span></div></div>
-      </div>
-      <a href="https://wa.me/447474833643" class="chat-input" target="_blank" rel="noopener"><span>Ask Halima anything</span><span class="chat-send" aria-hidden="true">&uarr;</span></a>
+    <div class="feel-list reveal">
+      <div class="feel-card card"><span class="feel-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4"/></svg></span><div><b>The cups</b><p>A firm tug, like a gentle pull on the skin.</p></div></div>
+      <div class="feel-card card"><span class="feel-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 19L19 5M15 5h4v4"/></svg></span><div><b>Wet cupping</b><p>A quick, light scratch. Lighter than a paper cut.</p></div></div>
+      <div class="feel-card card"><span class="feel-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12l5 5L19 7"/></svg></span><div><b>Every step</b><p>I tell you first, and nothing happens until you&rsquo;re ready.</p></div></div>
+      <p class="feel-more">Still unsure? <a href="https://wa.me/447474833643" target="_blank" rel="noopener">Message Halima on WhatsApp</a></p>
     </div>
   </div>
 </section>
