@@ -6,7 +6,7 @@ Handoff doc for Claude Code sessions editing the haloe website. Drop this in the
 
 ## Business overview
 
-Haloe is a premium, **women-only** hijama (wet cupping) and wellness therapy practice in Manchester, UK, run by Halima Yasmin. L5 Diploma in Health & Cupping Therapy (Distinction, The Suuk Academy), CMA & IPHM accredited.
+Haloe is a premium, **women-only** hijama (wet cupping) and wellness therapy practice in Manchester, UK, run by Halima Yasmin. L5 Diploma in Health & Cupping Therapy (Distinction, The Suuk Academy, a CMA & IPHM accredited course).
 
 - **Women only — permanent, firm boundary.** Professional and religious conviction, not a marketing phase. No mixed-gender treatment, no exceptions by service type. Do not reintroduce "all clients" language anywhere on the site.
 - **Instagram: `@haloe.health`** (changed from `@haloe_hijama` — update any remaining old-handle references site-wide, including footer links, meta tags, and any hardcoded social icons).
