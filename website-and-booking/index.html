@@ -839,7 +839,7 @@
   /* ============================================================
      MOTION — fade + rise on scroll, staggered
      ============================================================ */
-  .reveal { opacity:0; transform:translateY(18px); transition:opacity 0.35s ease-out, transform 0.35s ease-out; }
+  .reveal { opacity:0; transform:translateY(14px); transition:opacity 0.8s cubic-bezier(.22,.61,.36,1), transform 0.8s cubic-bezier(.22,.61,.36,1); }
   .reveal.in-view { opacity:1; transform:translateY(0); }
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity:1; transform:none; transition:none; }
@@ -872,6 +872,7 @@
 </style>
 <link rel="stylesheet" href="/tokens.css">
 <link rel="stylesheet" href="/ui.css">
+<link rel="stylesheet" href="/lightness.css">
 </head>
 <body>
 
@@ -2121,6 +2122,7 @@ hbInit();
   document.addEventListener('haloe-consent', showMap);
 })();
 </script>
+<script src="/lightness.js" defer></script>
 <script src="/tracking.js" defer></script>
 </body>
 </html>
