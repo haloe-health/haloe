@@ -752,14 +752,15 @@
   /* ============================================================
      BIG CTA
      ============================================================ */
-  .cta-card {
-    background:var(--gold); border-radius:var(--card-radius);
-    padding:40px var(--s5); text-align:center;
-  }
-  .cta-card p { margin-top:10px; color:var(--ink); opacity:0.75; }
-  .cta-benefits { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:22px; }
-  .cta-benefit { background:var(--ink); color:var(--cream); border-radius:999px; padding:var(--s2) var(--s4); font-size:0.8rem; font-weight:600; }
-  .cta-card .btn-pill { margin-top:26px; }
+  /* Closing card (Oct 2026): black, headline in Tan Ashford, one line, Book
+     + WhatsApp. Replaced the gold card with four black pills. */
+  .cta-card { background:#0D0D0D; color:#F5F0E8; border-radius:var(--card-radius); padding:40px var(--s5); text-align:center; }
+  .cta-card .section-eyebrow { color:var(--gold); opacity:1; }
+  .cta-card h2 { color:#F5F0E8; font-family:'Tan Ashford', Georgia, serif; font-weight:normal; font-synthesis:none; letter-spacing:-0.02em; font-size:clamp(2.2rem,9vw,3.2rem); line-height:1.18; margin-top:10px; }
+  .cta-card p { margin:14px auto 0; max-width:34ch; color:rgba(245,240,232,0.75); }
+  .cta-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:22px; }
+  .cta-card .btn-outline { border-color:rgba(245,240,232,0.5); color:#F5F0E8; }
+  .cta-card .btn-outline:hover { background:rgba(255,255,255,0.08); }
 
   /* ============================================================
      FOOTER
@@ -1224,15 +1225,13 @@
 <section>
   <div class="container">
     <div class="cta-card reveal">
-      <h2>Ready to feel lighter?</h2>
-      <p>Massage, dry cupping, hijama and life coaching — mobile across Manchester, every Tuesday at Deansgate, or online.</p>
-      <div class="cta-benefits">
-        <span class="cta-benefit">Introductory pricing, already applied</span>
-        <span class="cta-benefit">Unlimited cups</span>
-        <span class="cta-benefit">Black seed oil aftercare</span>
-        <span class="cta-benefit">Paid in full, no deposit</span>
+      <span class="section-eyebrow">Ready when you are</span>
+      <h2>Feel lighter this Tuesday.</h2>
+      <p>Introductory pricing is already applied. Book in two minutes, or message Halima first.</p>
+      <div class="cta-actions">
+        <a href="book.html" class="btn-pill btn-gold">Book a session</a>
+        <a href="https://wa.me/447474833643" class="btn-pill btn-outline" target="_blank" rel="noopener">WhatsApp</a>
       </div>
-      <a href="book.html" class="btn-pill" style="background:var(--ink);color:var(--cream);">Book your session</a>
     </div>
   </div>
 </section>
