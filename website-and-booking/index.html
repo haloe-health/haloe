@@ -582,6 +582,17 @@
   .price-dur { color:var(--text-muted); font-size:0.88rem; white-space:nowrap; }
   .price-book { margin-top:auto; padding-top:14px; font-weight:600; color:var(--gold-deep); font-size:0.95rem; }
   .price-note { margin-top:20px; font-size:0.82rem; color:var(--text-muted); }
+  /* Sessions on a black band (Oct 2026, Halima's ask): the section is
+     full-bleed near-black with cream type and gold eyebrow; the four cards
+     stay white so the prices lift off the dark. */
+  #pricing { background:#0D0D0D; padding-top:var(--s6); padding-bottom:var(--s6); }
+  #pricing .section-eyebrow { color:var(--gold); opacity:1; }
+  #pricing .section-head h2 { color:#F5F0E8; }
+  #pricing .section-head p { color:rgba(245,240,232,0.75); }
+  #pricing .price-card { background:#F7F2EA; box-shadow:none; }
+  #pricing .price-note { color:rgba(245,240,232,0.7); }
+  #pricing .price-note .link-gold { color:var(--gold); }
+  @media (min-width:768px) { #pricing { padding-top:56px; padding-bottom:56px; } }
   @media (max-width:599px) {
     .price-icon, .price-book { display:none; }
     .price-card h3 { font-size:0.98rem; }
