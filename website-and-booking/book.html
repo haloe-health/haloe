@@ -1966,6 +1966,21 @@
   .travel-fee-line { color: var(--cs-ink); }
   #panel-1 .service-card.selected, .where-card.selected, .where-card:has(input:checked) { box-shadow: inset 0 0 0 2px #B8924A; }
   #panel-1 .service-card.selected, #panel-1 .service-card.selected:focus, #panel-1 .service-card.selected:focus-visible, .where-card.selected, .where-card.selected:has(input:focus-visible) { outline: none; }
+  /* -- calm pass: step 3 (Date & time) -- */
+  .section-label { color: var(--cs-mute); font-weight: 400; font-size: 13px; letter-spacing: 0; text-transform: none; }
+  #panel-3 .cal-wrap, #panel-3 .calendar, #panel-3 #cal-card { background: var(--cs-card); border: 0; border-radius: 20px; box-shadow: none; }
+  .cal-month { color: var(--cs-ink); font-weight: 500; }
+  .cal-nav { color: var(--cs-ink); }
+  .cal-day-name { color: var(--cs-mute); font-weight: 400; font-size: 11px; }
+  .cal-day { color: var(--cs-ink); font-weight: 400; }
+  .cal-day.disabled { color: var(--cs-ink); opacity: .28; }
+  .cal-day:not(.disabled):not(.empty) { background: var(--cs-sel); font-weight: 500; }
+  .cal-day.today:not(.selected) { color: var(--cs-ink); box-shadow: inset 0 0 0 1.5px var(--cs-line); }
+  .cal-day.selected:not(.disabled):not(.empty), .cal-day.selected.today:not(.disabled) { background: var(--cs-ink); color: var(--cs-tick); box-shadow: 0 0 0 2px #B8924A; }
+  .time-count, .time-group-label, .time-hint { color: var(--cs-mute); font-weight: 300; }
+  .time-slot { background: var(--cs-card); border: 0; border-radius: 14px; color: var(--cs-ink); font-weight: 400; }
+  .time-slot.selected { background: var(--cs-sel); color: var(--cs-ink); font-weight: 500; box-shadow: inset 0 0 0 2px #B8924A; }
+  .time-slot.taken { opacity: .45; background: transparent; color: var(--cs-mute); }
   .footbar .foot-cta { background: var(--cs-page); color: var(--cs-ink); font-weight: 500; }
   .footbar .foot-cta svg { color: var(--cs-ink); }
   .footbar .foot-cta:disabled { background: rgba(247,243,234,.16); color: rgba(247,243,234,.6); opacity: 1; }
