@@ -641,9 +641,16 @@
      blue ticks, her replies on the left in white with tails and times, and a
      "message" bar that opens WhatsApp. Replaced the hurt card + five-step
      card. The asker is the reader (no name, no praise), not a client. */
-  .chat-card { margin-top:var(--s4); padding:0; overflow:hidden; background:#E5DDD5; }
+  /* The thread sits inside a phone-shaped frame, narrower than the page,
+     under its own heading — so it reads as "a message from Halima" rather
+     than a full-width panel. */
+  .chat-intro { margin-top:var(--s6); margin-bottom:var(--s4); }
+  .chat-card {
+    margin:0 auto; padding:0; overflow:hidden; background:#E5DDD5; max-width:340px;
+    border-radius:28px; box-shadow:0 18px 40px rgba(13,13,13,0.12); font-size:0.88rem;
+  }
   .chat-head { display:flex; align-items:center; gap:12px; padding:14px 16px; background:#075E54; color:#fff; }
-  .chat-name { font-weight:600; font-size:0.98rem; }
+  .chat-name { font-weight:600; font-size:0.95rem; }
   .chat-status { font-size:0.78rem; color:rgba(255,255,255,0.8); }
   .chat-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; object-position:50% 22%; flex:none; }
   .chat { display:flex; flex-direction:column; gap:8px; padding:14px 12px 10px; }
@@ -653,7 +660,7 @@
   .chat-them { justify-content:flex-end; }
   .chat-me { justify-content:flex-start; }
   .chat-bubble {
-    position:relative; padding:9px 12px 18px; border-radius:16px; font-size:0.95rem; line-height:1.45; max-width:82%;
+    position:relative; padding:8px 11px 17px; border-radius:16px; font-size:0.88rem; line-height:1.45; max-width:80%;
     box-shadow:0 1px 1px rgba(0,0,0,0.06);
   }
   .chat-them .chat-bubble { background:#DCF8C6; color:#111; border-bottom-right-radius:4px; }
@@ -666,11 +673,11 @@
   .chat-ticks { display:inline-block; width:14px; height:8px;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9' fill='none' stroke='%2334B7F1' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 5l2.5 2.5L9 2M6 7.5L7.5 9 15 2'/%3E%3C/svg%3E") no-repeat center/contain; }
   .chat-input {
-    display:flex; align-items:center; justify-content:space-between; margin:4px 12px 12px; padding:8px 8px 8px 16px;
-    background:#fff; border-radius:999px; color:#6B6B6B; font-size:0.9rem; text-decoration:none;
+    display:flex; align-items:center; justify-content:space-between; margin:4px 12px 12px; padding:6px 6px 6px 14px;
+    background:#fff; border-radius:999px; color:#6B6B6B; font-size:0.85rem; text-decoration:none;
   }
   .chat-send { width:32px; height:32px; border-radius:50%; background:#25D366; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:600; }
-  @media (min-width:768px) { .chat-card { max-width:640px; } .chat { padding:18px 16px 12px; } .chat-bubble { font-size:1rem; max-width:76%; } }
+  @media (min-width:768px) { .chat-intro { text-align:center; margin-left:auto; margin-right:auto; } .chat-card { max-width:360px; } }
 
   /* ============================================================
      REVIEWS
@@ -1024,13 +1031,18 @@
         </div>
       </li>
     </ol>
-    <div class="chat-card card reveal" id="does-it-hurt" aria-label="Does it hurt? A short exchange with Halima">
+    <div class="section-head reveal chat-intro" id="does-it-hurt">
+      <span class="section-eyebrow">The question everyone asks</span>
+      <h2>Does it hurt?</h2>
+      <p>Answered the way Halima answers it on WhatsApp every week.</p>
+    </div>
+    <div class="chat-card card reveal" aria-label="A short exchange with Halima">
       <div class="chat-head">
         <img src="images/halima-hero-640.jpg" alt="" class="chat-avatar" width="40" height="40" loading="lazy">
         <div><div class="chat-name">Halima</div><div class="chat-status">online</div></div>
       </div>
       <div class="chat">
-        <div class="chat-day"><span>The question everyone asks</span></div>
+        <div class="chat-day"><span>Today</span></div>
         <div class="chat-row chat-them"><div class="chat-bubble">Hi Halima, I'd like to book but I'm a bit nervous. Does it hurt?<span class="chat-meta">10:42 <i class="chat-ticks" aria-hidden="true"></i></span></div></div>
         <div class="chat-row chat-me"><div class="chat-bubble">Honestly, less than you'd think. The cups feel like a firm tug. The wet cupping pricks are a quick, light scratch, lighter than a paper cut.<span class="chat-meta">10:47</span></div></div>
         <div class="chat-row chat-me"><div class="chat-bubble">I tell you before every single step, and nothing happens until you're ready. Most people relax, and a few fall asleep by the time the black seed oil goes on.<span class="chat-meta">10:47</span></div></div>
