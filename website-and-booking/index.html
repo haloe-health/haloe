@@ -636,17 +636,24 @@
     .journey-step:last-child::before { display:none; }
   }
   /* "What happens in your session" — five steps + "Does it hurt?" (moved here from before-your-session.html, Oct 2026) */
-  .hurt-card { margin-top:var(--s4); padding:var(--s5) 22px; border-left:4px solid var(--gold); }
-  .hurt-card h3 { font-size:1.35rem; margin:6px 0 10px; }
-  .hurt-card p { font-size:1rem; line-height:1.6; color:var(--c-ink-warm); max-width:62ch; }
-  .process-steps { margin-top:14px; padding:var(--s5) 22px; }
-  .process-steps h3 { font-size:1.125rem; margin-bottom:var(--s4); }
-  .session-steps { list-style:none; counter-reset:step; margin:0; padding:0; }
-  .session-steps li { position:relative; counter-increment:step; padding:2px 0 0 44px; margin-bottom:14px; min-height:30px; font-size:0.95rem; line-height:1.5; color:var(--text); }
-  .session-steps li:last-child { margin-bottom:0; }
-  .session-steps li::before { content:counter(step); position:absolute; left:0; top:0; width:30px; height:30px; border-radius:50%; background:var(--gold-soft); color:var(--gold-deep); font-weight:600; font-size:0.85rem; display:flex; align-items:center; justify-content:center; }
-  .process-steps h4 { margin:22px 0 6px; font-size:1rem; }
-  .process-steps h4 + p { margin:0; font-size:0.92rem; color:var(--text-muted); }
+  /* "Does it hurt?" as a short WhatsApp-style exchange (Oct 2026, Halima's
+     ask): a client's question on the right in sand, her replies on the left
+     beside her photo. Replaced the hurt card + five-step card, which said the
+     same things twice. The asker is the reader (no name, no reply praising
+     her) so it never reads as a client testimonial. */
+  .chat-card { margin-top:var(--s4); padding:var(--s5) 18px; }
+  .chat { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+  .chat-row { display:flex; align-items:flex-end; gap:8px; }
+  .chat-them { justify-content:flex-end; }
+  .chat-stack { display:flex; flex-direction:column; gap:6px; max-width:84%; }
+  .chat-bubble {
+    padding:11px 14px; border-radius:18px; font-size:0.95rem; line-height:1.5; max-width:84%;
+    background:var(--cream); color:var(--text); border-bottom-right-radius:4px;
+  }
+  .chat-me .chat-bubble { background:#FBF4E6; border:1px solid rgba(200,169,110,0.35); border-radius:18px; border-bottom-left-radius:4px; max-width:none; }
+  .chat-me .chat-stack .chat-bubble:not(:last-child) { border-bottom-left-radius:18px; }
+  .chat-avatar { width:40px; height:40px; border-radius:50%; object-fit:cover; object-position:50% 22%; flex:none; }
+  @media (min-width:768px) { .chat-card { padding:var(--s5) 28px; max-width:720px; } .chat-bubble { font-size:1rem; } }
 
   /* ============================================================
      REVIEWS
@@ -1000,20 +1007,19 @@
         </div>
       </li>
     </ol>
-    <div class="hurt-card card reveal" id="does-it-hurt">
+    <div class="chat-card card reveal" id="does-it-hurt" aria-label="Does it hurt? A short exchange with Halima">
       <span class="section-eyebrow">The question everyone asks</span>
-      <h3>Does it hurt?</h3>
-      <p>The suction feels like a firm tug. The wet cupping pricks feel like a quick, light scratch. Most clients find the whole session relaxing, and some fall asleep. Nothing happens without Halima telling you first.</p>
-    </div>
-    <div class="process-steps card reveal">
-      <h3>What happens in your session</h3>
-      <ol class="session-steps">
-        <li>We talk first: your health form, and what you've come in with</li>
-        <li>Warm and relax: massage to settle the muscles</li>
-        <li>Cups applied: suction lifts the skin gently</li>
-        <li>Gentle draw: tiny pricks (wet cupping only)</li>
-        <li>Soothe and rest: black seed oil, then quiet time</li>
-      </ol>
+      <div class="chat">
+        <div class="chat-row chat-them"><div class="chat-bubble">Hi Halima, I'd like to book but I'm a bit nervous. Does it hurt?</div></div>
+        <div class="chat-row chat-me">
+          <img src="images/halima-hero-640.jpg" alt="" class="chat-avatar" width="36" height="36" loading="lazy">
+          <div class="chat-stack">
+            <div class="chat-bubble">Honestly, less than you'd think. The cups feel like a firm tug. The wet cupping pricks are a quick, light scratch, lighter than a paper cut.</div>
+            <div class="chat-bubble">I tell you before every single step, and nothing happens until you're ready. Most people relax, and a few fall asleep by the time the black seed oil goes on.</div>
+            <div class="chat-bubble">The hour goes: we talk first, then massage, then cups, tiny pricks if it's wet cupping, then black seed oil and rest.</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
