@@ -1,0 +1,45 @@
+/* Legal pages (terms, privacy) — on-brand layer. Loaded last. Same cream / black / gold
+   language as the homepage: black hero, Tan Ashford title, numbered sections, cream footer. */
+.wrap{max-width:640px;padding-top:84px}
+.legal-hero{background:#0D0D0D;color:#F5F0E8;border-radius:28px;padding:32px 24px 28px;margin:0 0 20px;position:relative;overflow:hidden}
+.legal-hero .legal-flower{position:absolute;top:18px;right:18px;width:44px;height:44px}
+.legal-hero .section-label{display:block;margin:0 0 22px;padding-top:2px;color:#D7BC82;letter-spacing:.28em}
+.legal-hero h1{font-family:'Tan Ashford',Georgia,serif;font-weight:normal;font-size:clamp(52px,16vw,76px);line-height:1.05;letter-spacing:0;color:#F5F0E8;margin:0 0 18px}
+.legal-hero h1 i{font-style:normal;color:#D7BC82}
+.legal-hero .step-lede{font-family:'Poppins',sans-serif;font-size:17px;line-height:1.55;color:rgba(245,240,232,.82);margin:0 0 20px;max-width:30ch}
+.legal-hero .legal-date{font-size:13px;color:rgba(245,240,232,.55);margin:0}
+.legal-points{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 20px}
+.legal-points div{background:#fff;border-radius:18px;padding:14px 10px;text-align:center;box-shadow:0 1px 0 rgba(13,13,13,.06)}
+.legal-points b{display:block;font-family:'Tan Ashford',Georgia,serif;font-weight:normal;font-size:24px;line-height:1;color:var(--gold-deep);margin-bottom:6px}
+.legal-points span{font-size:12.5px;line-height:1.35;color:var(--muted);display:block}
+.article{background:#fff;border-radius:28px;padding:8px 24px;counter-reset:sec;margin:0 0 24px}
+.article > .card{background:none;box-shadow:none;border-radius:0;padding:24px 0;margin:0;border:0;border-top:1px solid rgba(13,13,13,.09);counter-increment:sec}
+.article > .card:first-child{border-top:0}
+.article .card .section-label{display:block;font-family:'Tan Ashford',Georgia,serif;font-weight:normal;text-transform:none;letter-spacing:0;font-size:22px;line-height:1.15;color:var(--ink);margin:0 0 12px}
+.article .card .section-label::before{content:counter(sec,decimal-leading-zero);display:block;font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--gold-deep);margin-bottom:10px}
+.article .card p{font-size:16px;line-height:1.65;color:var(--muted)}
+.article .card p strong{color:var(--ink);font-weight:600}
+.article .card a{color:var(--gold-deep)}
+/* homepage footer */
+footer.site-footer{display:block;background:var(--page-bg);color:var(--ink);padding:36px 16px 28px;text-align:center;border-top:0}
+.site-footer .footer-brand{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:27px}
+.site-footer .footer-brand-icon{display:inline-flex;width:2.2em;height:2.2em;margin:-.5em 0}
+.site-footer .footer-brand-icon img{width:100%;height:100%;display:block}
+.site-footer .footer-brand span{font-family:'Tan Ashford',Georgia,serif;line-height:1;position:relative;top:.08em;color:#111}
+.site-footer .footer-line{margin:10px 0 0;font-size:14.5px;color:var(--ink)}
+.site-footer .footer-line + .footer-line{margin-top:4px}
+.site-footer .footer-line a{color:inherit;text-decoration:none}
+.site-footer .footer-social{display:flex;justify-content:center;gap:10px;margin-top:16px}
+.site-footer .footer-social a{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(13,13,13,.18);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;opacity:1}
+.site-footer .footer-social svg{width:20px;height:20px}
+.site-footer .footer-links{display:block;margin-top:16px;font-size:14px;font-weight:600}
+.site-footer .footer-links a{color:var(--ink);opacity:1;font-size:14px;letter-spacing:0;text-transform:none;text-decoration:none}
+.site-footer .footer-bottom{margin-top:18px;font-size:12.5px;color:var(--muted)}
+.site-footer .footer-legal{margin-top:6px;font-size:12.5px}
+.site-footer .footer-legal a{color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.site-footer .footer-legal a[aria-current]{color:var(--gold-deep)}
+.legal-hero.long h1{font-size:clamp(40px,13.6vw,64px)}
+.legal-hero.long h1{font-size:min(54px,13.6vw)}
+.article .card .section-label{line-height:1.22}
+.legal-points div{min-width:0;padding:14px 8px}
+.legal-points b{font-size:clamp(15px,4.6vw,19px)}
