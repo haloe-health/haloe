@@ -12,8 +12,8 @@
   background-size:260% 100%; background-position:100% 0;
   -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
   animation:wordSweep 2.2s cubic-bezier(.4,.1,.2,1) 0.7s 1 both;
-  /* inline padding widens the clip box so tall letters (l, h, g) aren't cut off */
-  padding:0.22em 0.08em; margin:-0.22em -0.08em; -webkit-box-decoration-break:clone; box-decoration-break:clone;
+  /* inline padding widens the clip box so tall letters (l, h) and the long tail of the g aren't cut off */
+  padding:0.22em 0.1em 0.55em; margin:-0.22em -0.1em -0.55em; -webkit-box-decoration-break:clone; box-decoration-break:clone;
 }
 @keyframes wordSweep { from { background-position:100% 0; } to { background-position:0% 0; } }
 
