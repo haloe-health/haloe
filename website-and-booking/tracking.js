@@ -61,7 +61,7 @@
     var b = document.createElement('div'); b.id = 'haloeConsent'; b.setAttribute('role', 'dialog'); b.setAttribute('aria-label', 'Cookies');
     b.innerHTML = '<p>We use cookies to see which pages and ads bring people to haloe. No health details are ever shared. <a href="/privacy">Privacy policy</a></p><div class="hc-row"><button class="hc-no" type="button">No thanks</button><button class="hc-yes" type="button">Accept</button></div>';
     document.body.appendChild(b);
-    b.querySelector('.hc-yes').onclick = function () { set('granted'); b.remove(); load(); };
+    b.querySelector('.hc-yes').onclick = function () { set('granted'); b.remove(); load(); try { document.dispatchEvent(new Event('haloe-consent')); } catch (e) {} };
     b.querySelector('.hc-no').onclick = function () { set('denied'); b.remove(); };
   }
 
