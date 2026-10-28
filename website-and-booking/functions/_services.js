@@ -16,6 +16,7 @@ export const SERVICES = {
     { name: 'Head Massage', price: 40, min: 60 },
     { name: 'Face & Head Massage', price: 70, min: 60 },
     { name: 'Head & Foot Massage', price: 60, min: 90 },
+    { name: 'Foot Massage', price: 50, min: 45 },
     { name: 'Back, Neck & Shoulders', price: 75, min: 60 },
     { name: 'Full Body Massage', price: 90, min: 90 },
   ],

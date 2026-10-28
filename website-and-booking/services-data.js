@@ -17,6 +17,7 @@ const SERVICES = {
     { name: 'Head Massage', time: '1 hour', price: 40, desc: 'Soothing scalp and head massage to help you unwind.' },
     { name: 'Face & Head Massage', time: '1 hour', price: 70, desc: 'Face and scalp together, for deeper calm.' },
     { name: 'Head & Foot Massage', time: '1 hr 30 min', price: 60, desc: 'Head and feet, for head-to-toe ease.' },
+    { name: 'Foot Massage', time: '45 min', price: 50, desc: 'A slow, grounding massage to ease tired feet and legs.' },
     { name: 'Back, Neck & Shoulders', time: '1 hour', price: 75, desc: 'Eases everyday tension where you hold it most.' },
     { name: 'Full Body Massage', time: '1 hr 30 min', price: 90, desc: 'A slow, head-to-toe reset for tired muscles.' },
   ],

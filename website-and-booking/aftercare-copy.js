@@ -35,7 +35,7 @@
   // Which set(s) a booking uses. Pass the stored treatment label ("A + B" for several treatments) or one treatment name.
   // 'massage' | 'hijama' for a known treatment; packages are a mix, so both. A name that matches nothing returns no kind and
   // the caller falls back to the original hijama wording (the status quo for unknown names) — never a guess in either direction.
-  const MASSAGE = ['Face Massage', 'Head Massage', 'Face & Head Massage', 'Head & Foot Massage', 'Back, Neck & Shoulders', 'Full Body Massage'];
+  const MASSAGE = ['Face Massage', 'Head Massage', 'Face & Head Massage', 'Head & Foot Massage', 'Foot Massage', 'Back, Neck & Shoulders', 'Full Body Massage'];
   const CUPPING = ['Face Cupping', 'Head Cupping', 'Face & Head Cupping', 'Targeted Area / Sports Injury', 'Full Back', 'Full Body', 'Head, Scalp & Full Body', 'Head & Scalp'];
   const PACKAGES = ['Pain & Mobility', 'Breathe & Reset', 'Cycle Comfort', 'Stress & Sleep', 'Headache & Tension', 'Digestion & Comfort', 'Circulation & Energy', "Women's Cycle Care", "Women's Hormonal Balance"];
   const kindsOf = (label) => {
