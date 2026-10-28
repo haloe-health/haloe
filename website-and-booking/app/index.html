@@ -556,6 +556,7 @@
   .cl-chip.amber { background: #FCE8A8; color: #5A4210; }
   :root[data-theme="dark"] .cl-chip.amber { background: #4A3A0E; color: #FCE8A8; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .cl-chip.amber { background: #4A3A0E; color: #FCE8A8; } }
+  .cl-chips:has(.cl-nudge) { max-width: none; flex-wrap: nowrap; }   /* Email + Nudge sit side by side */
   .cl-nudge { min-height: 44px; min-width: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--th-gold, #C8A96E); color: #1C1812; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
   .cl-nudge.sent { background: var(--th-sand, #EFE5CF); color: var(--gold-deep, #7A5C22); }
   .cl-nudge[disabled] { opacity: .55; cursor: default; }
@@ -913,6 +914,13 @@ const api = {
   },
   // Today → "For your clients": a ticked task is a row in admin_tasks (admin-only), un-ticking deletes it.
   // Rebook nudges: one log row per tap on "Send rebook nudge" (admin-only table). The weekly count and the streak come from this log.
+  async sendRebookEmail(p, force) {
+    const session = S.session;
+    const res = await timedFetch('/rebook-send', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ clientId: p.client ? p.client.id : null, email: p.client ? null : lower(p.email), force: !!force }) });
+    let j = {}; try { j = await res.json(); } catch (e) { /* no body */ }
+    if (!res.ok) { const err = new Error(j.error || 'failed'); err.code = j.error || 'failed'; throw err; }
+    return j;
+  },
   async logNudge(row) { const { data, error } = await sb.from('rebook_nudges').insert({ ...row, sent_by: S.session && S.session.user.id }).select().single(); if (error) throw error; return data; },
   async dismissUnlinked(email) { const { error } = await sb.from('unlinked_signins').update({ dismissed_at: new Date().toISOString() }).eq('email', email); if (error) throw error; },
   async setTask(key, on) {
@@ -2114,8 +2122,10 @@ function viewClients() {
   const rows = list.map((p) => {
     const due = dueSet.has(personKey(p)), sent = due && nudgeSince(p, t);
     const chips = (due && fk === 'all' ? '<span class="cl-chip gold">Due to rebook</span>' : '') + (hasIntakeP(p) ? '' : '<span class="cl-chip amber">Intake needed</span>');
+    const mailed = due && nudgeSince(p, t) && (nudgeSince(p, t).via === 'email');
+    const emailBtn = due && fk === 'rebook' ? `<button class="cl-nudge${mailed ? ' sent' : ''}" type="button" data-remail="${esc(personKey(p))}" ${p.email ? '' : 'disabled'}>${!p.email ? 'No email' : mailed ? 'Emailed' : 'Email'}</button>` : '';
     const nudge = due && fk === 'rebook' ? `<button class="cl-nudge${sent ? ' sent' : ''}" type="button" data-nudge="${esc(personKey(p))}" ${p.phone ? '' : 'disabled'}>${!p.phone ? 'No phone' : sent ? 'Nudged' : 'Nudge'}</button>` : '';
-    return `<div class="cl-card"><button class="cl-open" type="button" data-brief="${esc(p.key)}"><span class="av">${esc(initialOf(p.name))}</span><span class="cl-main"><b>${esc(shortName(p.name))} ${testPill(p.client)}</b><span class="cl-meta">${esc(clientMeta(p, t))}</span></span></button>${chips || nudge ? `<span class="cl-chips">${chips}${nudge}</span>` : ''}</div>`;
+    return `<div class="cl-card"><button class="cl-open" type="button" data-brief="${esc(p.key)}"><span class="av">${esc(initialOf(p.name))}</span><span class="cl-main"><b>${esc(shortName(p.name))} ${testPill(p.client)}</b><span class="cl-meta">${esc(clientMeta(p, t))}</span></span></button>${chips || nudge ? `<span class="cl-chips">${chips}${emailBtn}${nudge}</span>` : ''}</div>`;
   }).join('');
   const none = all.length
     ? (q ? stateHTML('No one matches “' + S.filter.trim() + '”', 'Check the spelling, or try a phone number.') : fk === 'rebook' ? stateHTML('No one needs rebooking', 'Everyone has been seen recently or has a session booked.') : stateHTML('No one here', ''))
@@ -2128,12 +2138,46 @@ function viewClients() {
   qi.oninput = () => { S.filter = qi.value; const pos = qi.selectionStart; render(); const n = document.getElementById('q'); n.focus(); n.setSelectionRange(pos, pos); };
   document.querySelectorAll('[data-cf]').forEach((b) => { b.onclick = () => { S.clientFilter = b.dataset.cf; render(); }; });
   document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief; }; });
+  document.querySelectorAll('[data-remail]').forEach((b) => { b.onclick = () => emailRebook(all.find((p) => personKey(p) === b.dataset.remail), t, b); });
   document.querySelectorAll('[data-nudge]').forEach((b) => { b.onclick = () => nudgeClient(all.find((p) => personKey(p) === b.dataset.nudge), t); });
   document.querySelectorAll('[data-dismiss]').forEach((b) => { b.onclick = async (ev) => {
     ev.stopPropagation(); b.disabled = true; const em = b.dataset.dismiss;
     try { await api.dismissUnlinked(em); const at = new Date().toISOString(); [S.data, S.raw].forEach((d) => ((d && d.unlinked) || []).forEach((u) => { if (u.email === em) u.dismissed_at = at; })); render(); toastMsg('Dismissed'); }
     catch (e) { toastMsg(friendly(e, 'save')); b.disabled = false; }
   }; });
+}
+/** Send the rebook email now (server sends + logs it). A second contact since the last session, or a server 'already sent', asks first. */
+function emailRebook(p, t, btn) {
+  if (!p || !p.email) return;
+  const go = async (force) => {
+    if (btn) btn.disabled = true;
+    try {
+      await api.sendRebookEmail(p, force);
+      const row = { client_id: p.client ? p.client.id : null, client_email: p.client ? null : lower(p.email), sent_at: new Date().toISOString(), sent_by: S.session && S.session.user.id, via: 'email' };
+      (S.data.nudges || (S.data.nudges = [])).push(row); if (S.raw && S.raw.nudges !== S.data.nudges) S.raw.nudges = S.data.nudges;
+      toastMsg('Email sent');
+    } catch (e) {
+      if (e.code === 'already_sent') { if (btn) btn.disabled = false; return ask('They were already emailed after their last session.'); }
+      if (e.code === 'opted_out') toastMsg('They asked not to get these emails');
+      else if (e.code === 'email_not_configured') toastMsg('Email isn’t set up yet');
+      else toastMsg(friendly(e, 'send'));
+    }
+    render();
+  };
+  const ask = (line) => {
+    const bg = document.createElement('div'); bg.className = 'sheet-bg';
+    bg.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="Send another email?"><div class="grab"></div><div class="lab">Rebook email</div>
+      <div style="font-weight:700;font-size:20px;letter-spacing:-.02em;margin-top:2px">Send another email?</div>
+      <p style="margin:var(--s3) 0 0">${esc(line)}</p>
+      <div class="sheet-actions" style="grid-template-columns:1fr 1fr"><button class="btn ghost" id="em-no" type="button">Not now</button><button class="btn" id="em-yes" type="button">Send again</button></div></div>`;
+    document.body.appendChild(bg);
+    bg.onclick = (e) => { if (e.target === bg) bg.remove(); };
+    bg.querySelector('#em-no').onclick = () => bg.remove();
+    bg.querySelector('#em-yes').onclick = () => { bg.remove(); go(true); };
+  };
+  const prior = nudgeSince(p, t);
+  if (prior) return ask(shortName(p.name) + ' was already contacted on ' + fmtDate(nudgeDay(prior)) + '.');
+  go(false);
 }
 /** Open the prefilled WhatsApp message and log it. A second nudge since the last session asks first. */
 function nudgeClient(p, t) {
