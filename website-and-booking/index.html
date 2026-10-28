@@ -533,6 +533,28 @@
   }
   .cond-hint { text-align:center; color:var(--gold-deep); font-size:0.85rem; font-weight:600; margin-top:-16px; margin-bottom:28px; }
 
+  /* Phone layout (Oct 2026): "What people come to us for" is a simple list so the whole
+     section fits one phone screen — one row per session: icon, title, price. The one-line
+     description is hidden here only (still in the markup, and still shown from 768px up).
+     Rows keep a 52px tap height. */
+  @media (max-width:767px) {
+    #conditions .section-head { margin-bottom:12px; }
+    #conditions .cond-grid { grid-template-columns:1fr; gap:6px; }
+    #conditions .cond-card {
+      display:grid; grid-template-columns:36px 1fr auto; column-gap:12px; align-items:center;
+      padding:8px 12px; min-height:52px; border-radius:16px;
+    }
+    #conditions .cond-icon { width:34px; height:34px; margin:0; }
+    #conditions .cond-icon svg { width:17px; height:17px; }
+    #conditions .cond-card h3 { font-size:0.9rem; font-weight:500; line-height:1.2; margin:0; }
+    #conditions .cond-what { display:none; }
+    #conditions .cond-price { display:contents; }
+    #conditions .cond-from { grid-column:3; grid-row:1; font-size:0.78rem; white-space:nowrap; }
+    #conditions .cond-from s { font-size:0.72rem; margin-right:3px; }
+    #conditions .cond-go { display:none; }
+    #conditions .cond-more { margin-top:8px; }
+  }
+
   /* Condition modal — restyled light */
   .cond-modal-top { display:flex; justify-content:space-between; align-items:flex-start; gap:var(--s4); }
   .cond-modal-icon {
