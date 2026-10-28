@@ -15,6 +15,7 @@ import { sbRequest } from './_supabase.js';
 import { sendEmail, esc, CREAM, GOLD, GOLD_DEEP, INK, BODY_TEXT, FONT, FONT_HEADING, FONT_HEADING_URL, LOGO_URL, logoMark } from './_email.js';
 import { notifyClient } from './_push.js';
 import { AFTERCARE_COPY } from './_aftercare-copy.js';
+import { runRebookEmails } from './_rebook.js';
 
 const FROM = 'haloe <halima@haloe.health>';
 const HALIMA_EMAIL = 'halima@haloe.health';
@@ -46,7 +47,7 @@ const HEADLINE = { 1: 'The day after', 7: 'A week on' };
 const RULE = '#E4DCCB';
 const cell = (inner, style = '', attrs = '') => `<tr><td width="100%" ${attrs} style="${style}">${inner}</td></tr>`;
 const divider = (padding) => cell(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td width="100%" height="1" bgcolor="${RULE}" style="height:1px;font-size:0;line-height:0;background:${RULE};">&nbsp;</td></tr></table>`, `padding:${padding};`);
-function reminderLayout({ eyebrow, headline, greeting, body, note }) {
+export function reminderLayout({ eyebrow, headline, greeting, body, note, cta = { href: APP_URL, label: 'OPEN MY AFTERCARE' } }) {
   const bg = `background-color:${CREAM};background-image:linear-gradient(${CREAM},${CREAM});`;
   return `<!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -82,7 +83,7 @@ ${cell(esc(headline), `padding:0 0 24px;font-family:${FONT_HEADING};font-size:28
 ${cell(`<p class="ink" style="margin:0 0 12px;font-family:${FONT};font-size:16px;line-height:24px;color:${INK};">${esc(greeting)}</p>
 <p class="body-text" style="margin:0;font-family:${FONT};font-size:16px;line-height:27px;color:${BODY_TEXT};">${esc(body)}</p>
 <p style="margin:20px 0 0;font-family:${FONT};font-size:15px;line-height:24px;color:#6B6357;">${esc(note)}</p>`, 'padding:0 32px;', 'align="left"')}
-${cell(`<table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;border-collapse:separate;"><tr><td class="btn-cell" align="center" bgcolor="${GOLD}" style="border-radius:26px;background-color:${GOLD};background-image:linear-gradient(${GOLD},${GOLD});padding:0;"><a class="btn-text" href="${APP_URL}" style="display:block;padding:14px 32px;color:${INK};text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:20px;letter-spacing:1.5px;text-transform:uppercase;font-weight:bold;">OPEN MY AFTERCARE</a></td></tr></table>`, 'padding:32px 0;', 'align="center"')}
+${cell(`<table role="presentation" align="center" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;border-collapse:separate;"><tr><td class="btn-cell" align="center" bgcolor="${GOLD}" style="border-radius:26px;background-color:${GOLD};background-image:linear-gradient(${GOLD},${GOLD});padding:0;"><a class="btn-text" href="${esc(cta.href)}" style="display:block;padding:14px 32px;color:${INK};text-decoration:none;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:20px;letter-spacing:1.5px;text-transform:uppercase;font-weight:bold;">${esc(cta.label)}</a></td></tr></table>`, 'padding:32px 0;', 'align="center"')}
 ${divider('0 0 24px')}
 ${cell(`<div class="gold-text" style="font-family:${FONT};font-size:13px;line-height:18px;letter-spacing:1px;font-weight:600;color:${GOLD_DEEP};">From haloe</div><div class="body-text" style="font-family:${FONT};font-size:12px;line-height:18px;margin-top:8px;color:${BODY_TEXT};">Manchester</div>`, 'padding:0 0 28px;', 'align="center"')}
 </table>
@@ -133,6 +134,7 @@ export async function runAftercare(env, now = new Date()) {
     out.window = hour >= 9 && hour < 20;
     if (out.window) await sendReminders(env, now, today, out);
   } catch (err) { out.errors++; console.error('aftercare: reminders failed:', err); }
+  try { out.rebook = await runRebookEmails(env, now); } catch (err) { out.errors++; console.error('rebook: run failed:', err); }
   try { out.purged = await purgeExpiredPhotos(env, now); } catch (err) { out.errors++; console.error('aftercare: photo purge failed:', err); }
   return out;
 }

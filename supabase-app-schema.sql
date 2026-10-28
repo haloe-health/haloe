@@ -610,3 +610,17 @@ grant select, update on public.whatsapp_messages to authenticated;
 grant select, insert, update, delete on public.whatsapp_messages to service_role;
 create policy whatsapp_select on public.whatsapp_messages for select to authenticated using (public.is_admin());
 create policy whatsapp_mark_read on public.whatsapp_messages for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- rebook email — Oct 2026 --------------------------------------------------------------------
+-- Run BEFORE setting REBOOK_EMAIL_MODE. Without clients.rebook_email_optout the job sends nothing (it fails closed).
+--  * rebook_emails: one row per (client, last session date) — the "only once" claim for the hourly rebook email (service role only).
+--  * clients.rebook_email_optout: set true for anyone who replies "no thanks"; they are never emailed about rebooking again.
+alter table public.clients add column if not exists rebook_email_optout boolean not null default false;
+create table if not exists public.rebook_emails (
+  client_key   text not null,            -- 'c/<client id>' or 'e/<lowercased email>', same as the app's nudge key
+  last_session date not null,
+  sent_at      timestamptz not null default now(),
+  primary key (client_key, last_session)
+);
+alter table public.rebook_emails enable row level security;
+grant select, insert, delete on public.rebook_emails to service_role;
