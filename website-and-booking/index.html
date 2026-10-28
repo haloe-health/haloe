@@ -601,6 +601,9 @@
   .price-from strong { color:var(--text); font-size:1.35rem; font-family:'Poppins', sans-serif; font-weight:600; }
   .price-was { color:var(--text-muted); font-size:0.95rem; margin-right:2px; }
   .price-dur { color:var(--text-muted); font-size:0.88rem; white-space:nowrap; }
+  .price-dur::before { content:'· '; }
+  /* Phone: the time sits on its own line under the price, so a "·" is never left at the start of a wrapped line. */
+  @media (max-width:767px) { .price-dur { display:block; margin-top:2px; } .price-dur::before { content:none; } }
   .price-book { margin-top:auto; padding-top:14px; font-weight:600; color:var(--gold-deep); font-size:0.95rem; }
   .price-note { margin-top:20px; font-size:0.82rem; color:var(--text-muted); }
   /* Sessions on a black band (Oct 2026, Halima's ask): the section is
@@ -826,6 +829,13 @@
   .footer-more { margin-top:8px; font-size:0.74rem; line-height:1.6; color:var(--text-muted); }
   .footer-more a { color:inherit; text-decoration:none; }
   .footer-more a:hover { color:var(--gold-deep); }
+  /* Phone: when a footer line wraps, no "·" may be left hanging at the end or start of a line.
+     Each piece is its own item; the bullets are dropped and spacing comes from the gap instead. */
+  @media (max-width:767px) {
+    .footer-line:first-of-type, .footer-bottom, .footer-more { display:flex; flex-wrap:wrap; justify-content:center; gap:2px 14px; }
+    .footer-line:first-of-type .fsep, .footer-bottom .fsep, .footer-more .fsep { display:none; }
+    .footer-more { gap:4px 14px; }
+  }
 
   /* ============================================================
      STICKY MOBILE BOTTOM BAR
@@ -1959,7 +1969,7 @@ hbInit();
       <span class="footer-brand-icon"><img src="haloe-logo-flower.svg" alt=""></span>
       <span>haloe</span>
     </div>
-    <p class="footer-line">Milton Hall, 244 Deansgate, Manchester M3 4BQ · Tuesdays</p>
+    <p class="footer-line"><span>Milton Hall, 244 Deansgate, Manchester M3 4BQ</span><span class="fsep"> · </span><span>Tuesdays</span></p>
     <p class="footer-line"><a href="https://wa.me/447474833643" target="_blank" rel="noopener">WhatsApp 07474 833643</a></p>
     <div class="footer-social" aria-label="Social">
       <a href="https://instagram.com/haloe.health" target="_blank" rel="noopener" aria-label="Instagram @haloe.health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
@@ -1968,9 +1978,9 @@ hbInit();
       <a href="mailto:halima@haloe.health" aria-label="Email halima@haloe.health"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></a>
     </div>
     <p class="footer-links"><a href="#pricing">Sessions</a> · <a href="#reviews">Reviews</a> · <a href="before-your-session.html">Before your session</a></p>
-    <p class="footer-bottom">© 2026 haloe · Halima Yasmin. All rights reserved. · CMA &amp; IPHM accredited training · Fully insured</p>
+    <p class="footer-bottom"><span>© 2026 haloe · Halima Yasmin. All rights reserved.</span><span class="fsep"> · </span><span>CMA &amp; IPHM accredited training</span><span class="fsep"> · </span><span>Fully insured</span></p>
     <p class="footer-legal"><a href="terms.html">Terms and conditions</a> · <a href="privacy.html">Privacy policy</a> · <a href="#" data-cookie-settings hidden>Cookie settings</a></p>
-    <nav class="footer-more" aria-label="More pages"><a href="hijama-manchester.html">Hijama in Manchester</a> · <a href="cupping-manchester.html">Dry cupping</a> · <a href="massage-manchester.html">Massage</a> · <a href="life-coaching-manchester.html">Life coaching</a></nav>
+    <nav class="footer-more" aria-label="More pages"><a href="hijama-manchester.html">Hijama in Manchester</a><span class="fsep"> · </span><a href="cupping-manchester.html">Dry cupping</a><span class="fsep"> · </span><a href="massage-manchester.html">Massage</a><span class="fsep"> · </span><a href="life-coaching-manchester.html">Life coaching</a></nav>
   </div>
 </footer>
 
@@ -2063,15 +2073,20 @@ hbInit();
   grid.innerHTML = CATS.map(function (c) {
     var items = SERVICES[c.key] || [];
     if (!items.length) return '';
-    var net = Math.min.apply(null, items.map(netPrice));
-    var list = Math.min.apply(null, items.map(function (x) { return x.price; }));
-    var mins = Math.min.apply(null, items.map(minutesOf).filter(Boolean));
+    // "from £X · N min" must describe ONE treatment: the cheapest (ties: the shorter), so the
+    // price and the time can never come from different treatments (Foot Massage, 45 min, is not the £32 one).
+    var cheapest = items.slice().sort(function (a, b) {
+      return netPrice(a) - netPrice(b) || (minutesOf(a) || 9999) - (minutesOf(b) || 9999);
+    })[0];
+    var net = netPrice(cheapest);
+    var list = cheapest.price;
+    var mins = minutesOf(cheapest);
     var was = list > net ? '<s class="price-was">£' + list + '</s> ' : '';
     return '<a href="book.html?cat=' + c.key + '" class="price-card card reveal">' +
       '<span class="price-icon">' + c.icon + '</span>' +
       '<h3>' + c.label + '</h3>' +
       '<p class="price-desc">' + c.desc + '</p>' +
-      '<p class="price-from">from ' + was + '<strong>£' + net + '</strong>' + (mins ? ' <span class="price-dur">· ' + fmtMin(mins) + '</span>' : '') + '</p>' +
+      '<p class="price-from">from ' + was + '<strong>£' + net + '</strong>' + (mins ? ' <span class="price-dur">' + fmtMin(mins) + '</span>' : '') + '</p>' +
       '<span class="price-book">Book ' + c.label.toLowerCase() + ' <span aria-hidden="true">→</span></span></a>';
   }).join('');
   // Newly-injected .reveal cards need their own observer, since the page-load
