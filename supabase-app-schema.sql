@@ -610,3 +610,16 @@ grant select, update on public.whatsapp_messages to authenticated;
 grant select, insert, update, delete on public.whatsapp_messages to service_role;
 create policy whatsapp_select on public.whatsapp_messages for select to authenticated using (public.is_admin());
 create policy whatsapp_mark_read on public.whatsapp_messages for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- shared session notes — migration "shared_notes", 30 Oct 2026 ----------------------
+-- Until now every session note was private to Halima. A note can now be SHARED with the client it is about
+-- (life-coaching summaries, "what we covered", next steps). Sharing is per note and OFF by default, so every existing
+-- note and every new note stays private unless Halima switches it on. Clients get a SELECT policy on their own
+-- shared notes only; there is still no client write policy, and unshared rows return nothing to a client.
+alter table public.session_notes add column if not exists shared_with_client boolean not null default false;
+alter table public.session_notes add column if not exists shared_at timestamptz;
+alter table public.session_notes add column if not exists title text;
+
+drop policy if exists client_read_shared_notes on public.session_notes;
+create policy client_read_shared_notes on public.session_notes for select to authenticated
+  using (shared_with_client = true and client_id = public.my_client_id());

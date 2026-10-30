@@ -783,6 +783,53 @@
   }
   @media (max-width: 380px) { .navdock { gap: var(--s2); } .navdock .tabbar button { width: 50px; } .navdock .navplus { width: 48px; } }
   /* ===== iOS refresh END ===== */
+
+  /* ---- shared notes, view-as-client banner (30 Oct 2026) ---- */
+  .note-title { width: 100%; min-height: 44px; margin-top: 6px; border-radius: 14px; border: 1px solid var(--fill-hover); background: var(--card); padding: 0 14px; font-size: 16px; }
+  .note-item .when b.shared { color: var(--gold-deep); }
+  .note-card p { font-size: 16px; line-height: 1.55; }
+  .pv-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 60; min-height: 40px; padding: calc(4px + env(safe-area-inset-top)) 16px 4px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #1C1812; color: #F5F0E8; font-size: 14px; }
+  .pv-bar button { min-height: 32px; border: 0; border-radius: 999px; padding: 0 14px; background: #C8A96E; color: #1C1812; font-weight: 600; font-size: 14px; }
+  body.previewing { padding-top: calc(40px + env(safe-area-inset-top)); }
+  body.previewing .app-head { top: calc(40px + env(safe-area-inset-top)); }
+
+  /* ---- CRM: contacts table + pipeline board (desktop) ---- */
+  .crm-table { display: none; }
+  .pl-board { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  .pl-col { background: var(--fill); border-radius: 16px; padding: 12px; min-width: 0; }
+  .pl-col h2 { display: flex; justify-content: space-between; align-items: center; margin: 4px 6px 10px; font-size: 14px; font-weight: 600; }
+  .pl-col h2 i { font-style: normal; font-size: 12px; color: var(--muted); background: var(--card); border-radius: 999px; padding: 2px 10px; }
+  .pl-card { display: grid; gap: 4px; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px; background: var(--card); border: 1px solid var(--edge); border-radius: 14px; font: inherit; color: inherit; min-height: 44px; }
+  .pl-card span { font-size: 13px; color: var(--muted); }
+  .pl-card .pl-foot { color: var(--gold-deep); font-weight: 500; }
+  .pl-none { margin: 6px; font-size: 13px; color: var(--muted); }
+  .stg { font-style: normal; display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--fill); color: var(--ink); }
+  .stg-new { background: #E8EEF9; color: #2A4A8A; } .stg-booked { background: #E3F1E6; color: #1F6B37; } .stg-seen { background: var(--fill); } .stg-rebook { background: #F6EAD0; color: #7A5F25; }
+  @media (min-width: 700px) { .pl-board { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) {
+    .pl-board { grid-template-columns: repeat(4, 1fr); }
+    /* left sidebar for the admin (CRM layout); clients keep the floating pill */
+    body:has(.navdock.crm) { padding-left: 232px; }
+    .navdock.crm { left: 0; top: 0; bottom: 0; transform: none; width: 232px; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 8px; padding: 72px 12px 16px; background: var(--card); border-right: 1px solid var(--edge); z-index: 40; }
+    .navdock.crm::before { content: 'haloe'; position: absolute; top: 20px; left: 26px; font-family: var(--font-wordmark, Georgia, serif); font-size: 30px; color: #111; }
+    :root[data-theme="dark"] .navdock.crm::before { color: var(--gold); }
+    .navdock.crm .tabbar { display: flex; flex-direction: column; width: 100%; gap: 2px; padding: 0; background: none; box-shadow: none; border: 0; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .navdock.crm .tabbar button { width: 100%; min-height: 44px; flex-direction: row; justify-content: flex-start; gap: 12px; padding: 0 14px; border-radius: 12px; }
+    .navdock.crm .tabbar button span { position: static; width: auto; height: auto; clip: auto; overflow: visible; font-size: 15px; }
+    .navdock.crm .navplus { width: 100%; height: 44px; border-radius: 12px; font-size: 0; box-shadow: none; }
+    .navdock.crm .navplus::after { content: '+ New booking'; font-size: 15px; font-weight: 600; }
+    body:has(.navdock.crm) .app-head .brand { visibility: hidden; }
+    body:has(.crm-table) .wrap { max-width: 1180px; }
+    body:has(.pl-board) .wrap { max-width: 1280px; }
+    .crm-table { display: block; margin-top: 12px; background: var(--card); border: 1px solid var(--edge); border-radius: 16px; overflow: hidden; }
+    .cl-stack { display: none; }
+    .crm-th, .crm-tr { display: grid; grid-template-columns: minmax(220px, 2.2fr) 1fr 1fr .8fr 1.8fr; gap: 12px; align-items: center; padding: 12px 18px; text-align: left; }
+    .crm-th { background: var(--fill); font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+    .crm-tr { width: 100%; border: 0; border-top: 1px solid var(--edge); background: transparent; font: inherit; color: inherit; min-height: 60px; cursor: pointer; }
+    @media (hover: hover) { .crm-tr:hover { background: var(--fill); } }
+    .crm-c { display: grid; gap: 2px; min-width: 0; } .crm-c i { font-style: normal; font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .crm-tr > span { font-size: 14px; min-width: 0; }
+  }
 </style>
 </head>
 <body>
@@ -898,6 +945,7 @@ function timedFetch(input, init) {
 }
 /** Calm wording for any failed action. verb: 'save' | 'send' | 'delete' | 'change' … — never e.message. */
 function friendly(e, verb) {
+  if (e && e.net === 'preview') return 'Preview only. Nothing was changed.';
   if (e && e.net === 'offline' || navigator.onLine === false) return OFFLINE_MSG;
   return "That didn't " + (verb || 'save') + '. Please try again in a minute.';
 }
@@ -925,7 +973,9 @@ const api = {
   async loadClient() {
     const q = (t, sel = '*') => sb.from(t).select(sel).then(({ data, error }) => { if (error) throw new Error(t + ': ' + error.message); return data || []; });
     const [clients, bookings, checkins, intakes] = await Promise.all([q('clients'), q('bookings'), q('check_ins'), q('intake_forms', 'id,created_at,package')]);
-    return { client: clients[0] || null, bookings, checkins, intakes };
+    // Notes Halima has chosen to share (row-level security returns only those). Tolerates the migration not being run yet.
+    const notes = await sb.from('session_notes').select('id,created_at,shared_at,title,note,booking_id').order('created_at', { ascending: false }).then(({ data, error }) => (error ? [] : data || []));
+    return { client: clients[0] || null, bookings, checkins, intakes, notes };
   },
   // A signed-in person with no client record: tell the server (it records email + date only and sends the admin one quiet alert a day).
   async reportUnmatched() {
@@ -980,6 +1030,7 @@ const api = {
     await timedFetch('/photo-alert', { method: 'POST', headers: { Authorization: 'Bearer ' + (session && session.access_token), 'Content-Type': 'application/json' }, body: JSON.stringify({ submissionId: id }) });
   },
   async addCheckIn(row) { const { data, error } = await sb.from('check_ins').insert(row).select().single(); if (error) throw error; return data; },
+  async setNoteShared(id, on) { const { data, error } = await sb.from('session_notes').update({ shared_with_client: on, shared_at: on ? new Date().toISOString() : null }).eq('id', id).select().single(); if (error) throw error; return data; },
   async addNote(row) { const { data, error } = await sb.from('session_notes').insert(row).select().single(); if (error) throw error; return data; },
   async findOrCreateCollab(name, notes) {
     const { data: found } = await sb.from('collaborators').select('id').ilike('name', name).limit(1);
@@ -1116,7 +1167,7 @@ const firstNameFromEmail = (em) => { const l = String(em || '').split('@')[0].re
 
 /* ---- Settings: tile screen (admin). The client's own Settings keeps its layout (viewClientSettings). ---- */
 function viewSettings() {
-  if (S.isClient) return viewClientSettings();
+  if (clientUI()) return viewClientSettings();
   const th = currentTheme() || 'system', email = (S.session && S.session.user && S.session.user.email) || '', first = firstNameFromEmail(email);
   const seg = [['light', 'Light'], ['dark', 'Dark'], ['system', 'System']].map(([k, l]) => `<button type="button" data-th="${k}" aria-pressed="${th === k}">${l}</button>`).join('');
   shell(`<div class="tile-home settings"><div class="th-titlerow"><h1>Settings</h1></div>
@@ -1266,9 +1317,12 @@ const ICON = {
   home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-7 8 7v8.5a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 19.5z"/><path d="M9.5 21v-6h5v6"/></svg>',
   progress: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17l5-6 4 3 7-8"/><path d="M3.5 21h17"/></svg>',
   book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17M12 13.5v4M10 15.5h4"/></svg>',
+  notes: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h9l3.5 3.5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1z"/><path d="M14.5 3.5V7H18M8.5 12h7M8.5 16h5"/></svg>',
+  pipeline: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="16.5" y="4" width="4" height="6" rx="1.5"/></svg>',
   gear: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
 };
 
+const clientUI = () => S.isClient || !!S.preview;
 function headerHTML(withSettings) {
   return `<header class="app-head">
     <a class="brand" href="#/today" aria-label="haloe"><img src="/haloe-logo-flower.svg" alt=""><span>haloe</span></a>
@@ -1280,7 +1334,7 @@ function headerHTML(withSettings) {
 /** Wipe every trace of the signed-in session from this page and this device. Never waits on the network. */
 function clearSession() {
   voiceStop();
-  S.session = null; S.admin = false; S.isClient = false; S.profile = null;
+  S.session = null; S.admin = false; S.isClient = false; S.profile = null; S.preview = null;
   S.data = null; S.raw = null; S.cdata = null; S.error = null; S.filter = '';
   S.loginStage = 'form'; S.loginPurpose = 'first'; S.loginEmail = '';   // back to a fresh sign-in screen
   S.needPassword = false; S.forcePassword = false; S.passwordSkipped = null; S.todayTab = 'day'; S.segFrom = null; S.noteDraft = null;
@@ -1583,19 +1637,22 @@ function viewNoMatch() {
     await enter(S.session);
     if (S.cdata && !S.cdata.client && !S.cdata.bookings.length) toastMsg('Still no match for this email yet.');
   };
-  if (S.reportedUnmatched !== email) { S.reportedUnmatched = email; api.reportUnmatched().catch(() => {}); }   // quiet, once per email per page load; failures are silent
+  if (S.reportedUnmatched !== email && !S.preview) { S.reportedUnmatched = email; api.reportUnmatched().catch(() => {}); }   // quiet, once per email per page load; failures are silent
 }
 
 function tabbarHTML() {
-  const items = S.isClient ? [['home', 'Home'], ['aftercare', 'Aftercare'], ['progress', 'Progress'], ['book', 'Book']] : [['today', 'Today'], ['inbox', 'Inbox'], ['clients', 'Clients'], ['codes', 'Codes'], ['stats', 'Stats']];
-  return `<div class="navdock"><div class="tabbar" role="navigation" aria-label="Main">${items.map(([k, l]) =>
-    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span>${k === 'inbox' && unreadCount() ? '<i class="nbadge">' + unreadCount() + '</i>' : ''}</button>`).join('')}</div>${S.isClient ? '' : '<a class="navplus" href="/book?location=clinic" target="_blank" rel="noopener" aria-label="Book a session">+</a>'}</div>`;
+  const items = clientUI() ? [['home', 'Home'], ['aftercare', 'Aftercare'], ['notes', 'Notes'], ['progress', 'Progress'], ['book', 'Book']] : [['today', 'Today'], ['inbox', 'Inbox'], ['clients', 'Clients'], ['pipeline', 'Pipeline'], ['codes', 'Codes'], ['stats', 'Stats']];
+  return `<div class="navdock${clientUI() ? '' : ' crm'}"><div class="tabbar" role="navigation" aria-label="Main">${items.map(([k, l]) =>
+    `<button data-go="${k}" ${S.view === k || (k === 'clients' && S.view === 'brief') ? 'aria-current="page"' : ''}>${ICON[k]}<span>${l}</span>${k === 'inbox' && unreadCount() ? '<i class="nbadge">' + unreadCount() + '</i>' : ''}</button>`).join('')}</div>${clientUI() ? '' : '<a class="navplus" href="/book?location=clinic" target="_blank" rel="noopener" aria-label="Book a session">+</a>'}</div>`;
 }
 
 function shell(inner, withNav = true) {
   const fadeKey = S.view + ':' + (S.view === 'today' ? S.todayTab : S.threadPhone || ''), fade = S.fadeKey !== fadeKey; S.fadeKey = fadeKey;   // fade only when the screen or tab changes, not on every tick
-  $root.innerHTML = headerHTML(true) + `<main class="wrap${fade ? ' ios-fade' : ''}">${inner}</main>` + (withNav ? tabbarHTML() : '');
+  const pv = S.preview ? `<div class="pv-bar" role="status"><span>Previewing as <b>${esc(firstName(S.preview.name) || 'client')}</b> · read only</span><button type="button" id="pvExit">Back to admin</button></div>` : '';
+  document.body.classList.toggle('previewing', !!S.preview);
+  $root.innerHTML = pv + headerHTML(true) + `<main class="wrap${fade ? ' ios-fade' : ''}">${inner}</main>` + (withNav ? tabbarHTML() : '');
   wireHeader();
+  const pvx = document.getElementById('pvExit'); if (pvx) pvx.onclick = exitPreview;
   document.querySelectorAll('[data-go]').forEach((b) => { b.onclick = () => { location.hash = '#/' + b.dataset.go; }; });
 }
 
@@ -2097,10 +2154,12 @@ function clientMeta(p, t) {
   return parts.length ? parts.join(' · ') : 'No bookings yet';
 }
 function viewClients() {
-  const t = todayISO(), all = people(), q = lower(S.filter).trim(), fk = S.clientFilter === 'rebook' ? 'rebook' : 'all';
+  const t = todayISO(), all = people(), q = lower(S.filter).trim(), fk = ['rebook', 'new', 'booked', 'seen'].includes(S.clientFilter) ? S.clientFilter : 'all';
+  const wk = ['clinic', 'mobile', 'virtual'].includes(S.whereFilter) ? S.whereFilter : 'all';
   const dueSet = new Set(all.filter((p) => isDueToRebook(p, t)).map(personKey));
   const nDue = dueSet.size;
-  let list = all.filter((p) => fk === 'all' || dueSet.has(personKey(p)));
+  const stageCount = Object.fromEntries(STAGES.map(([k]) => [k, all.filter((p) => stageOf(p, t) === k).length]));
+  let list = all.filter((p) => (fk === 'all' || stageOf(p, t) === fk) && (wk === 'all' || whereOf(p) === wk));
   if (q) list = list.filter((p) => lower(p.name).includes(q) || lower(p.email).includes(q) || digits(p.phone).includes(digits(q)) && digits(q).length > 2);
   list.sort((a, b) => {
     const da = dueSet.has(personKey(a)), db = dueSet.has(personKey(b));
@@ -2122,11 +2181,14 @@ function viewClients() {
     : stateHTML('No clients yet', 'People appear here after they book or send an intake form.');
   shell(`<div class="tile-home clients"><div class="th-titlerow"><h1>Clients</h1></div>${unlinkedCardHTML()}
     <input class="cl-search" id="q" type="search" placeholder="Search by name or phone" value="${esc(S.filter)}" autocomplete="off" aria-label="Search clients">
-    <div class="cl-chipsbar" role="group" aria-label="Show"><button class="cl-fchip" type="button" data-cf="all" aria-pressed="${fk === 'all'}">All ${all.length}</button><button class="cl-fchip" type="button" data-cf="rebook" aria-pressed="${fk === 'rebook'}">Needs rebooking ${nDue}</button></div>
-    <div class="cl-stack">${rows || none}</div></div>`);
+    <div class="cl-chipsbar" role="group" aria-label="Stage"><button class="cl-fchip" type="button" data-cf="all" aria-pressed="${fk === 'all'}">All ${all.length}</button>${STAGES.map(([k, l]) => `<button class="cl-fchip" type="button" data-cf="${k}" aria-pressed="${fk === k}">${l} ${stageCount[k]}</button>`).join('')}</div>
+    <div class="cl-chipsbar cl-where" role="group" aria-label="Where"><button class="cl-fchip" type="button" data-wf="all" aria-pressed="${wk === 'all'}">Anywhere</button>${Object.entries(WHERE_LABEL).map(([k, l]) => `<button class="cl-fchip" type="button" data-wf="${k}" aria-pressed="${wk === k}">${l}</button>`).join('')}</div>
+    <div class="cl-stack">${rows || none}</div>
+    ${list.length ? `<div class="crm-table" role="table" aria-label="Clients"><div class="crm-th" role="row"><span>Contact</span><span>Where</span><span>Stage</span><span>Value</span><span>Sessions</span></div>${list.map((p) => `<button class="crm-tr" type="button" data-brief="${esc(p.key)}" role="row"><span class="crm-c"><b>${esc(p.name || '—')} ${testPill(p.client)}</b><i>${esc([p.phone, p.email].filter(Boolean).join(' · '))}</i></span><span>${esc(WHERE_LABEL[whereOf(p)] || '—')}</span><span><em class="stg stg-${stageOf(p, t)}">${esc(STAGES.find(([k]) => k === stageOf(p, t))[1])}</em></span><span>${valueOf(p) ? money(valueOf(p)) : '—'}</span><span>${esc(clientMeta(p, t))}</span></button>`).join('')}</div>` : ''}</div>`);
   const qi = document.getElementById('q');
   qi.oninput = () => { S.filter = qi.value; const pos = qi.selectionStart; render(); const n = document.getElementById('q'); n.focus(); n.setSelectionRange(pos, pos); };
   document.querySelectorAll('[data-cf]').forEach((b) => { b.onclick = () => { S.clientFilter = b.dataset.cf; render(); }; });
+  document.querySelectorAll('[data-wf]').forEach((b) => { b.onclick = () => { S.whereFilter = b.dataset.wf; render(); }; });
   document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief; }; });
   document.querySelectorAll('[data-nudge]').forEach((b) => { b.onclick = () => nudgeClient(all.find((p) => personKey(p) === b.dataset.nudge), t); });
   document.querySelectorAll('[data-dismiss]').forEach((b) => { b.onclick = async (ev) => {
@@ -2414,12 +2476,16 @@ function viewBrief(key, bid) {
   const hist = p.bookings.map((b) => `<div class="h${b.status === 'cancelled' ? ' cancelled' : ''}"><b>${fmtDate(b.booking_date)} · ${fmtTime(b.start_min)}</b> ${statusChip(b)}<br>${esc(treatmentLabel(b))} ${tagHTML(pk(b))}<br><span class="muted">${money(b.amount_pence)} paid${b.discount_code ? ' · ' + esc(b.discount_code) : ''}${confirmed(b) ? '' : ' · ' + esc(b.status)}${b.done_at ? ' · done' : ''} · booked ${bookedOn(b)}</span>${b.status === 'cancelled' ? '<br><span class="muted small">Cancelled. Refunds are made in Stripe.</span>' : ''}${isPending(b) ? `<br>New time proposed: <b>${esc(fmtTs(b.proposed_starts_at))}</b>` : ''}${b.original_starts_at && b.status === 'confirmed' ? `<br><span class="muted">Moved from ${esc(fmtTs(b.original_starts_at))}</span>` : ''}${confirmed(b) ? `<div class="acts"><button class="btn sm ghost" data-resched="${b.id}" type="button">Reschedule</button><button class="btn sm ghost" data-cancel="${b.id}" type="button">Cancel booking</button>${isPending(b) && (p.phone || b.customer_phone) ? `<a class="btn sm" target="_blank" rel="noopener" href="${esc(rescheduleWA(b, p.phone || b.customer_phone, p.name))}">Send on WhatsApp</a>` : ''}</div>` : ''}</div>`).join('') || '<p class="muted small">No bookings yet.</p>';
   const notes = c ? S.data.notes.filter((n) => n.client_id === c.id).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))) : [];
   const ctxBooking = bid ? p.bookings.find((b) => b.id === Number(bid)) : (p.bookings.find((b) => confirmed(b) && b.booking_date >= todayISO()) || p.bookings[0]);
+  const fn = firstName(p.name) || 'them';
   const noteBlock = c
     ? `<div class="card"><div class="section-label">Session notes</div>
-        <label class="f" for="noteText" style="margin-top:10px">New note <span class="muted small">· private to you</span></label>
+        <label class="f" for="noteTitle" style="margin-top:10px">Title <span class="muted small">· optional</span></label>
+        <input class="note-title" id="noteTitle" type="text" maxlength="120" placeholder="e.g. Life coaching, session 1" autocomplete="off" value="${esc(S.noteDraft && S.noteDraft.cid === c.id ? S.noteDraft.title || '' : '')}">
+        <label class="f" for="noteText" style="margin-top:10px">New note</label>
         <textarea class="note dictate" id="noteText" rows="5" placeholder="Type or dictate a note…" enterkeyhint="enter" autocapitalize="sentences" style="margin-top:6px">${esc(S.noteDraft && S.noteDraft.cid === c.id ? S.noteDraft.text : '')}</textarea>
+        <div class="toggle-line" style="margin:8px 0 0"><span>Share with ${esc(fn)} in their account<br><span class="muted small">Off = private to you. They sign in at haloe.health/app.</span></span><button class="switch-wrap" id="noteShare" type="button" aria-label="Share with ${esc(fn)}"><span class="switch" role="switch" aria-checked="${!!(S.noteDraft && S.noteDraft.cid === c.id && S.noteDraft.share)}"></span></button></div>
         <button class="btn block" id="noteSave" style="margin-top:10px">Save note</button>
-        ${notes.map((n) => `<div class="note-item"><div class="when">${new Date(n.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/London' })}</div><p>${esc(n.note)}</p></div>`).join('')}</div>`
+        ${notes.map((n) => `<div class="note-item"><div class="when">${new Date(n.created_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/London' })} · <b class="${n.shared_with_client ? 'shared' : ''}">${n.shared_with_client ? 'Shared with ' + esc(fn) : 'Private'}</b></div>${trimStr(n.title) ? `<p><b>${esc(n.title)}</b></p>` : ''}<p>${esc(n.note)}</p><button class="btn sm ghost" data-shr="${n.id}" type="button" style="margin-top:10px">${n.shared_with_client ? 'Make private' : 'Share with ' + esc(fn)}</button></div>`).join('')}</div>`
     : `<div class="card"><div class="section-label">Session notes</div><p class="muted small" style="margin:10px 0 0">Notes attach to a client record, which is created when they submit the intake form.</p></div>`;
   shell(`<button class="back" id="bk">${ICON.back}Back</button>
     <div class="card">
@@ -2433,7 +2499,7 @@ function viewBrief(key, bid) {
         <div class="fact"><div class="k">Signature</div><div class="v">${intake && intake.signature_path ? 'On file' : intake ? 'Not on file' : '—'}</div></div>
       </div>
       ${intake && intake.signature_path ? `<div class="sig"><img class="thumb" id="sigImg" alt="Signature" hidden><span class="small muted" id="sigNote">Loading signature…</span></div>` : ''}
-      <div class="contact" style="flex-wrap:wrap">${p.phone ? `<a class="btn" href="tel:${esc(p.phone.replace(/[^\d+]/g, ''))}" data-call="${esc(p.phone)}" data-callname="${esc(p.name || '')}">Call</a><a class="btn ghost" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}${c ? '<button class="btn ghost" id="ciBtn" type="button">Check-in</button>' : ''}</div>
+      <div class="contact" style="flex-wrap:wrap">${p.phone ? `<a class="btn" href="tel:${esc(p.phone.replace(/[^\d+]/g, ''))}" data-call="${esc(p.phone)}" data-callname="${esc(p.name || '')}">Call</a><a class="btn ghost" href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a>` : ''}${c ? '<button class="btn ghost" id="ciBtn" type="button">Check-in</button>' : ''}${c ? '<button class="btn ghost" id="pvBtn" type="button">View as ' + esc(firstName(p.name) || 'client') + '</button>' : ''}</div>
     </div>
     ${act}
     <div class="card"><div class="section-label">Conditions, medication, allergies</div><div class="kv rows" style="margin-top:12px">
@@ -2461,18 +2527,32 @@ function viewBrief(key, bid) {
   if (c) loadPhotoThumbs();
   document.querySelectorAll('[data-resched]').forEach((btn) => { btn.onclick = () => openReschedule(Number(btn.dataset.resched), p); });
   document.querySelectorAll('[data-cancel]').forEach((btn) => { btn.onclick = () => openCancelBooking(Number(btn.dataset.cancel)); });
+  const pvBtn = document.getElementById('pvBtn'); if (pvBtn) pvBtn.onclick = () => startPreview(p.key);
   const ciBtn = document.getElementById('ciBtn');
   if (ciBtn) ciBtn.onclick = () => openCheckIn(c, p.bookings.find((b) => confirmed(b) && b.booking_date === todayISO()) || null);   // today's session, if any
   const save = document.getElementById('noteSave');
   const nt = document.getElementById('noteText');
   // Keep an unsaved (dictated) note in memory so a re-render never loses it; it is cleared on save and on sign-out.
-  if (nt) nt.addEventListener('input', () => { S.noteDraft = { cid: c.id, text: nt.value }; });
+  const ntt = document.getElementById('noteTitle'), nsh = document.getElementById('noteShare');
+  const draft = () => { S.noteDraft = { cid: c.id, text: nt.value, title: ntt.value, share: nsh.querySelector('.switch').getAttribute('aria-checked') === 'true' }; };
+  if (nt) { nt.addEventListener('input', draft); ntt.addEventListener('input', draft); nsh.onclick = () => { const sw = nsh.querySelector('.switch'); sw.setAttribute('aria-checked', sw.getAttribute('aria-checked') === 'true' ? 'false' : 'true'); draft(); }; }
+  document.querySelectorAll('[data-shr]').forEach((b) => {
+    b.onclick = async () => {
+      const n = S.data.notes.find((x) => x.id === Number(b.dataset.shr)); if (!n) return;
+      const turnOn = !n.shared_with_client;
+      if (turnOn && b.dataset.armed !== '1') { b.dataset.armed = '1'; b.textContent = 'Tap again to share'; setTimeout(() => { if (b.isConnected) { b.dataset.armed = ''; b.textContent = 'Share with ' + fn; } }, 4000); return; }
+      b.disabled = true;
+      try { const row = await api.setNoteShared(n.id, turnOn); Object.assign(n, row); render(); toastMsg(turnOn ? 'Shared with ' + fn : 'Now private'); }
+      catch (e) { toastMsg(friendly(e, 'save')); b.disabled = false; }
+    };
+  });
   if (save) save.onclick = async () => {
     const txt = nt.value.trim(); if (!txt) return;
     save.disabled = true;
     try {
-      const row = await api.addNote({ client_id: c.id, booking_id: ctxBooking ? ctxBooking.id : null, note: txt });
-      S.data.notes.push(row); S.noteDraft = null; render(); toastMsg('Saved');
+      const share = nsh.querySelector('.switch').getAttribute('aria-checked') === 'true', title = ntt.value.trim();
+      const row = await api.addNote({ client_id: c.id, booking_id: ctxBooking ? ctxBooking.id : null, note: txt, title: title || null, shared_with_client: share, shared_at: share ? new Date().toISOString() : null });
+      S.data.notes.push(row); S.noteDraft = null; render(); toastMsg(row.shared_with_client ? 'Saved and shared' : 'Saved');
     } catch (e) { toastMsg(friendly(e, 'save')); save.disabled = false; }
   };
 }
@@ -2644,18 +2724,18 @@ function viewClientSettings() {
   shell(`${pageHead('Settings')}
     <div class="card"><div class="section-label">Appearance</div>
       <div class="seg">${[['light', 'Light'], ['dark', 'Dark'], ['system', 'System']].map(([k, l]) => `<button data-th="${k}" aria-pressed="${th === k}">${l}</button>`).join('')}</div></div>
-    ${S.isClient ? '' : `<div class="card" id="pushCard"><div class="section-label">Alerts on this device</div><div id="pushBody" class="muted small" style="margin-top:8px">Checking…</div></div>`}
-    ${S.isClient ? '' : `<div class="card"><div class="section-label">Data</div><div class="toggle-line" style="margin:8px 0 0"><span>Show test data</span><button class="switch-wrap" id="testBtn2" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div><p class="muted small" style="margin:4px 0 0">Rehearsal clients and bookings. Hidden from Clients, Today, Codes and Stats (and so from revenue) unless this is on.</p></div>`}
-    ${S.isClient && S.cdata && S.cdata.client ? `<div class="card" id="photosCard"><div class="section-label">Photos</div><p class="muted small" style="margin:8px 0 0">Photos you send Halima are private to you and Halima. They are kept for 90 days, then deleted automatically.</p><p class="small" id="photoCount" style="margin:10px 0 0"></p><button class="btn ghost block" id="delPhotos" type="button" style="margin-top:12px">Delete my photos</button></div><div class="card" id="cpushCard"><div class="section-label">Aftercare reminders</div><div id="cpushBody" class="muted small" style="margin-top:8px">Checking…</div></div>` : ''}
+    ${clientUI() ? '' : `<div class="card" id="pushCard"><div class="section-label">Alerts on this device</div><div id="pushBody" class="muted small" style="margin-top:8px">Checking…</div></div>`}
+    ${clientUI() ? '' : `<div class="card"><div class="section-label">Data</div><div class="toggle-line" style="margin:8px 0 0"><span>Show test data</span><button class="switch-wrap" id="testBtn2" aria-label="Show test data"><span class="switch" role="switch" aria-checked="${S.showTest}"></span></button></div><p class="muted small" style="margin:4px 0 0">Rehearsal clients and bookings. Hidden from Clients, Today, Codes and Stats (and so from revenue) unless this is on.</p></div>`}
+    ${S.isClient && !S.preview && S.cdata && S.cdata.client ? `<div class="card" id="photosCard"><div class="section-label">Photos</div><p class="muted small" style="margin:8px 0 0">Photos you send Halima are private to you and Halima. They are kept for 90 days, then deleted automatically.</p><p class="small" id="photoCount" style="margin:10px 0 0"></p><button class="btn ghost block" id="delPhotos" type="button" style="margin-top:12px">Delete my photos</button></div><div class="card" id="cpushCard"><div class="section-label">Aftercare reminders</div><div id="cpushBody" class="muted small" style="margin-top:8px">Checking…</div></div>` : ''}
     <div class="card"><div class="section-label">Account</div>
-      <p style="margin:10px 0 14px">${esc((S.session && S.session.user && S.session.user.email) || ADMIN_EMAIL)}</p>
-      <button class="btn ghost block" id="signOutBtn">Sign out</button></div>
+      ${S.preview ? `<p style="margin:10px 0 14px">Previewing ${esc(firstName(S.preview.name))}'s view.</p><button class="btn ghost block" id="signOutBtn">Back to admin</button>` : `<p style="margin:10px 0 14px">${esc((S.session && S.session.user && S.session.user.email) || ADMIN_EMAIL)}</p>
+      <button class="btn ghost block" id="signOutBtn">Sign out</button>`}</div>
     <div class="card"><div class="section-label">About</div>
-      <p class="muted" style="margin:10px 0 0">${S.isClient ? 'haloe · your sessions and progress are private to you and are not stored on this device.' : 'haloe practitioner app · client details never leave your account and are not stored on this device.'}</p></div>`);
+      <p class="muted" style="margin:10px 0 0">${clientUI() ? 'haloe · your sessions and progress are private to you and are not stored on this device.' : 'haloe practitioner app · client details never leave your account and are not stored on this device.'}</p></div>`);
   document.querySelectorAll('[data-th]').forEach((b) => { b.onclick = () => { setTheme(b.dataset.th === 'system' ? null : b.dataset.th); render(); }; });
-  document.getElementById('signOutBtn').onclick = signOut;
+  document.getElementById('signOutBtn').onclick = S.preview ? exitPreview : signOut;
   const tb2 = document.getElementById('testBtn2'); if (tb2) tb2.onclick = () => setShowTest(!S.showTest);
-  if (S.cdata && S.cdata.client) { initClientPhotoCard(); initClientPushCard(); }
+  if (S.isClient && !S.preview && S.cdata && S.cdata.client) { initClientPhotoCard(); initClientPushCard(); }
 }
 
 
@@ -2664,6 +2744,64 @@ function viewClientSettings() {
 // words only — no condition names, no practitioner notes (session_notes is never queried or readable).
 const firstName = (n) => { const w = String(n || '').trim().split(/\s+/)[0] || ''; return w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : ''; };
 const placeOf = (b) => (b.location === 'clinic' ? 'Milton Hall, Deansgate' : b.location === 'virtual' ? 'Online (video call)' : 'Home visit' + (b.address ? ' · ' + b.address : ''));
+/* ---------- view as client (admin only; read only) ----------
+ * Builds the SAME data shape a signed-in client would load, from what the admin app already holds, and draws the real client
+ * screens. Only notes marked shared are included, exactly as the client's own login would return. Every client write is blocked
+ * (see the api guard below), and the client-only settings that read the signed-in user's own rows are not drawn. */
+function startPreview(key) {
+  const p = findPerson(key); if (!p || !S.admin || !S.data) return;
+  const c = p.client;
+  S.preview = { key, name: p.name || 'client' };
+  S.cdata = {
+    client: c, bookings: p.bookings.slice(), checkins: c ? checkinsOf(c) : [],
+    intakes: c ? S.data.intakes.filter((i) => i.client_id === c.id).map((i) => ({ id: i.id, created_at: i.created_at, package: i.package })) : [],
+    notes: c ? S.data.notes.filter((n) => n.client_id === c.id && n.shared_with_client).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))) : [],
+  };
+  S.fadeKey = null;
+  if (location.hash === '#/home') render(); else location.hash = '#/home';
+}
+function exitPreview() {
+  const key = S.preview && S.preview.key;
+  S.preview = null; S.cdata = null; S.fadeKey = null;
+  document.body.classList.remove('previewing');
+  if (location.hash === '#/brief/' + key) render(); else location.hash = '#/brief/' + key;
+}
+['acceptReschedule', 'uploadPhoto', 'removePhotos', 'addPhotoSubmission', 'deleteMyPhotos', 'alertPhoto'].forEach((n) => {
+  const f = api[n];
+  api[n] = function () { return S.preview ? Promise.reject(Object.assign(new Error('preview'), { net: 'preview' })) : f.apply(api, arguments); };
+});
+
+/* ---------- client Notes tab: only notes Halima has shared ---------- */
+function viewNotes() {
+  const list = (S.cdata.notes || []).slice().sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+  const when = (n) => new Date(n.created_at).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/London' });
+  const body = list.length
+    ? `<p class="muted" style="margin:0 4px 14px">Notes Halima has written for you after your sessions. They are private to you.</p>` +
+      list.map((n) => `<div class="card note-card"><div class="section-label">${esc(trimStr(n.title) || 'Session notes')}</div><div class="when muted small" style="margin:6px 0 10px">${esc(when(n))}</div><p style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere">${esc(n.note)}</p></div>`).join('')
+    : `<div class="card"><div class="section-label">Your notes</div><p class="muted" style="margin:10px 0 0">When Halima shares notes from a session, they will appear here.</p></div>`;
+  shell(`${pageHead('Notes')}${body}`);
+}
+
+/* ---------- CRM stages (derived from bookings, nothing stored) ---------- */
+const STAGES = [['new', 'New'], ['booked', 'Booked'], ['seen', 'Seen'], ['rebook', 'Due to rebook']];
+function stageOf(p, t) {
+  if (nextBookingDate(p)) return 'booked';
+  if (isDueToRebook(p, t)) return 'rebook';
+  if (lastSession(p, t)) return 'seen';
+  return 'new';
+}
+const valueOf = (p) => p.bookings.filter(confirmed).reduce((n, b) => n + (Number(b.amount_pence) || 0), 0);
+const whereOf = (p) => { const b = p.bookings.filter(confirmed)[0] || p.bookings[0]; return b ? (b.location === 'clinic' ? 'clinic' : b.location === 'virtual' ? 'virtual' : 'mobile') : ''; };
+const WHERE_LABEL = { clinic: 'Milton Hall', mobile: 'Home visit', virtual: 'Online' };
+function viewPipeline() {
+  const t = todayISO(), all = people();
+  const cols = STAGES.map(([k, label]) => {
+    const ps = all.filter((p) => stageOf(p, t) === k).sort((a, b) => (nextBookingDate(a) || lastSession(a, t) || '9').localeCompare(nextBookingDate(b) || lastSession(b, t) || '9'));
+    return `<section class="pl-col"><h2><span>${label}</span><i>${ps.length}</i></h2>${ps.map((p) => `<button class="pl-card" type="button" data-brief="${esc(p.key)}"><b>${esc(shortName(p.name))} ${testPill(p.client)}</b><span>${esc(clientMeta(p, t))}</span><span class="pl-foot">${WHERE_LABEL[whereOf(p)] || ''}${valueOf(p) ? ' · ' + money(valueOf(p)) : ''}</span></button>`).join('') || '<p class="pl-none">No one here</p>'}</section>`;
+  }).join('');
+  shell(`<div class="tile-home clients"><div class="th-titlerow"><h1>Pipeline</h1></div><div class="pl-board">${cols}</div></div>`);
+  document.querySelectorAll('[data-brief]').forEach((b) => { b.onclick = () => { location.hash = '#/brief/' + b.dataset.brief; }; });
+}
 function viewHome() {
   const d = S.cdata, t = todayISO();
   const who = d.client ? d.client.full_name : (d.bookings[0] && d.bookings[0].customer_name);
@@ -2710,7 +2848,7 @@ function viewHome() {
       try { await api.acceptReschedule(Number(btn.dataset.accept)); S.cdata = await api.loadClient(); render(); toastMsg('Thank you — your new time is confirmed.'); }
       catch (e) {
         btn.disabled = false; btn.textContent = 'Accept';
-        toastMsg(e.code === 'time_taken' ? 'That time has just been taken — please ask for a different time.' : e.code === 'not_pending' ? 'This has already been confirmed.' : e.net === 'offline' || navigator.onLine === false ? OFFLINE_MSG : "That didn't go through. Please try again in a minute, or message Halima.");
+        toastMsg(e.net === 'preview' ? friendly(e) : e.code === 'time_taken' ? 'That time has just been taken — please ask for a different time.' : e.code === 'not_pending' ? 'This has already been confirmed.' : e.net === 'offline' || navigator.onLine === false ? OFFLINE_MSG : "That didn't go through. Please try again in a minute, or message Halima.");
       }
     };
   });
@@ -2876,13 +3014,13 @@ function stateHTML(title, hint, btn) { return '<div class="state"><b>' + esc(tit
 document.addEventListener('click', (ev) => { if (ev.target && ev.target.id === 'retryLoad' && S.session) { S.error = null; const sess = S.session; S.session = null; enter(sess); } });
 
 /* ---------- router / boot ---------- */
-const ADMIN_VIEWS = ['today', 'inbox', 'clients', 'codes', 'stats', 'settings'], CLIENT_VIEWS = ['home', 'progress', 'book', 'aftercare', 'settings'];
+const ADMIN_VIEWS = ['today', 'inbox', 'clients', 'pipeline', 'codes', 'stats', 'settings'], CLIENT_VIEWS = ['home', 'progress', 'book', 'aftercare', 'notes', 'settings'];
 function route() {
-  const h = (location.hash || (S.isClient ? '#/home' : '#/today')).replace(/^#\//, '');
+  const h = (location.hash || (clientUI() ? '#/home' : '#/today')).replace(/^#\//, '');
   const [path, qs] = h.split('?');
   const parts = path.split('/');
-  if (!S.isClient && parts[0] === 'brief') { S.view = 'brief'; S.briefKey = parts[1] + '/' + parts[2]; S.briefBid = new URLSearchParams(qs || '').get('b'); }
-  else if (S.isClient) S.view = CLIENT_VIEWS.includes(parts[0]) ? parts[0] : 'home';
+  if (!clientUI() && parts[0] === 'brief') { S.view = 'brief'; S.briefKey = parts[1] + '/' + parts[2]; S.briefBid = new URLSearchParams(qs || '').get('b'); }
+  else if (clientUI()) S.view = CLIENT_VIEWS.includes(parts[0]) ? parts[0] : 'home';
   else S.view = ADMIN_VIEWS.includes(parts[0]) ? parts[0] : 'today';
   S.threadPhone = S.view === 'inbox' && parts[1] ? parts[1] : null;
   if (S.view !== 'brief') S.briefRetried = null;
@@ -2893,16 +3031,16 @@ function render() {
   if (S.needPassword) return viewCreatePassword();
   clearInterval(S.loginTimer);
   document.body.classList.remove('tilebg');
-  if (S.admin) {
+  if (S.admin && !S.preview) {
     if (!S.data) { shell(S.error ? loadErrorHTML() : loadingHTML(), false); return; }
     route();
     if (!S.voiceTried) { S.voiceTried = true; initVoice(); }
     clearInterval(S.inboxTimer);
     document.body.classList.toggle('ios-today', S.view === 'today');
-    document.body.classList.toggle('tilebg', ['today', 'inbox', 'clients', 'codes', 'stats', 'settings'].includes(S.view));
+    document.body.classList.toggle('tilebg', ['today', 'inbox', 'clients', 'pipeline', 'codes', 'stats', 'settings'].includes(S.view));
     if (S.view !== 'codes') { S.codeReady = null; S.quickSel = null; }
     window.scrollTo(0, 0);
-    ({ today: viewToday, inbox: viewInbox, clients: viewClients, codes: viewCodes, stats: viewStats, settings: viewSettings, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
+    ({ today: viewToday, inbox: viewInbox, clients: viewClients, pipeline: viewPipeline, codes: viewCodes, stats: viewStats, settings: viewSettings, brief: () => viewBrief(S.briefKey, S.briefBid) })[S.view]();
     return;
   }
   // client
@@ -2910,7 +3048,7 @@ function render() {
   route();
   if (!S.cdata.client && !S.cdata.bookings.length && S.view !== 'settings') return viewNoMatch();      // nothing of theirs on file yet (the gear → Settings still works)
   window.scrollTo(0, 0);
-  ({ home: viewHome, progress: viewProgress, book: viewBook, aftercare: viewAftercare, settings: viewSettings })[S.view]();
+  ({ home: viewHome, progress: viewProgress, book: viewBook, aftercare: viewAftercare, notes: viewNotes, settings: viewSettings })[S.view]();
 }
 async function refreshData() { await loadAdminData(); render(); }
 async function enter(session) {
@@ -2934,7 +3072,7 @@ async function enter(session) {
   try { S.cdata = await api.loadClient(); } catch (e) { S.error = friendly(e, 'load').replace("That didn't load.", "That didn't load just now."); }
   render();
 }
-window.addEventListener('hashchange', () => { if ((S.admin && S.data) || (S.isClient && S.cdata)) render(); });
+window.addEventListener('hashchange', () => { if ((S.admin && S.data) || (S.isClient && S.cdata) || S.preview) render(); });
 sb.auth.onAuthStateChange((ev, session) => {
   if (ev === 'SIGNED_OUT') enter(null);
   else if (ev === 'SIGNED_IN' || ev === 'INITIAL_SESSION') { if (!S.session || S.session.user.id !== (session && session.user.id)) setTimeout(() => enter(session), 0); }
