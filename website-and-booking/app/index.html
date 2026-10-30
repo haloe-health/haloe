@@ -830,6 +830,28 @@
     .crm-c { display: grid; gap: 2px; min-width: 0; } .crm-c i { font-style: normal; font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .crm-tr > span { font-size: 14px; min-width: 0; }
   }
+
+  /* ---- sign-in polish (30 Oct 2026): calm rounded fields, one clean focus ring, even 8/16/24 rhythm ---- */
+  .arrival { padding-left: 24px; padding-right: 24px; }
+  .arr-mark { width: 56px; height: 56px; }
+  .arr-word { font-size: 64px; margin-top: 20px; }
+  .arr-tag { font-size: 12px; letter-spacing: .24em; padding-left: .24em; margin-top: 12px; }
+  .arr-lower { padding-top: 40px; }
+  .arr-h { font-size: 28px; margin: 0 0 8px; }
+  .arr-sub { margin: 0 0 28px; }
+  .arrival .arr-label { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 8px 4px; }
+  .arrival .arr-input { height: 56px; padding: 0 18px; border: 1.5px solid color-mix(in srgb, var(--ink) 16%, transparent); border-radius: 16px; background: var(--card); box-shadow: none; transition: border-color .15s ease, box-shadow .15s ease; }
+  .arrival .arr-input:focus, .arrival .arr-input:focus-visible { outline: none; border-color: var(--gold-deep); box-shadow: 0 0 0 4px color-mix(in srgb, var(--gold) 30%, transparent); }
+  .arrival .arr-input:-webkit-autofill, .arrival .arr-input:-webkit-autofill:focus { -webkit-box-shadow: 0 0 0 100px var(--card) inset; box-shadow: 0 0 0 100px var(--card) inset; border-radius: 16px; }
+  .arrival .arr-field .arr-input { padding-right: 56px; }
+  .arrival .arr-eye { right: 6px; top: 6px; }
+  .arrival .arr-code { padding: 0; letter-spacing: .4em; text-indent: .4em; }
+  .arrival .arr-label[style] { margin-top: 20px !important; }
+  .arr-btn { margin-top: 28px; }
+  .arr-err { min-height: 22px; margin: 12px 4px 0; text-align: center; }
+  .arr-textbtn { margin-top: 8px; font-size: 15px; }
+  .arr-textbtn + .arr-textbtn { margin-top: 0; }
+  .arr-foot { margin-top: 24px; }
 </style>
 </head>
 <body>
